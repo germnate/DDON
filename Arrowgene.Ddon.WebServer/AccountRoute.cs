@@ -25,6 +25,7 @@ namespace Arrowgene.Ddon.WebServer
             public string Action { get; set; }
             public string Account { get; set; }
             public string Password { get; set; }
+            public string PasswordToken { get; set; }
         }
 
         private class AccountResponse
@@ -127,6 +128,17 @@ namespace Arrowgene.Ddon.WebServer
 
                     res.Message = "Account created";
                     break;
+
+                case "reset":
+                    account = ResetPassword(req.Account, req.Password, req.PasswordToken);
+                    if(account == null)
+                    {
+                        res.Error = "Invalid token or password";
+                        break;
+                    }
+
+                    res.Message = "Password changed";
+                    break;
             }
 
             WebResponse response = new WebResponse();
@@ -146,6 +158,27 @@ namespace Arrowgene.Ddon.WebServer
 
             string hash = PasswordHash.CreateHash(password);
             account = _database.CreateAccount(name, mail, hash);
+            return account;
+        }
+
+        private Account ResetPassword(string name, string password, string passwordToken)
+        {
+            Account account = _database.SelectAccountByName(name);
+            if (account == null || account.PasswordToken != passwordToken)
+            {
+                Logger.Error($"{name} - ResetPassword: invalid token");
+                return null;
+            }
+
+            if (password == "" || password == null)
+            {
+                Logger.Error($"{name} - ResetPassword: invalid password");
+                return null;
+            }
+
+            account.PasswordToken = PasswordHash.CreateHash(passwordToken).Substring(0, 20);
+            account.Hash = PasswordHash.CreateHash(password);
+            _database.UpdateAccount(account);
             return account;
         }
 
