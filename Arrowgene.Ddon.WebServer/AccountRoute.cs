@@ -231,7 +231,7 @@ namespace Arrowgene.Ddon.WebServer
                 return null;
             }
 
-            account.LoginToken = GameToken.GenerateLoginToken();
+            account.LoginToken = GameToken.GenerateToken();
             account.LoginTokenCreated = DateTime.UtcNow;
             _database.UpdateAccount(account);
             return account.LoginToken;
