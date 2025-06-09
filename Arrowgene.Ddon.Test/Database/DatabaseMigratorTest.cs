@@ -286,6 +286,7 @@ namespace Arrowgene.Ddon.Test.Database
         public Account SelectAccountById(int accountId) { return new Account(); }
         public Account SelectAccountByLoginToken(string loginToken) { return new Account(); }
         public Account SelectAccountByName(string accountName) { return new Account(); }
+        public Account SelectAccountByEmail(string email) { return new Account(); }
         public List<BazaarExhibition> SelectActiveBazaarExhibitionsByItemIdExcludingOwn(uint itemId, uint excludedCharacterId, DbConnection? connectionIn = null) { return new List<BazaarExhibition>(); }
         public List<BazaarExhibition> SelectActiveBazaarExhibitionsByItemIdsExcludingOwn(List<uint> itemIds, uint excludedCharacterId, DbConnection? connectionIn = null) { return new List<BazaarExhibition>(); }
         public List<AbilityId> SelectAllUnlockedSecretAbilities(uint commonId) { return new List<AbilityId>(); }

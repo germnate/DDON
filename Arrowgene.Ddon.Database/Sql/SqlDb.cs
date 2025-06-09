@@ -297,6 +297,7 @@ public abstract class SqlDb : IDatabase
     public abstract Account? CreateAccount(string name, string mail, string hash);
     public abstract Account SelectAccountById(int accountId);
     public abstract Account? SelectAccountByName(string accountName);
+    public abstract Account? SelectAccountByEmail(string email);
     public abstract Account? SelectAccountByLoginToken(string loginToken);
     public abstract bool UpdateAccount(Account account);
     public abstract bool DeleteAccount(int accountId);

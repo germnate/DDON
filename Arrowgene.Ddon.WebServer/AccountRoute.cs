@@ -24,6 +24,8 @@ namespace Arrowgene.Ddon.WebServer
         {
             public string Action { get; set; }
             public string Account { get; set; }
+            public string Email { get; set; }
+            public string EmailToken { get; set; }
             public string Password { get; set; }
             public string PasswordToken { get; set; }
         }
@@ -41,12 +43,14 @@ namespace Arrowgene.Ddon.WebServer
             public string Message { get; set; }
             public string Username { get; set; }
             public string Password { get; set; }
+            public string Email { get; set; }
 
-            public AccountVerification(string username, string password)
+            public AccountVerification(string username, string password, string email)
             {
                 Username = username;
                 Password = password;
-
+                Email = email;
+                
                 // Very simple data checks on the parameters.
 
                 if (Username.Trim().Length == 0)
@@ -78,6 +82,29 @@ namespace Arrowgene.Ddon.WebServer
                     Message = "Password cannot contain spaces";
                     return;
                 }
+                
+                if (Email.Trim().Length == 0)
+                {
+                    Error = true;
+                    Message = "E-mail cannot be empty";
+                    return;
+                }
+
+                if (Regex.IsMatch(Email, @"\s"))
+                {
+                    Error = true;
+                    Message = "E-mail cannot contain spaces";
+                    return;
+                }
+
+                if (!Regex.IsMatch(Email, @"^[^@]+@[^@]+$"))
+                {
+                    Error = true;
+                    Message = "Invalid e-mail";
+                    return;
+                }
+
+
             }
         }
 
@@ -95,7 +122,7 @@ namespace Arrowgene.Ddon.WebServer
             }
 
             AccountResponse res = new AccountResponse();
-            AccountVerification accountCheck = new(req.Account, req.Password);
+            AccountVerification accountCheck = new(req.Account, req.Password, req.Email);
 
             switch (req.Action)
             {
@@ -119,10 +146,10 @@ namespace Arrowgene.Ddon.WebServer
                         break;
                     }
 
-                    Account account = CreateAccount(req.Account, $"{req.Account}@dd.on", req.Password);
+                    Account account = CreateAccount(req.Account, req.Email, req.Password);
                     if (account == null)
                     {
-                        res.Error = "Account already exists";
+                        res.Error = "Account or e-mail already in use";
                         break;
                     }
 
@@ -153,6 +180,13 @@ namespace Arrowgene.Ddon.WebServer
             if (account != null)
             {
                 Logger.Error($"{name} - CreateAccount: account already taken");
+                return null;
+            }
+
+            Account email = _database.SelectAccountByEmail(mail);
+            if (email != null)
+            {
+                Logger.Error($"{mail} - CreateAccount: email already taken");
                 return null;
             }
 
