@@ -31,9 +31,9 @@ public partial class DdonSqlDb : SqlDb
         account.Hash = hash;
         account.State = AccountStateType.User;
         account.Created = DateTime.UtcNow;
-        account.MailToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(mail));
-        account.PasswordToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(name));
-        account.LoginToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(name));
+        account.MailToken = null;
+        account.PasswordToken = null;
+        account.LoginToken = null;
         account.LoginTokenCreated = DateTime.UtcNow;
         account.MailVerifiedAt = DateTime.SpecifyKind(DateTime.MinValue, DateTimeKind.Utc);
         account.LastAuthentication = DateTime.UtcNow;
