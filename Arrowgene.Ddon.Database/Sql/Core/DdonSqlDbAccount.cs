@@ -2,6 +2,7 @@ using System;
 using System.Data.Common;
 using System.Text;
 using Arrowgene.Ddon.Database.Model;
+using Arrowgene.Ddon.Shared.Model;
 
 namespace Arrowgene.Ddon.Database.Sql.Core;
 
@@ -31,7 +32,7 @@ public partial class DdonSqlDb : SqlDb
         account.Hash = hash;
         account.State = AccountStateType.User;
         account.Created = DateTime.UtcNow;
-        account.MailToken = null;
+        account.MailToken = GameToken.GenerateToken();
         account.PasswordToken = null;
         account.LoginToken = null;
         account.LoginTokenCreated = DateTime.UtcNow;
