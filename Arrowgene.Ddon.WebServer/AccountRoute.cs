@@ -128,7 +128,7 @@ namespace Arrowgene.Ddon.WebServer
             {
                 case "login":
 
-                    string token = CreateToken(req.Account, req.Password);
+                    string token = CreateLoginToken(req.Account, req.Password);
                     if (token == null)
                     {
                         res.Error = "Account or password wrong";
@@ -157,8 +157,15 @@ namespace Arrowgene.Ddon.WebServer
                     break;
 
                 case "reset":
+                    account = CreatePasswordToken(req.Email);
+                    if (account != null && (req.PasswordToken == null || req.PasswordToken == ""))
+                    {
+                        res.Message = "Token generated";
+                        break;
+                    }
+
                     account = ResetPassword(req.Account, req.Password, req.PasswordToken);
-                    if(account == null)
+                    if (account == null)
                     {
                         res.Error = "Invalid token or password";
                         break;
@@ -166,6 +173,7 @@ namespace Arrowgene.Ddon.WebServer
 
                     res.Message = "Password changed";
                     break;
+
             }
 
             WebResponse response = new WebResponse();
@@ -195,28 +203,7 @@ namespace Arrowgene.Ddon.WebServer
             return account;
         }
 
-        private Account ResetPassword(string name, string password, string passwordToken)
-        {
-            Account account = _database.SelectAccountByName(name);
-            if (account == null || account.PasswordToken != passwordToken)
-            {
-                Logger.Error($"{name} - ResetPassword: invalid token");
-                return null;
-            }
-
-            if (password == "" || password == null)
-            {
-                Logger.Error($"{name} - ResetPassword: invalid password");
-                return null;
-            }
-
-            account.PasswordToken = PasswordHash.CreateHash(passwordToken).Substring(0, 20);
-            account.Hash = PasswordHash.CreateHash(password);
-            _database.UpdateAccount(account);
-            return account;
-        }
-
-        private string CreateToken(string name, string password)
+        private string CreateLoginToken(string name, string password)
         {
             Account account = _database.SelectAccountByName(name);
             if (account == null)
@@ -235,6 +222,46 @@ namespace Arrowgene.Ddon.WebServer
             account.LoginTokenCreated = DateTime.UtcNow;
             _database.UpdateAccount(account);
             return account.LoginToken;
+        }
+
+        private Account ResetPassword(string name, string password, string passwordToken)
+        {
+            Account account = _database.SelectAccountByName(name);
+            if (account == null || account.PasswordToken != passwordToken || account.MailVerifiedAt.Value.AddMinutes(10) < DateTime.UtcNow)
+            {
+                Logger.Error($"{name} - ResetPassword: invalid token");
+                account.PasswordToken = null;
+                _database.UpdateAccount(account);
+                return null;
+            }
+
+            if (password == "" || password == null)
+            {
+                Logger.Error($"{name} - ResetPassword: invalid password");
+                account.PasswordToken = null;
+                _database.UpdateAccount(account);
+                return null;
+            }
+
+            account.PasswordToken = null;
+            account.Hash = PasswordHash.CreateHash(password);
+            _database.UpdateAccount(account);
+            return account;
+        }
+
+        private Account CreatePasswordToken(string email)
+        {
+            Account? account = _database.SelectAccountByEmail(email);
+            if (account == null || (account.PasswordToken != null && account.MailVerifiedAt.Value.AddMinutes(10) > DateTime.UtcNow))
+            {
+                Logger.Info($"{email} - CreatePasswordToken: A valid token exists");
+                return null;
+            }
+
+            account.PasswordToken = GameToken.GenerateToken();
+            account.MailVerifiedAt = DateTime.UtcNow;
+            _database.UpdateAccount(account);
+            return account;
         }
     }
 }
