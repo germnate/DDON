@@ -1,6 +1,7 @@
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Scripting;
 using Arrowgene.Logging;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Arrowgene.Ddon.GameServer.Scripting
@@ -27,7 +28,9 @@ namespace Arrowgene.Ddon.GameServer.Scripting
         public AddendumModule AddendumModule { get; private set; } = new AddendumModule();
         public MonsterCautionSpotModule MonsterCautionSpotModule { get; private set; } = new MonsterCautionSpotModule();
         public InstanceEnemyPropertyGeneratorModule InstanceEnemyPropertyGeneratorModule { get; private set; } = new InstanceEnemyPropertyGeneratorModule();
-        public SkillAugmentationModule SkillAugmentationModule { get; private set; } = new SkillAugmentationModule();
+        public JobOrbTreeModule SkillAugmentationModule { get; private set; } = new JobOrbTreeModule("job_orb_tree/skill_augmentation");
+        public JobOrbTreeModule SpecialSkillAugmentationModule { get; private set; } = new JobOrbTreeModule("job_orb_tree/special_skill_augmentation");
+        public JobOrbTreeSpecialConditionModule JobOrbSpecialConditionModule { get; private set; } = new();
 
         public JobEmblemStatModule JobEmblemStatModule { get; private set; } = new JobEmblemStatModule();
 
@@ -49,19 +52,28 @@ namespace Arrowgene.Ddon.GameServer.Scripting
             AddModule(InstanceEnemyPropertyGeneratorModule);
             AddModule(SkillAugmentationModule);
             AddModule(JobEmblemStatModule);
-
-            // World Manage Quests have some dependency on Caution Spots, so load caution spots first
-            // to prevent unecssary quest relod on server load
+            AddModule(SpecialSkillAugmentationModule);
+            AddModule(JobOrbSpecialConditionModule);
             AddModule(MonsterCautionSpotModule);
-            AddModule(QuestModule);
-
-            // This module should run last since it applies fine grained modifications to other modules
-            AddModule(AddendumModule);
         }
 
         public override void Initialize()
         {
             base.Initialize(Globals);
+        }
+
+        protected override void CompileScripts(List<ScriptModule> modules = null)
+        {
+            base.CompileScripts(modules);
+
+            // World Manage Quests have a dependency on Caution Spots, so load quests after
+            // caution spots
+            base.CompileScripts([QuestModule]);
+            AddModule(QuestModule);
+
+            // This module should run last since it applies fine grained modifications to other modules
+            base.CompileScripts([AddendumModule]);
+            AddModule(AddendumModule);
         }
 
         protected override void OnChanged(object sender, FileSystemEventArgs e)

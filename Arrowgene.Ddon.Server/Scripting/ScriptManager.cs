@@ -7,8 +7,10 @@ using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Scripting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -56,12 +58,14 @@ namespace Arrowgene.Ddon.Shared.Scripting
         /// the compiled script as a dll so the debugger can find the 
         /// symbols and source files.
         /// </summary>
+        /// <param name="module">The script module object</param>
         /// <param name="script">The compiled script object</param>
         /// <param name="path">Path to the main script being executed</param>
-        private void EmitScriptsAsDllForDebug(Script script, string path)
+        private void EmitScriptsAsDllForDebug(ScriptModule module, Script script, string path)
         {
             // Put the debug assemblies in <asset_path>/net9.0/Files
-            var assembliesPath = Path.Combine(ScriptsRoot, "../../script_assemblies");
+            var assembliesPath = Path.Combine(Path.Combine(ScriptsRoot, "../../script_assemblies"), module.ModuleRoot);
+            assembliesPath = Path.GetFullPath(assembliesPath);
             if (!Directory.Exists(assembliesPath))
             {
                 Directory.CreateDirectory(assembliesPath);
@@ -117,7 +121,7 @@ namespace Arrowgene.Ddon.Shared.Scripting
                 );
 
 #if DEBUG
-                EmitScriptsAsDllForDebug(script, path);
+                EmitScriptsAsDllForDebug(module, script, path);
 #endif
 
                 var result = await script.RunAsync(globals: GlobalVariables);
@@ -164,10 +168,10 @@ namespace Arrowgene.Ddon.Shared.Scripting
             return false;
         }
 
-        protected void CompileScripts()
+        protected virtual void CompileScripts(List<ScriptModule> modules = null)
         {
-            Dictionary<string, ScriptModule>.ValueCollection scriptModulesValues = ScriptModules.Values;
-            Parallel.ForEach(scriptModulesValues, module =>
+            var scriptModules = modules ?? ScriptModules.Values.ToList();
+            Parallel.ForEach(scriptModules, module =>
             {
                 var path = Path.Combine(ScriptsRoot, module.ModuleRoot);
                 if (!module.IsEnabled)

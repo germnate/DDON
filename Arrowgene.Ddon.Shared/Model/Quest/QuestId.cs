@@ -219,6 +219,9 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         ArmsWithThePowerOfTheDragon1 = 61000001,
         ArmsWithThePowerOfTheDragon2 = 61000002,
 
+        HerosRestRathniteRegion = 60300020,
+        HerosRestFeryanaRegion = 60300021,
+
         SummerBeachFestival1 = 60200033,
         SummerBeachFestival2 = 60200034,
         SummerBeachFestivalDecorations = 60200035,

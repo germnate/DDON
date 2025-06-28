@@ -137,7 +137,7 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                 return false;
             }
 
-                assetData.OverrideEnemySpawn = (assetData.QuestType == QuestType.Main || assetData.QuestType == QuestType.ExtremeMission);
+            assetData.OverrideEnemySpawn = (assetData.QuestType == QuestType.Main || assetData.QuestType == QuestType.ExtremeMission);
             if (jQuest.TryGetProperty("override_enemy_spawn", out JsonElement jOverrideEnemySpawn))
             {
                 assetData.OverrideEnemySpawn = jOverrideEnemySpawn.GetBoolean();
@@ -960,14 +960,14 @@ namespace Arrowgene.Ddon.Shared.AssetReader
 
             if (!jMissionParams.TryGetProperty("group", out JsonElement jGroup))
             {
-                Logger.Error($"Missing required member 'group' from ExtremeMission config.");
+                Logger.Error($"Missing required member 'group' from Extreme Mission config.");
                 return false;
             }
             assetData.MissionParams.Group = jGroup.GetUInt32();
 
             if (!jMissionParams.TryGetProperty("phase_groups", out JsonElement jPhaseGroups))
             {
-                Logger.Error($"Missing required member 'phase_groups' from ExtremeMission config.");
+                Logger.Error($"Missing required member 'phase_groups' from Extreme Mission config.");
                 return false;
             }
 
