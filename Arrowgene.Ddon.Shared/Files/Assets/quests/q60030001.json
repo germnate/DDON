@@ -12,6 +12,7 @@
     },
     "area_id": "MysreeForest",
     "adventure_guide_category": "AreaTrialOrMission",
+    "override_enemy_spawn": true,
     "order_conditions": [],
     "rewards": [
         {
@@ -97,6 +98,14 @@
                     "exp_scheme": "automatic"
                 }
             ]
+        },
+        {
+            "stage_id": {
+                "id": 79,
+                "group_id": 2
+            },
+            "comment": "This blocks the Sphinx in the world quest q20055005 from spawning",
+            "enemies": []
         }
     ],
     "blocks": [

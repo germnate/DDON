@@ -34,7 +34,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         private static readonly Dictionary<uint, uint> craftRankLimits = new()
         {
-            { 8, 16 }, { 16, 21 }, { 21, 26 }, { 26, 31 }, { 31, 36 }, { 36, 41 }, { 41, 46 }, { 46, 51 }, { 51, 56 }, { 56, 61 }, { 61, 66 }, { 66, 71 }
+            { 8, 16 }, { 16, 21 }, { 21, 26 }, { 26, 31 }, { 31, 36 }, { 36, 41 }, { 41, 46 }, { 46, 51 }, { 51, 56 }, { 56, 61 }, { 61, 66 }, { 66, 71 }, { 71, 76 }
         };
 
         private const int GreatSuccessOddsDefault = 10;
@@ -388,7 +388,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public static bool CanPawnRankUp(Pawn pawn)
         {
-            return pawn.CraftData.CraftExp >= craftRankExpLimit[(int)pawn.CraftData.CraftRank] && pawn.CraftData.CraftRank < pawn.CraftData.CraftRankLimit;
+            return pawn.CraftData.CraftExp >= craftRankExpLimit[Math.Min((int)pawn.CraftData.CraftRank, craftRankExpLimit.Count - 1)] && pawn.CraftData.CraftRank < pawn.CraftData.CraftRankLimit;
         }
 
         public static uint CalculatePawnRankUp(Pawn pawn)
@@ -397,7 +397,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
             if (CanPawnRankUp(pawn))
             {
-                for (int i = (int)pawn.CraftData.CraftRank; i < pawn.CraftData.CraftRankLimit; i++)
+                for (int i = (int)pawn.CraftData.CraftRank; i < Math.Min(pawn.CraftData.CraftRankLimit, craftRankExpLimit.Count); i++)
                 {
                     if (pawn.CraftData.CraftExp >= craftRankExpLimit[i])
                     {
@@ -433,7 +433,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 rankUpNtc.CraftRank = leadPawn.CraftData.CraftRank;
                 rankUpNtc.TotalCraftPoint = leadPawn.CraftData.CraftPoint;
                 
-                leadPawn.CraftData.CraftExp = Math.Clamp(leadPawn.CraftData.CraftExp, 0, craftRankExpLimit[(int)leadPawn.CraftData.CraftRankLimit-1]);
+                leadPawn.CraftData.CraftExp = Math.Clamp(leadPawn.CraftData.CraftExp, 0, craftRankExpLimit[Math.Min((int)leadPawn.CraftData.CraftRankLimit-1, craftRankExpLimit.Count - 1)]);
             }
 
             return rankUpNtc;
@@ -441,7 +441,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public static bool CanPawnExpUp(Pawn pawn)
         {
-            return pawn.CraftData.CraftRank < pawn.CraftData.CraftRankLimit;
+            return pawn.CraftData.CraftRank < pawn.CraftData.CraftRankLimit && pawn.CraftData.CraftRank < craftRankExpLimit.Count;
         }
 
         public static S2CCraftCraftExpUpNtc HandlePawnExpUpNtc(GameClient client, Pawn leadPawn, uint exp, double BonusExpMultiplier)
@@ -474,8 +474,8 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 expNtc.TotalExp = (uint)totalAddedExp; // presumably this should be pawns literal TotalEXP, but my testing had me level up several times.
                 
                 leadPawn.CraftData.CraftExp += expNtc.TotalExp;
-                
-                leadPawn.CraftData.CraftExp = Math.Clamp(leadPawn.CraftData.CraftExp, 0, craftRankExpLimit[(int)leadPawn.CraftData.CraftRankLimit]);
+
+                leadPawn.CraftData.CraftExp = Math.Clamp(leadPawn.CraftData.CraftExp, 0, craftRankExpLimit[Math.Min((int)leadPawn.CraftData.CraftRankLimit, craftRankExpLimit.Count - 1)]);
             }
 
             return expNtc;

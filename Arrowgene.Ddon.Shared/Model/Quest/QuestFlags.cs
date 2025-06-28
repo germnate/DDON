@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
 
 namespace Arrowgene.Ddon.Shared.Model.Quest
@@ -468,6 +467,16 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             /// Unlocks "Valtable Hall" in Stage.HollowofBeginnings0 when set
             /// </summary>
             public static QuestFlagInfo ValtableHall { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(2183, QuestId.Q70023001);
+
+            /// <summary>
+            /// Spawns Spirit Dragon in Hallow of Beginnings
+            /// </summary>
+            public static QuestFlagInfo SpiritDragon { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(4515, QuestId.Q70023001, Stage.HollowofBeginnings1);
+
+            /// <summary>
+            /// Spawns Mordred in Hallow of Beginnings
+            /// </summary>
+            public static QuestFlagInfo Mordred { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(4973, QuestId.Q70023001, Stage.HollowofBeginnings1);
         }
 
         public static class ValtableHall
@@ -578,6 +587,12 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             /// Opens the door to Epitaph Road: Rathnite Foothills
             /// </summary>
             public static QuestFlagInfo EpitaphRoadRathniteFoothills { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(3518, QuestId.Q70030001);
+
+            /// <summary>
+            /// Spawns Quintus in Fort Thines infront of the seat where Nedo sits.
+            /// @note Only appears to be set when the party is first created and doesn't change afterwards.
+            /// </summary>
+            public static QuestFlagInfo Quintus { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(8166, QuestId.Q70033001, StageInfo);
         }
 
         public static class RathniteFoothillsLakeside
@@ -608,6 +623,96 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             /// Opens the front gate to Bertha's Bandit Group Hideout
             /// </summary>
             public static QuestFlagInfo GateToBandGroupHide { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(2814, QuestId.Q70030001);
+        }
+
+        public static class BerthasBanditGroupHideout
+        {
+            private static StageInfo StageInfo = Stage.BerthasBanditGroupHideout;
+
+            /// <summary>
+            /// When set spawns the NPC Bertha
+            /// </summary>
+            public static QuestFlagInfo Bertha { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(5588, QuestId.Q70030001, StageInfo);
+        }
+
+        public static class FeryanaWilderness
+        {
+            private static StageInfo StageInfo = Stage.FeryanaWilderness;
+
+            /// <summary>
+            /// Opens the door to "Dark Path to the Secret Spring" dungeon
+            /// </summary>
+            public static QuestFlagInfo DarkPathToTheSecretSpring { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(3111, QuestId.Q70031001);
+
+            /// <summary>
+            /// Opens gate next to "West Feryana Wilderness" warp point
+            /// </summary>
+            public static QuestFlagInfo WestFeryanaGate { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(2930, QuestId.Q70030001);
+        }
+
+        public static class MephiteTravelersInn
+        {
+            private static StageInfo StageInfo = Stage.MephiteTravelersInn;
+
+            /// <summary>
+            /// Spawns the area master Nayajiku (Nazik)
+            /// </summary>
+            public static QuestFlagInfo Nayajiku { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(5557, QuestId.Q70030001, StageInfo);
+        }
+
+        public static class BeforetheSecretSpring
+        {
+            private static StageInfo StageInfo = Stage.BeforetheSecretSpring;
+            
+            /// <summary>
+            /// Spawns the gate for the key monster enemy.
+            /// </summary>
+            public static QuestFlagInfo KeyMonsterGate { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(7206, QuestId.Q70030001, StageInfo);
+
+            /// <summary>
+            /// Makes the dragon spring present on the map
+            /// </summary>
+            public static QuestFlagInfo DragonSpringPresent { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(5552, QuestId.Q70030001, StageInfo);
+
+            /// <summary>
+            /// Turns the dragon spring on
+            /// </summary>
+            public static QuestFlagInfo DragonSpringOn { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(5553, QuestId.Q70031001, StageInfo);
+        }
+
+        public static class RoyalFamilysSecretPath
+        {
+            private static StageInfo StageInfo = Stage.RoyalFamilysSecretPath;
+
+            /// <summary>
+            /// Enables warp To Lookout Castle (st0450)
+            /// </summary>
+            public static QuestFlagInfo LookoutCastleDoor0 { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(6194, QuestId.Q70031001, StageInfo);
+
+            /// <summary>
+            /// Enables warp To Lookout Castle (st0451)
+            /// </summary>
+            public static QuestFlagInfo LookoutCastleDoor1 { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(6195, QuestId.Q70031001, StageInfo);
+
+            /// <summary>
+            /// Activates the door to Lookout castle
+            /// </summary>
+            public static QuestFlagInfo ActivateLookoutCastleWarp { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(2956, QuestId.Q70031001);
+        }
+
+        public static class LookoutCastle
+        {
+            private static StageInfo StageInfo = Stage.LookoutCastle1;
+
+            /// <summary>
+            /// Spawns Nedos Table, chair and seats
+            /// </summary>
+            public static QuestFlagInfo NedosFurniture { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(6377, QuestId.Q70031001, StageInfo);
+
+            /// <summary>
+            /// Opens the gate to Epitaph Road: Feryana Wilderness
+            /// </summary>
+            public static QuestFlagInfo EpitaphRoadFeryanaWilderness { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(3520, QuestId.Q70031001);
         }
 
         public static class NpcFunctions
@@ -735,6 +840,11 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             /// Unlocks the NPC option "Area Information" for the NPC Endale in Rathnite Foothills
             /// </summary>
             public static QuestFlagInfo RathniteFoothillsAreaInfo { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(3240, QuestId.Q70030001);
+
+            /// <summary>
+            /// Unlocks the NPC option "Area Information" for the NPC Nayajiku in Feryana Wilderness
+            /// </summary>
+            public static QuestFlagInfo FeryanaWildernessAreaInfo { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(3241, QuestId.Q70030001);
 
             /// <summary>
             /// Adds the NPC option "Extreme Mission" for the NPC Seneka

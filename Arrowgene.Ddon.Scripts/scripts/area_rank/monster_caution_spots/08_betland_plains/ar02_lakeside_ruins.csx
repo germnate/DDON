@@ -20,6 +20,7 @@ public class MonsterSpotInfo : IMonsterSpotInfo
         var enemies = new List<InstancedEnemy>()
         {
             LibDdon.Enemy.CreateAuto(EnemyId.Colossus0, 39, 0)
+                .SetIsBoss(true)
                 .SetNamedEnemyParams(NamedParamId.GowanTheColossus),
         };
 
