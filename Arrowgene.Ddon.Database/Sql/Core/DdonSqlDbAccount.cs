@@ -124,8 +124,8 @@ public partial class DdonSqlDb : SqlDb
             AddParameter(command, "@mail", account.Mail);
             AddParameter(command, "@mail_verified", account.MailVerified);
             AddParameter(command, "@mail_verified_at", account.MailVerifiedAt);
-            AddParameter(command, "@mail_token", account.MailToken);
-            AddParameter(command, "@password_token", account.PasswordToken);
+            AddParameter(command, "@mail_token", string.IsNullOrWhiteSpace(account.MailToken) ? "" : account.MailToken);
+            AddParameter(command, "@password_token", string.IsNullOrWhiteSpace(account.PasswordToken) ? "" : account.PasswordToken);
             AddParameter(command, "@login_token", account.LoginToken);
             AddParameter(command, "@login_token_created", account.LoginTokenCreated);
             AddParameterEnumInt32(command, "@state", account.State);
