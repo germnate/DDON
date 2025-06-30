@@ -138,6 +138,7 @@ namespace Arrowgene.Ddon.WebServer
                     res.Message = "Login Success";
                     res.Token = token;
                     break;
+
                 case "create":
 
                     if (accountCheck.Error)
@@ -158,9 +159,14 @@ namespace Arrowgene.Ddon.WebServer
 
                 case "reset":
                     account = CreatePasswordToken(req.Email);
-                    if (account != null && (req.PasswordToken == null || req.PasswordToken == ""))
+                    if (account != null && string.IsNullOrEmpty(req.PasswordToken))
                     {
                         res.Message = "Token generated";
+                        break;
+                    }
+                    else if (account == null && !string.IsNullOrEmpty(req.Email))
+                    {
+                        res.Error = "E-mail not found";
                         break;
                     }
 
@@ -227,7 +233,7 @@ namespace Arrowgene.Ddon.WebServer
         private Account ResetPassword(string name, string password, string passwordToken)
         {
             Account account = _database.SelectAccountByName(name);
-            if (account == null || account.PasswordToken != passwordToken || account.MailVerifiedAt.Value.AddMinutes(10) < DateTime.UtcNow)
+            if (account == null && account.PasswordToken != passwordToken && account.MailVerified)
             {
                 Logger.Error($"{name} - ResetPassword: invalid token");
                 account.PasswordToken = null;
@@ -235,7 +241,7 @@ namespace Arrowgene.Ddon.WebServer
                 return null;
             }
 
-            if (password == "" || password == null)
+            if (string.IsNullOrEmpty(password))
             {
                 Logger.Error($"{name} - ResetPassword: invalid password");
                 account.PasswordToken = null;
@@ -252,7 +258,7 @@ namespace Arrowgene.Ddon.WebServer
         private Account CreatePasswordToken(string email)
         {
             Account? account = _database.SelectAccountByEmail(email);
-            if (account == null || (account.PasswordToken != null && account.MailVerifiedAt.Value.AddMinutes(10) > DateTime.UtcNow))
+            if (account == null || (!string.IsNullOrEmpty(account.PasswordToken) && account.MailVerified))
             {
                 Logger.Info($"{email} - CreatePasswordToken: A valid token exists");
                 return null;
