@@ -97,14 +97,12 @@ namespace Arrowgene.Ddon.WebServer
                     return;
                 }
 
-                if (!Regex.IsMatch(Email, @"^[^@]+@[^@]+$"))
+                if (!Regex.IsMatch(Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
                 {
                     Error = true;
                     Message = "Invalid e-mail";
                     return;
                 }
-
-
             }
         }
 
