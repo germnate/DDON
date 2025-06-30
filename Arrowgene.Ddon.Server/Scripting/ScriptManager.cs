@@ -119,11 +119,14 @@ namespace Arrowgene.Ddon.Shared.Scripting
                 Logger.Info(path);
 
 #if DEBUG
-                using var stream = File.OpenRead(path);
-                var hash = stream.GetHash<MD5>();
-                if (await RestoreScriptFromStoredDll(module, path, hash))
+                string hash = "";
+                using (FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
-                    return;
+                    hash = stream.GetHash<MD5>();
+                    if (await RestoreScriptFromStoredDll(module, path, hash))
+                    {
+                        return;
+                    }
                 }
 #endif
 
