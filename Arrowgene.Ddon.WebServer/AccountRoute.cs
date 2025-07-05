@@ -83,7 +83,7 @@ namespace Arrowgene.Ddon.WebServer
                     return;
                 }
                 
-                if (Email.Trim().Length == 0)
+                if (Email == null || Email.Trim().Length == 0)
                 {
                     Error = true;
                     Message = "E-mail cannot be empty";
