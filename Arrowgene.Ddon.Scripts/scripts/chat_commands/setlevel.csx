@@ -123,7 +123,7 @@ public class ChatCommand : IChatCommand
                 lvlNtc.Level = targetLevel;
                 lvlNtc.AddJobPoint = 0;
                 lvlNtc.TotalJobPoint = targetJobData.JobPoint;
-                GameStructure.CDataCharacterLevelParam(lvlNtc.CharacterLevelParam, targetCharacter);
+                lvlNtc.CharacterLevelParam = targetCharacter.CDataCharacterLevelParam;
                 client.Send(lvlNtc);
             }
             else if (targetCharacter is Pawn)
@@ -134,7 +134,7 @@ public class ChatCommand : IChatCommand
                 lvlNtc.Level = targetLevel;
                 lvlNtc.AddJobPoint = 0;
                 lvlNtc.TotalJobPoint = targetJobData.JobPoint;
-                GameStructure.CDataCharacterLevelParam(lvlNtc.CharacterLevelParam, targetCharacter);
+                lvlNtc.CharacterLevelParam = targetCharacter.CDataCharacterLevelParam;
                 client.Send(lvlNtc);
 
                 targetName = ((Pawn)targetCharacter).Name;

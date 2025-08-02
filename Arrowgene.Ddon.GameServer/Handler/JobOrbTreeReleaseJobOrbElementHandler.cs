@@ -30,7 +30,9 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             foreach (var member in client.Party.Members)
             {
-                if (member is PawnPartyMember pawnMember && pawnMember.Pawn.CharacterId == client.Character.CharacterId)
+                if (member is PawnPartyMember pawnMember 
+                    && pawnMember.Pawn is not RentalPawn
+                    && pawnMember.Pawn.CharacterId == client.Character.CharacterId)
                 {
                     packets.AddRange(Server.CharacterManager.UpdateCharacterExtendedParamsNtc(client, pawnMember.Pawn));
                 }

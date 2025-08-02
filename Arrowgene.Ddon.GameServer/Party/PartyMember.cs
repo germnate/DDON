@@ -1,7 +1,5 @@
-using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
-using Arrowgene.Ddon.Shared.Network;
 
 namespace Arrowgene.Ddon.GameServer.Party;
 
@@ -18,5 +16,22 @@ public abstract class PartyMember
     public byte[] AnyValueList { get; set; }
     public byte SessionStatus { get; set; }
 
-    public abstract CDataPartyMember GetCDataPartyMember();
+    public virtual CDataPartyMember CDataPartyMember 
+    { 
+        get
+        {
+            return new()
+            {
+                MemberType = MemberType,
+                MemberIndex = MemberIndex,
+                PawnId = PawnId,
+                IsLeader = IsLeader,
+                IsPawn = IsPawn,
+                IsPlayEntry = IsPlayEntry,
+                JoinState = JoinState,
+                AnyValueList = AnyValueList,
+                SessionStatus = SessionStatus
+            };
+        }
+    }
 }

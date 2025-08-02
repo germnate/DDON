@@ -161,7 +161,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             var upgrade = jobOrbUpgrades[jobId].Where(x => x.ElementId == elementId).FirstOrDefault() ??
                 throw new ResponseErrorException(ErrorCode.ERROR_CODE_CONTENTS_RELEASE_NOT_JOB_ORB_TREE, $"An element with the ID {elementId} doesn't exist for {jobId}");
 
-            var amount = Server.WalletManager.GetWalletAmount(client.Character, WalletType.BloodOrbs);
+            var amount = Server.WalletManager.GetWalletAmount(client.Character, upgrade.WalletType);
             if (amount < upgrade.Cost)
             {
                 throw new ResponseErrorException(ErrorCode.ERROR_CODE_TREE_RELEASE_COST_LACK);

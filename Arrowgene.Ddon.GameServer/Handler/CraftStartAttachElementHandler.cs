@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
@@ -9,6 +6,9 @@ using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.Craft;
 using Arrowgene.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -84,11 +84,19 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 }
 
                 Pawn leadPawn = Server.CraftManager.FindPawn(client, request.CraftMainPawnId);
-                List<CraftPawn> craftPawns = new()
+                List<CraftPawn> craftPawns =
+                [
+                    new CraftPawn(leadPawn, CraftPosition.Leader),
+                    .. request.CraftSupportPawnIDList.Select(p => new CraftPawn(Server.CraftManager.FindPawn(client, p.PawnId), CraftPosition.Assistant)),
+                ];
+
+                foreach(CraftPawn p in craftPawns)
                 {
-                    new CraftPawn(leadPawn, CraftPosition.Leader)
-                };
-                craftPawns.AddRange(request.CraftSupportPawnIDList.Select(p => new CraftPawn(Server.CraftManager.FindPawn(client, p.PawnId), CraftPosition.Assistant)));
+                    if (p.Pawn is RentalPawn rentalPawn)
+                    {
+                        Server.RentalPawnManager.HandleCraftCountDecrement(rentalPawn, connection);
+                    }
+                }
 
                 uint cost = Server.CraftManager.CalculateRecipeCost(totalCost, clientItemInfo, craftPawns);
                 updateCharacterItemNtc.UpdateType = ItemNoticeType.StartAttachElement;

@@ -90,7 +90,7 @@ public interface IDatabase
     bool DeleteCharacter(uint characterId);
     bool UpdateCharacterBaseInfo(Character character);
     bool UpdateCharacterMatchingProfile(Character character);
-    bool UpdateCharacterArisenProfile(Character character);
+    bool UpdateCharacterProfile(CharacterCommon characterCommon, DbConnection? connectionIn = null);
     bool UpdateMyPawnSlot(uint characterId, uint num, DbConnection? connectionIn = null);
     bool UpdateRentalPawnSlot(uint characterId, uint num, DbConnection? connectionIn = null);
     bool UpdateCharacterBinaryData(uint characterId, byte[] data);
@@ -106,14 +106,12 @@ public interface IDatabase
     Pawn SelectPawn(uint pawnId);
     Pawn SelectPawn(DbConnection connection, uint pawnId);
     List<Pawn> SelectPawnsByCharacterId(uint characterId, DbConnection? connectionIn = null);
-    List<uint> SelectOfficialPawns();
+    List<uint> SelectOfficialPawns(DbConnection? connectionIn = null);
     List<uint> SelectAllPlayerPawns(uint limit = 100);
     List<uint> SelectAllPlayerPawns(DbConnection connection, uint limit = 100);
     List<uint> SelectClanPawns(uint clanId, uint characterId = 0, uint limit = 100, DbConnection? connectionIn = null);
 
-    List<CDataRegisterdPawnList> SelectRegisteredPawns(Character searchingCharacter, CDataPawnSearchParameter searchParams);
-
-    List<CDataRegisterdPawnList> SelectRegisteredPawns(DbConnection conn, Character searchingCharacter, CDataPawnSearchParameter searchParams);
+    List<CDataRegisterdPawnList> SelectRegisteredPawns(Character searchingCharacter, CDataPawnSearchParameter searchParams, DbConnection? connectionIn = null);
 
     bool DeletePawn(uint pawnId, DbConnection? connectionIn = null);
     bool UpdatePawnBaseInfo(Pawn pawn, DbConnection? connectionIn = null);
@@ -595,17 +593,26 @@ public interface IDatabase
     List<LightQuestRecord> SelectLightQuestRecords(DbConnection? connectionIn = null);
     bool DeleteLightQuestRecord(uint scheduleId, DbConnection? connectionIn = null);
 
+    // Pawn Favorites
     bool InsertPawnFavorite(uint characterId, uint pawnId, DbConnection? connectionIn = null);
     bool DeletePawnFavorite(uint characterId, uint pawnId, DbConnection? connectionIn = null);
     HashSet<uint> GetPawnFavorites(uint characterId, DbConnection? connectionIn = null);
 
-    #region Pawn craft progress
-
+    // Pawn craft progress
     bool ReplacePawnCraftProgress(CraftProgress craftProgress, DbConnection? connectionIn = null);
     bool InsertPawnCraftProgress(CraftProgress craftProgress, DbConnection? connectionIn = null);
     bool UpdatePawnCraftProgress(CraftProgress craftProgress, DbConnection? connectionIn = null);
     bool DeletePawnCraftProgress(uint craftCharacterId, uint craftLeadPawnId, DbConnection? connectionIn = null);
     CraftProgress? SelectPawnCraftProgress(uint craftCharacterId, uint craftLeadPawnId, DbConnection? connectionIn = null);
 
-    #endregion
+    // Rental pawns
+    List<RentalPawn> SelectRentalPawns(uint characterId, DbConnection? connectionIn = null);
+    bool InsertRentalPawn(uint characterId, RentalPawnRecord record, byte adventureCount, byte craftCount, DbConnection? connectionIn = null);
+    bool UpdateRentalPawn(uint characterId, RentalPawn pawn, DbConnection? connectionIn = null);
+    bool DeleteRentalPawn(uint characterId, uint pawnId, DbConnection? connectionIn = null);
+    CDataCommunityCharacterBaseInfo SelectCommunityCharacterBaseInfo(uint characterId, DbConnection? connectionIn = null);
+    bool InsertRentalPawnFeedback(uint characterId, RentalPawn pawn, List<CDataPawnFeedback> pawnFeedbacks, DbConnection? connectionIn = null);
+    List<CDataPawnHistory> SelectPawnHistory(uint pawnId, DbConnection? connectionIn = null);
+    CDataPawnTotalScore SelectPawnTotalScore(uint pawnId, DbConnection? connectionIn = null);
+
 }

@@ -67,7 +67,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     DownPower = arisenPreset.DownPower,
                     ShakePower = arisenPreset.ShakePower,
                     StunPower = arisenPreset.StunPower,
-                    Consitution = arisenPreset.Consitution,
+                    Constitution = arisenPreset.Consitution,
                     Guts = arisenPreset.Guts,
                     FireResist = arisenPreset.FireResist,
                     IceResist = arisenPreset.IceResist,

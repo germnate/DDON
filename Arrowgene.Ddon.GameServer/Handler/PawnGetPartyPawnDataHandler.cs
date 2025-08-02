@@ -1,4 +1,3 @@
-using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Model;
@@ -32,14 +31,16 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED,
                 $"Couldn't find pawn ID {packet.PawnId}.");
 
-            var res = new S2CPawnGetPartyPawnDataRes();
-            res.CharacterId = pawn.CharacterId;
-            res.PawnId = pawn.PawnId;
+            var res = new S2CPawnGetPartyPawnDataRes
+            {
+                CharacterId = pawn.CharacterId,
+                PawnId = pawn.PawnId,
+                PawnInfo = pawn.CDataPawnInfo
+            };
 
             // TODO: This static function is not flexible enough to accept
             // TODO: things like the CharacterManager. We should create a
             // TODO: proper mechanism for these conversions between server object and CData objects.
-            GameStructure.CDataPawnInfo(res.PawnInfo, pawn);
             res.PawnInfo.AbilityCostMax = Server.CharacterManager.GetMaxAugmentAllocation(pawn);
 
             S2CPawnGetPawnOrbDevoteInfoNtc ntc = new S2CPawnGetPawnOrbDevoteInfoNtc()

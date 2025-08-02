@@ -1,7 +1,6 @@
 using Arrowgene.Ddon.GameServer.Quests;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
-using Arrowgene.Ddon.Shared.Network;
 
 namespace Arrowgene.Ddon.GameServer.Party;
 
@@ -17,24 +16,32 @@ public class PlayerPartyMember : PartyMember
 
     public SoloQuestStateManager QuestState { get; set; }
 
-    public override CDataPartyMember GetCDataPartyMember()
+    public override CDataPartyMember CDataPartyMember
     {
-        CDataPartyMember obj = new CDataPartyMember();
-        GameStructure.CDataPartyMember(obj, this);
-        return obj;
+        get
+        {
+            var cdata = base.CDataPartyMember;
+            cdata.CharacterListElement = Client.Character.CDataCharacterListElement;
+            return cdata;
+        }
     }
 
     public S2CContextGetPartyPlayerContextNtc GetPartyContext()
     {
-        CDataPartyPlayerContext partyPlayerContext = new CDataPartyPlayerContext();
-        GameStructure.CDataContextBase(partyPlayerContext.Base, Client.Character);
-        GameStructure.CDataContextPlayerInfo(partyPlayerContext.PlayerInfo, Client.Character);
-        GameStructure.CDataContextResist(partyPlayerContext.ResistInfo, Client.Character);
-        partyPlayerContext.EditInfo = Client.Character.EditInfo;
+        CDataPartyPlayerContext partyPlayerContext = new()
+        {
+            Base = Client.Character.CDataContextBase,
+            PlayerInfo = Client.Character.CDataContextPlayerInfo,
+            ResistInfo = Client.Character.CDataContextResist,
+            EditInfo = Client.Character.EditInfo
+        };
 
-        S2CContextGetPartyPlayerContextNtc partyPlayerContextNtc = new S2CContextGetPartyPlayerContextNtc();
-        partyPlayerContextNtc.CharacterId = Client.Character.CharacterId;
-        partyPlayerContextNtc.Context = partyPlayerContext;
+        S2CContextGetPartyPlayerContextNtc partyPlayerContextNtc = new()
+        {
+            CharacterId = Client.Character.CharacterId,
+            Context = partyPlayerContext
+        };
+
         partyPlayerContextNtc.Context.Base.MemberIndex = MemberIndex;
         return partyPlayerContextNtc;
     }

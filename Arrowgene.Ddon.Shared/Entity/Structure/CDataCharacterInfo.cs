@@ -6,49 +6,6 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
 {
     public class CDataCharacterInfo
     {
-        public CDataCharacterInfo(Character character)
-        {
-            CharacterId = character.CharacterId;
-            UserId = character.UserId;
-            Version = character.Version;
-            FirstName = character.FirstName;
-            LastName = character.LastName;
-            EditInfo = character.EditInfo;
-            StatusInfo = character.StatusInfo;
-            Job = character.Job;
-            CharacterJobDataList = character.CharacterJobDataList;
-            PlayPointList = character.PlayPointList;
-            CharacterEquipDataList = new List<CDataCharacterEquipData>() { new CDataCharacterEquipData() {
-                    Equips = character.Equipment.AsCDataEquipItemInfo(EquipType.Performance)
-            }};
-            CharacterEquipViewDataList = new List<CDataCharacterEquipData>() { new CDataCharacterEquipData() {
-                    Equips = character.Equipment.AsCDataEquipItemInfo(EquipType.Visual)
-            }};
-            CharacterEquipJobItemList = character.EquipmentTemplate.JobItemsAsCDataEquipJobItem(character.Job);
-            JewelrySlotNum = character.JewelrySlotNum;
-            EmblemStatList = character.EmblemStatList;
-            CharacterItemSlotInfoList = character.Storage.GetAllStoragesAsCDataCharacterItemSlotInfoList();
-            WalletPointList = character.WalletPointList;
-            MyPawnSlotNum = character.MyPawnSlotNum;
-            RentalPawnSlotNum = character.RentalPawnSlotNum;
-            OrbStatusList = character.OrbStatusList;
-            MsgSetList = character.MsgSetList;
-            ShortCutList = character.ShortCutList;
-            CommunicationShortCutList = character.CommunicationShortCutList;
-            MatchingProfile = character.MatchingProfile;
-            ArisenProfile = character.ArisenProfile;
-            HideEquipHead = character.HideEquipHead;
-            HideEquipLantern = character.HideEquipLantern;
-            HideEquipHeadPawn = character.HideEquipHeadPawn;
-            HideEquipLanternPawn = character.HideEquipLanternPawn;
-            ArisenProfileShareRange = character.ArisenProfileShareRange;
-            OnlineStatus = character.OnlineStatus;
-        }
-
-        public CDataCharacterInfo()
-        {
-        }
-
         public uint CharacterId { get; set; }
         public uint UserId { get; set; }
         public uint Version { get; set; }

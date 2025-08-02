@@ -1,5 +1,4 @@
 using Arrowgene.Ddon.GameServer.Characters;
-using Arrowgene.Ddon.GameServer.Quests;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
@@ -83,7 +82,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             {
                 GameMode = packet.GameMode, // Probably not right? int vs uint
                 CreateCharacter = createCharacter,
-                CharacterInfo = new CDataCharacterInfo(client.Character),
+                CharacterInfo = client.Character.CDataCharacterInfo,
             });
 
             client.Send(new S2CItemUpdateCharacterItemNtc()
@@ -124,7 +123,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             bbmCharacter.MyPawnSlotNum = 0;
             bbmCharacter.RentalPawnSlotNum = 0;
             bbmCharacter.MatchingProfile = normalCharacter.MatchingProfile;
-            bbmCharacter.ArisenProfile = normalCharacter.ArisenProfile;
+            bbmCharacter.CharacterProfile = normalCharacter.CharacterProfile;
             bbmCharacter.HideEquipHead = normalCharacter.HideEquipHead;
             bbmCharacter.HideEquipLantern = normalCharacter.HideEquipLantern;
             bbmCharacter.HideEquipHeadPawn = normalCharacter.HideEquipHeadPawn;
@@ -166,7 +165,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 DownPower = arisenPreset.DownPower,
                 ShakePower = arisenPreset.ShakePower,
                 StunPower = arisenPreset.StunPower,
-                Consitution = arisenPreset.Consitution,
+                Constitution = arisenPreset.Consitution,
                 Guts = arisenPreset.Guts,
                 FireResist = arisenPreset.FireResist,
                 IceResist = arisenPreset.IceResist,

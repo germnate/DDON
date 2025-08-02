@@ -28,8 +28,9 @@ namespace Arrowgene.Ddon.GameServer.Handler
             // If you don't send the corresponding position, that gathering point doesn't appear.
             // Figuring out what spots are valid is somewhat tricky (spread across multiple subsystems)
             // so just return all possible spots and call it good. This is what we were doing with the old handler.
-            HashSet<byte> posIds = Enumerable.Range(0, byte.MaxValue).Select(x => (byte)x).ToHashSet();
-            HashSet<byte> emptySpots = new();
+            HashSet<byte> posIds = [.. Enumerable.Range(0, byte.MaxValue).Select(x => (byte)x)];
+            HashSet<byte> emptySpots = client.InstanceGatheringItemManager.EmptySpots(request.LayoutId);
+            HashSet<byte> gatheredSpots = client.InstanceGatheringItemManager.GatheredSpots(request.LayoutId);
 
             // Filter out one off gathering spots (red shinies)
             var stage = Stage.StageInfoFromStageLayoutId(request.LayoutId.AsStageLayoutId());
@@ -73,11 +74,12 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 }
             }
 
-            res.SetList = posIds.Select(x => new CDataLayoutItemData()
+            res.SetList = [.. posIds.Select(x => new CDataLayoutItemData()
             {
                 PosId = x,
+                IsGathered = gatheredSpots.Contains(x),
                 IsEmpty = emptySpots.Contains(x)
-            }).ToList();
+            })];
 
             return res;
         }

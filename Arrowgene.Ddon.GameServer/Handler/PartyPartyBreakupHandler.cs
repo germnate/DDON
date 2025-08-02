@@ -30,7 +30,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
             {
                 if (member is PlayerPartyMember player)
                 {
-                    Server.PartnerPawnManager.HandleLeaveFromParty(player.Client);
                     player.Client.Send(ntc);
                 }
             }

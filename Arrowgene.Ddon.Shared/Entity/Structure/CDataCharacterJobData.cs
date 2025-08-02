@@ -1,54 +1,91 @@
 using Arrowgene.Buffers;
 using Arrowgene.Ddon.Shared.Model;
+using System.Text.Json.Serialization;
 
 namespace Arrowgene.Ddon.Shared.Entity.Structure
 {
     public class CDataCharacterJobData
     {
-        public JobId Job;
-        public uint Exp;
-        public uint JobPoint;
-        public uint Lv;
-        public ushort Atk;
-        public ushort Def;
-        public ushort MAtk;
-        public ushort MDef;
-        public ushort Strength;
-        public ushort DownPower;
-        public ushort ShakePower;
-        public ushort StunPower;
-        public ushort Consitution;
-        public ushort Guts;
-        public byte FireResist;
-        public byte IceResist;
-        public byte ThunderResist;
-        public byte HolyResist;
-        public byte DarkResist;
-        public byte SpreadResist;
-        public byte FreezeResist;
-        public byte ShockResist;
-        public byte AbsorbResist;
-        public byte DarkElmResist;
-        public byte PoisonResist;
-        public byte SlowResist;
-        public byte SleepResist;
-        public byte StunResist;
-        public byte WetResist;
-        public byte OilResist;
-        public byte SealResist;
-        public byte CurseResist;
-        public byte SoftResist;
-        public byte StoneResist;
-        public byte GoldResist;
-        public byte FireReduceResist;
-        public byte IceReduceResist;
-        public byte ThunderReduceResist;
-        public byte HolyReduceResist;
-        public byte DarkReduceResist;
-        public byte AtkDownResist;
-        public byte DefDownResist;
-        public byte MAtkDownResist;
-        public byte MDefDownResist;
+        // Some of these fields are purposefully hidden from the JSON serializer used for rental pawns.
+        public JobId Job { get; set; }
+
+        [JsonIgnore]
+        public uint Exp{ get; set; }
+        [JsonIgnore]
+        public uint JobPoint{ get; set; }
+
+        public uint Lv { get; set; }
+        public ushort Atk { get; set; }
+        public ushort Def { get; set; }
+        public ushort MAtk { get; set; }
+        public ushort MDef { get; set; }
+        public ushort Strength { get; set; }
+        public ushort DownPower { get; set; }
+        public ushort ShakePower { get; set; }
+        public ushort StunPower { get; set; }
+        public ushort Constitution { get; set; }
+        public ushort Guts { get; set; }
+
+        [JsonIgnore]
+        public byte FireResist{ get; set; }
+        [JsonIgnore]
+        public byte IceResist{ get; set; }
+        [JsonIgnore]
+        public byte ThunderResist{ get; set; }
+        [JsonIgnore]
+        public byte HolyResist{ get; set; }
+        [JsonIgnore]
+        public byte DarkResist{ get; set; }
+        [JsonIgnore]
+        public byte SpreadResist{ get; set; }
+        [JsonIgnore]
+        public byte FreezeResist{ get; set; }
+        [JsonIgnore]
+        public byte ShockResist{ get; set; }
+        [JsonIgnore]
+        public byte AbsorbResist{ get; set; }
+        [JsonIgnore]
+        public byte DarkElmResist{ get; set; }
+        [JsonIgnore]
+        public byte PoisonResist{ get; set; }
+        [JsonIgnore]
+        public byte SlowResist{ get; set; }
+        [JsonIgnore]
+        public byte SleepResist{ get; set; }
+        [JsonIgnore]
+        public byte StunResist{ get; set; }
+        [JsonIgnore]
+        public byte WetResist{ get; set; }
+        [JsonIgnore]
+        public byte OilResist{ get; set; }
+        [JsonIgnore]
+        public byte SealResist{ get; set; }
+        [JsonIgnore]
+        public byte CurseResist{ get; set; }
+        [JsonIgnore]
+        public byte SoftResist{ get; set; }
+        [JsonIgnore]
+        public byte StoneResist{ get; set; }
+        [JsonIgnore]
+        public byte GoldResist{ get; set; }
+        [JsonIgnore]
+        public byte FireReduceResist{ get; set; }
+        [JsonIgnore]
+        public byte IceReduceResist{ get; set; }
+        [JsonIgnore]
+        public byte ThunderReduceResist{ get; set; }
+        [JsonIgnore]
+        public byte HolyReduceResist{ get; set; }
+        [JsonIgnore]
+        public byte DarkReduceResist{ get; set; }
+        [JsonIgnore]
+        public byte AtkDownResist{ get; set; }
+        [JsonIgnore]
+        public byte DefDownResist{ get; set; }
+        [JsonIgnore]
+        public byte MAtkDownResist{ get; set; }
+        [JsonIgnore]
+        public byte MDefDownResist{ get; set; }
 
         public class Serializer : EntitySerializer<CDataCharacterJobData>
         {
@@ -66,7 +103,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
                 WriteUInt16(buffer, obj.DownPower);
                 WriteUInt16(buffer, obj.ShakePower);
                 WriteUInt16(buffer, obj.StunPower);
-                WriteUInt16(buffer, obj.Consitution);
+                WriteUInt16(buffer, obj.Constitution);
                 WriteUInt16(buffer, obj.Guts);
                 WriteByte(buffer, obj.FireResist);
                 WriteByte(buffer, obj.IceResist);
@@ -115,7 +152,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
                 obj.DownPower = ReadUInt16(buffer);
                 obj.ShakePower = ReadUInt16(buffer);
                 obj.StunPower = ReadUInt16(buffer);
-                obj.Consitution = ReadUInt16(buffer);
+                obj.Constitution = ReadUInt16(buffer);
                 obj.Guts = ReadUInt16(buffer);
                 obj.FireResist = ReadByte(buffer);
                 obj.IceResist = ReadByte(buffer);

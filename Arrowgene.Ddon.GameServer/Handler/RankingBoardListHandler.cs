@@ -21,7 +21,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
             S2CRankingBoardListRes res = new();
 
             var questList = Server.Database.SelectUsedRankingBoardQuests()
-                .Select(x => QuestManager.GetQuestByScheduleId(x));
+                .Select(x => QuestManager.GetQuestByScheduleId(x))
+                .Where(x => x is not null);
 
             //Calculate the previous Monday.
             var monday = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek + (int)DayOfWeek.Monday);

@@ -39,6 +39,11 @@ public partial class DdonSqlDb : SqlDb
         "character_common_id", "revive_point", "hp", "white_hp"
     };
 
+    private static readonly string[] CDataProfileFields = new[]
+    {
+        "character_common_id", "background_id", "title_uid", "title_index", "motion_id", "motion_frame_no", "comment"
+    };
+
     private static readonly string SqlUpdateEditInfo =
         $"UPDATE \"ddon_edit_info\" SET {BuildQueryUpdate(CDataEditInfoFields)} WHERE \"character_common_id\" = @character_common_id;";
 
@@ -61,6 +66,16 @@ public partial class DdonSqlDb : SqlDb
 
     private readonly string SqlUpdateCharacterCommon =
         $"UPDATE \"ddon_character_common\" SET {BuildQueryUpdate(CharacterCommonFields)} WHERE \"character_common_id\" = @character_common_id;";
+
+    private static readonly string SqlSelectCharacterProfile =
+    $"SELECT {BuildQueryField(CDataProfileFields)} FROM \"ddon_character_profile\" WHERE \"character_common_id\" = @character_common_id;";
+
+    private readonly string SqlInsertCharacterProfile =
+        $"INSERT INTO \"ddon_character_profile\" ({BuildQueryField(CDataProfileFields)}) VALUES ({BuildQueryInsert(CDataProfileFields)});";
+
+    private static readonly string SqlUpdateCharacterProfile =
+        $"UPDATE \"ddon_character_profile\" SET {BuildQueryUpdate(CDataProfileFields)} WHERE \"character_common_id\" = @character_common_id;";
+
 
     public override bool UpdateCharacterCommonBaseInfo(CharacterCommon common, DbConnection? connectionIn = null)
     {
@@ -104,6 +119,16 @@ public partial class DdonSqlDb : SqlDb
         return commonUpdateRowsAffected > NoRowsAffected;
     }
 
+    public override bool UpdateCharacterProfile(CharacterCommon characterCommon, DbConnection? connectionIn = null)
+    {
+        return ExecuteQuerySafe(connectionIn, connection =>
+        {
+            return ExecuteNonQuery(connection,
+                SqlUpdateCharacterProfile,
+                command => { AddParameter(command, characterCommon); }
+            ) == 1;
+        });
+    }
 
     private void QueryCharacterCommonData(DbConnection conn, CharacterCommon common)
     {
@@ -381,6 +406,13 @@ public partial class DdonSqlDb : SqlDb
         common.StatusInfo.HP = GetUInt32(reader, "hp");
         common.StatusInfo.WhiteHP = GetUInt32(reader, "white_hp");
 
+        common.CharacterProfile.BackgroundId = GetByte(reader, "background_id");
+        common.CharacterProfile.Title.UId = GetUInt32(reader, "title_uid");
+        common.CharacterProfile.Title.Index = GetUInt32(reader, "title_index");
+        common.CharacterProfile.MotionId = GetUInt16(reader, "motion_id");
+        common.CharacterProfile.MotionFrameNo = GetUInt32(reader, "motion_frame_no");
+        common.CharacterProfile.Comment = GetString(reader, "comment");
+
         if (common.StatusInfo.HP == 0 || common.StatusInfo.WhiteHP == 0)
         {
             // TODO: Figure out why this is happening
@@ -473,5 +505,13 @@ public partial class DdonSqlDb : SqlDb
         AddParameter(command, "@revive_point", common.StatusInfo.RevivePoint);
         AddParameter(command, "@hp", common.GreenHp);
         AddParameter(command, "@white_hp", common.WhiteHp);
+        // CDataArisenProfile
+        AddParameter(command, "@background_id", common.CharacterProfile.BackgroundId);
+        AddParameter(command, "@title_uid", common.CharacterProfile.Title.UId);
+        AddParameter(command, "@title_index", common.CharacterProfile.Title.Index);
+        AddParameter(command, "@motion_id", common.CharacterProfile.MotionId);
+        AddParameter(command, "@motion_frame_no", common.CharacterProfile.MotionFrameNo);
+        AddParameter(command, "@comment", common.CharacterProfile.Comment);
+
     }
 }

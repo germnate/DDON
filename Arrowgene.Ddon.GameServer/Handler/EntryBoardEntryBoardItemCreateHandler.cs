@@ -1,15 +1,9 @@
-using Arrowgene.Buffers;
 using Arrowgene.Ddon.GameServer.Characters;
-using Arrowgene.Ddon.GameServer.Dump;
-using Arrowgene.Ddon.GameServer.Utils;
 using Arrowgene.Ddon.Server;
-using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
-using Arrowgene.Ddon.Shared.Network;
 using Arrowgene.Logging;
-using System;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -49,8 +43,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
             {
                 EntryFlag = true,
                 Id = 1,
+                CharacterListElement = client.Character.CDataCharacterListElement
             };
-            GameStructure.CDataCharacterListElement(member.CharacterListElement, client.Character);
             data.EntryItem.EntryMemberList.Add(member);
 
             for (int i = 2; i < data.EntryItem.Param.MaxEntryNum + 1; i++)

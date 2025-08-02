@@ -19,8 +19,6 @@ public partial class DdonSqlDb : SqlDb
 
     private const string SqlDeleteCharacterMatchingProfile = "DELETE FROM \"ddon_character_matching_profile\" WHERE \"character_id\"=@character_id;";
 
-    private const string SqlDeleteCharacterArisenProfile = "DELETE FROM \"ddon_character_arisen_profile\" WHERE \"character_id\"=@character_id;";
-
     private static readonly string[] CharacterFields = new[]
     {
         /* character_id */ "version", "character_common_id", "account_id", "first_name", "last_name", "created", "my_pawn_slot_num", "rental_pawn_slot_num",
@@ -31,11 +29,6 @@ public partial class DdonSqlDb : SqlDb
     {
         "character_id", "entry_job", "entry_job_level", "current_job", "current_job_level", "objective_type1", "objective_type2",
         "play_style", "comment", "is_join_party"
-    };
-
-    private static readonly string[] CDataArisenProfileFields = new[]
-    {
-        "character_id", "background_id", "title_uid", "title_index", "motion_id", "motion_frame_no"
     };
 
     private static readonly string[] CharacterBinaryDataFields = new[]
@@ -57,57 +50,46 @@ public partial class DdonSqlDb : SqlDb
     private static readonly string SqlSelectCharacterMatchingProfile =
         $"SELECT {BuildQueryField(CDataMatchingProfileFields)} FROM \"ddon_character_matching_profile\" WHERE \"character_id\" = @character_id;";
 
-    private static readonly string SqlUpdateCharacterArisenProfile =
-        $"UPDATE \"ddon_character_arisen_profile\" SET {BuildQueryUpdate(CDataArisenProfileFields)} WHERE \"character_id\" = @character_id;";
-
-    private static readonly string SqlSelectCharacterArisenProfile =
-        $"SELECT {BuildQueryField(CDataArisenProfileFields)} FROM \"ddon_character_arisen_profile\" WHERE \"character_id\" = @character_id;";
-
     private static readonly string SqlSelectCharacterBinaryData =
         $"SELECT {BuildQueryField(CharacterBinaryDataFields)} FROM \"ddon_binary_data\" WHERE \"character_id\" = @character_id;";
 
     private readonly string SqlInsertCharacter = $"INSERT INTO \"ddon_character\" ({BuildQueryField(CharacterFields)}) VALUES ({BuildQueryInsert(CharacterFields)});";
 
-
-    private readonly string SqlInsertCharacterArisenProfile =
-        $"INSERT INTO \"ddon_character_arisen_profile\" ({BuildQueryField(CDataArisenProfileFields)}) VALUES ({BuildQueryInsert(CDataArisenProfileFields)});";
-
     private readonly string SqlInsertCharacterBinaryData =
         $"INSERT INTO \"ddon_binary_data\" ({BuildQueryField(CharacterBinaryDataFields)}) VALUES ({BuildQueryInsert(CharacterBinaryDataFields)});";
-
 
     private readonly string SqlInsertCharacterMatchingProfile =
         $"INSERT INTO \"ddon_character_matching_profile\" ({BuildQueryField(CDataMatchingProfileFields)}) VALUES ({BuildQueryInsert(CDataMatchingProfileFields)});";
 
     private readonly string SqlSelectAllCharacterData =
-        $"SELECT \"ddon_character\".\"character_id\", {BuildQueryField("ddon_character", CharacterFields)}, \"ddon_character_common\".\"character_common_id\", {BuildQueryField("ddon_character_common", CharacterCommonFields)}, {BuildQueryField("ddon_edit_info", CDataEditInfoFields)}, {BuildQueryField("ddon_status_info", CDataStatusInfoFields)}, {BuildQueryField("ddon_character_matching_profile", CDataMatchingProfileFields)}, {BuildQueryField("ddon_character_arisen_profile", CDataArisenProfileFields)}, {BuildQueryField("ddon_binary_data", CharacterBinaryDataFields)} "
+        $"SELECT \"ddon_character\".\"character_id\", {BuildQueryField("ddon_character", CharacterFields)}, \"ddon_character_common\".\"character_common_id\", {BuildQueryField("ddon_character_common", CharacterCommonFields)}, {BuildQueryField("ddon_edit_info", CDataEditInfoFields)}, {BuildQueryField("ddon_status_info", CDataStatusInfoFields)}, {BuildQueryField("ddon_character_matching_profile", CDataMatchingProfileFields)}, {BuildQueryField("ddon_character_profile", CDataProfileFields)}, {BuildQueryField("ddon_binary_data", CharacterBinaryDataFields)} "
         + "FROM \"ddon_character\" "
         + "LEFT JOIN \"ddon_character_common\" ON \"ddon_character_common\".\"character_common_id\" = \"ddon_character\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_edit_info\" ON \"ddon_edit_info\".\"character_common_id\" = \"ddon_character\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_status_info\" ON \"ddon_status_info\".\"character_common_id\" = \"ddon_character\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_character_matching_profile\" ON \"ddon_character_matching_profile\".\"character_id\" = \"ddon_character\".\"character_id\" "
-        + "LEFT JOIN \"ddon_character_arisen_profile\" ON \"ddon_character_arisen_profile\".\"character_id\" = \"ddon_character\".\"character_id\" "
+        + "LEFT JOIN \"ddon_character_profile\" ON \"ddon_character_profile\".\"character_common_id\" = \"ddon_character\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_binary_data\" ON \"ddon_binary_data\".\"character_id\" = \"ddon_character\".\"character_id\" "
         + "WHERE \"ddon_character\".\"character_id\" = @character_id";
 
     private readonly string SqlSelectAllCharactersData =
-        $"SELECT \"ddon_character\".\"character_id\", {BuildQueryField("ddon_character", CharacterFields)}, \"ddon_character_common\".\"character_common_id\", {BuildQueryField("ddon_character_common", CharacterCommonFields)}, {BuildQueryField("ddon_edit_info", CDataEditInfoFields)}, {BuildQueryField("ddon_status_info", CDataStatusInfoFields)}, {BuildQueryField("ddon_character_matching_profile", CDataMatchingProfileFields)}, {BuildQueryField("ddon_character_arisen_profile", CDataArisenProfileFields)}, {BuildQueryField("ddon_binary_data", CharacterBinaryDataFields)} "
+        $"SELECT \"ddon_character\".\"character_id\", {BuildQueryField("ddon_character", CharacterFields)}, \"ddon_character_common\".\"character_common_id\", {BuildQueryField("ddon_character_common", CharacterCommonFields)}, {BuildQueryField("ddon_edit_info", CDataEditInfoFields)}, {BuildQueryField("ddon_status_info", CDataStatusInfoFields)}, {BuildQueryField("ddon_character_matching_profile", CDataMatchingProfileFields)}, {BuildQueryField("ddon_character_profile", CDataProfileFields)}, {BuildQueryField("ddon_binary_data", CharacterBinaryDataFields)} "
         + "FROM \"ddon_character\" "
         + "LEFT JOIN \"ddon_character_common\" ON \"ddon_character_common\".\"character_common_id\" = \"ddon_character\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_edit_info\" ON \"ddon_edit_info\".\"character_common_id\" = \"ddon_character\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_status_info\" ON \"ddon_status_info\".\"character_common_id\" = \"ddon_character\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_character_matching_profile\" ON \"ddon_character_matching_profile\".\"character_id\" = \"ddon_character\".\"character_id\" "
-        + "LEFT JOIN \"ddon_character_arisen_profile\" ON \"ddon_character_arisen_profile\".\"character_id\" = \"ddon_character\".\"character_id\" "
+        + "LEFT JOIN \"ddon_character_profile\" ON \"ddon_character_profile\".\"character_common_id\" = \"ddon_character\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_binary_data\" ON \"ddon_binary_data\".\"character_id\" = \"ddon_character\".\"character_id\" ";
 
     private readonly string SqlSelectAllCharactersDataByAccountId =
-        $"SELECT \"ddon_character\".\"character_id\", {BuildQueryField("ddon_character", CharacterFields)}, \"ddon_character_common\".\"character_common_id\", {BuildQueryField("ddon_character_common", CharacterCommonFields)}, {BuildQueryField("ddon_edit_info", CDataEditInfoFields)}, {BuildQueryField("ddon_status_info", CDataStatusInfoFields)}, {BuildQueryField("ddon_character_matching_profile", CDataMatchingProfileFields)}, {BuildQueryField("ddon_character_arisen_profile", CDataArisenProfileFields)}, {BuildQueryField("ddon_binary_data", CharacterBinaryDataFields)} "
+        $"SELECT \"ddon_character\".\"character_id\", {BuildQueryField("ddon_character", CharacterFields)}, \"ddon_character_common\".\"character_common_id\", {BuildQueryField("ddon_character_common", CharacterCommonFields)}, {BuildQueryField("ddon_edit_info", CDataEditInfoFields)}, {BuildQueryField("ddon_status_info", CDataStatusInfoFields)}, {BuildQueryField("ddon_character_matching_profile", CDataMatchingProfileFields)}, {BuildQueryField("ddon_character_profile", CDataProfileFields)}, {BuildQueryField("ddon_binary_data", CharacterBinaryDataFields)} "
         + "FROM \"ddon_character\" "
         + "LEFT JOIN \"ddon_character_common\" ON \"ddon_character_common\".\"character_common_id\" = \"ddon_character\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_edit_info\" ON \"ddon_edit_info\".\"character_common_id\" = \"ddon_character\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_status_info\" ON \"ddon_status_info\".\"character_common_id\" = \"ddon_character\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_character_matching_profile\" ON \"ddon_character_matching_profile\".\"character_id\" = \"ddon_character\".\"character_id\" "
-        + "LEFT JOIN \"ddon_character_arisen_profile\" ON \"ddon_character_arisen_profile\".\"character_id\" = \"ddon_character\".\"character_id\" "
+        + "LEFT JOIN \"ddon_character_profile\" ON \"ddon_character_profile\".\"character_common_id\" = \"ddon_character\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_binary_data\" ON \"ddon_binary_data\".\"character_id\" = \"ddon_character\".\"character_id\" "
         + "WHERE \"account_id\" = @account_id AND \"game_mode\" = @game_mode "
         + "ORDER BY \"ddon_character\".\"character_id\";";
@@ -134,7 +116,7 @@ public partial class DdonSqlDb : SqlDb
             ExecuteNonQuery(conn, SqlInsertEditInfo, command => { AddParameter(command, character); });
             ExecuteNonQuery(conn, SqlInsertStatusInfo, command => { AddParameter(command, character); });
             ExecuteNonQuery(conn, SqlInsertCharacterMatchingProfile, command => { AddParameter(command, character); });
-            ExecuteNonQuery(conn, SqlInsertCharacterArisenProfile, command => { AddParameter(command, character); });
+            ExecuteNonQuery(conn, SqlInsertCharacterProfile, command => { AddParameter(command, character); });
             ExecuteNonQuery(conn, SqlInsertCharacterBinaryData, command => { AddParameter(command, character); });
 
             CreateItems(conn, character);
@@ -165,19 +147,6 @@ public partial class DdonSqlDb : SqlDb
     public bool UpdateCharacterMatchingProfile(DbConnection conn, Character character)
     {
         int characterUpdateRowsAffected = ExecuteNonQuery(conn, SqlUpdateCharacterMatchingProfile, command => { AddParameter(command, character); });
-
-        return characterUpdateRowsAffected > NoRowsAffected;
-    }
-
-    public override bool UpdateCharacterArisenProfile(Character character)
-    {
-        using DbConnection connection = OpenNewConnection();
-        return UpdateCharacterArisenProfile(connection, character);
-    }
-
-    public bool UpdateCharacterArisenProfile(DbConnection conn, Character character)
-    {
-        int characterUpdateRowsAffected = ExecuteNonQuery(conn, SqlUpdateCharacterArisenProfile, command => { AddParameter(command, character); });
 
         return characterUpdateRowsAffected > NoRowsAffected;
     }
@@ -545,12 +514,12 @@ public partial class DdonSqlDb : SqlDb
     //Helper function to add specific items to a storage
     public override void CreateListItems(DbConnection conn, Character character, StorageType storageType, List<(uint ItemId, uint Amount)> itemList)
     {
-        Storage itemBagJob = character.Storage.GetAllStorages()[storageType];
+        Storage itemType = character.Storage.GetAllStorages()[storageType];
         foreach ((uint itemId, uint quantity) in itemList)
         {
-            Item jobItem = new() { ItemId = itemId };
-            ushort slot = itemBagJob.AddItem(jobItem, quantity);
-            InsertStorageItem(character.ContentCharacterId, StorageType.ItemBagJob, slot, quantity, jobItem, conn);
+            Item storageItem = new() { ItemId = itemId };
+            ushort slot = itemType.AddItem(storageItem, quantity);
+            InsertStorageItem(character.ContentCharacterId, storageType, slot, quantity, storageItem, conn);
         }
     }
 
@@ -674,11 +643,7 @@ public partial class DdonSqlDb : SqlDb
         character.MatchingProfile.Comment = GetString(reader, "comment");
         character.MatchingProfile.IsJoinParty = GetBoolean(reader, "is_join_party");
 
-        character.ArisenProfile.BackgroundId = GetByte(reader, "background_id");
-        character.ArisenProfile.Title.UId = GetUInt32(reader, "title_uid");
-        character.ArisenProfile.Title.Index = GetUInt32(reader, "title_index");
-        character.ArisenProfile.MotionId = GetUInt16(reader, "motion_id");
-        character.ArisenProfile.MotionFrameNo = GetUInt32(reader, "motion_frame_no");
+        
 
         character.FavWarpSlotNum = GetUInt32(reader, "fav_warp_slot_num");
 
@@ -715,17 +680,8 @@ public partial class DdonSqlDb : SqlDb
         AddParameter(command, "@play_style", character.MatchingProfile.PlayStyle);
         AddParameter(command, "@comment", character.MatchingProfile.Comment);
         AddParameter(command, "@is_join_party", character.MatchingProfile.IsJoinParty);
-        // CDataArisenProfile
-        AddParameter(command, "@background_id", character.ArisenProfile.BackgroundId);
-        AddParameter(command, "@title_uid", character.ArisenProfile.Title.UId);
-        AddParameter(command, "@title_index", character.ArisenProfile.Title.Index);
-        AddParameter(command, "@motion_id", character.ArisenProfile.MotionId);
-        AddParameter(command, "@motion_frame_no", character.ArisenProfile.MotionFrameNo);
-
         AddParameter(command, "@fav_warp_slot_num", character.FavWarpSlotNum);
-
         AddParameter(command, "@max_bazaar_exhibits", character.MaxBazaarExhibits);
-
         AddParameter(command, "@binary_data", character.BinaryData);
         AddParameter(command, "@game_mode", (uint)character.GameMode);
     }

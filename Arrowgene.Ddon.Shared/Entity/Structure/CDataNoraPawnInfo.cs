@@ -1,4 +1,5 @@
 using Arrowgene.Buffers;
+using Arrowgene.Ddon.Shared.Model;
 using System.Collections.Generic;
 
 namespace Arrowgene.Ddon.Shared.Entity.Structure
@@ -8,7 +9,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
         public uint Version { get; set; }
         public string Name { get; set; } = string.Empty;
         public CDataEditInfo EditInfo { get; set; } = new();
-        public byte Job { get; set; }
+        public JobId Job { get; set; }
         public List<CDataCharacterEquipData> CharacterEquipData { get; set; } = new();
         public List<CDataCharacterEquipData> CharacterEquipViewData { get; set; } = new();
 
@@ -19,7 +20,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
                 WriteUInt32(buffer, obj.Version);
                 WriteMtString(buffer, obj.Name);
                 WriteEntity(buffer, obj.EditInfo);
-                WriteByte(buffer, obj.Job);
+                WriteByte(buffer, (byte)obj.Job);
                 WriteEntityList(buffer, obj.CharacterEquipData);
                 WriteEntityList(buffer, obj.CharacterEquipViewData);
             }
@@ -30,7 +31,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
                 obj.Version = ReadUInt32(buffer);
                 obj.Name = ReadMtString(buffer);
                 obj.EditInfo = ReadEntity<CDataEditInfo>(buffer);
-                obj.Job = ReadByte(buffer);
+                obj.Job = (JobId)ReadByte(buffer);
                 obj.CharacterEquipData = ReadEntityList<CDataCharacterEquipData>(buffer);
                 obj.CharacterEquipViewData = ReadEntityList<CDataCharacterEquipData>(buffer);
                 return obj;

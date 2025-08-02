@@ -5,6 +5,7 @@ using Arrowgene.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Arrowgene.Ddon.Shared.Model
 {
@@ -178,6 +179,8 @@ namespace Arrowgene.Ddon.Shared.Model
 
         public StorageType Type { get; private set; }
         public List<Tuple<Item, uint>?> Items { get; set; }
+
+        [JsonIgnore]
         public byte[] SortData { get; set; }
 
         public Storage(StorageType type, ushort slotMax) : this(type, slotMax, new byte[1024])
@@ -190,6 +193,14 @@ namespace Arrowgene.Ddon.Shared.Model
             Type = type;
             Items = Enumerable.Repeat<Tuple<Item, uint>?>(null, slotMax).ToList();
             SortData = sortData;
+        }
+
+        [JsonConstructor]
+        public Storage(StorageType type, List<Tuple<Item, uint>?> items)
+        {
+            Type = type;
+            Items = items;
+            SortData = new byte[1024];
         }
 
         public void Clear()
@@ -289,16 +300,10 @@ namespace Arrowgene.Ddon.Shared.Model
         }
     }
 
-    public class Equipment
+    public class Equipment(Storage storage, int offset)
     {
-        public Storage Storage { get; private set; }
-        public int Offset { get; private set; }
-
-        public Equipment(Storage equipmentStorage, int offset)
-        {
-            Storage = equipmentStorage;
-            Offset = offset;
-        }
+        public Storage Storage { get; private set; } = storage;
+        public int Offset { get; private set; } = offset;
 
         public List<Item?> GetItems(EquipType equipType)
         {

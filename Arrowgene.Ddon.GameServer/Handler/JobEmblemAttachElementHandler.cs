@@ -56,15 +56,15 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         .ToList();
                     if (crests.Count == 0)
                     {
-                        throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_INTERNAL_ERROR, "Failed to locate crest ids for emblem inheritance");
+                        throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_INTERNAL_ERROR, "Failed to locate crest ids for emblem inheritance.");
                     }
 
                     // Select a random crest to inherit if there are multiple
                     var crest = crests[Random.Shared.Next(0, crests.Count)];
                     foreach (var uid in request.EmblemUIDs)
                     {
-                        var (storageType, storageInfo) = client.Character.Storage.FindItemByUIdInStorage(ItemManager.EquipmentStorages, uid);
-                        var (slotNo, item, _) = storageInfo;
+                        var (storageType, (slotNo, item, _)) = client.Character.Storage.FindItemByUIdInStorage(ItemManager.EquipmentStorages, uid)
+                            ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_NOT_FOUND, "Failed to locate crest for emblem inheritance.");
 
                         ushort relativeSlotNo = slotNo;
                         CharacterCommon characterCommon = client.Character;
@@ -72,7 +72,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         {
                             uint pawnId = Storages.DeterminePawnId(client.Character, storageType, relativeSlotNo);
                             characterCommon = client.Character.Pawns.Where(x => x.PawnId == pawnId).SingleOrDefault()
-                                ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED, "Unable to locate the pawn that has this emblem item equipped");
+                                ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED, "Unable to locate the pawn that has this emblem item equipped.");
                             relativeSlotNo = EquipManager.DeterminePawnEquipSlot(relativeSlotNo);
                         }
 
@@ -92,7 +92,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                             match.Add = crest.Add;
                         }
 
-                        Server.Database.InsertCrest(characterCommon.CommonId, uid, request.InheritanceSlot, crest.CrestId, crest.Add, connection);
+                        Server.Database.InsertCrest(client.Character.CommonId, uid, request.InheritanceSlot, crest.CrestId, crest.Add, connection);
                         itemUpdateNtc.UpdateItemList.Add(Server.ItemManager.CreateItemUpdateResult(characterCommon, item, storageType, relativeSlotNo, 1, 1));
                     }
                 }

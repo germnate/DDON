@@ -23,7 +23,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             var joinNtc = new S2CPawnJoinPartyPawnNtc()
             {
-                PartyMember = partyMember.GetCDataPartyMember()
+                PartyMember = partyMember.CDataPartyMember
             };
 
             var contextNtc = partyMember.GetPartyContext();
@@ -34,7 +34,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             if (pawn.PawnId == client.Character.PartnerPawnId)
             {
-                Server.PartnerPawnManager.CreateAdventureTimer(client);
+                Server.PartnerPawnManager.CreateAdventureTimer(client, partyMember);
             }
 
             return new();

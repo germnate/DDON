@@ -160,4 +160,172 @@ skillAugmentation.AddNode(27)
     .Unlocks(OrbGainParamType.AllJobsPhysicalAttack, 2);
 #endregion
 
+#region TIER2
+// Row 11
+skillAugmentation.AddNode(28)
+    .Location(4, 11)
+    .BloodOrbCost(5500)
+    .HasUnlockDependencies(26)
+    .Unlocks(OrbGainParamType.JobHpMax, 50)
+    .HasQuestDependency(QuestId.HerosRestFeryanaRegion);
+// Row 12
+skillAugmentation.AddNode(29)
+    .Location(2, 12)
+    .BloodOrbCost(5600)
+    .HasUnlockDependencies(28)
+    .Unlocks(OrbGainParamType.JobMagicalAttack, 1);
+skillAugmentation.AddNode(30)
+    .Location(6, 12)
+    .BloodOrbCost(5600)
+    .HasUnlockDependencies(28)
+    .Unlocks(OrbGainParamType.JobPhysicalAttack, 1);
+// Row 13
+skillAugmentation.AddNode(31)
+    .Location(2, 13)
+    .BloodOrbCost(5800)
+    .HasUnlockDependencies(29)
+    .Unlocks(OrbGainParamType.JobStaminaMax, 15);
+skillAugmentation.AddNode(32)
+    .Location(6, 13)
+    .BloodOrbCost(5800)
+    .HasUnlockDependencies(30)
+    .Unlocks(OrbGainParamType.JobStaminaMax, 15);
+// Row 14
+skillAugmentation.AddNode(33)
+    .Location(2, 14)
+    .BloodOrbCost(6000)
+    .HasUnlockDependencies(31)
+    .Unlocks(OrbGainParamType.JobHpMax, 50);
+skillAugmentation.AddNode(34)
+    .Location(3, 14)
+    .HighOrbCost(500)
+    .HasUnlockDependencies(31)
+    .Unlocks(OrbGainParamType.JobMagicalAttack, 2);
+skillAugmentation.AddNode(35)
+    .Location(5, 14)
+    .HighOrbCost(500)
+    .HasUnlockDependencies(32)
+    .Unlocks(OrbGainParamType.JobPhysicalAttack, 2);
+skillAugmentation.AddNode(36)
+    .Location(6, 14)
+    .BloodOrbCost(6000)
+    .HasUnlockDependencies(32)
+    .Unlocks(OrbGainParamType.JobHpMax, 50);
+// Row 15
+skillAugmentation.AddNode(37)
+    .Location(2, 15)
+    .BloodOrbCost(6200)
+    .HasUnlockDependencies(33)
+    .Unlocks(OrbGainParamType.JobMagicalDefence, 1);
+skillAugmentation.AddNode(38)
+    .Location(6, 15)
+    .BloodOrbCost(6200)
+    .HasUnlockDependencies(36)
+    .Unlocks(OrbGainParamType.JobPhysicalDefence, 1);
+// Row 16
+skillAugmentation.AddNode(39)
+    .Location(2, 16)
+    .BloodOrbCost(6400)
+    .HasUnlockDependencies(37)
+    .Unlocks(OrbGainParamType.JobMagicalDefence, 2);
+skillAugmentation.AddNode(40)
+    .Location(3, 16)
+    .HighOrbCost(500)
+    .HasUnlockDependencies(37)
+    .Unlocks(OrbGainParamType.JobMagicalAttack, 2);
+skillAugmentation.AddNode(41)
+    .Location(5, 16)
+    .HighOrbCost(500)
+    .HasUnlockDependencies(38)
+    .Unlocks(OrbGainParamType.JobPhysicalAttack, 2);
+skillAugmentation.AddNode(42)
+    .Location(6, 16)
+    .BloodOrbCost(6400)
+    .HasUnlockDependencies(38)
+    .Unlocks(OrbGainParamType.JobPhysicalDefence, 2);
+// Row 17
+skillAugmentation.AddNode(43)
+    .Location(2, 17)
+    .BloodOrbCost(6600)
+    .HasUnlockDependencies(39)
+    .Unlocks(OrbGainParamType.JobMagicalDefence, 2);
+skillAugmentation.AddNode(44)
+    .Location(6, 17)
+    .BloodOrbCost(6600)
+    .HasUnlockDependencies(42)
+    .Unlocks(OrbGainParamType.JobPhysicalDefence, 2);
+// Row 18
+skillAugmentation.AddNode(45)
+    .Location(2, 18)
+    .HighOrbCost(600)
+    .HasUnlockDependencies(43)
+    .HasSpecialConditionDependencies(4)
+    .Unlocks(OrbGainParamType.JobHpMax, 50);
+skillAugmentation.AddNode(46)
+    .Location(3, 18)
+    .BloodOrbCost(6800)
+    .HasUnlockDependencies(43)
+    .Unlocks(OrbGainParamType.JobMagicalAttack, 2);
+skillAugmentation.AddNode(47)
+    .Location(5, 18)
+    .BloodOrbCost(6800)
+    .HasUnlockDependencies(44)
+    .Unlocks(OrbGainParamType.JobPhysicalAttack, 2);
+skillAugmentation.AddNode(48)
+    .Location(6, 18)
+    .HighOrbCost(600)
+    .HasUnlockDependencies(44)
+    .HasSpecialConditionDependencies(5)
+    .Unlocks(OrbGainParamType.JobHpMax, 50);
+// Row 19
+skillAugmentation.AddNode(49)
+    .Location(1, 19)
+    .HighOrbCost(600)
+    .HasUnlockDependencies(45)
+    .Unlocks(OrbGainParamType.JobMagicalAttack, 3);
+skillAugmentation.AddNode(50)
+    .Location(3, 19)
+    .BloodOrbCost(7000)
+    .HasUnlockDependencies(46)
+    .Unlocks(OrbGainParamType.JobHpMax, 50);
+skillAugmentation.AddNode(51)
+    .Location(5, 19)
+    .BloodOrbCost(7000)
+    .HasUnlockDependencies(47)
+    .Unlocks(OrbGainParamType.JobHpMax, 50);
+skillAugmentation.AddNode(52)
+    .Location(7, 19)
+    .HighOrbCost(600)
+    .HasUnlockDependencies(48)
+    .Unlocks(OrbGainParamType.JobPhysicalAttack, 3);
+// Row 20
+skillAugmentation.AddNode(53)
+    .Location(1, 20)
+    .HighOrbCost(700)
+    .HasUnlockDependencies(49)
+    .Unlocks(AbilityId.SkySlashAbsorption);
+skillAugmentation.AddNode(54)
+    .Location(4, 20)
+    .HighOrbCost(600)
+    .HasUnlockDependencies(50, 51)
+    .HasSpecialConditionDependencies(6)
+    .Unlocks(OrbGainParamType.JobStaminaMax, 20);
+skillAugmentation.AddNode(55)
+    .Location(7, 20)
+    .HighOrbCost(700)
+    .HasUnlockDependencies(52)
+    .Unlocks(AbilityId.FallingSlashAbsorption);
+// Row 21
+skillAugmentation.AddNode(56)
+    .Location(3, 21)
+    .HighOrbCost(700)
+    .HasUnlockDependencies(54)
+    .Unlocks(OrbGainParamType.AllJobsMagicalAttack, 2);
+skillAugmentation.AddNode(57)
+    .Location(5, 21)
+    .HighOrbCost(700)
+    .HasUnlockDependencies(54)
+    .Unlocks(OrbGainParamType.AllJobsPhysicalAttack, 2);
+#endregion
+
 return skillAugmentation;

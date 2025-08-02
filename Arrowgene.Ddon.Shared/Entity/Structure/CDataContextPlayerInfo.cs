@@ -14,46 +14,6 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
             OcdActiveList=new List<CDataOcdActive>();
         }
 
-        public static CDataContextPlayerInfo FromPawn(Pawn pawn)
-        {
-            CDataContextPlayerInfo obj = new CDataContextPlayerInfo()
-            {
-                Job = pawn.Job,
-                HP = pawn.StatusInfo.HP,
-                MaxHP = pawn.StatusInfo.MaxHP,
-                WhiteHP = pawn.StatusInfo.WhiteHP,
-                Stamina = pawn.StatusInfo.Stamina,
-                MaxStamina = pawn.StatusInfo.MaxStamina,
-                // Weight
-                Lv = (ushort) pawn.ActiveCharacterJobData.Lv,
-                Exp = pawn.ActiveCharacterJobData.Exp,
-                Atk = pawn.ActiveCharacterJobData.Atk,
-                Def = pawn.ActiveCharacterJobData.Def,
-                MAtk = pawn.ActiveCharacterJobData.MAtk,
-                MDef = pawn.ActiveCharacterJobData.MDef,
-                Strength = pawn.ActiveCharacterJobData.Strength,
-                DownPower = pawn.ActiveCharacterJobData.DownPower,
-                ShakePower = pawn.ActiveCharacterJobData.ShakePower,
-                StanPower = pawn.ActiveCharacterJobData.StunPower,
-                Constitution = pawn.ActiveCharacterJobData.Consitution,
-                Guts = pawn.ActiveCharacterJobData.Guts,
-                JobPoint = pawn.ActiveCharacterJobData.JobPoint,
-                GainHp = pawn.StatusInfo.GainHP,
-                GainStamina = pawn.StatusInfo.GainStamina,
-                GainAttack = pawn.StatusInfo.GainAttack,
-                GainDefense = pawn.StatusInfo.GainDefense,
-                GainMagicAttack = pawn.StatusInfo.GainMagicAttack,
-                GainMagicDefense = pawn.StatusInfo.GainMagicDefense,
-                ActNo = 0,
-                RevivePoint = 0,
-                CustomSkillGroup = 0,
-                JobList = CDataContextJobData.FromCDataCharacterJobData(pawn.CharacterJobDataList)
-                // ChargeEffectList
-                // OcdActiveList
-            };
-            return obj;
-        }
-
         public JobId Job { get; set; }
         public float HP { get; set; }
         public float MaxHP { get; set; }
@@ -70,7 +30,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
         public uint Strength { get; set; }
         public uint DownPower { get; set; }
         public uint ShakePower { get; set; }
-        public uint StanPower { get; set; }
+        public uint StunPower { get; set; }
         public uint Constitution { get; set; }
         public uint Guts { get; set; }
         public ulong JobPoint { get; set; }
@@ -125,7 +85,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
                 WriteUInt32(buffer, obj.Strength);
                 WriteUInt32(buffer, obj.DownPower);
                 WriteUInt32(buffer, obj.ShakePower);
-                WriteUInt32(buffer, obj.StanPower);
+                WriteUInt32(buffer, obj.StunPower);
                 WriteUInt32(buffer, obj.Constitution);
                 WriteUInt32(buffer, obj.Guts);
                 WriteUInt64(buffer, obj.JobPoint);
@@ -180,7 +140,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
                 obj.Strength = ReadUInt32(buffer);
                 obj.DownPower = ReadUInt32(buffer);
                 obj.ShakePower = ReadUInt32(buffer);
-                obj.StanPower = ReadUInt32(buffer);
+                obj.StunPower = ReadUInt32(buffer);
                 obj.Constitution = ReadUInt32(buffer);
                 obj.Guts = ReadUInt32(buffer);
                 obj.JobPoint = ReadUInt64(buffer);

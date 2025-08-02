@@ -93,6 +93,7 @@ namespace Arrowgene.Ddon.GameServer
             JobOrbUnlockManager = new JobOrbUnlockManager(this);
             JobEmblemManager = new JobEmblemManager(this);
             LightQuestManager = new LightQuestManager(this);
+            RentalPawnManager = new RentalPawnManager(this);
 
             // Orb Management is slightly complex and requires updating fields across multiple systems
             OrbUnlockManager = new OrbUnlockManager(this);
@@ -139,6 +140,7 @@ namespace Arrowgene.Ddon.GameServer
         public JobMasterManager JobMasterManager { get; private set; }
         public JobOrbUnlockManager JobOrbUnlockManager { get; }
         public JobEmblemManager JobEmblemManager { get; }
+        public RentalPawnManager RentalPawnManager { get; }
 
         public ChatLogHandler ChatLogHandler { get; }
         public LightQuestManager LightQuestManager { get; }
@@ -581,6 +583,8 @@ namespace Arrowgene.Ddon.GameServer
             AddHandler(new ProfileGetMyCharacterProfileHandler(this));
             AddHandler(new ProfileSetArisenProfileHandler(this));
             AddHandler(new ProfileSetMatchingProfileHandler(this));
+            AddHandler(new ProfileSetPawnProfileHandler(this));
+            AddHandler(new ProfileSetPawnProfileCommentHandler(this));
 
             AddHandler(new Quest_11_60_16_Handler(this));
             AddHandler(new QuestCancelHandler(this));
@@ -742,6 +746,9 @@ namespace Arrowgene.Ddon.GameServer
 			AddHandler(new StampBonusGetListHandler(this));
 			AddHandler(new StampBonusReceiveDailyHandler(this));
             AddHandler(new StampBonusReceiveTotalHandler(this));
+
+            AddHandler(new SupportPointSupportPointGetRateHandler(this));
+            AddHandler(new SupportPointSupportPointUseHandler(this));
 
             AddHandler(new WarpAreaWarpHandler(this));
             AddHandler(new WarpGetAreaWarpPointListHandler(this));

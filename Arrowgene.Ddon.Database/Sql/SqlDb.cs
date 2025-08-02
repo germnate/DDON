@@ -313,7 +313,7 @@ public abstract class SqlDb : IDatabase
     public abstract bool DeleteCharacter(uint characterId);
     public abstract bool UpdateCharacterBaseInfo(Character character);
     public abstract bool UpdateCharacterMatchingProfile(Character character);
-    public abstract bool UpdateCharacterArisenProfile(Character character);
+    public abstract bool UpdateCharacterProfile(CharacterCommon characterCommon, DbConnection? connectionIn = null);
     public abstract bool UpdateMyPawnSlot(uint characterId, uint num, DbConnection? connectionIn = null);
     public abstract bool UpdateRentalPawnSlot(uint characterId, uint num, DbConnection? connectionIn = null);
     public abstract bool UpdateCharacterBinaryData(uint characterId, byte[] data);
@@ -325,12 +325,11 @@ public abstract class SqlDb : IDatabase
     public abstract Pawn SelectPawn(uint pawnId);
     public abstract Pawn SelectPawn(DbConnection connection, uint pawnId);
     public abstract List<Pawn> SelectPawnsByCharacterId(uint characterId, DbConnection? connectionIn = null);
-    public abstract List<uint> SelectOfficialPawns();
+    public abstract List<uint> SelectOfficialPawns(DbConnection? connectionIn = null);
     public abstract List<uint> SelectAllPlayerPawns(uint limit = 100);
     public abstract List<uint> SelectAllPlayerPawns(DbConnection connection, uint limit = 100);
     public abstract List<uint> SelectClanPawns(uint clanId, uint characterId = 0, uint limit = 100, DbConnection? connectionIn = null);
-    public abstract List<CDataRegisterdPawnList> SelectRegisteredPawns(Character searchingCharacter, CDataPawnSearchParameter searchParams);
-    public abstract List<CDataRegisterdPawnList> SelectRegisteredPawns(DbConnection conn, Character searchingCharacter, CDataPawnSearchParameter searchParams);
+    public abstract List<CDataRegisterdPawnList> SelectRegisteredPawns(Character searchingCharacter, CDataPawnSearchParameter searchParams, DbConnection? connectionIn = null);
     public abstract bool DeletePawn(uint pawnId, DbConnection? connectionIn = null);
     public abstract bool UpdatePawnBaseInfo(Pawn pawn, DbConnection? connectionIn = null);
     public abstract uint GetPawnOwnerCharacterId(uint pawnId, DbConnection? connectionIn = null);
@@ -621,6 +620,15 @@ public abstract class SqlDb : IDatabase
     public abstract bool InsertPawnFavorite(uint characterId, uint pawnId, DbConnection? connectionIn = null);
     public abstract bool DeletePawnFavorite(uint characterId, uint pawnId, DbConnection? connectionIn = null);
     public abstract HashSet<uint> GetPawnFavorites(uint characterId, DbConnection? connectionIn = null);
+
+    public abstract List<RentalPawn> SelectRentalPawns(uint characterId, DbConnection? connectionIn = null);
+    public abstract bool InsertRentalPawn(uint characterId, RentalPawnRecord record, byte adventureCount, byte craftCount, DbConnection? connectionIn = null);
+    public abstract bool UpdateRentalPawn(uint characterId, RentalPawn pawn, DbConnection? connectionIn = null);
+    public abstract bool DeleteRentalPawn(uint characterId, uint pawnId, DbConnection? connectionIn = null);
+    public abstract CDataCommunityCharacterBaseInfo SelectCommunityCharacterBaseInfo(uint characterId, DbConnection? connectionIn = null);
+    public abstract bool InsertRentalPawnFeedback(uint characterId, RentalPawn pawn, List<CDataPawnFeedback> pawnFeedbacks, DbConnection? connectionIn = null);
+    public abstract List<CDataPawnHistory> SelectPawnHistory(uint pawnId, DbConnection? connectionIn = null);
+    public abstract CDataPawnTotalScore SelectPawnTotalScore(uint pawnId, DbConnection? connectionIn = null);
 
     protected virtual DbCommand Command(string query, DbConnection connection)
     {

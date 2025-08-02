@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
-using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Logging;
 
@@ -18,9 +15,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         public override S2CPawnGetRegisteredPawnDataRes Handle(GameClient client, C2SPawnGetRegisteredPawnDataReq request)
         {
-            S2CPawnGetRegisteredPawnDataRes res = new S2CPawnGetRegisteredPawnDataRes();
-            res.PawnId = (uint)request.PawnId;
-
             Pawn pawn = null;
             uint ownerCharacterId = Server.Database.GetPawnOwnerCharacterId((uint) request.PawnId);
             if (ownerCharacterId == 0)
@@ -40,7 +34,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 break;
             }
 
-            GameStructure.CDataPawnInfo(res.PawnInfo, pawn);
+            S2CPawnGetRegisteredPawnDataRes res = new S2CPawnGetRegisteredPawnDataRes
+            {
+                PawnId = (uint)request.PawnId,
+                PawnInfo = pawn.CDataPawnInfo
+            };
 
             return res;
         }

@@ -14,7 +14,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
         public uint SlotNo { get; set; }
         public string Name { get; set; } = string.Empty;
         public byte Sex { get; set; }
-        public byte PawnState { get; set; }
+        public PawnState PawnState { get; set; }
         public byte CraftCount { get; set; }
         public byte AdventureCount {  get; set; }
         public CDataPawnListData PawnListData { get; set; }
@@ -28,7 +28,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
                 WriteUInt32(buffer, obj.SlotNo);
                 WriteMtString(buffer, obj.Name);
                 WriteByte(buffer, obj.Sex);
-                WriteByte(buffer, obj.PawnState);
+                WriteByte(buffer, (byte)obj.PawnState);
                 WriteByte(buffer, obj.CraftCount);
                 WriteByte(buffer, obj.AdventureCount);
                 WriteEntity<CDataPawnListData>(buffer, obj.PawnListData);
@@ -42,7 +42,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
                 obj.SlotNo = ReadUInt32(buffer);
                 obj.Name = ReadMtString(buffer);
                 obj.Sex = ReadByte(buffer);
-                obj.PawnState = ReadByte(buffer);
+                obj.PawnState = (PawnState)ReadByte(buffer);
                 obj.CraftCount = ReadByte(buffer);
                 obj.AdventureCount = ReadByte(buffer);
                 obj.PawnListData = ReadEntity<CDataPawnListData>(buffer);

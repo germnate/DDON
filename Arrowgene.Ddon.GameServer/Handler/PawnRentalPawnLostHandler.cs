@@ -18,14 +18,15 @@ namespace Arrowgene.Ddon.GameServer.Handler
         {
             PacketQueue queue = new();
 
-            Pawn pawn = client.Character.PawnById(request.PawnId, PawnType.Support);
-            // TODO: Decrement by one the rented pawn's adventure count
+            RentalPawn pawn = (RentalPawn)client.Character.PawnById(request.PawnId, PawnType.Support);
+
+            queue.AddRange(Server.RentalPawnManager.HandleAdventureCountDecrement(client, pawn));
 
             S2CPawnRentalPawnLostNtc ntc = new S2CPawnRentalPawnLostNtc()
             {
                 PawnId = pawn.PawnId,
                 PawnName = pawn.Name,
-                AdventureCount = 5
+                AdventureCount = pawn.AdventureCount
             };
             client.Party.EnqueueToAll(ntc, queue);
 
@@ -33,7 +34,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             {
                 PawnId = pawn.PawnId,
                 PawnName = pawn.Name,
-                AdventureCount = 5
+                AdventureCount = pawn.AdventureCount
             }, queue);
 
             var pawnMember = client.Party.GetPartyMemberByCharacter(pawn);

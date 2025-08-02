@@ -210,15 +210,16 @@ CREATE TABLE IF NOT EXISTS "ddon_character_matching_profile"
     CONSTRAINT "fk_ddon_character_matching_profile_character_id" FOREIGN KEY ("character_id") REFERENCES "ddon_character" ("character_id") ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS "ddon_character_arisen_profile"
+CREATE TABLE IF NOT EXISTS "ddon_character_profile"
 (
-    "character_id"    INTEGER PRIMARY KEY NOT NULL,
-    "background_id"   SMALLINT            NOT NULL,
-    "title_uid"       INTEGER             NOT NULL,
-    "title_index"     INTEGER             NOT NULL,
-    "motion_id"       SMALLINT            NOT NULL,
-    "motion_frame_no" INTEGER             NOT NULL,
-    CONSTRAINT "fk_ddon_character_arisen_profile_character_id" FOREIGN KEY ("character_id") REFERENCES "ddon_character" ("character_id") ON DELETE CASCADE
+    "character_common_id"    INTEGER PRIMARY KEY NOT NULL,
+    "background_id"          SMALLINT            NOT NULL,
+    "title_uid"              INTEGER             NOT NULL,
+    "title_index"            INTEGER             NOT NULL,
+    "motion_id"              SMALLINT            NOT NULL,
+    "motion_frame_no"        INTEGER             NOT NULL,
+    "comment"                TEXT                NOT NULL,                
+    CONSTRAINT "fk_ddon_character_profile_character_id" FOREIGN KEY ("character_common_id") REFERENCES "ddon_character_common" ("character_common_id") ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS "ddon_character_job_data"
@@ -1048,4 +1049,35 @@ CREATE TABLE IF NOT EXISTS "ddon_pawn_favorites" (
     CONSTRAINT pk_ddon_pawn_favorites PRIMARY KEY ("character_id", "pawn_id"),
     CONSTRAINT fk_ddon_pawn_favorites_pawn_id FOREIGN KEY ("pawn_id") REFERENCES "ddon_pawn" ("pawn_id") ON DELETE CASCADE,
     CONSTRAINT fk_ddon_pawn_favorites_character_id FOREIGN KEY ("character_id") REFERENCES "ddon_character" ("character_id") ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "ddon_rental_pawn"
+(
+    "hiring_character_id"         INTEGER       NOT NULL,
+    "pawn_id"                     INTEGER       NOT NULL,
+    "data"                        BLOB          NOT NULL,
+    "data_size"                   INTEGER       NOT NULL,
+    "adventure_count"             TINYINT       NOT NULL,
+    "craft_count"                 TINYINT       NOT NULL,
+    "kill_count"                  INTEGER       NOT NULL,
+    CONSTRAINT "pk_ddon_rental_pawn" PRIMARY KEY ("hiring_character_id", "pawn_id"),
+    CONSTRAINT "fk_ddon_rental_pawn_hiring_character_id" FOREIGN KEY ("hiring_character_id") REFERENCES "ddon_character" ("character_id") ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "ddon_rental_pawn_feedback"
+(
+    "hiring_character_id"         INTEGER       NOT NULL,
+    "pawn_id"                     INTEGER       NOT NULL,
+    "hire_date"                   DATETIME      NOT NULL,
+    "return_date"                 DATETIME      NOT NULL,
+    "adventure_count"             TINYINT       NOT NULL,
+    "craft_count"                 TINYINT       NOT NULL,
+    "kill_count"                  INTEGER       NOT NULL,
+    "appearance_score"            TINYINT,
+    "appearance_comment"          TINYINT,
+    "combat_score"                TINYINT,
+    "combat_comment"              TINYINT,
+    "craft_score"                 TINYINT,
+    "craft_comment"               TINYINT,
+    CONSTRAINT "fk_ddon_rental_pawn_feedback_pawn_id" FOREIGN KEY ("pawn_id") REFERENCES "ddon_pawn" ("pawn_id") ON DELETE CASCADE
 );

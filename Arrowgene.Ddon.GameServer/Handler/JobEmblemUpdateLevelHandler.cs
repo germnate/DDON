@@ -26,6 +26,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 client.Enqueue(playPointNtc, packets);
 
                 Server.Database.UpsertJobEmblemData(client.Character.CharacterId, emblemData, connection);
+                packets.AddRange(Server.AchievementManager.HandleEmblemStone(client, emblemData.EmblemLevel, connectionIn: connection));
             });
 
             client.Enqueue(new S2CJobEmblemUpdateLevelRes()

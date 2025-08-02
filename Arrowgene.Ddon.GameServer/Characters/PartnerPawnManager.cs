@@ -1,3 +1,4 @@
+using Arrowgene.Ddon.GameServer.Party;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
@@ -30,6 +31,15 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return null;
             }
             return client.Character.Pawns.Where(x => x.PawnId == client.Character.PartnerPawnId).FirstOrDefault();
+        }
+
+        public PawnPartyMember GetPartnerPawnPartyMember(GameClient client)
+        {
+            if (client.Character.PartnerPawnId == 0)
+            {
+                return null;
+            }
+            return (PawnPartyMember)(client.Party?.Members.Where(x => x.IsPawn && x.PawnId == client.Character.PartnerPawnId).FirstOrDefault() ?? null);
         }
 
         public PartnerPawnData? GetPartnerPawnData(GameClient client, DbConnection? connectionIn = null)
@@ -68,7 +78,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return new();
             }
 
-            Pawn partnerPawn = client.Character.Pawns.Find(x => x.PawnId == client.Character.PartnerPawnId);
+            Pawn partnerPawn = GetPartnerPawn(client);
             if (partnerPawn == null)
             {
                 return new();
@@ -177,116 +187,114 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 .FirstOrDefault();
         }
 
-        public bool CreateAdventureTimer(GameClient client)
+        public bool CreateAdventureTimer(GameClient client, PawnPartyMember pawnPartyMember)
         {
-            lock (client.Character.PartnerTimerLockObj)
+            lock (pawnPartyMember.TimerLock)
             {
                 if (client.Character.PartnerPawnId == 0 || IsActionConsumedForDay(client, PartnerPawnAffectionAction.Adventure))
                 {
                     // No partner pawn or
                     // can't start another adventure for credit
                     // until the next reset
-                    return true;
+                    return false;
                 }
 
-                if (client.Character.PartnerPawnAdventureTimerId != 0 || !StageManager.IsSafeArea(client.Character.Stage))
+                if (!StageManager.IsSafeArea(client.Character.Stage))
                 {
                     Logger.Error(client, "Attempted to create an adventure timer in an invalid state");
                     return false;
                 }
 
-                client.Character.PartnerPawnAdventureTimerId = Server.TimerManager.CreateTimer(Server.GameSettings.GameServerSettings.PartnerPawnAdventureDurationInSeconds, () =>
+                if (pawnPartyMember.AdventureTimer != 0)
                 {
-                    Logger.Info($"(PartnerPawn) Adventure timer for PartnerPawnId={client.Character.PartnerPawnAdventureTimerId} met");
-                    CancelAdventureTimer(client);
+                    Logger.Error(client, "Attempted to create an adventure timer for a pawn that already has one.");
+                    return false;
+                }
+
+                uint timerId = Server.TimerManager.CreateTimer(Server.GameSettings.GameServerSettings.PartnerPawnAdventureDurationInSeconds, () =>
+                {
+                    Logger.Info($"(PartnerPawn) Adventure timer for PartnerPawnId={pawnPartyMember.PawnId} met");
+                    CancelAdventureTimer(client, pawnPartyMember);
                     UpdateLikabilityIncreaseAction(client, PartnerPawnAffectionAction.Adventure);
                 });
-                Logger.Info(client, $"(PartnerPawn) Adventure timer for PartnerPawnId={client.Character.PartnerPawnAdventureTimerId} created");
+                Logger.Info(client, $"(PartnerPawn) Adventure timer for PartnerPawnId={pawnPartyMember.PawnId} created");
+                return true;
             }
-
-            return true;
         }
 
-        public void HandleStageAreaChange(GameClient client)
+        public void HandleStageAreaChange(GameClient client, uint fromStage, uint toStage)
         {
-            lock (client.Character.PartnerTimerLockObj)
+            bool fromSafe = StageManager.IsSafeArea(fromStage);
+            bool toSafe = StageManager.IsSafeArea(toStage);
+            PawnPartyMember partnerPartyMember = GetPartnerPawnPartyMember(client);
+            if (partnerPartyMember is null)
             {
-                var timerId = client.Character.PartnerPawnAdventureTimerId;
-                if (timerId == 0)
+                return;
+            }
+
+            lock (partnerPartyMember.TimerLock)
+            {
+                if (partnerPartyMember.AdventureTimer == 0 || fromSafe == toSafe)
                 {
+                    // Base->Base or Adventure->Adventure transition, so no need to adjust the timers.
                     return;
                 }
-
-                // Handle transitioning from safe to dangerous area
-                // Handle transitioning from dangerous to safe area
-                // Dangerous to Dangerous can be considered ignored since the timer should be running still
-                if (!Server.TimerManager.IsTimerStarted(timerId) && !StageManager.IsSafeArea(client.Character.Stage) ||
-                    Server.TimerManager.IsTimerPaused(timerId) && !StageManager.IsSafeArea(client.Character.Stage))
+                else if (fromSafe && !toSafe)
                 {
-                    StartAdventureTimer(client);
+                    // Base->Adventure, so start the timers.
+                    StartAdventureTimer(client, partnerPartyMember);
                 }
-                else if (Server.TimerManager.IsTimerStarted(timerId) && StageManager.IsSafeArea(client.Character.Stage))
+                else if (!fromSafe && toSafe)
                 {
-                    PauseAdventureTimer(client);
+                    // Adventure->Base, so pause the timers.
+                    PauseAdventureTimer(client, partnerPartyMember);
                 }
             }
         }
 
-        private bool StartAdventureTimer(GameClient client)
+        private bool StartAdventureTimer(GameClient client, PawnPartyMember pawnPartyMember)
         {
-            lock (client.Character.PartnerTimerLockObj)
+            lock (pawnPartyMember.TimerLock)
             {
-                if (client.Character.PartnerPawnAdventureTimerId == 0)
+                if (pawnPartyMember?.AdventureTimer == 0)
                 {
                     Logger.Error(client, "Attempted to start/resume the adventure timer but the timer id is invalid");
                     return false;
                 }
-                return Server.TimerManager.StartTimer(client.Character.PartnerPawnAdventureTimerId);
+                return Server.TimerManager.StartTimer(pawnPartyMember.AdventureTimer);
             }
         }
 
-        private bool PauseAdventureTimer(GameClient client)
+        private bool PauseAdventureTimer(GameClient client, PawnPartyMember pawnPartyMember)
         {
-            lock (client.Character.PartnerTimerLockObj)
+            lock (pawnPartyMember.TimerLock)
             {
-                if (client.Character.PartnerPawnAdventureTimerId == 0)
+                if (pawnPartyMember?.AdventureTimer == 0)
                 {
                     Logger.Error(client, "Attempted to start/resume the adventure timer but the timer id is invalid");
                     return false;
                 }
 
-                Server.TimerManager.PauseTimer(client.Character.PartnerPawnAdventureTimerId);
-                Logger.Info(client, $"(PartnerPawn) Adventure timer for PartnerPawnId={client.Character.PartnerPawnAdventureTimerId} paused");
+                Server.TimerManager.PauseTimer(pawnPartyMember.AdventureTimer);
+                Logger.Info(client, $"(PartnerPawn) Adventure timer for PartnerPawnId={pawnPartyMember.PawnId} paused");
 
                 return true;
             }
         }
 
-        public bool HandleLeaveFromParty(GameClient client)
+        
+        private bool CancelAdventureTimer(GameClient client, PawnPartyMember pawnPartyMember)
         {
-            lock (client.Character.PartnerTimerLockObj)
+            lock (pawnPartyMember.TimerLock)
             {
-                if (client.Character.PartnerPawnAdventureTimerId == 0)
-                {
-                    return true;
-                }
-                Logger.Info(client, $"(PartnerPawn) PartnerPawnId={client.Character.PartnerPawnAdventureTimerId} kicked/left party, canceling timer");
-                return CancelAdventureTimer(client);
-            }
-        }
-
-        private bool CancelAdventureTimer(GameClient client)
-        {
-            lock (client.Character.PartnerTimerLockObj)
-            {
-                if (client.Character.PartnerPawnAdventureTimerId == 0)
+                if (pawnPartyMember?.AdventureTimer == 0)
                 {
                     Logger.Error(client, "Attempted to cancel the adventure timer but the timer id is invalid");
                     return false;
                 }
 
-                Server.TimerManager.CancelTimer(client.Character.PartnerPawnAdventureTimerId);
-                client.Character.PartnerPawnAdventureTimerId = 0;
+                Server.TimerManager.CancelTimer(pawnPartyMember.AdventureTimer);
+                pawnPartyMember.AdventureTimer = 0;
                 return true;
             }
         }

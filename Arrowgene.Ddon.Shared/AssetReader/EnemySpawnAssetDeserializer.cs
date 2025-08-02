@@ -20,7 +20,7 @@ namespace Arrowgene.Ddon.Shared.AssetReader
 
         private static readonly ILogger Logger = LogProvider.Logger(typeof(EnemySpawnAssetDeserializer));
 
-        private static readonly string[] ENEMY_HEADERS = {"StageId", "LayerNo", "GroupId", "SubGroupId", "EnemyId", "NamedEnemyParamsId", "RaidBossId", "Scale", "Lv", "HmPresetNo", "StartThinkTblNo", "RepopNum", "RepopCount", "EnemyTargetTypesId", "MontageFixNo", "SetType", "InfectionType", "IsBossGauge", "IsBossBGM", "IsManualSet", "IsAreaBoss", "IsBloodOrbEnemy", "BloodOrbs", "IsHighOrbEnemy", "HighOrbs", "Experience", "DropsTableId", "SpawnTime", "PPDrop"};
+        private static readonly string[] ENEMY_HEADERS = {"StageId", "LayerNo", "GroupId", "SubGroupId", "PositionIndex", "EnemyId", "NamedEnemyParamsId", "RaidBossId", "Scale", "Lv", "HmPresetNo", "StartThinkTblNo", "RepopNum", "RepopCount", "EnemyTargetTypesId", "MontageFixNo", "SetType", "InfectionType", "IsBossGauge", "IsBossBGM", "IsManualSet", "IsAreaBoss", "IsBloodOrbEnemy", "BloodOrbs", "IsHighOrbEnemy", "HighOrbs", "Experience", "DropsTableId", "SpawnTime", "PPDrop"};
         private static readonly string[] DROPS_TABLE_HEADERS = {"ItemId", "ItemNum", "MaxItemNum", "Quality", "IsHidden", "DropChance"};
 
         private Dictionary<uint, NamedParam> namedParams;
@@ -113,9 +113,14 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                     BloodOrbs = row[enemySchemaIndexes["BloodOrbs"]].GetUInt32(),
                     HighOrbs = row[enemySchemaIndexes["HighOrbs"]].GetUInt32(),
                     Experience = row[enemySchemaIndexes["Experience"]].GetUInt32(),
-
                     Subgroup = subGroupId,
                 };
+
+                enemy.Index = Enemy.INVALID_INDEX;
+                if (enemySchemaIndexes.ContainsKey("PositionIndex"))
+                {
+                    enemy.Index = row[enemySchemaIndexes["PositionIndex"]].GetByte();
+                }
 
                 // Fallback for old style schema
                 enemy.IsBloodOrbEnemy = enemy.BloodOrbs > 0;

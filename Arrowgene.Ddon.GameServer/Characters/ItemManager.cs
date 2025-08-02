@@ -907,17 +907,17 @@ namespace Arrowgene.Ddon.GameServer.Characters
         }
 
 
-        public CDataItemUpdateResult CreateItemUpdateResult(CharacterCommon character, Item item, StorageType storageType, ushort slotNo, uint itemNum, uint updateItemNum)
+        public CDataItemUpdateResult CreateItemUpdateResult(CharacterCommon common, Item item, StorageType storageType, ushort slotNo, uint itemNum, uint updateItemNum)
         {
             uint pawnId = 0;
             uint characterId = 0;
-            if (character is Character)
+            if (common is Character character)
             {
-                characterId = ((Character)character).CharacterId;
+                characterId = character.CharacterId;
             }
-            else if (character is Pawn)
+            else if (common is Pawn pawn)
             {
-                pawnId = ((Pawn)character).PawnId;
+                pawnId = pawn.PawnId;
             }
 
             CDataItemUpdateResult updateResult = new CDataItemUpdateResult();
@@ -1112,7 +1112,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
             PacketQueue queue = new();
             if (client.Character.IsLanternLit)
             {
-                _Server.TimerManager.SetTimer(client.Character.LanternTimer, lanternTimer);
+                _Server.TimerManager.CancelTimer(client.Character.LanternTimer);
+                client.Character.LanternTimer = _Server.TimerManager.CreateTimer(lanternTimer, () =>
+                {
+                    StopLantern(client).Send();
+                });
+                _Server.TimerManager.StartTimer(client.Character.LanternTimer);
             }
             else
             {
@@ -1122,9 +1127,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 });
                 _Server.TimerManager.StartTimer(client.Character.LanternTimer);
                 client.Enqueue(new S2CCharacterStartLanternNtc() { RemainTime = lanternTimer }, queue);
-                //client.Party.EnqueueToAllExcept(new S2CCharacterStartLanternOtherNtc() { CharacterId = client.Character.CharacterId }, queue, client);
             }
-            client.Character.IsLanternLit = true;
 
             return queue;
         }
@@ -1140,10 +1143,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     _Server.TimerManager.CancelTimer(client.Character.LanternTimer);
                 }
                 client.Enqueue(new S2CCharacterFinishLanternNtc(), queue);
-                //client.Party.EnqueueToAllExcept(new S2CCharacterFinishLanternOtherNtc() { CharacterId = client.Character.CharacterId }, queue, client);
             }
 
-            client.Character.IsLanternLit = false;
+            client.Character.LanternTimer = 0;
 
             return queue;
         }

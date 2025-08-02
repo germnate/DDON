@@ -66,7 +66,7 @@ public partial class DdonSqlDb : SqlDb
         characterJobData.DownPower = GetUInt16(reader, "down_power");
         characterJobData.ShakePower = GetUInt16(reader, "shake_power");
         characterJobData.StunPower = GetUInt16(reader, "stun_power");
-        characterJobData.Consitution = GetUInt16(reader, "consitution");
+        characterJobData.Constitution = GetUInt16(reader, "consitution");
         characterJobData.Guts = GetUInt16(reader, "guts");
         characterJobData.FireResist = GetByte(reader, "fire_resist");
         characterJobData.IceResist = GetByte(reader, "ice_resist");
@@ -116,7 +116,7 @@ public partial class DdonSqlDb : SqlDb
         AddParameter(command, "down_power", characterJobData.DownPower);
         AddParameter(command, "shake_power", characterJobData.ShakePower);
         AddParameter(command, "stun_power", characterJobData.StunPower);
-        AddParameter(command, "consitution", characterJobData.Consitution);
+        AddParameter(command, "consitution", characterJobData.Constitution);
         AddParameter(command, "guts", characterJobData.Guts);
         AddParameter(command, "fire_resist", characterJobData.FireResist);
         AddParameter(command, "ice_resist", characterJobData.IceResist);

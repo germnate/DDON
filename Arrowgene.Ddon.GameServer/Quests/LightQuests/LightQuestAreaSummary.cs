@@ -1,4 +1,5 @@
 using Arrowgene.Ddon.GameServer.Utils;
+using Arrowgene.Ddon.Shared;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.Quest;
 using System;

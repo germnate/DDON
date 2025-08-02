@@ -15,9 +15,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         public override S2CClanClanPartnerPawnDataGetRes Handle(GameClient client, C2SClanClanPartnerPawnDataGetReq request)
         {
-            S2CClanClanPartnerPawnDataGetRes res = new S2CClanClanPartnerPawnDataGetRes();
-
-            res.PawnId = request.PawnId;
 
             Pawn pawn = null;
             Server.Database.ExecuteInTransaction(connection =>
@@ -32,7 +29,12 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 pawn = ownerCharacter.Pawns.Find(x => x.PawnId == request.PawnId)
                     ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_INVALID);
             });
-            GameStructure.CDataNoraPawnInfo(res.PawnInfo, pawn, Server);
+
+            S2CClanClanPartnerPawnDataGetRes res = new S2CClanClanPartnerPawnDataGetRes
+            {
+                PawnId = request.PawnId,
+                PawnInfo = pawn.CDataNoraPawnInfo
+            };
 
             return res;
         }

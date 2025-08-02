@@ -3,6 +3,7 @@ using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Model;
+using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
 using System;
 using System.Linq;
@@ -52,8 +53,13 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     }
 
                     updateCharacterItemNtc.UpdateItemList.Add(Server.ItemManager.CreateItemUpdateResult(characterCommon, item, storageType, relativeSlotNo, 0, 0));
-                    item.EquipElementParamList.Where(x => x.SlotNo == request.InheritanceSlot).FirstOrDefault().CrestId = 0;
-                    Server.Database.RemoveCrest(characterCommon.CommonId, uid, request.InheritanceSlot, connection);
+                    var removedCrest = item.EquipElementParamList.Where(x => x.SlotNo == request.InheritanceSlot).FirstOrDefault()
+                        ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_CRAFT_ELEMENT_SLOT_NOT_OCCUPIED, "Unable to locate crest to be removed from emblem.");
+                    if (removedCrest is not null)
+                    {
+                        removedCrest.CrestId = 0;
+                    }
+                    Server.Database.RemoveCrest(client.Character.CommonId, uid, request.InheritanceSlot, connection);
                     updateCharacterItemNtc.UpdateItemList.Add(Server.ItemManager.CreateItemUpdateResult(characterCommon, item, storageType, relativeSlotNo, 1, 1));
 
                     // note: This might be set multiple times but should all be the same

@@ -2,20 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Arrowgene.Ddon.GameServer.Utils
+namespace Arrowgene.Ddon.Shared
 {
     public static class RandomExtensions
     {
         public static UInt64 NextU64(this Random rnd)
         {
-            var buffer = new byte[sizeof(Int64)];
+            var buffer = new byte[sizeof(UInt64)];
             rnd.NextBytes(buffer);
             return BitConverter.ToUInt64(buffer, 0);
         }
 
         public static UInt32 NextU32(this Random rnd)
         {
-            var buffer = new byte[sizeof(Int64)];
+            var buffer = new byte[sizeof(UInt32)];
             rnd.NextBytes(buffer);
             return BitConverter.ToUInt32(buffer, 0);
         }
@@ -46,7 +46,7 @@ namespace Arrowgene.Ddon.GameServer.Utils
         /// <returns></returns>
         public static int WeightedNext(this Random rnd, int max, double bias = 2.0)
         {
-            return WeightedNext(rnd, 0, max, bias);
+            return rnd.WeightedNext(0, max, bias);
         }
 
         /// <summary>
@@ -109,7 +109,10 @@ namespace Arrowgene.Ddon.GameServer.Utils
                 throw new ArgumentException("Cannot choose from an empty list of objects.");
             }
 
-            weights = weights ?? Enumerable.Repeat(1.0, objects.Count).ToList();
+            if (weights is null)
+            {
+                return rnd.Choose(objects);
+            }
 
             if (weights.Count != objects.Count)
             {
@@ -134,6 +137,12 @@ namespace Arrowgene.Ddon.GameServer.Utils
 
             double rv = rnd.NextDouble() * cumWeights.Last();
             int index = cumWeights.Count(x => x < rv);
+            return objects[index];
+        }
+
+        public static T Choose<T>(this Random rnd, List<T> objects)
+        {
+            int index = rnd.Next(objects.Count);
             return objects[index];
         }
     }

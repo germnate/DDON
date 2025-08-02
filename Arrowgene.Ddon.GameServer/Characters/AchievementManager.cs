@@ -178,8 +178,15 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public PacketQueue HandleEmblemStone(GameClient client, uint level, DbConnection? connectionIn = null)
         {
-            // TODO: Implement.
             PacketQueue queue = new();
+            (AchievementType, uint) key = (AchievementType.EmblemStone, 0);
+            uint progress = client.Character.JobEmblems.Select(x => x.Value.EmblemLevel).DefaultIfEmpty().Max();
+
+            Server.Database.ExecuteQuerySafe(connectionIn, connection =>
+            {
+                queue.AddRange(CheckGainAchievement(client, key.Item1, key.Item2, progress, connection));
+            });
+
             return queue;
         }
 
@@ -516,7 +523,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     continue;
                 }
 
-                // TODO: ClearSubstory, EmblemStone, EpitaphRoad, MandragoraSpecies
+                // TODO: ClearSubstory, MandragoraSpecies
                 switch (asset.Type)
                 {
                     case AchievementType.Appraisal:
@@ -588,6 +595,14 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     case AchievementType.OrbDevote:
                         {
                             progress.Add((uint)orbProgress.GetValueOrDefault((OrbGainParamType)asset.Param));
+                            break;
+                        }
+                    case AchievementType.EmblemStone:
+                        {
+                            progress.Add(client.Character.JobEmblems
+                                .Select(x => x.Value.EmblemLevel)
+                                .DefaultIfEmpty()
+                                .Max());
                             break;
                         }
                     default:

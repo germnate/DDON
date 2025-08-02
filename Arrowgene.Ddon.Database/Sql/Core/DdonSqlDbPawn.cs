@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using Arrowgene.Ddon.Shared.Entity.Structure;
@@ -127,19 +128,21 @@ public partial class DdonSqlDb : SqlDb
         $"INSERT INTO \"ddon_sp_skill\" ({BuildQueryField(CDataSpSkillFields)}) VALUES ({BuildQueryInsert(CDataSpSkillFields)});";
 
     private readonly string SqlSelectAllPawnData =
-        $"SELECT \"ddon_pawn\".\"pawn_id\", {BuildQueryField("ddon_pawn", PawnFields)}, \"ddon_character_common\".\"character_common_id\", {BuildQueryField("ddon_character_common", CharacterCommonFields)}, {BuildQueryField("ddon_edit_info", CDataEditInfoFields)}, {BuildQueryField("ddon_status_info", CDataStatusInfoFields)}"
+        $"SELECT \"ddon_pawn\".\"pawn_id\", {BuildQueryField("ddon_pawn", PawnFields)}, \"ddon_character_common\".\"character_common_id\", {BuildQueryField("ddon_character_common", CharacterCommonFields)}, {BuildQueryField("ddon_edit_info", CDataEditInfoFields)}, {BuildQueryField("ddon_status_info", CDataStatusInfoFields)}, {BuildQueryField("ddon_character_profile", CDataProfileFields)} "
         + "FROM \"ddon_pawn\" "
         + "LEFT JOIN \"ddon_character_common\" ON \"ddon_character_common\".\"character_common_id\" = \"ddon_pawn\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_edit_info\" ON \"ddon_edit_info\".\"character_common_id\" = \"ddon_pawn\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_status_info\" ON \"ddon_status_info\".\"character_common_id\" = \"ddon_pawn\".\"character_common_id\" "
+        + "LEFT JOIN \"ddon_character_profile\" ON \"ddon_character_profile\".\"character_common_id\" = \"ddon_pawn\".\"character_common_id\" "
         + "WHERE \"ddon_pawn\".\"pawn_id\" = @pawn_id";
 
     private readonly string SqlSelectAllPawnsDataByCharacterId =
-        $"SELECT \"ddon_pawn\".\"pawn_id\", {BuildQueryField("ddon_pawn", PawnFields)}, \"ddon_character_common\".\"character_common_id\", {BuildQueryField("ddon_character_common", CharacterCommonFields)}, {BuildQueryField("ddon_edit_info", CDataEditInfoFields)}, {BuildQueryField("ddon_status_info", CDataStatusInfoFields)}"
+        $"SELECT \"ddon_pawn\".\"pawn_id\", {BuildQueryField("ddon_pawn", PawnFields)}, \"ddon_character_common\".\"character_common_id\", {BuildQueryField("ddon_character_common", CharacterCommonFields)}, {BuildQueryField("ddon_edit_info", CDataEditInfoFields)}, {BuildQueryField("ddon_status_info", CDataStatusInfoFields)}, {BuildQueryField("ddon_character_profile", CDataProfileFields)} "
         + "FROM \"ddon_pawn\" "
         + "LEFT JOIN \"ddon_character_common\" ON \"ddon_character_common\".\"character_common_id\" = \"ddon_pawn\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_edit_info\" ON \"ddon_edit_info\".\"character_common_id\" = \"ddon_pawn\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_status_info\" ON \"ddon_status_info\".\"character_common_id\" = \"ddon_pawn\".\"character_common_id\" "
+        + "LEFT JOIN \"ddon_character_profile\" ON \"ddon_character_profile\".\"character_common_id\" = \"ddon_pawn\".\"character_common_id\" "
         + "WHERE \"character_id\" = @character_id "
         + "ORDER BY \"pawn_id\"";
 
@@ -173,6 +176,7 @@ public partial class DdonSqlDb : SqlDb
                 SqlInsertStatusInfo,
                 command => { AddParameter(command, pawn); }
             );
+            ExecuteNonQuery(conn, SqlInsertCharacterProfile, command => { AddParameter(command, pawn); });
 
             StorePawnData(conn, pawn);
         });
@@ -258,49 +262,43 @@ public partial class DdonSqlDb : SqlDb
 
     public override List<CDataRegisterdPawnList> SelectRegisteredPawns(
         Character searchingCharacter,
-        CDataPawnSearchParameter searchParams
+        CDataPawnSearchParameter searchParams,
+        DbConnection? connectionIn = null
     )
     {
-        using DbConnection conn = OpenNewConnection();
-        return SelectRegisteredPawns(conn, searchingCharacter, searchParams);
-    }
-
-    public override List<CDataRegisterdPawnList> SelectRegisteredPawns(
-        DbConnection conn,
-        Character searchingCharacter,
-        CDataPawnSearchParameter searchParams
-    )
-    {
-        List<CDataRegisterdPawnList> registeredPawns = new();
-        ExecuteReader(
-            conn,
-            SqlSelectRegisteredPawns,
-            command => { AddParameter(command, searchingCharacter, searchParams); },
-            reader =>
-            {
-                while (reader.Read())
+        return ExecuteQuerySafe(connectionIn, conn =>
+        {
+            List<CDataRegisterdPawnList> registeredPawns = new();
+            ExecuteReader(
+                conn,
+                SqlSelectRegisteredPawns,
+                command => { AddParameter(command, searchingCharacter, searchParams); },
+                reader =>
                 {
-                    uint lv = GetUInt32(reader, "lv");
-                    registeredPawns.Add(
-                        new CDataRegisterdPawnList
-                        {
-                            Name = GetString(reader, "name"),
-                            PawnId = GetUInt32(reader, "pawn_id"),
-                            RentalCost = lv * 10,
-                            Sex = GetByte(reader, "sex"),
-                            Updated = 0, // TODO: Updated
-                            PawnListData = new CDataPawnListData
+                    while (reader.Read())
+                    {
+                        uint lv = GetUInt32(reader, "lv");
+                        registeredPawns.Add(
+                            new CDataRegisterdPawnList
                             {
-                                Job = (JobId)GetByte(reader, "job"),
-                                Level = lv,
-                                CraftRank = GetUInt32(reader, "craft_rank")
+                                Name = GetString(reader, "name"),
+                                PawnId = GetUInt32(reader, "pawn_id"),
+                                RentalCost = lv * 10,
+                                Sex = GetByte(reader, "sex"),
+                                Updated = DateTimeOffset.UtcNow, // TODO: Updated
+                                PawnListData = new CDataPawnListData
+                                {
+                                    Job = (JobId)GetByte(reader, "job"),
+                                    Level = lv,
+                                    CraftRank = GetUInt32(reader, "craft_rank")
+                                }
                             }
-                        }
-                    );
+                        );
+                    }
                 }
-            }
-        );
-        return registeredPawns;
+            );
+            return registeredPawns;
+        });
     }
 
     public override uint GetPawnOwnerCharacterId(uint pawnId, DbConnection? connectionIn = null)
@@ -345,29 +343,26 @@ public partial class DdonSqlDb : SqlDb
         return pawns;
     }
 
-    public override List<uint> SelectOfficialPawns()
+    public override List<uint> SelectOfficialPawns(DbConnection? connectionIn = null)
     {
-        using DbConnection connection = OpenNewConnection();
-        return SelectOfficialPawns(connection);
-    }
-
-    public List<uint> SelectOfficialPawns(DbConnection connection)
-    {
-        List<uint> pawns = new();
-        ExecuteReader(
-            connection,
-            SqlSelectOfficialPawns,
-            command => { },
-            reader =>
-            {
-                while (reader.Read())
+        return ExecuteQuerySafe(connectionIn, connection =>
+        {
+            List<uint> pawns = new();
+            ExecuteReader(
+                connection,
+                SqlSelectOfficialPawns,
+                command => { },
+                reader =>
                 {
-                    uint pawnId = GetUInt32(reader, "pawn_id");
-                    pawns.Add(pawnId);
+                    while (reader.Read())
+                    {
+                        uint pawnId = GetUInt32(reader, "pawn_id");
+                        pawns.Add(pawnId);
+                    }
                 }
-            }
-        );
-        return pawns;
+            );
+            return pawns;
+        });
     }
 
     public override bool DeletePawn(uint pawnId, DbConnection? connectionIn = null)

@@ -12,7 +12,19 @@ public class CDataCharacterName
     
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    
+
+    public override string? ToString()
+    {
+        if (LastName.Length > 0)
+        {
+            return $"{FirstName} {LastName}";
+        }
+        else
+        {
+            return FirstName;
+        }
+    }
+
     public class Serializer : EntitySerializer<CDataCharacterName>
     {
         public override void Write(IBuffer buffer, CDataCharacterName obj)

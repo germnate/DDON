@@ -1013,6 +1013,28 @@
             ]
         }
     ],
+    "starter_consumable_items": [
+        {
+            "comment": "7552,\u6bd2\u306e\u77e2,Healing Elixir,",
+            "item_id": 7552,
+            "quantity": 10
+        },
+        {
+            "comment": "9361,\u9ad8\u7d1a\u30ac\u30e9\u30a8\u30ad\u30b9,Quality Gala Extract,",
+            "item_id": 9361,
+            "quantity": 10
+        },
+        {
+            "comment": "55,\u30e9\u30f3\u30bf\u30f3\u706b\u7a2e,Lantern Kindling,",
+            "item_id": 55,
+            "quantity": 10
+        },
+        {
+            "comment": "41,\u4e07\u80fd\u85ac,Panacea,",
+            "item_id": 41,
+            "quantity": 5
+        }
+    ],
     "starter_job_items": [
         {
             "comment": "9858,\u6bd2\u306e\u77e2,Poison Arrow,",

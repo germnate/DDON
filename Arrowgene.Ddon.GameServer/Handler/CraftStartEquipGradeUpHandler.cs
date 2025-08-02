@@ -227,6 +227,14 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     client.Enqueue(CraftManager.HandlePawnExpUpNtc(client, leadPawn, 0, 0), queue);
                 }
 
+                foreach (CraftPawn p in craftPawns)
+                {
+                    if (p.Pawn is RentalPawn rentalPawn)
+                    {
+                        Server.RentalPawnManager.HandleCraftCountDecrement(rentalPawn, connection);
+                    }
+                }
+
                 Server.Database.UpdatePawnBaseInfo(leadPawn, connection);
             });
 

@@ -1,6 +1,5 @@
 using Arrowgene.Ddon.LoginServer.Dump;
 using Arrowgene.Ddon.Server;
-using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared;
 using Arrowgene.Ddon.Shared.Entity;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
@@ -111,7 +110,7 @@ namespace Arrowgene.Ddon.LoginServer.Handler
             //character.ShortCutList = packet.Structure.CharacterInfo.ShortCutList;
             //character.CommunicationShortCutList = packet.Structure.CharacterInfo.CommunicationShortCutList;
             character.MatchingProfile = packet.Structure.CharacterInfo.MatchingProfile;
-            character.ArisenProfile = packet.Structure.CharacterInfo.ArisenProfile;
+            character.CharacterProfile.CDataArisenProfile = packet.Structure.CharacterInfo.ArisenProfile;
             character.HideEquipHead = packet.Structure.CharacterInfo.HideEquipHead;
             character.HideEquipLantern = packet.Structure.CharacterInfo.HideEquipLantern;
             character.HideEquipHeadPawn = packet.Structure.CharacterInfo.HideEquipHeadPawn;
@@ -150,7 +149,7 @@ namespace Arrowgene.Ddon.LoginServer.Handler
                     DownPower = arisenPreset.DownPower,
                     ShakePower = arisenPreset.ShakePower,
                     StunPower = arisenPreset.StunPower,
-                    Consitution = arisenPreset.Consitution,
+                    Constitution = arisenPreset.Consitution,
                     Guts = arisenPreset.Guts,
                     FireResist = arisenPreset.FireResist,
                     IceResist = arisenPreset.IceResist,

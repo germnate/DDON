@@ -25,18 +25,21 @@ Due to these differences, in the main `EpitaphRoad.json` file, there will be fie
 
 ### Important OMs
 
-| Type               | OM ID    | Comment
-|:-------------------|:--------:|:-------
-| Bare Walls         | om522922 | Walls which removed by spending souls
-| NPC Wall           | om523102 | Wall which is cleared buy spending souls at an NPC. The `NpcGetExtendedFacilityHandler` needs to be updated to give the NPC correct menu options (`NpcFunction.GiveSpirits`).
-| Stone Statue Space | om511320 | Red door which blocks the entrance to the Stone Statue
-| Mysterious Doors   | om522554 | Doors with Green light that can be unlocked
-| Mysterious Powers  | om522552 | Green light pillars spawned when touching door (gathering points)
-| Brown Chest        | om513051 | Dungeon trash (souls)
-| Treasure Chest     | om513052 | Chests behind the gate of mysterious doors
-| Bronze Chest       | om513053 | Weekly reward
-| Silver Chest       | om513054 |
-| Gold Chest         | om513055 | Weekly reward
+| Type                    | OM ID    | Comment
+|:------------------------|:--------:|:-------
+| Bare Walls              | om522922 | Walls which removed by spending souls
+| NPC Wall                | om523102 | Wall which is cleared buy spending souls at an NPC. The `NpcGetExtendedFacilityHandler` needs to be updated to give the NPC correct menu options (`NpcFunction.GiveSpirits`).
+| Stone Statue Space Door | om511320 | Red door which blocks the entrance to the Stone Statue
+| Stone Statue            | om511321 | Statue to complete each section of Epitaph
+| Mysterious Doors        | om522554 | Doors with Green light that can be unlocked
+| Mysterious Powers       | om522552 | Green light pillars spawned when touching door (gathering points)
+| Iron Chest              | om513050 |
+| Brown Chest             | om513051 | Dungeon trash (souls)
+| Treasure Chest          | om513052 | Chests behind the gate of mysterious doors
+| Bronze Chest            | om513053 | Weekly reward
+| Silver Chest            | om513054 |
+| Gold Chest              | om513055 | Weekly reward
+| Purple Chest            | om513056 |
 
 ### Pattern for Mysterious doors
 

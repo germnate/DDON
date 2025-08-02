@@ -110,5 +110,9 @@
     {
         "code": "ERROR_CODE_CONTENTS_RELEASE_NOT_PARTY_PLAY_WITH_PLAYER",
         "en": "This or invited character has not yet unlocked playing in a party."
+    },
+    {
+        "code": "ERROR_CODE_PAWN_ALREADY_RENTED",
+        "en": "This pawn has already been rented."
     }
 ]

@@ -819,6 +819,58 @@ namespace Arrowgene.Ddon.Server.Settings
         }
 
         /// <summary>
+        /// Minimum price in G for a single item on the bazaar.
+        /// </summary>
+        [DefaultValue(_BazaarExhibitionMinPrice)]
+        public uint BazaarExhibitionMinPrice
+        {
+            set
+            {
+                SetSetting("BazaarExhibitionMinPrice", value);
+            }
+            get
+            {
+                return TryGetSetting("BazaarExhibitionMinPrice", _BazaarExhibitionMinPrice);
+            }
+        }
+        private const uint _BazaarExhibitionMinPrice = 1;
+
+        /// <summary>
+        /// Maximum price in G for a single item on the bazaar.
+        /// This ends up being interpreted as a signed integer by the client, so its capped at ~2 billion.
+        /// </summary>
+        [DefaultValue(_BazaarExhibitionMaxPrice)]
+        public uint BazaarExhibitionMaxPrice
+        {
+            set
+            {
+                SetSetting("BazaarExhibitionMaxPrice", value);
+            }
+            get
+            {
+                return TryGetSetting("BazaarExhibitionMaxPrice", _BazaarExhibitionMaxPrice);
+            }
+        }
+        private const uint _BazaarExhibitionMaxPrice = 99999;
+
+        /// <summary>
+        /// Number of items that can be included in a single exhibition on the bazaar.
+        /// </summary>
+        [DefaultValue(_BazaarExhibitionMaxItemNum)]
+        public ushort BazaarExhibitionMaxItemNum
+        {
+            set
+            {
+                SetSetting("BazaarExhibitionMaxItemNum", value);
+            }
+            get
+            {
+                return TryGetSetting("BazaarExhibitionMaxItemNum", _BazaarExhibitionMaxItemNum);
+            }
+        }
+        private const ushort _BazaarExhibitionMaxItemNum = 20;
+
+        /// <summary>
         /// Ties area rank progress to various paths to dungeons.
         /// </summary>
         [DefaultValue(_EnableAreaRankSpotLocks)]
@@ -834,6 +886,24 @@ namespace Arrowgene.Ddon.Server.Settings
             }
         }
         private const bool _EnableAreaRankSpotLocks = true;
+
+        /// <summary>
+        /// Confgures the amount of AP to be rewarded when clearing an area or dungeon boss
+        /// in the normal game mode.
+        /// </summary>
+        [DefaultValue(_AreaBossApReward)]
+        public uint AreaBossApReward
+        {
+            set
+            {
+                SetSetting("AreaBossApReward", value);
+            }
+            get
+            {
+                return TryGetSetting("AreaBossApReward", _AreaBossApReward);
+            }
+        }
+        private const uint _AreaBossApReward = 500;
 
         /// <summary>
         /// Configures the chance that various gathering tools can break
@@ -1451,6 +1521,7 @@ namespace Arrowgene.Ddon.Server.Settings
 
         /// <summary>
         /// Configures if the HO exchange is enabled or not.
+        /// @warning Current implementation is able to be exploited for infinite conversion.
         /// </summary>
         [DefaultValue(_EnableHighOrbConversion)]
         public bool EnableHighOrbConversion
@@ -1464,6 +1535,130 @@ namespace Arrowgene.Ddon.Server.Settings
                 return TryGetSetting("EnableHighOrbConversion", _EnableHighOrbConversion);
             }
         }
-        private const bool _EnableHighOrbConversion = true;
+        private const bool _EnableHighOrbConversion = false;
+
+        /// <summary>
+        /// When set to true, allows pawns to bypass Job Training requirements
+        /// and learn any skill or augment they otherwise meet the requirements of.
+        /// </summary>
+        [DefaultValue(_PawnSkipJobTraining)]
+        public bool PawnSkipJobTraining
+        {
+            set
+            {
+                SetSetting("PawnSkipJobTraining", value);
+            }
+            get
+            {
+                return TryGetSetting("PawnSkipJobTraining", _PawnSkipJobTraining);
+            }
+        }
+        private const bool _PawnSkipJobTraining = true;
+
+        /// <summary>
+        /// The number of adventure charges that a support pawn has when hired.
+        /// Other pieces of the UI seemingly expect this to be 10, but it may be more flexible.
+        /// </summary>
+        [DefaultValue(_RentalPawnAdventureCount)]
+        public byte RentalPawnAdventureCount
+        {
+            set
+            {
+                SetSetting("RentalPawnAdventureCount", value);
+            }
+            get
+            {
+                return TryGetSetting("RentalPawnAdventureCount", _RentalPawnAdventureCount);
+            }
+        }
+        private const byte _RentalPawnAdventureCount = 10;
+
+        /// <summary>
+        /// The number of crafting charges that a support pawn has when hired.
+        /// Other pieces of the UI seemingly expect this to be 5, but it may be more flexible.
+        /// </summary>
+        [DefaultValue(_RentalPawnCraftCount)]
+        public byte RentalPawnCraftCount
+        {
+            set
+            {
+                SetSetting("RentalPawnCraftCount", value);
+            }
+            get
+            {
+                return TryGetSetting("RentalPawnCraftCount", _RentalPawnCraftCount);
+            }
+        }
+        private const byte _RentalPawnCraftCount = 10;
+
+        /// <summary>
+        /// Time, in seconds, that a support pawn must be adventuring before it loses one of its adventuring charges.
+        /// By default, 1350 seconds = 22.5 minutes, or 6 hours Lestanian time.
+        /// </summary>
+        [DefaultValue(_RentalPawnAdventureTimer)]
+        public uint RentalPawnAdventureTimer
+        {
+            set
+            {
+                SetSetting("RentalPawnAdventureTimer", value);
+            }
+            get
+            {
+                return TryGetSetting("RentalPawnAdventureTimer", _RentalPawnAdventureTimer);
+            }
+        }
+        private const uint _RentalPawnAdventureTimer = 1350;
+
+        /// <summary>
+        /// If true, active rental pawn timers are automatically reset upon returning to a safe area, even if the instance wouldn't normally reset.
+        /// This is a QOL feature, since removing and readding them to the party would reset the timer anyways.
+        /// </summary>
+        [DefaultValue(_RentalPawnAdventureTimerAutoReset)]
+        public bool RentalPawnAdventureTimerAutoReset
+        {
+            set
+            {
+                SetSetting("RentalPawnAdventureTimerAutoReset", value);
+            }
+            get
+            {
+                return TryGetSetting("RentalPawnAdventureTimerAutoReset", _RentalPawnAdventureTimerAutoReset);
+            }
+        }
+        private const bool _RentalPawnAdventureTimerAutoReset = true;
+
+        /// <summary>
+        /// If true, rental pawns will consume an adventure charge when starting an EXM, but won't have their usual adventure timer running.
+        /// </summary>
+        [DefaultValue(_RentalPawnAdventureConsumeOnEXM)]
+        public bool RentalPawnAdventureConsumeOnEXM
+        {
+            set
+            {
+                SetSetting("RentalPawnAdventureConsumeOnEXM", value);
+            }
+            get
+            {
+                return TryGetSetting("RentalPawnAdventureConsumeOnEXM", _RentalPawnAdventureConsumeOnEXM);
+            }
+        }
+        private const bool _RentalPawnAdventureConsumeOnEXM = true;
+
+        /// <summary>
+        /// The number of rental points (RP), gained by renting and returning pawns, required to buy one JP for a pawn.
+        /// </summary>
+        [DefaultValue(_RentalPointConversionRate)]
+        public uint RentalPointConversionRate
+        {
+            set
+            {
+                SetSetting("RentalPointConversionRate", value);
+            }
+            get
+            {
+                return TryGetSetting("RentalPointConversionRate", _RentalPointConversionRate);
+            }
+        }
+        private const uint _RentalPointConversionRate = 10;
     }
 }

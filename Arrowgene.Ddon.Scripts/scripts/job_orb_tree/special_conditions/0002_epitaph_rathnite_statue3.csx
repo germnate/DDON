@@ -3,7 +3,7 @@
 public class SpecialCondition : IJobOrbSpecialCondition
 {
     public override uint ConditionId => 2;
-    public override string Message => "Hero's Rest (Rathnite): Cave Depths Trial";
+    public override string Message => "Epitaph Road (Rathnite): Cave Depths Trial";
 
     public override bool EvaluateCondition(GameClient client)
     {

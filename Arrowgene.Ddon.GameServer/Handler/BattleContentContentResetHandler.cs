@@ -58,14 +58,16 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 // Recreate starting items for player
                 Server.Database.CreateItems(connection, client.Character);
 
-                // Add starter job items for Bitterblack Maze characters
+                // Add starter job items and starter consumable items for Bitterblack Maze characters
                 if(client.Character.GameMode == GameMode.BitterblackMaze) 
-                {
+                {   
+                    Server.Database.CreateListItems(connection, client.Character, StorageType.ItemBagConsumable, Server.AssetRepository.BitterblackMazeAsset.GenerateStarterConsumableItems());
                     Server.Database.CreateListItems(connection, client.Character, StorageType.ItemBagJob, Server.AssetRepository.BitterblackMazeAsset.GenerateStarterJobItems());
                 }
             });
 
-            //job items added for Bitterblack Maze needs to be updated to the Client
+            //job and consumable items added for Bitterblack Maze needs to be updated to the Client
+            updateItemList.AddRange(GetRefreshInventoryList(client.Character, StorageType.ItemBagConsumable));
             updateItemList.AddRange(GetRefreshInventoryList(client.Character, StorageType.ItemBagJob));
             
             S2CItemUpdateCharacterItemNtc updateCharacterItemNtc = new S2CItemUpdateCharacterItemNtc()

@@ -1,15 +1,10 @@
 using Arrowgene.Ddon.GameServer.Characters;
+using Arrowgene.Ddon.GameServer.Party;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
-using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
-using Arrowgene.Ddon.Shared.Network;
 using Arrowgene.Logging;
-using Arrowgene.Networking.Tcp.Consumer.BlockingQueueConsumption;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -35,6 +30,25 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 // These next values come from rEndContentsSortieInfo.esi.json
                 ntc.TimeGainQuestPlayStartData.QuestPhaseGroupIdList = quest.MissionParams.QuestPhaseGroupIdList;
                 client.Party.SendToAll(ntc);
+
+                if (Server.GameSettings.GameServerSettings.RentalPawnAdventureConsumeOnEXM)
+                {
+                    PacketQueue queue = new();
+                    Server.Database.ExecuteInTransaction(connection =>
+                    {
+                        foreach (var member in client.Party.Members)
+                        {
+                            if (member is PawnPartyMember pawnMember && pawnMember.Pawn is RentalPawn rentalPawn)
+                            {
+                                queue.AddRange(Server.RentalPawnManager.HandleAdventureCountDecrement(client, rentalPawn, connection));
+                                pawnMember.AdventureTimer = 0;
+                                Server.TimerManager.CancelTimer(pawnMember.AdventureTimer);
+                            }
+                        }
+                    });
+                    queue.Send();
+                }
+                
                 // TODO: Handle swapping/restricting items?
             }
 

@@ -59,10 +59,9 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 IsLeader = partyMember.IsLeader,
                 MemberIndex = partyMember.MemberIndex,
                 MemberType = partyMember.MemberType,
-                PawnId = partyMember.PawnId
+                PawnId = partyMember.PawnId,
+                CommunityCharacterBaseInfo = partyMember.Client.Character.CDataCommunityCharacterBaseInfo
             };
-            GameStructure.CDataCommunityCharacterBaseInfo(newMemberMinimum.CommunityCharacterBaseInfo,
-                partyMember.Client.Character);
             inviteJoinMemberNtc.MemberMinimumList.Add(newMemberMinimum);
             party.Leader.Client.Enqueue(inviteJoinMemberNtc, queue);
 

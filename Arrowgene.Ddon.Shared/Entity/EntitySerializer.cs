@@ -45,8 +45,8 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new CDataAreaInfoList.Serializer());
             Create(new CDataAreaQuestHint.Serializer());
             Create(new CDataAreaRank.Serializer());
-            Create(new CDataAreaRankSeason3.Serializer());
-            Create(new CDataAreaRankUnk0.Serializer());
+            Create(new CDataAreaRankPeriodicallyReleasedSpot.Serializer());
+            Create(new CDataAreaRankMonsterGatheringSpot.Serializer());
             Create(new CDataAreaRankUpQuestInfo.Serializer());
             Create(new CDataAreaSpotSet.Serializer());
             Create(new CDataArisenProfile.Serializer());
@@ -480,6 +480,7 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new CDataStorageItemUIDList.Serializer());
             Create(new CDataSubstoryQuestOrderList.Serializer());
             Create(new CDataSupplyItem.Serializer());
+            Create(new CDataSupportRate.Serializer());
 
             Create(new CDataTimeGainQuestList.Serializer());
             Create(new CDataTimeGainQuestRestrictions.Serializer());
@@ -492,6 +493,8 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new CDataTutorialQuestList.Serializer());
             Create(new CDataTutorialQuestOrderList.Serializer());
 
+            Create(new CDataUseSupportPoint.Serializer());
+            Create(new CDataUseSupportPointRes.Serializer());
             Create(new CDataURLInfo.Serializer());
             Create(new CDataUpdateMatchingProfileInfo.Serializer());
             Create(new CDataUpdateWalletPoint.Serializer());
@@ -886,6 +889,8 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new C2SProfileGetMyCharacterProfileReq.Serializer());
             Create(new C2SProfileSetArisenProfileReq.Serializer());
             Create(new C2SProfileSetMatchingProfileReq.Serializer());
+            Create(new C2SProfileSetPawnProfileReq.Serializer());
+            Create(new C2SProfileSetPawnProfileCommentReq.Serializer());
 
             Create(new C2SQuestSetPriorityQuestReq.Serializer());
             Create(new C2SQuestSetNavigationQuestReq.Serializer());
@@ -1023,10 +1028,14 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new C2SStageUnisonAreaChangeGetRecruitmentStateReq.Serializer());
             Create(new C2SStageUnisonAreaChangeReadyCancelReq.Serializer());
             Create(new C2SStageUnisonAreaChangeReadyReq.Serializer());
+
             Create(new C2SStampBonusCheckReq.Serializer());
             Create(new C2SStampBonusGetListReq.Serializer());
             Create(new C2SStampBonusRecieveDailyReq.Serializer());
             Create(new C2SStampBonusRecieveTotalReq.Serializer());
+
+            Create(new C2SSupportPointSupportPointGetRateReq.Serializer());
+            Create(new C2SSupportPointSupportPointUseReq.Serializer());
 
             Create(new C2SWarpAreaWarpReq.Serializer());
             Create(new C2SWarpGetFavoriteWarpPointListReq.Serializer());
@@ -1548,12 +1557,15 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new S2CPawnTrainingSetTrainingStatusRes.Serializer());
             Create(new S2CPawnUpdatePawnReactionListNtc.Serializer());
             Create(new S2CPawnUpdatePawnReactionListRes.Serializer());
+            Create(new S2CPawnUpdateRentalPawnAdventureCountNtc.Serializer());
 
             Create(new S2CProfileGetAvailableBackgroundListRes.Serializer());
             Create(new S2CProfileGetCharacterProfileRes.Serializer());
             Create(new S2CProfileGetMyCharacterProfileRes.Serializer());
             Create(new S2CProfileSetArisenProfileRes.Serializer());
             Create(new S2CProfileSetMatchingProfileRes.Serializer());
+            Create(new S2CProfileSetPawnProfileRes.Serializer());
+            Create(new S2CProfileSetPawnProfileCommentRes.Serializer());
 
             Create(new S2CQuest_11_125_16_Ntc.Serializer());
             Create(new S2CQuestCancelNavigationQuestRes.Serializer());
@@ -1751,6 +1763,9 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new S2CStampBonusGetListRes.Serializer());
             Create(new S2CStampBonusRecieveDailyRes.Serializer());
             Create(new S2CStampBonusRecieveTotalRes.Serializer());
+
+            Create(new S2CSupportPointSupportPointGetRateRes.Serializer());
+            Create(new S2CSupportPointSupportPointUseRes.Serializer());
 
             Create(new S2CUpdateCharacterJobPointNtc.Serializer());
             Create(new S2CUserListJoinNtc.Serializer());

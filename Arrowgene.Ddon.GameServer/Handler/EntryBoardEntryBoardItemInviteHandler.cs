@@ -1,8 +1,6 @@
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
-using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Logging;
-using System.Diagnostics.Metrics;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -27,9 +25,9 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     {
                         BoardId = data.BoardId,
                         ItemId = data.EntryItem.Id,
-                        Comment = data.EntryItem.Param.Comment
+                        Comment = data.EntryItem.Param.Comment,
+                        Character = client.Character.CDataCharacterListElement
                     };
-                    GameStructure.CDataCharacterListElement(ntc.Character, client.Character);
 
                     memberClient.Send(ntc);
                 }

@@ -23,8 +23,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     ClanId = client.Character.ClanId,
                     ClanName = client.Character.ClanName.Name,
+                    CharacterListElement = client.Character.CDataCharacterListElement,
                 };
-                GameStructure.CDataCharacterListElement(ntc.CharacterListElement, client.Character);
                 targetClient.Send(ntc);
             }
 

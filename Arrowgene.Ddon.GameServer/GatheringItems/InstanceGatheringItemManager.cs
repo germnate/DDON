@@ -79,6 +79,19 @@ namespace Arrowgene.Ddon.GameServer.GatheringItems
             InstancedItems.Clear();
         }
 
+        public HashSet<byte> GatheredSpots(CDataStageLayoutId stageLayout)
+        {
+            return [.. InstancedItems.GetValueOrDefault(stageLayout.AsStageLayoutId(), [])
+                .Select(x => (byte)x.Key)];
+        }
+
+        public HashSet<byte> EmptySpots(CDataStageLayoutId stageLayout)
+        {
+            return [.. InstancedItems.GetValueOrDefault(stageLayout.AsStageLayoutId(), [])
+                .Where(x => x.Value.DefaultIfEmpty().Sum(y => y.ItemNum) == 0)
+                .Select(x => (byte)x.Key)];
+        }
+
         public string Report(StageLayoutId stageId, uint index)
         {
             var infoStrings = FetchOrGenerate(stageId, index).Items.Select(x => $"{Server.AssetRepository.ClientItemInfos[x.ItemId].Name} x{x.ItemNum}");

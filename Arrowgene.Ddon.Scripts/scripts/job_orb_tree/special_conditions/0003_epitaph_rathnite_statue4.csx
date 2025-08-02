@@ -3,7 +3,7 @@
 public class SpecialCondition : IJobOrbSpecialCondition
 {
     public override uint ConditionId => 3;
-    public override string Message => "Hero's Rest (Rathnite): Waterway Trial";
+    public override string Message => "Epitaph Road (Rathnite): Waterway Trial";
 
     public override bool EvaluateCondition(GameClient client)
     {

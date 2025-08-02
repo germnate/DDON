@@ -14,8 +14,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         public override S2CProfileSetArisenProfileRes Handle(GameClient client, C2SProfileSetArisenProfileReq request)
         {
-            client.Character.ArisenProfile = request.ArisenProfile;
-            Server.Database.UpdateCharacterArisenProfile(client.Character);
+            client.Character.CharacterProfile.CDataArisenProfile = request.ArisenProfile;
+            Server.Database.UpdateCharacterProfile(client.Character);
             return new();
         }
     }

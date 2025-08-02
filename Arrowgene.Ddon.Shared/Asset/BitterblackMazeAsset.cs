@@ -13,6 +13,7 @@ namespace Arrowgene.Ddon.Shared.Asset
             Stages = new Dictionary<StageLayoutId, BitterblackMazeConfig>();
             StarterEquipment = new Dictionary<JobId, Dictionary<EquipType, List<Item>>>();
             StarterJobEquipment = new Dictionary<JobId, List<Item>>();
+            StarterConsumableItems = new List<(uint ItemId, uint Amount)>();
             StarterJobItems = new List<(uint ItemId, uint Amount)>();
             RareItemAppraisalList = new List<CDataCommonU32>();
             ItemTakeawayList = new List<CDataCommonU32>();
@@ -43,7 +44,8 @@ namespace Arrowgene.Ddon.Shared.Asset
         public Dictionary<uint, LootRange> LootRanges { get; set; }
         public Dictionary<JobId, Dictionary<EquipType, List<Item>>> StarterEquipment {  get; set; }
         public Dictionary<JobId, List<Item>> StarterJobEquipment { get; set; }
-        public List<(uint ItemId, uint Amount)>  StarterJobItems { get; set; }
+        public List<(uint ItemId, uint Amount)>  StarterConsumableItems { get; set; }
+        public List<(uint ItemId, uint Amount)> StarterJobItems { get; set; }
         public List<CDataCommonU32> RareItemAppraisalList { get; set; }
         public List<CDataCommonU32> ItemTakeawayList {  get; set; }
         public List<CDataBattleContentStageProgression> StageProgressionList {  get; set; }
@@ -94,12 +96,24 @@ namespace Arrowgene.Ddon.Shared.Asset
 
             return result;
         }
-
-        //Hunter arrows and Alchemist elixirs
-        public List<(uint ItemId, uint Amount)> GenerateStarterJobItems() 
+        
+        //Starter potions/stam/kindling/panacea
+        public List<(uint ItemId, uint Amount)> GenerateStarterConsumableItems() 
         {
             var result = new List<(uint ItemId, uint Amount)>();
-            foreach(var (itemId, quantity) in StarterJobItems) 
+            foreach(var (itemId, quantity) in StarterConsumableItems) 
+            {
+                result.Add((itemId, quantity));
+            }
+
+            return result;
+        }
+
+        //Hunter arrows and Alchemist elixirs
+        public List<(uint ItemId, uint Amount)> GenerateStarterJobItems()
+        {
+            var result = new List<(uint ItemId, uint Amount)>();
+            foreach (var (itemId, quantity) in StarterJobItems)
             {
                 result.Add((itemId, quantity));
             }

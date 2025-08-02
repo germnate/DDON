@@ -4,7 +4,9 @@ using System.Collections.Generic;
 namespace Arrowgene.Ddon.Shared.Model
 {
     public class Enemy
-    {       
+    {
+        public const byte INVALID_INDEX = 0xff;
+
         public Enemy()
         {
             NamedEnemyParams = NamedParam.DEFAULT_NAMED_PARAM;
@@ -37,6 +39,7 @@ namespace Arrowgene.Ddon.Shared.Model
             Experience = enemy.Experience;
             DropsTable = enemy.DropsTable;
             Subgroup = enemy.Subgroup;
+            Index = enemy.Index;
             PPDrop = enemy.PPDrop;
             IsBloodOrbEnemy = enemy.IsBloodOrbEnemy;
             IsHighOrbEnemy = enemy.IsHighOrbEnemy;
@@ -75,6 +78,7 @@ namespace Arrowgene.Ddon.Shared.Model
             } 
         }
         public byte Subgroup { get; set; }
+        public byte Index { get; set; }
 
         public uint GetDroppedExperience()
         {

@@ -3,10 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Arrowgene.Ddon.Shared
 {
@@ -512,6 +514,50 @@ namespace Arrowgene.Ddon.Shared
             }
 
             return content;   
+        }
+    
+        public static byte[] CompressJSON(string jsonData)
+        {
+            var bytes = Encoding.UTF8.GetBytes(jsonData);
+            using var memoryStream = new MemoryStream();
+            using (var gzipStream = new GZipStream(memoryStream, CompressionLevel.Optimal))
+            {
+                gzipStream.Write(bytes, 0, bytes.Length);
+            }
+            return memoryStream.ToArray();
+        }
+
+        public static string DecompressJSON(byte[] data)
+        {
+            using var memoryStream = new MemoryStream(data);
+            using var outputStream = new MemoryStream();
+            using (var decompressStream = new GZipStream(memoryStream, CompressionMode.Decompress))
+            {
+                decompressStream.CopyTo(outputStream);
+            }
+            return Encoding.UTF8.GetString(outputStream.ToArray());
+        }
+
+        public static async Task<byte[]> CompressJSONAsync(string jsonData)
+        {
+            var bytes = Encoding.UTF8.GetBytes(jsonData);
+            using var memoryStream = new MemoryStream();
+            using (var gzipStream = new GZipStream(memoryStream, CompressionLevel.Optimal))
+            {
+                await gzipStream.WriteAsync(bytes);
+            }
+            return memoryStream.ToArray();
+        }
+
+        public static async Task<string> DecompressJSONAsync(byte[] data)
+        {
+            using var memoryStream = new MemoryStream(data);
+            using var outputStream = new MemoryStream();
+            using (var brotliStream = new GZipStream(memoryStream, CompressionMode.Decompress))
+            {
+                await brotliStream.CopyToAsync(outputStream);
+            }
+            return Encoding.UTF8.GetString(outputStream.ToArray());
         }
 
         public static string GetHash<T>(this Stream stream) where T : HashAlgorithm

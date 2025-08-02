@@ -58,7 +58,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             ntc.LeaderCharacterId = partyLeader.CharacterId;
             foreach (PartyMember member in party.Members)
             {
-                ntc.PartyMembers.Add(member.GetCDataPartyMember());
+                ntc.PartyMembers.Add(member.CDataPartyMember);
             }
 
             party.SendToAll(ntc);

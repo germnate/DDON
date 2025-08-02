@@ -1,9 +1,9 @@
+using Arrowgene.Ddon.GameServer.Scripting.Interfaces;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Logging;
 using System;
-using System.Collections.Generic;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -18,25 +18,37 @@ namespace Arrowgene.Ddon.GameServer.Handler
         public override S2CPawnGetOfficialPawnListRes Handle(GameClient client, C2SPawnGetOfficialPawnListReq request)
         {
             var results = new S2CPawnGetOfficialPawnListRes();
-            var officialPawnIds = Server.Database.SelectOfficialPawns();
-            foreach (var pawnId in officialPawnIds)
+
+            Server.Database.ExecuteInTransaction(connection =>
             {
-                var pawn = Server.Database.SelectPawn(pawnId);
-                results.OfficialPawnList.Add(new CDataRegisterdPawnList()
+                var officialPawnIds = Server.Database.SelectOfficialPawns(connection);
+                foreach (var pawnId in officialPawnIds)
                 {
-                    Name = pawn.Name,
-                    RentalCost = client.Character.ActiveCharacterJobData.Lv * 10,
-                    Sex = pawn.EditInfo.Sex,
-                    Updated = (ulong)DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                    PawnId = pawn.PawnId,
-                    PawnListData = new CDataPawnListData()
+                    var pawn = Server.Database.SelectPawn(connection, pawnId);
+                    results.OfficialPawnList.Add(new CDataRegisterdPawnList()
                     {
-                        Job = pawn.Job,
-                        Level = client.Character.ActiveCharacterJobData.Lv,
-                        PawnCraftSkillList = pawn.CraftData.PawnCraftSkillList,
-                    }
-                });
+                        Name = pawn.Name,
+                        Sex = pawn.EditInfo.Sex,
+                        Updated = DateTimeOffset.UtcNow,
+                        PawnId = pawn.PawnId,
+                        PawnListData = new CDataPawnListData()
+                        {
+                            Job = pawn.Job,
+                            Level = pawn.ActiveCharacterJobData.Lv,
+                            PawnCraftSkillList = pawn.CraftData.PawnCraftSkillList,
+                        }
+                    });
+                }
+            });
+            
+
+            var mixin = Server.ScriptManager.MixinModule.Get<IRentalCostMixin>("rental_cost");
+            foreach (var registeredPawn in results.OfficialPawnList)
+            {
+                // TODO: Should official pawns always be discounted? Or have some other adjustment?
+                registeredPawn.RentalCost = mixin.GetRentalCost(client, registeredPawn, false);
             }
+
             return results;
         }
     }

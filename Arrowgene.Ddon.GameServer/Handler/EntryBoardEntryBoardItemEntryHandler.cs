@@ -4,9 +4,7 @@ using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
-using Arrowgene.Ddon.Shared.Network;
 using Arrowgene.Logging;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
@@ -43,7 +41,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             {
                 memberData = data.EntryItem.EntryMemberList.First(x => x.EntryFlag == false);
                 memberData.EntryFlag = true;
-                GameStructure.CDataCharacterListElement(memberData.CharacterListElement, client.Character);
+                memberData.CharacterListElement = client.Character.CDataCharacterListElement;
             }
 
             S2CEntryBoardEntryBoardItemChangeMemberNtc ntc = new S2CEntryBoardEntryBoardItemChangeMemberNtc()

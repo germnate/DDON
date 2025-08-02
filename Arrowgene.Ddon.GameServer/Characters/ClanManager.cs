@@ -437,9 +437,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 Rank = ClanMemberRank.Master,
                 Created = DateTimeOffset.UtcNow,
                 LastLoginTime = DateTimeOffset.UtcNow,
-                Permission = ALL_PERMISSIONS
+                Permission = ALL_PERMISSIONS,
+                CharacterListElement = character.CDataCharacterListElement
             };
-            GameStructure.CDataCharacterListElement(info.CharacterListElement, character);
             return info;
         }
 
@@ -450,9 +450,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 Rank = ClanMemberRank.Member,
                 Created = DateTimeOffset.UtcNow,
                 LastLoginTime = DateTimeOffset.UtcNow,
-                Permission = 0
+                Permission = 0,
+                CharacterListElement = character.CDataCharacterListElement
             };
-            GameStructure.CDataCharacterListElement(info.CharacterListElement, character);
             return info;
         }
 

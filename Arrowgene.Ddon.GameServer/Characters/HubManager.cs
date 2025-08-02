@@ -135,15 +135,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         private void SendContext(GameClient sourceClient, GameClient targetClient)
         {
-            S2CContextGetLobbyPlayerContextNtc contextNtc = new S2CContextGetLobbyPlayerContextNtc();
-            GameStructure.S2CContextGetLobbyPlayerContextNtc(Server, contextNtc, sourceClient.Character);
-            targetClient.Send(contextNtc);
+            targetClient.Send(sourceClient.Character.S2CContextGetLobbyPlayerContextNtc);
         }
 
         private void SendContext(GameClient sourceClient, IEnumerable<GameClient> targetClients)
         {
-            S2CContextGetLobbyPlayerContextNtc contextNtc = new S2CContextGetLobbyPlayerContextNtc();
-            GameStructure.S2CContextGetLobbyPlayerContextNtc(Server, contextNtc, sourceClient.Character);
+            S2CContextGetLobbyPlayerContextNtc contextNtc = sourceClient.Character.S2CContextGetLobbyPlayerContextNtc;
             foreach (GameClient client in targetClients)
             {
                 client.Send(contextNtc);
@@ -154,8 +151,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
         {
             foreach (GameClient source in sourceClients)
             {
-                S2CContextGetLobbyPlayerContextNtc contextNtc = new S2CContextGetLobbyPlayerContextNtc();
-                GameStructure.S2CContextGetLobbyPlayerContextNtc(Server, contextNtc, source.Character);
+                S2CContextGetLobbyPlayerContextNtc contextNtc = source.Character.S2CContextGetLobbyPlayerContextNtc;
                 targetClient.Send(contextNtc);
             }
         }

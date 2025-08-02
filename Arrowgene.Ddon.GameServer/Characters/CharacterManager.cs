@@ -343,6 +343,13 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
                 UpdateCharacterExtendedParams(pawn, ownerCharacter: character);
             }
+
+            character.RentedPawns = Server.Database.SelectRentalPawns(character.ContentCharacterId, connectionIn);
+            foreach(var pawn in character.RentedPawns)
+            {
+                pawn.MaxAdventureCount = Server.GameSettings.GameServerSettings.RentalPawnAdventureCount;
+                pawn.MaxCraftCount = Server.GameSettings.GameServerSettings.RentalPawnCraftCount;
+            }
         }
 
         public void UpdateOnlineStatus(GameClient client, Character character, OnlineStatus onlineStatus)
@@ -446,9 +453,6 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public void CleanupOnExit(GameClient client)
         {
-            // Cancel any pending timers
-            Server.PartnerPawnManager.HandleLeaveFromParty(client);
-
             // Update player health in the DB
             UpdateDatabaseOnExit(client.Character);
         }
@@ -488,10 +492,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
         {
             PacketQueue queue = new();
 
-            if (characterCommon is Character)
+            if (characterCommon is Character character)
             {
-                S2CContextGetLobbyPlayerContextNtc ntc1 = new S2CContextGetLobbyPlayerContextNtc();
-                GameStructure.S2CContextGetLobbyPlayerContextNtc(Server, ntc1, (Character) characterCommon);
+                var ntc1 = character.S2CContextGetLobbyPlayerContextNtc;
 
                 S2CExtendEquipSlotNtc ntc2 = new S2CExtendEquipSlotNtc()
                 {

@@ -1,6 +1,7 @@
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
+using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Logging;
 using System.Collections.Generic;
@@ -20,9 +21,15 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         public override S2CAreaGetSpotInfoListRes Handle(GameClient client, C2SAreaGetSpotInfoListReq request)
         {
-            // TODO: This still uses the List<CDataAreaRankSeason3> Unk1 from the Pcap, the client complains if its not present.
-            var pcap = EntitySerializer.Get<S2CAreaGetSpotInfoListRes>().Read(PcapData);
-            pcap.SpotInfoList = new();
+            //var pcap = EntitySerializer.Get<S2CAreaGetSpotInfoListRes>().Read(PcapData);
+            //pcap.SpotInfoList = [];
+
+            S2CAreaGetSpotInfoListRes res = new()
+            {
+                MonsterGatheringSpots = Server.AreaRankManager.CheckMonsterGatheringSpots(client),
+                PeriodicallyReleasedSpots = Server.AreaRankManager.CheckPeriodicallyReleasedSpots(client),
+                SpotAlertList = [.. Server.AreaRankManager.CheckMonsterGatheringSpots(client).Select(x => new CDataCommonU32(x.SpotId))]
+            };
 
             var clientRank = client.Character.AreaRanks.GetValueOrDefault(request.AreaId)
                 ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_AREAMASTER_AREA_INFO_NOT_FOUND);
@@ -30,7 +37,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             foreach (var spot in Server.AssetRepository.AreaRankSpotInfoAsset[request.AreaId].Where(x => !x.ReleaseOnly))
             {
-                pcap.SpotInfoList.Add(new()
+                res.SpotInfoList.Add(new()
                 {
                     SpotId = spot.SpotId,
                     TextIndex = spot.TextIndex,
@@ -39,7 +46,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 });
             }
 
-            return pcap;
+            return res;
         }
     }
 }

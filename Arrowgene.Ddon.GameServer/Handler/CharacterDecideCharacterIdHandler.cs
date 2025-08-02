@@ -20,10 +20,12 @@ namespace Arrowgene.Ddon.GameServer.Handler
         public override PacketQueue Handle(GameClient client, C2SCharacterDecideCharacterIdReq request)
         {
             PacketQueue packetQueue = new PacketQueue();
-            S2CCharacterDecideCharacterIdRes res = new S2CCharacterDecideCharacterIdRes();
-            res.CharacterId = client.Character.CharacterId;
-            res.CharacterInfo = new CDataCharacterInfo(client.Character);
-            res.BinaryData = client.Character.BinaryData;
+            S2CCharacterDecideCharacterIdRes res = new()
+            {
+                CharacterId = client.Character.CharacterId,
+                CharacterInfo = client.Character.CDataCharacterInfo,
+                BinaryData = client.Character.BinaryData
+            };
             client.Enqueue(res, packetQueue);
 
             // Unlocks menu options such as inventory, warping, etc.

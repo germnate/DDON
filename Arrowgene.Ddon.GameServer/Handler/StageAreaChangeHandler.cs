@@ -44,6 +44,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
             // For shared spaces, deal with all the context updating required for characters to be visible.
             // Must be done after Character.StageNo is set because of how the context is structured.
             Server.HubManager.UpdateLobbyContextOnStageChange(client, previousStageId, packet.StageId);
+            Server.RentalPawnManager.HandleStageAreaChange(client, previousStageId, packet.StageId);
+            Server.PartnerPawnManager.HandleStageAreaChange(client, previousStageId, packet.StageId);
 
             foreach (var pawn in client.Character.Pawns)
             {
@@ -78,6 +80,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     Server.EpitaphRoadManager.ResetInstance(client.Party);
                     client.Party.ResetInstance();
                     client.Party.SendToAll(new S2CInstanceAreaResetNtc());
+                    Server.RentalPawnManager.HandleReset(client.Party).Send();
 
                     Server.Database.ExecuteInTransaction(connection =>
                     {
@@ -135,11 +138,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     quest.HandleAreaChange(client, client.Character.Stage);
                 }
-            }
-
-            if (client.IsPartyLeader())
-            {
-                Server.PartnerPawnManager.HandleStageAreaChange(client);
             }
 
             queue.AddRange(Server.JobMasterManager.HandleAreaChange(client));

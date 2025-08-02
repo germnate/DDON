@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using Arrowgene.Buffers;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Network;
+using System.Collections.Generic;
 
 namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
 {
@@ -9,18 +9,11 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
     {
         public PacketId Id => PacketId.S2C_PAWN_GET_PAWN_ORB_DEVOTE_INFO_NTC;
 
-        public S2CPawnGetPawnOrbDevoteInfoNtc()
-        {
-            OrbPageStatusList = new List<CDataOrbPageStatus>();
-            JobOrbTreeStatusList = new List<CDataJobOrbTreeStatus>();
-            JobOrbHiBOStatusList = new List<CDataJobOrbTreeStatus>();
-        }
-
         public uint CharacterId { get; set; }
         public uint PawnId { get; set; }
-        public List<CDataOrbPageStatus> OrbPageStatusList { get; set; } // Dragon Force Augmentation
-        public List<CDataJobOrbTreeStatus> JobOrbTreeStatusList { get; set; } // Skill Augmentation
-        public List<CDataJobOrbTreeStatus> JobOrbHiBOStatusList { get; set; } // Special Skill Augmentation tree?
+        public List<CDataOrbPageStatus> OrbPageStatusList { get; set; } = []; // Dragon Force Augmentation
+        public List<CDataJobOrbTreeStatus> JobOrbTreeStatusList { get; set; } = []; // Skill Augmentation
+        public List<CDataJobOrbTreeStatus> JobOrbHiBOStatusList { get; set; } = []; // Special Skill Augmentation tree?
 
         public class Serializer : PacketEntitySerializer<S2CPawnGetPawnOrbDevoteInfoNtc>
         {

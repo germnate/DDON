@@ -1,14 +1,12 @@
+using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
-using Arrowgene.Ddon.Shared.Network;
 using Arrowgene.Logging;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using Arrowgene.Ddon.GameServer.Characters;
-using Arrowgene.Ddon.Server.Network;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -159,7 +157,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 DownPower = arisenPreset.DownPower,
                 ShakePower = arisenPreset.ShakePower,
                 StunPower = arisenPreset.StunPower,
-                Consitution = arisenPreset.Consitution,
+                Constitution = arisenPreset.Consitution,
                 Guts = arisenPreset.Guts,
                 FireResist = arisenPreset.FireResist,
                 IceResist = arisenPreset.IceResist,

@@ -61,7 +61,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     PartyId = party.Id,
                     ServerId = (uint)Server.Id,
-                    MemberList = [.. party.Members.Select(x => x.GetCDataPartyMember())]
+                    MemberList = [.. party.Members.Select(x => x.CDataPartyMember)]
                 }
             };
 
@@ -74,7 +74,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     PartyId = party.Id,
                     ServerId = (uint)Server.Id,
-                    MemberList = [invitedMember.GetCDataPartyMember()]
+                    MemberList = [invitedMember.CDataPartyMember]
                 }
             };
 

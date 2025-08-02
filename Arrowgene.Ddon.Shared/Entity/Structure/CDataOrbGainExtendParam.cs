@@ -4,23 +4,6 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
 {
     public class CDataOrbGainExtendParam
     {
-        public CDataOrbGainExtendParam()
-        {
-            HpMax = 0;
-            StaminaMax = 0;
-            Attack = 0;
-            Defence = 0;
-            MagicAttack = 0;
-            MagicDefence = 0;
-            AbilityCost = 0;
-            JewelrySlot = 0;
-            UseItemSlot = 0;
-            MaterialItemSlot = 0;
-            EquipItemSlot = 0;
-            MainPawnSlot = 0;
-            SupportPawnSlot = 0;
-        }
-
         public ushort HpMax { get; set; }
         public ushort StaminaMax { get; set; }
         public ushort Attack { get; set; }
@@ -34,6 +17,26 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
         public ushort EquipItemSlot { get; set; }
         public ushort MainPawnSlot { get; set; }
         public ushort SupportPawnSlot { get; set; }
+
+        public static CDataOrbGainExtendParam operator +(CDataOrbGainExtendParam a, CDataOrbGainExtendParam b)
+        {
+            return new CDataOrbGainExtendParam()
+            {
+                HpMax = (ushort)(a.HpMax + b.HpMax),
+                StaminaMax = (ushort)(a.StaminaMax + b.StaminaMax),
+                Attack = (ushort)(a.Attack + b.Attack),
+                Defence = (ushort)(a.Defence + b.Defence),
+                MagicAttack = (ushort)(a.MagicAttack + b.MagicAttack),
+                MagicDefence = (ushort)(a.MagicDefence + b.MagicDefence),
+                AbilityCost = (ushort)(a.AbilityCost + b.AbilityCost),
+                JewelrySlot = (ushort)(a.JewelrySlot + b.JewelrySlot),
+                UseItemSlot = (ushort)(a.UseItemSlot + b.UseItemSlot),
+                MaterialItemSlot = (ushort)(a.MaterialItemSlot + b.MaterialItemSlot),
+                EquipItemSlot = (ushort)(a.EquipItemSlot + b.EquipItemSlot),
+                MainPawnSlot = (ushort)(a.MainPawnSlot + b.MainPawnSlot),
+                SupportPawnSlot = (ushort)(a.SupportPawnSlot + b.SupportPawnSlot),
+            };
+        }
 
         public class Serializer : EntitySerializer<CDataOrbGainExtendParam>
         {

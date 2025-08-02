@@ -9,6 +9,7 @@ using Arrowgene.Ddon.Shared.Model.BattleContent;
 using Arrowgene.Ddon.Shared.Model.Clan;
 using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Ddon.Shared.Model.Scheduler;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -324,7 +325,7 @@ namespace Arrowgene.Ddon.Test.Database
         public bool SetToken(GameToken token) { return true; }
         public bool UpdateAccount(Account account) { return true; }
         public int UpdateBazaarExhibiton(BazaarExhibition exhibition) { return 1; }
-        public bool UpdateCharacterArisenProfile(Character character) { return true; }
+        public bool UpdateCharacterProfile(CharacterCommon characterCommon, DbConnection? connectionIn = null) { return true; }
         public bool UpdateCharacterBaseInfo(Character character) { return true; }
         public bool UpdateCharacterCommonBaseInfo(CharacterCommon common, DbConnection? connectionIn = null) { return true; }
         public bool UpdateCharacterJobData(uint commonId, CDataCharacterJobData updatedCharacterJobData, DbConnection? connectionIn = null) { return true; }
@@ -401,7 +402,7 @@ namespace Arrowgene.Ddon.Test.Database
         public bool UpdateBBMContentTreasure(uint characterId, uint contentId, uint amount) { return true; }
         public bool RemoveBBMContentTreasure(uint characterId) { return true; }
         public List<BitterblackMazeTreasure> SelectBBMContentTreasure(uint characterId, DbConnection? connectionIn = null) { return new List<BitterblackMazeTreasure>(); }
-        public List<uint> SelectOfficialPawns() { return new List<uint>(); }
+        public List<uint> SelectOfficialPawns(DbConnection? connectionIn = null) { return []; }
         public List<uint> SelectAllPlayerPawns(uint limit = 100) { return new List<uint>(); }
         public List<uint> SelectAllPlayerPawns(DbConnection connection, uint limit = 100) { return new List<uint>(); }
         public List<uint> SelectClanPawns(uint clanId, uint characterId = 0, uint limit = 100, DbConnection? connectionIn = null) { return new(); }
@@ -436,8 +437,7 @@ namespace Arrowgene.Ddon.Test.Database
 
         public Dictionary<TaskType, SchedulerTaskEntry> SelectAllTaskEntries() { return new(); }
         public bool UpdateScheduleInfo(TaskType type, long timestamp) { return true; }
-        public List<CDataRegisterdPawnList> SelectRegisteredPawns(Character searchingCharacter, CDataPawnSearchParameter searchParams) { return new List<CDataRegisterdPawnList>(); }
-        public List<CDataRegisterdPawnList> SelectRegisteredPawns(DbConnection conn, Character searchingCharacter, CDataPawnSearchParameter searchParams) { return new List<CDataRegisterdPawnList>(); }
+        public List<CDataRegisterdPawnList> SelectRegisteredPawns(Character searchingCharacter, CDataPawnSearchParameter searchParams, DbConnection? connectionIn = null) { return new List<CDataRegisterdPawnList>(); }
         public void DeleteWeeklyEpitaphClaimedRewards(DbConnection? connectionIn = null) { }
         public bool InsertAreaRank(uint characterId, AreaRank areaRank, DbConnection? connectionIn = null) { return true; }
         public bool UpdateAreaRank(uint characterId, AreaRank areaRank, DbConnection? connectionIn = null) { return true; }
@@ -530,6 +530,15 @@ namespace Arrowgene.Ddon.Test.Database
         public bool InsertPawnFavorite(uint characterId, uint pawnId, DbConnection? connectionIn = null) { return true; }
         public bool DeletePawnFavorite(uint characterId, uint pawnId, DbConnection? connectionIn = null) { return true; }
         public HashSet<uint> GetPawnFavorites(uint characterId, DbConnection? connectionIn = null) { return new(); }
+
+        public List<RentalPawn> SelectRentalPawns(uint characterId, DbConnection? connectionIn = null) { return new(); }
+        public bool InsertRentalPawn(uint characterId, RentalPawnRecord record, byte adventureCount, byte craftCount, DbConnection? connectionIn = null) { return true; }
+        public bool UpdateRentalPawn(uint characterId, RentalPawn pawn, DbConnection? connectionIn = null) { return true; }
+        public bool DeleteRentalPawn(uint characterId, uint pawnId, DbConnection? connectionIn = null) { return true; }
+        public CDataCommunityCharacterBaseInfo SelectCommunityCharacterBaseInfo(uint characterId, DbConnection? connectionIn = null) { return new(); }
+        public bool InsertRentalPawnFeedback(uint characterId, RentalPawn pawn, List<CDataPawnFeedback> pawnFeedbacks, DbConnection? connectionIn = null) { return true; }
+        public List<CDataPawnHistory> SelectPawnHistory(uint pawnId, DbConnection? connectionIn = null) { return []; }
+        public CDataPawnTotalScore SelectPawnTotalScore(uint pawnId, DbConnection? connectionIn = null) { return new(); }
 
         public void AddParameter(DbCommand command, string name, object? value, DbType type) { }
         public void AddParameter(DbCommand command, string name, string value) { }
