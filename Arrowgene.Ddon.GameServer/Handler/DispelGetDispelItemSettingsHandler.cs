@@ -20,6 +20,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         public override S2CDispelGetDispelItemSettingsRes Handle(GameClient client, C2SDispelGetDispelItemSettingsReq request)
         {
+            Logger.Info($"SpecialShopType={request.ShopType}");
+
             var res = new S2CDispelGetDispelItemSettingsRes();
 
             var specialShops = Server.AssetRepository.SpecialShopAsset.SpecialShops;
