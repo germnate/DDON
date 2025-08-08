@@ -1146,7 +1146,7 @@
         },
         {
             "location": "Breya Coast",
-            "type": "other",
+            "type": "shell",
             "is_spot": false,
             "name": "White Seashell",
             "item_id": 8016,
@@ -4536,7 +4536,7 @@
         },
         {
             "location": "Hidell Plains",
-            "type": "other",
+            "type": "shell",
             "is_spot": false,
             "name": "White Seashell",
             "item_id": 8016,
@@ -7266,7 +7266,7 @@
         },
         {
             "location": "Mysree Forest",
-            "type": "other",
+            "type": "shell",
             "is_spot": false,
             "name": "White Seashell",
             "item_id": 8016,
@@ -7288,7 +7288,7 @@
         },
         {
             "location": "Mysree Forest: Glowworm Cave",
-            "type": "other",
+            "type": "shell",
             "is_spot": false,
             "name": "Beautiful Conch Shell",
             "item_id": 8017,
@@ -26710,7 +26710,7 @@
         },
         {
             "location": "Bloodbane Isle",
-            "type": "other",
+            "type": "shell",
             "is_spot": false,
             "name": "Large Scallop Shell",
             "item_id": 8018,
@@ -26732,7 +26732,7 @@
         },
         {
             "location": "Bloodbane Isle",
-            "type": "other",
+            "type": "shell",
             "is_spot": false,
             "name": "Large Scallop Shell",
             "item_id": 8018,

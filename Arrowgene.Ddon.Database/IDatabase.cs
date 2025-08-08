@@ -185,8 +185,7 @@ public interface IDatabase
     List<EquipItem> SelectEquipItemByCharacter(uint characterCommonId);
 
     // Job Items
-    bool InsertEquipJobItem(string itemUId, uint commonId, JobId job, ushort slotNo);
-    bool ReplaceEquipJobItem(string itemUId, uint commonId, JobId job, ushort slotNo);
+    bool UpsertEquipJobItem(string itemUId, uint commonId, JobId job, ushort slotNo, DbConnection? connectionIn = null);
     bool DeleteEquipJobItem(uint commonId, JobId job, ushort slotNo);
 
     // CustomSkills

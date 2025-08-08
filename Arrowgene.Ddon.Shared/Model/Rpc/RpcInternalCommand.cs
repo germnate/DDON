@@ -18,6 +18,7 @@ namespace Arrowgene.Ddon.Shared.Model.Rpc
         //InternalChatRoute
         SendTellMessage, // RpcChatData
         SendClanMessage, // RpcChatData
+        SendShoutMessage, // RpcChatData
 
         //PacketRoute
         AnnouncePacketAll, // RpcPacketData

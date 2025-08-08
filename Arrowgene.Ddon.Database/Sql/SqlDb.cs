@@ -375,8 +375,7 @@ public abstract class SqlDb : IDatabase
     public abstract bool DeleteEquipItem(uint commonId, JobId job, EquipType equipType, byte equipSlot, DbConnection? connectionIn = null);
     public abstract void DeleteAllEquipItems(uint commonId, DbConnection? connectionIn = null);
     public abstract List<EquipItem> SelectEquipItemByCharacter(uint characterCommonId);
-    public abstract bool InsertEquipJobItem(string itemUId, uint commonId, JobId job, ushort slotNo);
-    public abstract bool ReplaceEquipJobItem(string itemUId, uint commonId, JobId job, ushort slotNo);
+    public abstract bool UpsertEquipJobItem(string itemUId, uint commonId, JobId job, ushort slotNo, DbConnection? connectionIn = null);
     public abstract bool DeleteEquipJobItem(uint commonId, JobId job, ushort slotNo);
     public abstract bool InsertLearnedCustomSkill(uint commonId, CustomSkill skill, DbConnection? connectionIn = null);
     public abstract bool UpdateLearnedCustomSkill(uint commonId, CustomSkill updatedSkill, DbConnection? connectionIn = null);

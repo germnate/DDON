@@ -193,6 +193,12 @@ namespace Arrowgene.Ddon.GameServer.Chat
                     }
                 case LobbyChatMsgType.Shout:
                     response.Recipients.AddRange(_Server.ClientLookup.GetAll());
+
+                    if (_Server.GameSettings.ChatCommandsSettings.CrossChannelShout)
+                    {
+                        _Server.RpcManager.AnnounceShoutChat(client, response);
+                    }
+
                     break;
                 case LobbyChatMsgType.Party:
                     PartyGroup party = client.Party;

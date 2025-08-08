@@ -80,7 +80,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     // EQUIP
                     Item item = server.Database.SelectStorageItemByUId(changeEquipJobItem.EquipJobItemUId);
                     characterToEquipTo.EquipmentTemplate.SetJobItem(item, characterToEquipTo.Job, changeEquipJobItem.EquipSlotNo);
-                    server.Database.ReplaceEquipJobItem(item.UId, characterToEquipTo.CommonId, characterToEquipTo.Job, changeEquipJobItem.EquipSlotNo);
+                    server.Database.UpsertEquipJobItem(item.UId, characterToEquipTo.CommonId, characterToEquipTo.Job, changeEquipJobItem.EquipSlotNo);
                 }
             }
 

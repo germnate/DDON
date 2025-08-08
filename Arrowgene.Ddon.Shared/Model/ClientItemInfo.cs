@@ -11,6 +11,11 @@ namespace Arrowgene.Ddon.Shared.Model
             get => this[(ItemId)itemId];
             set => this[(ItemId)itemId] = value;
         }
+        
+        public ClientItemInfo this[Item item]
+        {
+            get => this[item.ItemId];
+        }
 
         public void Add(uint itemId, ClientItemInfo item)
         {

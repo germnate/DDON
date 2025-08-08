@@ -57,8 +57,8 @@ namespace Arrowgene.Ddon.Shared.Model
         SilverChest = 513054,
         GoldChest = 513055,
         PurpleChest = 513056,
-        UnkChest0 = 513060,
-        UnkChest1 = 513061,
+        SmallRoundChest0 = 513060, // Usually found on tables in dungeons
+        SmallRoundChest1 = 513061,
         // SetInfoOmTreasureBoxG
         OrangeSealedChest = 513130, // (BBM)
         PurpleSealedChest = 513133, // (BBM)
@@ -144,8 +144,8 @@ namespace Arrowgene.Ddon.Shared.Model
             [OmGatheringPoint.SilverChest] = GatheringPointType.TreasureChest,
             [OmGatheringPoint.GoldChest] = GatheringPointType.TreasureChest,
             [OmGatheringPoint.PurpleChest] = GatheringPointType.TreasureChest,
-            [OmGatheringPoint.UnkChest0] = GatheringPointType.TreasureChest,
-            [OmGatheringPoint.UnkChest1] = GatheringPointType.TreasureChest,
+            [OmGatheringPoint.SmallRoundChest0] = GatheringPointType.TreasureChest,
+            [OmGatheringPoint.SmallRoundChest1] = GatheringPointType.TreasureChest,
             // OmTreasureBoxG
             [OmGatheringPoint.OrangeSealedChest] = GatheringPointType.SealedTreasureChest,
             [OmGatheringPoint.PurpleSealedChest] = GatheringPointType.SealedTreasureChest,

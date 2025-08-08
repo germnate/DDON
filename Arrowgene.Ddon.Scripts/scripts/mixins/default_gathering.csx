@@ -50,6 +50,8 @@ private class GatheringExtensions
         [OmGatheringPoint.BrownChest] = 1,
         [OmGatheringPoint.IronChest] = 2,
         [OmGatheringPoint.TreasureChest] = 3,
+        [OmGatheringPoint.SmallRoundChest0] = 3,
+        [OmGatheringPoint.SmallRoundChest1] = 3,
         [OmGatheringPoint.BronzeChest] = 4,
         [OmGatheringPoint.SilverChest] = 5,
         [OmGatheringPoint.GoldChest] = 6,

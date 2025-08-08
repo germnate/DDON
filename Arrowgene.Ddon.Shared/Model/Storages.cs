@@ -39,20 +39,20 @@ namespace Arrowgene.Ddon.Shared.Model
                 .ToList();
         }
 
-        public Tuple<StorageType, Tuple<ushort, Item, uint>> FindItemByUIdInStorage(List<StorageType> storageTypes, string uId)
+        public Tuple<StorageType, Tuple<ushort, Item, uint>> FindItemByUIdInStorage(IEnumerable<StorageType> storageTypes, string uId)
         {
-            foreach (var storage in storages)
+            foreach (var storage in storageTypes)
             {
-                var foundItem = storage.Value.FindItemByUId(uId);
+                var foundItem = storages.GetValueOrDefault(storage)?.FindItemByUId(uId);
                 if (foundItem != null)
                 {
-                    return (storage.Key, foundItem).ToTuple();
+                    return (storage, foundItem).ToTuple();
                 }
             }
             return null;
         }
 
-        public List<(StorageType StorageType, (ushort Index, Item Item, uint Amount))> FindItemsByIdInStorage(List<StorageType> storageTypes, ItemId itemId)
+        public List<(StorageType StorageType, (ushort Index, Item Item, uint Amount))> FindItemsByIdInStorage(IEnumerable<StorageType> storageTypes, ItemId itemId)
         {
             var result = new List<(StorageType StorageType, (ushort Index, Item Item, uint Amount))>();
             foreach (var storage in GetAllStorages().Where(x => storageTypes.Contains(x.Key)).ToList())
@@ -327,7 +327,7 @@ namespace Arrowgene.Ddon.Shared.Model
                 {
                     ItemId = (ushort) x.ItemId,
                     ColorNo = x.Color,
-                    PlusValue = x.SafetySetting,
+                    PlusValue = x.PlusValue,
                     EquipElementParamList = x.EquipElementParamList,
                     AddStatusParamList = x.AddStatusParamList,
                 })

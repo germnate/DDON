@@ -183,11 +183,16 @@ namespace Arrowgene.Ddon.GameServer
             }
         }
 
+        public void AnnounceAsync(ushort channelId, string route, RpcInternalCommand command, object data)
+        {
+            Task.Run(() => Announce(channelId, route, command, data));
+        }
+
         public void AnnounceAll(string route, RpcInternalCommand command, object data)
         {
             foreach (var channel in Server.AssetRepository.ServerList)
             {
-                Announce(channel.Id, route, command, data);
+                AnnounceAsync(channel.Id, route, command, data);
             }
         }
 
@@ -196,7 +201,7 @@ namespace Arrowgene.Ddon.GameServer
             foreach (var channel in Server.AssetRepository.ServerList)
             {
                 if (channel.Id == Server.Id) continue;
-                Announce(channel.Id, route, command, data);
+                AnnounceAsync(channel.Id, route, command, data);
             }
         }
 
@@ -211,7 +216,7 @@ namespace Arrowgene.Ddon.GameServer
 
                 if (channel.Value.Any(x => x.Value.ClanId == clanId))
                 {
-                    Announce(channel.Key, route, command, data);
+                    AnnounceAsync(channel.Key, route, command, data);
                 }
             }
         }
@@ -327,6 +332,23 @@ namespace Arrowgene.Ddon.GameServer
         #endregion
 
         #region Chat
+        public void AnnounceShoutChat(GameClient client, ChatResponse chatResponse)
+        {
+            RpcChatData chatData = new RpcChatData()
+            {
+                HandleId = 0,
+                Type = LobbyChatMsgType.Shout,
+                MessageFlavor = chatResponse.MessageFlavor,
+                PhrasesCategory = chatResponse.PhrasesCategory,
+                PhrasesIndex = chatResponse.PhrasesIndex,
+                Message = chatResponse.Message,
+                Deliver = false,
+                SourceData = new RpcCharacterData(client.Character)
+            };
+
+            AnnounceOthers("internal/chat", RpcInternalCommand.SendShoutMessage, chatData);
+        }
+
         public void AnnounceClanChat(GameClient client, ChatResponse chatResponse)
         {
             if (client.Character.ClanId == 0) return;
@@ -372,7 +394,7 @@ namespace Arrowgene.Ddon.GameServer
                 }
             };
 
-            Announce(targetServer, "internal/chat", RpcInternalCommand.SendTellMessage, chatData);
+            AnnounceAsync(targetServer, "internal/chat", RpcInternalCommand.SendTellMessage, chatData);
         }
         #endregion
 

@@ -94,8 +94,6 @@ namespace Arrowgene.Ddon.GameServer
             JobEmblemManager = new JobEmblemManager(this);
             LightQuestManager = new LightQuestManager(this);
             RentalPawnManager = new RentalPawnManager(this);
-
-            // Orb Management is slightly complex and requires updating fields across multiple systems
             OrbUnlockManager = new OrbUnlockManager(this);
 
             S2CStageGetStageListRes stageListPacket =

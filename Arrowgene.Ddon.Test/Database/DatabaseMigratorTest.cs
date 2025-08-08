@@ -242,7 +242,6 @@ namespace Arrowgene.Ddon.Test.Database
         public bool InsertConnection(Connection connection) { return true; }
         public int InsertContact(uint requestingCharacterId, uint requestedCharacterId, ContactListStatus status, ContactListType type, bool requesterFavorite, bool requestedFavorite) { return 1; }
         public bool InsertEquipItem(uint commonId, JobId job, EquipType equipType, byte equipSlot, string itemUId) { return true; }
-        public bool InsertEquipJobItem(string itemUId, uint commonId, JobId job, ushort slotNo) { return true; }
         public bool InsertEquippedAbility(uint commonId, JobId equipptedToJob, byte slotNo, Ability ability) { return true; }
         public bool InsertEquippedCustomSkill(uint commonId, byte slotNo, CustomSkill skill) { return true; }
         public bool InsertGainExtendParam(uint commonId, CDataOrbGainExtendParam Param) { return true; }
@@ -273,7 +272,6 @@ namespace Arrowgene.Ddon.Test.Database
         public bool ReplaceCharacterJobData(uint commonId, CDataCharacterJobData replacedCharacterJobData, DbConnection? connectionIn = null) { return true; }
         public bool ReplaceCommunicationShortcut(uint characterId, CDataCommunicationShortCut communicationShortcut, DbConnection? connectionIn = null) { return true; }
         public bool ReplaceEquipItem(uint commonId, JobId job, EquipType equipType, byte equipSlot, string itemUId, DbConnection? connectionIn = null) { return true; }
-        public bool ReplaceEquipJobItem(string itemUId, uint commonId, JobId job, ushort slotNo) { return true; }
         public bool ReplaceEquippedAbilities(uint commonId, JobId equippedToJob, List<Ability> abilities) { return true; }
         public bool ReplaceEquippedAbility(uint commonId, JobId equipptedToJob, byte slotNo, Ability ability) { return true; }
         public bool ReplaceEquippedCustomSkill(uint commonId, byte slotNo, CustomSkill skill) { return true; }
@@ -539,6 +537,8 @@ namespace Arrowgene.Ddon.Test.Database
         public bool InsertRentalPawnFeedback(uint characterId, RentalPawn pawn, List<CDataPawnFeedback> pawnFeedbacks, DbConnection? connectionIn = null) { return true; }
         public List<CDataPawnHistory> SelectPawnHistory(uint pawnId, DbConnection? connectionIn = null) { return []; }
         public CDataPawnTotalScore SelectPawnTotalScore(uint pawnId, DbConnection? connectionIn = null) { return new(); }
+
+        public bool UpsertEquipJobItem(string itemUId, uint commonId, JobId job, ushort slotNo, DbConnection? connectionIn = null) { return true; }
 
         public void AddParameter(DbCommand command, string name, object? value, DbType type) { }
         public void AddParameter(DbCommand command, string name, string value) { }

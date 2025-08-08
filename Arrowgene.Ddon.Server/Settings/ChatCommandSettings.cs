@@ -25,5 +25,22 @@ namespace Arrowgene.Ddon.Server.Settings
             }
         }
         private const bool _DisableAccountTypeCheck = false;
+
+        /// <summary>
+        /// Controls whether Shout is sent to all channels or not.
+        /// </summary>
+        [DefaultValue(_CrossChannelShout)]
+        public bool CrossChannelShout
+        {
+            set
+            {
+                SetSetting("CrossChannelShout", value);
+            }
+            get
+            {
+                return TryGetSetting("CrossChannelShout", _CrossChannelShout);
+            }
+        }
+        private const bool _CrossChannelShout = true;
     }
 }

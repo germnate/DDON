@@ -142,7 +142,6 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 changeJobNotice.EquipJobItemList = jobItems;
                 // TODO: Unk0
                 
-
                 updateCharacterItemNtc.UpdateType = ItemNoticeType.ChangeJob;
 
                 S2CJobChangeJobRes changeJobResponse = new S2CJobChangeJobRes();
@@ -158,7 +157,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     .FirstOrDefault(new CDataPlayPointData());
                 changeJobResponse.Unk0.Unk0 = (byte)jobId;
                 changeJobResponse.Unk0.Unk1 = character.Storage.GetAllStoragesAsCDataCharacterItemSlotInfoList();
-                
+
                 client.Enqueue(changeJobResponse, queue);
                 client.Enqueue(updateCharacterItemNtc, queue);
                 foreach (GameClient otherClient in Server.ClientLookup.GetAll())
@@ -167,8 +166,6 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 }
 
                 queue.AddRange(Server.CharacterManager.UpdateCharacterExtendedParamsNtc(client, common));
-
-                return queue;
             }
             else if (common is Pawn)
             {
@@ -209,12 +206,32 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
                 queue.AddRange(Server.CharacterManager.UpdateCharacterExtendedParamsNtc(client, common));
 
-                return queue;
             }
             else
             {
                 throw new Exception("Unknown character type");
             }
+
+            var equippedJobEmblems = client.Character.JobEmblems
+                .GetValueOrDefault(common.Job)
+                ?.UIDs
+                .Select(x => common.Equipment.Storage.FindItemByUId(x))
+                .Where(x => x is not null);
+            if (equippedJobEmblems is not null && equippedJobEmblems.Any())
+            {
+                var extraUpdateItemNtc = new S2CItemUpdateCharacterItemNtc()
+                {
+                    UpdateType = ItemNoticeType.EmblemStatUpdate // ???
+                };
+                foreach (var (slot, item, _) in equippedJobEmblems)
+                {
+                    extraUpdateItemNtc.UpdateItemList.Add(Server.ItemManager.CreateItemUpdateResult(common, item, common.Equipment.Storage.Type, slot, 1, 1));
+                }
+
+                client.Enqueue(extraUpdateItemNtc, queue);
+            }
+
+            return queue;
         }
 
         private List<CDataItemUpdateResult> SwapEquipmentAndStorage(GameClient client, CharacterCommon common, JobId oldJobId, JobId newJobId, EquipType equipType, DbConnection? connectionIn = null)

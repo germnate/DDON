@@ -99,6 +99,15 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 VisualEquipItemList = client.Character.Equipment.AsCDataEquipItemInfo(EquipType.Visual),
             });
 
+            client.Send(new S2CItemSortGetItemSortdataBinNtc()
+            {
+                SortData = [.. ItemManager.ItemBagStorageTypes.Select(x => new CDataItemSort()
+                {
+                    StorageType = x,
+                    Bin = client.Character.Storage.GetStorage(x).SortData
+                })]
+            });
+
             return new S2CCharacterSwitchGameModeRes()
             {
                 GameMode = packet.GameMode,
