@@ -30,7 +30,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 // using the /givepawn command before reaching this quest.
                 return new S2CPawnCreatePawnRes();
             }
-            else if (request.SlotNo > 3)
+            else if (request.SlotNo != 1 && request.SlotNo > client.Character.MyPawnSlotNum)
             {
                 throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_CREATE_NUM_OVER);
             }
@@ -143,7 +143,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 GainMagicDefense = activeJobPreset.GainMagicDefense,
             };
 
-            pawn.CharacterJobDataList = Server.AssetRepository.ArisenAsset.Where(x => x.Job == pawn.Job).Select(arisenPreset => new CDataCharacterJobData
+            pawn.CharacterJobDataList = [.. Server.AssetRepository.ArisenAsset.Where(x => x.Job == pawn.Job).Select(arisenPreset => new CDataCharacterJobData
             {
                 Job = arisenPreset.Job,
                 Exp = arisenPreset.Exp,
@@ -189,7 +189,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 DefDownResist = arisenPreset.DefDownResist,
                 MAtkDownResist = arisenPreset.MAtkDownResist,
                 MDefDownResist = arisenPreset.MDefDownResist
-            }).ToList();
+            })];
 
             pawn.EquipmentTemplate = new EquipmentTemplate(
                 Server.AssetRepository.PawnStartGearAsset.Select(pawnGearPreset => new Tuple<JobId, Dictionary<EquipType, List<Item>>>(pawnGearPreset.Job,
@@ -320,138 +320,26 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 })).ToDictionary(x => x.Item1, x => x.Item2)
             );
 
-            pawn.EquippedCustomSkillsDictionary = Server.AssetRepository.ArisenAsset.Select(arisenPreset => new Tuple<JobId, List<CustomSkill>>(arisenPreset.Job,
-                new List<CustomSkill>()
-                {
-                    // Main Palette
-                    new CustomSkill()
-                    {
-                        Job = arisenPreset.Job,
-                        SkillId = arisenPreset.Cs1MpId,
-                        SkillLv = arisenPreset.Cs1MpLv
-                    },
-                    new CustomSkill()
-                    {
-                        Job = arisenPreset.Job,
-                        SkillId = arisenPreset.Cs2MpId,
-                        SkillLv = arisenPreset.Cs2MpLv
-                    },
-                    new CustomSkill()
-                    {
-                        Job = arisenPreset.Job,
-                        SkillId = arisenPreset.Cs3MpId,
-                        SkillLv = arisenPreset.Cs3MpLv
-                    },
-                    new CustomSkill()
-                    {
-                        Job = arisenPreset.Job,
-                        SkillId = arisenPreset.Cs4MpId,
-                        SkillLv = arisenPreset.Cs4MpLv
-                    },
-                    null, null, null, null, null, null, null, null, null, null, null, null, // Padding from slots 0x04 (Main Palette slot 4) to 0x11 (Sub Palette slot 1)
-                    // Sub Palette
-                    new CustomSkill()
-                    {
-                        Job = arisenPreset.Job,
-                        SkillId = arisenPreset.Cs1SpId,
-                        SkillLv = arisenPreset.Cs1SpLv
-                    },
-                    new CustomSkill()
-                    {
-                        Job = arisenPreset.Job,
-                        SkillId = arisenPreset.Cs2SpId,
-                        SkillLv = arisenPreset.Cs2SpLv
-                    },
-                    new CustomSkill()
-                    {
-                        Job = arisenPreset.Job,
-                        SkillId = arisenPreset.Cs3SpId,
-                        SkillLv = arisenPreset.Cs3SpLv
-                    },
-                    new CustomSkill()
-                    {
-                        Job = arisenPreset.Job,
-                        SkillId = arisenPreset.Cs4SpId,
-                        SkillLv = arisenPreset.Cs4SpLv
-                    }
-                }.Select(skill => skill?.SkillId == 0 ? null : skill).ToList()
-            )).ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
+            pawn.EquippedCustomSkillsDictionary = [];
+            pawn.LearnedCustomSkills = [.. Server.JobOrbUnlockManager.GetExSkills(character).Select(x => new CustomSkill
+            {
+                CustomSkillId = x,
+                SkillLv = 1,
+            })];
 
-            pawn.LearnedCustomSkills = pawn.EquippedCustomSkillsDictionary.SelectMany(jobAndSkills => jobAndSkills.Value).Where(skill => skill != null).ToList();
+            pawn.EquippedAbilitiesDictionary = [];
+            pawn.LearnedAbilities = [];
 
-            pawn.EquippedAbilitiesDictionary = Server.AssetRepository.ArisenAsset.Select(arisenPreset => new Tuple<JobId, List<Ability>>(arisenPreset.Job, new List<Ability>()
-                {
-                    new Ability()
-                    {
-                        Job = arisenPreset.Ab1Jb,
-                        AbilityId = arisenPreset.Ab1Id,
-                        AbilityLv = arisenPreset.Ab1Lv
-                    },
-                    new Ability()
-                    {
-                        Job = arisenPreset.Ab2Jb,
-                        AbilityId = arisenPreset.Ab2Id,
-                        AbilityLv = arisenPreset.Ab2Lv
-                    },
-                    new Ability()
-                    {
-                        Job = arisenPreset.Ab3Jb,
-                        AbilityId = arisenPreset.Ab3Id,
-                        AbilityLv = arisenPreset.Ab3Lv
-                    },
-                    new Ability()
-                    {
-                        Job = arisenPreset.Ab4Jb,
-                        AbilityId = arisenPreset.Ab4Id,
-                        AbilityLv = arisenPreset.Ab4Lv
-                    },
-                    new Ability()
-                    {
-                        Job = arisenPreset.Ab5Jb,
-                        AbilityId = arisenPreset.Ab5Id,
-                        AbilityLv = arisenPreset.Ab5Lv
-                    },
-                    new Ability()
-                    {
-                        Job = arisenPreset.Ab6Jb,
-                        AbilityId = arisenPreset.Ab6Id,
-                        AbilityLv = arisenPreset.Ab6Lv
-                    },
-                    new Ability()
-                    {
-                        Job = arisenPreset.Ab7Jb,
-                        AbilityId = arisenPreset.Ab7Id,
-                        AbilityLv = arisenPreset.Ab7Lv
-                    },
-                    new Ability()
-                    {
-                        Job = arisenPreset.Ab8Jb,
-                        AbilityId = arisenPreset.Ab8Id,
-                        AbilityLv = arisenPreset.Ab8Lv
-                    },
-                    new Ability()
-                    {
-                        Job = arisenPreset.Ab9Jb,
-                        AbilityId = arisenPreset.Ab9Id,
-                        AbilityLv = arisenPreset.Ab9Lv
-                    },
-                    new Ability()
-                    {
-                        Job = arisenPreset.Ab10Jb,
-                        AbilityId = arisenPreset.Ab10Id,
-                        AbilityLv = arisenPreset.Ab10Lv
-                    }
-                }.Select(aug => aug?.AbilityId == 0 ? null : aug).ToList()
-            )).ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
-
-            pawn.LearnedAbilities = pawn.EquippedAbilitiesDictionary.SelectMany(jobAndAugs => jobAndAugs.Value).Where(aug => aug != null).ToList();
             pawn.TrainingPoints = int.MaxValue;
             pawn.AvailableTraining = uint.MaxValue;
-            pawn.PawnReactionList = Enumerable.Range(1, 11).Select(x => new CDataPawnReaction() { ReactionType = (byte)x, MotionNo = 1 }).ToList();
+            pawn.PawnReactionList = [.. Enumerable.Range(1, 11).Select(x => new CDataPawnReaction() { ReactionType = (byte)x, MotionNo = 1 })];
 
-            foreach (JobId job in Enum.GetValues(typeof(JobId)))
+            foreach (JobId job in Enum.GetValues<JobId>())
             {
-                var startingSkill = SkillData.AllSkills.Where(x => x.Job == job && x.Params.FirstOrDefault()?.RequireJobLevel == 0).FirstOrDefault();
+                var startingSkill = Server.AssetRepository.SkillData.Skills
+                    .GetValueOrDefault(job, [])
+                    .Where(x => x.Params.FirstOrDefault()?.RequireJobLevel == 0)
+                    .FirstOrDefault();
                 if (startingSkill != null && !pawn.LearnedCustomSkills.Where(x => (x.Job == job) && (x.SkillId == startingSkill.SkillNo)).Any())
                 {
                     pawn.LearnedCustomSkills.Add(new() { Job = job, SkillId = startingSkill.SkillNo, SkillLv = 1 });

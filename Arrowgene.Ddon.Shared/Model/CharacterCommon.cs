@@ -45,7 +45,7 @@ namespace Arrowgene.Ddon.Shared.Model
         public Dictionary<JobId, CDataOrbGainExtendParam> ExtendedJobParams { get; set; } = [];
         public Dictionary<JobId, HashSet<uint>> ReleasedExtendedJobParams { get; set; } = [];
         public Dictionary<JobId, HashSet<uint>> UnlockedCustomSkills { get; set; } = [];
-        public Dictionary<JobId, HashSet<uint>> UnlockedAbilities { get; set; } = [];
+        public Dictionary<JobId, HashSet<AbilityId>> UnlockedAbilities { get; set; } = [];
         public List<CDataEquipStatParam> EmblemStatList { get; set; } = [];
         public List<CDataReleaseOrbElement> OrbRelease { get; set; } = [];
         public CharacterProfile CharacterProfile { get; set; } = new();

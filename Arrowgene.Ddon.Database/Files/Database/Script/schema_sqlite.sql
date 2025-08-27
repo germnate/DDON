@@ -308,21 +308,6 @@ CREATE TABLE IF NOT EXISTS "ddon_storage_item"
     CONSTRAINT "fk_ddon_storage_item_character_id" FOREIGN KEY ("character_id") REFERENCES "ddon_character" ("character_id") ON DELETE CASCADE
 );
 
--- CREATE TABLE IF NOT EXISTS ddon_additional_status
--- (
---     "item_uid"          TEXT NOT NULL,
---     "character_id"      INTEGER NOT NULL,
---     "is_add_stat1"      TINYINT NOT NULL,
---     "is_add_stat2"      TINYINT NOT NULL,
---     "additional_status1" SMALLINT NOT NULL,
---     "additional_status2" SMALLINT NOT NULL,
---     CONSTRAINT pk_ddon_additional_status PRIMARY KEY ("item_uid"),
---     CONSTRAINT fk_additional_status_item_uid FOREIGN KEY ("item_uid") REFERENCES ddon_storage_item ("item_uid") ON DELETE CASCADE,
---     CONSTRAINT fk_additional_status_character_id FOREIGN KEY ("character_id") REFERENCES ddon_character ("character_id") ON DELETE CASCADE
--- );
--- Put in comments because it seems this might be apart of a larger system. TODO: Revisit this when we start messing around with Craig's crafting.
-
-
 CREATE TABLE IF NOT EXISTS "ddon_equip_item"
 (
     "item_uid"            TEXT NOT NULL,
@@ -939,12 +924,12 @@ VALUES (24, 0);
 CREATE TABLE IF NOT EXISTS "ddon_equipment_limit_break"
 (
     "character_id"     INTEGER    NOT NULL,
-    "item_uid"         TEXT NOT NULL,
-    "effect_1"         INTEGER    NOT NULL,
-    "effect_2"         INTEGER    NOT NULL,
-    "is_effect1_valid" BOOLEAN    NOT NULL,
-    "is_effect2_valid" BOOLEAN    NOT NULL,
-    CONSTRAINT "pk_ddon_equipment_limit_break" PRIMARY KEY ("character_id", "item_uid"),
+    "item_uid"         TEXT       NOT NULL,
+    "effect_id"        INTEGER    NOT NULL,
+    "unk1"             INTEGER    NOT NULL,
+    "effect_type"      SMALLINT    NOT NULL,
+    "unk0"             SMALLINT    NOT NULL,
+    CONSTRAINT "pk_ddon_equipment_limit_break" PRIMARY KEY ("character_id", "item_uid", "effect_type"),
     CONSTRAINT "fk_ddon_equipment_limit_break_item_uid" FOREIGN KEY ("item_uid") REFERENCES "ddon_storage_item" ("item_uid") ON DELETE CASCADE,
     CONSTRAINT "fk_ddon_equipment_limit_break_character_id" FOREIGN KEY ("character_id") REFERENCES "ddon_character" ("character_id") ON DELETE CASCADE
 );

@@ -54,17 +54,23 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     statRolls.Rolls[Random.Shared.Next((int) statRolls.MinGreatSuccessIndex, statRolls.Rolls.Count)] :
                     statRolls.Rolls.GetWeightedRandomElement(Server.GameSettings.GameServerSettings.EquipmentLimitBreakBias);
 
-                var newAddStatusParam = new CDataAddStatusParam()
+                var param = item.AddStatusParamList.Find(x => x.EnhanceType == EquipEnhanceType.LimitBreak);
+                if (param is null)
                 {
-                    AdditionalStatus1 = statRoll,
-                    IsAddStat1 = true
-                };
+                    param = new CDataAddStatusParam()
+                    {
+                        EnhanceId = statRoll,
+                        EnhanceType = EquipEnhanceType.LimitBreak
+                    };
+                    item.AddStatusParamList.Add(param);
+                }
+                else
+                {
+                    param.EnhanceId = statRoll;
+                }
 
-                Server.Database.UpsertEquipmentLimitBreakRecord(client.Character.CharacterId, item.UId, newAddStatusParam, connection);
-
-                item.AddStatusParamList.Clear();
-                item.AddStatusParamList.Add(newAddStatusParam);
-
+                Server.Database.UpsertEquipmentLimitBreakRecord(client.Character.CharacterId, item.UId, param, connection);
+                
                 ushort relativeSlotNo = slotNo;
                 CharacterCommon characterCommon = client.Character;
                 if (storageType == StorageType.PawnEquipment)

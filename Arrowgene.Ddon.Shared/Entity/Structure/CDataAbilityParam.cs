@@ -6,24 +6,19 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
 {
     public class CDataAbilityParam
     {
-        public uint AbilityNo { get; set; }
+        public AbilityId AbilityNo { get; set; }
         public JobId Job { get; set; }
         public byte Category { get; set; }
         public byte SortCategory { get; set; }
-        public byte Type { get; set; }
+        public byte Type { get; set; } = 1;
         public uint Cost { get; set; }
-        public List<CDataAbilityLevelParam> Params { get; set; }
-
-        public CDataAbilityParam()
-        {
-            Params = new List<CDataAbilityLevelParam>();
-        }
+        public List<CDataAbilityLevelParam> Params { get; set; } = [];
 
         public class Serializer : EntitySerializer<CDataAbilityParam>
         {
             public override void Write(IBuffer buffer, CDataAbilityParam obj)
             {
-                WriteUInt32(buffer, obj.AbilityNo);
+                WriteUInt32(buffer, (uint)obj.AbilityNo);
                 WriteByte(buffer, (byte) obj.Job);
                 WriteByte(buffer, obj.Category);
                 WriteByte(buffer, obj.SortCategory);
@@ -35,7 +30,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
             public override CDataAbilityParam Read(IBuffer buffer)
             {
                 CDataAbilityParam obj = new CDataAbilityParam();
-                obj.AbilityNo = ReadUInt32(buffer);
+                obj.AbilityNo = (AbilityId) ReadUInt32(buffer);
                 obj.Job = (JobId) ReadByte(buffer);
                 obj.Category = ReadByte(buffer);
                 obj.SortCategory = ReadByte(buffer);

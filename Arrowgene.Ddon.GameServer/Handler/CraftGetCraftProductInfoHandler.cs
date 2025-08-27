@@ -5,6 +5,7 @@ using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Logging;
+using System.Collections.Generic;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -28,7 +29,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     ItemID = craftProgress.ItemId,
                     ItemNum = craftProgress.CreateCount,
-                    Unk0 = craftProgress.AdditionalStatusId,
+                    AddStatusParam = Server.AssetRepository.CraftAddStatusAsset.AddStatuses.GetValueOrDefault(craftProgress.AdditionalStatusId)?.BuffId ?? 0,
                     PlusValue = (byte)craftProgress.PlusValue,
                     Exp = craftProgress.Exp,
                     ExtraBonus = craftProgress.BonusExp,
@@ -70,7 +71,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 craftProductInfoRes.CraftProductInfo = craftProductInfo;
             });
 
-            // TODO: track and increase CraftCount for NTC 8.35.16
             client.Enqueue(craftProductInfoRes, queue);
 
             return queue;

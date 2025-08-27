@@ -11,8 +11,8 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
         public uint PawnId { get; set; }
         public JobId Job { get; set; }
         public byte SlotNo { get; set; }
-        public uint SkillId { get; set; }
-        public byte SkillLv { get; set; }
+        public AbilityId AbilityId { get; set; }
+        public byte AbilityLv { get; set; }
 
         public class Serializer : PacketEntitySerializer<C2SSkillSetPawnAbilityReq>
         {
@@ -21,8 +21,8 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
                 WriteUInt32(buffer, obj.PawnId);
                 WriteByte(buffer, (byte) obj.Job);
                 WriteByte(buffer, obj.SlotNo);
-                WriteUInt32(buffer, obj.SkillId);
-                WriteByte(buffer, obj.SkillLv);
+                WriteUInt32(buffer, (uint)obj.AbilityId);
+                WriteByte(buffer, obj.AbilityLv);
             }
 
             public override C2SSkillSetPawnAbilityReq Read(IBuffer buffer)
@@ -31,8 +31,8 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
                 obj.PawnId = ReadUInt32(buffer);
                 obj.Job = (JobId) ReadByte(buffer);
                 obj.SlotNo = ReadByte(buffer);
-                obj.SkillId = ReadUInt32(buffer);
-                obj.SkillLv = ReadByte(buffer);
+                obj.AbilityId = (AbilityId)ReadUInt32(buffer);
+                obj.AbilityLv = ReadByte(buffer);
                 return obj;
             }
         }

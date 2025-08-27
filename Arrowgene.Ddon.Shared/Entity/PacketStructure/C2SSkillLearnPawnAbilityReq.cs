@@ -1,4 +1,5 @@
 using Arrowgene.Buffers;
+using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Network;
     
 namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
@@ -8,7 +9,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
         public PacketId Id => PacketId.C2S_SKILL_LEARN_PAWN_ABILITY_REQ;
 
         public uint PawnId { get; set; }
-        public uint AbilityId { get; set; }
+        public AbilityId AbilityId { get; set; }
         public byte AbilityLv { get; set; }
 
         public class Serializer : PacketEntitySerializer<C2SSkillLearnPawnAbilityReq>
@@ -16,7 +17,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
             public override void Write(IBuffer buffer, C2SSkillLearnPawnAbilityReq obj)
             {
                 WriteUInt32(buffer, obj.PawnId);
-                WriteUInt32(buffer, obj.AbilityId);
+                WriteUInt32(buffer, (uint)obj.AbilityId);
                 WriteByte(buffer, obj.AbilityLv);
             }
 
@@ -24,7 +25,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
             {
                 C2SSkillLearnPawnAbilityReq obj = new C2SSkillLearnPawnAbilityReq();
                 obj.PawnId = ReadUInt32(buffer);
-                obj.AbilityId = ReadUInt32(buffer);
+                obj.AbilityId = (AbilityId)ReadUInt32(buffer);
                 obj.AbilityLv = ReadByte(buffer);
                 return obj;
             }

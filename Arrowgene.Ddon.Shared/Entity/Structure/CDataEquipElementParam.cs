@@ -1,4 +1,4 @@
-﻿using Arrowgene.Buffers;
+using Arrowgene.Buffers;
 
 namespace Arrowgene.Ddon.Shared.Entity.Structure
 {
@@ -8,6 +8,17 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
         public uint CrestId { get; set; }
         public ushort Add { get; set; }
         
+        public CDataEquipElementParam(CDataEquipElementParam obj)
+        {
+            this.SlotNo = obj.SlotNo;
+            this.CrestId = obj.CrestId;
+            this.Add = obj.Add;
+        }
+
+        public CDataEquipElementParam()
+        {
+        }
+
         public class Serializer : EntitySerializer<CDataEquipElementParam>
         {
             public override void Write(IBuffer buffer, CDataEquipElementParam obj)

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using Arrowgene.Ddon.Shared.Entity.Structure;
+using Arrowgene.Ddon.Shared.Model;
 
 namespace Arrowgene.Ddon.Database.Sql.Core;
 
@@ -10,13 +11,13 @@ public partial class DdonSqlDb : SqlDb
     /* ddon_equipment_limit_break */
     protected static readonly string[] EquipmentLimitBreakFields = new[]
     {
-        "character_id", "item_uid", "effect_1", "effect_2", "is_effect1_valid", "is_effect2_valid"
+        "character_id", "item_uid", "effect_id", "unk1", "effect_type", "unk0"
     };
 
     // Identify key vs. non‑key fields for the upsert
     protected static readonly string[] EquipmentLimitBreakKeyFields = new[]
     {
-        "character_id", "item_uid"
+        "character_id", "item_uid", "effect_type"
     };
 
     protected static readonly string[] EquipmentLimitBreakNonKeyFields
@@ -35,41 +36,9 @@ public partial class DdonSqlDb : SqlDb
         $"""
          INSERT INTO "ddon_equipment_limit_break" ({BuildQueryField(EquipmentLimitBreakFields)}) 
                         VALUES ({BuildQueryInsert(EquipmentLimitBreakFields)}) 
-                        ON CONFLICT ("character_id","item_uid") 
+                        ON CONFLICT ("character_id","item_uid","effect_type") 
                         DO UPDATE SET {BuildQueryUpdateWithPrefix("EXCLUDED.", EquipmentLimitBreakNonKeyFields)};
          """;
-
-    public override bool InsertEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null)
-    {
-        return ExecuteQuerySafe(connectionIn, connection =>
-        {
-            return ExecuteNonQuery(connection, SqlInsertEquipmentLimitBreakRecord, command =>
-            {
-                AddParameter(command, "character_id", characterId);
-                AddParameter(command, "item_uid", itemUID);
-                AddParameter(command, "effect_1", statusParam.AdditionalStatus1);
-                AddParameter(command, "effect_2", statusParam.AdditionalStatus2);
-                AddParameter(command, "is_effect1_valid", statusParam.IsAddStat1);
-                AddParameter(command, "is_effect2_valid", statusParam.IsAddStat2);
-            }) == 1;
-        });
-    }
-
-    public override bool UpdateEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null)
-    {
-        return ExecuteQuerySafe(connectionIn, connection =>
-        {
-            return ExecuteNonQuery(connection, SqlUpdateEquipmentLimitBreakRecord, command =>
-            {
-                AddParameter(command, "character_id", characterId);
-                AddParameter(command, "item_uid", itemUID);
-                AddParameter(command, "effect_1", statusParam.AdditionalStatus1);
-                AddParameter(command, "effect_2", statusParam.AdditionalStatus2);
-                AddParameter(command, "is_effect1_valid", statusParam.IsAddStat1);
-                AddParameter(command, "is_effect2_valid", statusParam.IsAddStat2);
-            }) == 1;
-        });
-    }
 
     public override bool HasEquipmentLimitBreakRecord(uint characterId, string itemUID, DbConnection? connectionIn = null)
     {
@@ -97,10 +66,10 @@ public partial class DdonSqlDb : SqlDb
             {
                 AddParameter(command, "character_id", characterId);
                 AddParameter(command, "item_uid", itemUID);
-                AddParameter(command, "effect_1", statusParam.AdditionalStatus1);
-                AddParameter(command, "effect_2", statusParam.AdditionalStatus2);
-                AddParameter(command, "is_effect1_valid", statusParam.IsAddStat1);
-                AddParameter(command, "is_effect2_valid", statusParam.IsAddStat2);
+                AddParameter(command, "effect_id", statusParam.EnhanceId);
+                AddParameter(command, "unk1", statusParam.Unk1);
+                AddParameter(command, "effect_type", (byte)statusParam.EnhanceType);
+                AddParameter(command, "unk0", statusParam.Unk0);
             }) == 1;
         });
     }
@@ -113,13 +82,15 @@ public partial class DdonSqlDb : SqlDb
             ExecuteReader(connection, SqlSelectEquipmentLimitBreakRecord, command => { AddParameter(command, "item_uid", itemUID); }, reader =>
             {
                 while (reader.Read())
+                {
                     results.Add(new CDataAddStatusParam
                     {
-                        AdditionalStatus1 = GetUInt16(reader, "effect_1"),
-                        AdditionalStatus2 = GetUInt16(reader, "effect_2"),
-                        IsAddStat1 = GetBoolean(reader, "is_effect1_valid"),
-                        IsAddStat2 = GetBoolean(reader, "is_effect2_valid")
+                        EnhanceId = GetUInt16(reader, "effect_id"),
+                        Unk1 = GetUInt16(reader, "unk1"),
+                        EnhanceType = (EquipEnhanceType)GetByte(reader, "effect_type"),
+                        Unk0 = GetByte(reader, "unk0")
                     });
+                }
             });
         });
         return results;

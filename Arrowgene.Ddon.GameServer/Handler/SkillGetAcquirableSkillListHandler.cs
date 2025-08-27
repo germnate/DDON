@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
@@ -18,6 +19,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
         {
             // This list can't be filtered based on progress because it's cached between BBM and normal gameplay.
             //CharacterId = 0 in the request is for the player
+
             if (request.CharacterId == 0 || Server.GameSettings.GameServerSettings.PawnSkipJobTraining == false)
             {
                 return new S2CSkillGetAcquirableSkillListRes()
@@ -27,14 +29,17 @@ namespace Arrowgene.Ddon.GameServer.Handler
             }
             else 
             {
-                var allDefaultSkills = SkillData.AllSkills.Where(x => x.Job == request.Job && !SkillData.IsUnlockableSkill(request.Job, x.SkillNo, 1));
-                var pawnUnlocks = SkillData.AllSkills.Where(x => x.Job == request.Job
-                    && SkillData.IsUnlockableSkill(request.Job, x.SkillNo, 1)
+                var allDefaultSkills = Server.AssetRepository.SkillData.Skills
+                    .GetValueOrDefault(request.Job, [])
+                    .Where(x => !SkillData.IsUnlockableSkill(request.Job, x.SkillNo, 1));
+                var pawnUnlocks = Server.AssetRepository.SkillData.Skills
+                    .GetValueOrDefault(request.Job, [])
+                    .Where(x => SkillData.IsUnlockableSkill(request.Job, x.SkillNo, 1)
                     && IsSkillUnlocked(client.Character, request.Job, x.SkillNo)
                     );
                 return new S2CSkillGetAcquirableSkillListRes()
                 {
-                    SkillParamList = allDefaultSkills.Concat(pawnUnlocks).ToList()
+                    SkillParamList = [.. allDefaultSkills, .. pawnUnlocks]
                 };
             }
         }

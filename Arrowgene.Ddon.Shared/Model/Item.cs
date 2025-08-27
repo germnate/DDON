@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 
 namespace Arrowgene.Ddon.Shared.Model
@@ -33,9 +34,9 @@ namespace Arrowgene.Ddon.Shared.Model
 
         public Item()
         {
-            EquipElementParamList = new List<CDataEquipElementParam>();
-            AddStatusParamList = new List<CDataAddStatusParam>();
-            EquipStatParamList = new List<CDataEquipStatParam>();
+            EquipElementParamList = [];
+            AddStatusParamList = [];
+            EquipStatParamList = [];
         }
 
         public Item(Item obj)
@@ -46,10 +47,9 @@ namespace Arrowgene.Ddon.Shared.Model
             this.Color = obj.Color;
             this.PlusValue = obj.PlusValue;
             this.EquipPoints = obj.EquipPoints;
-            // TODO: Make a copy constructor for these
-            this.EquipElementParamList = obj.EquipElementParamList;
-            this.AddStatusParamList = obj.AddStatusParamList;
-            this.EquipStatParamList = obj.EquipStatParamList;
+            this.EquipElementParamList = [.. obj.EquipElementParamList.Select(x => new CDataEquipElementParam(x))];
+            this.AddStatusParamList = [.. obj.AddStatusParamList.Select(x => new CDataAddStatusParam(x))];
+            this.EquipStatParamList = [.. obj.EquipStatParamList.Select(x => new CDataEquipStatParam(x))];
         }
 
         private string UpdateUId()

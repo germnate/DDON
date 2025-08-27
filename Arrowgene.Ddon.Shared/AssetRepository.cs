@@ -67,6 +67,8 @@ namespace Arrowgene.Ddon.Shared
         public const string JobMastersKey = "JobMasters.json";
         public const string LightQuestKey = "LightQuests.json";
         public const string QuestScheduleIdKey = "QuestScheduleId.csv";
+        public const string CraftAddStatusKey = "CraftAddStatus.json";
+        public const string SkillDataKey = "SkillData.json";
 
         public const string QuestAssestKey = "quests";
         public const string EpitaphAssestKey = "epitaph";
@@ -135,6 +137,8 @@ namespace Arrowgene.Ddon.Shared
             DefaultGatheringDropsAsset = new();
             JobMasterAsset = new();
             LightQuestAsset = new();
+            CraftAddStatusAsset = new();
+            SkillData = new([], [], []);
         }
 
         public Dictionary<ErrorCode, ClientErrorCode> ClientErrorCodes { get; private set; }
@@ -183,7 +187,9 @@ namespace Arrowgene.Ddon.Shared
         public DefaultGatheringDropsAsset DefaultGatheringDropsAsset { get; private set; }
         public JobMasterAsset JobMasterAsset { get; private set; }
         public LightQuestAsset LightQuestAsset { get; private set; }
+        public SkillDataAsset SkillData { get; private set; }
         public Dictionary<QuestId, uint> QuestScheduleIdAsset { get; private set; }
+        public CraftAddStatusAsset CraftAddStatusAsset { get; private set; }
 
         public void Initialize()
         {
@@ -232,6 +238,8 @@ namespace Arrowgene.Ddon.Shared
             RegisterAsset(value => JobMasterAsset = value, JobMastersKey, new JobMasterAssetDeserializer());
             RegisterAsset(value => LightQuestAsset = value, LightQuestKey, new LightQuestAssetDeserializer());
             RegisterAsset(value => QuestScheduleIdAsset = value, QuestScheduleIdKey, new QuestScheduleIdCsv());
+            RegisterAsset(value => SkillData = value, SkillDataKey, new SkillDataAssetDeserializer());
+            RegisterAsset(value => CraftAddStatusAsset = value, CraftAddStatusKey, new CraftAddStatusAssetReader());
 
             // This must be set before calling QuestAssetDeserializer and EpitaphTrialAssetDeserializer
             var commonEnemyDeserializer = new AssetCommonDeserializer(this.NamedParamAsset);

@@ -80609,7 +80609,457 @@
             "IsSp": true
           }
         ]
-      }
+      },
+	  {
+		"RecipeID": 2950,
+		"ItemID": 21250,
+		"Time": 60,
+		"Cost": 500,
+		"Exp": 10,
+		"NeedRank": 1,
+		"NpcAct": 1,
+		"IsHide": false,
+		"CraftMaterialList": [
+		  {
+			"ItemId": 21246,
+			"Num": 3,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17888,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17889,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  }
+		]
+	  },
+	  {
+		"RecipeID": 2951,
+		"ItemID": 17897,
+		"Time": 60,
+		"Cost": 500,
+		"Exp": 10,
+		"NeedRank": 1,
+		"NpcAct": 1,
+		"IsHide": false,
+		"CraftMaterialList": [
+		  {
+			"ItemId": 18876,
+			"Num": 3,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17888,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17889,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  }
+		]
+	  },
+	  {
+		"RecipeID": 2952,
+		"ItemID": 21248,
+		"Time": 60,
+		"Cost": 500,
+		"Exp": 10,
+		"NeedRank": 1,
+		"NpcAct": 1,
+		"IsHide": false,
+		"CraftMaterialList": [
+		  {
+			"ItemId": 21244,
+			"Num": 3,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17888,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17889,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  }
+		]
+	  },
+	  {
+		"RecipeID": 2953,
+		"ItemID": 21288,
+		"Time": 60,
+		"Cost": 500,
+		"Exp": 10,
+		"NeedRank": 1,
+		"NpcAct": 1,
+		"IsHide": false,
+		"CraftMaterialList": [
+		  {
+			"ItemId": 21284,
+			"Num": 3,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17888,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17889,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  }
+		]
+	  },
+	  {
+		"RecipeID": 2954,
+		"ItemID": 21290,
+		"Time": 60,
+		"Cost": 500,
+		"Exp": 10,
+		"NeedRank": 1,
+		"NpcAct": 1,
+		"IsHide": false,
+		"CraftMaterialList": [
+		  {
+			"ItemId": 21286,
+			"Num": 3,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17888,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17889,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  }
+		]
+	  },
+	  {
+		"RecipeID": 2955,
+		"ItemID": 17905,
+		"Time": 60,
+		"Cost": 500,
+		"Exp": 10,
+		"NeedRank": 1,
+		"NpcAct": 1,
+		"IsHide": false,
+		"CraftMaterialList": [
+		  {
+			"ItemId": 18884,
+			"Num": 3,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17888,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17889,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  }
+		]
+	  },
+	  {
+		"RecipeID": 2956,
+		"ItemID": 21249,
+		"Time": 60,
+		"Cost": 500,
+		"Exp": 10,
+		"NeedRank": 1,
+		"NpcAct": 1,
+		"IsHide": false,
+		"CraftMaterialList": [
+		  {
+			"ItemId": 21245,
+			"Num": 3,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17888,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17889,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  }
+		]
+	  },
+	  {
+		"RecipeID": 2957,
+		"ItemID": 21251,
+		"Time": 60,
+		"Cost": 500,
+		"Exp": 10,
+		"NeedRank": 1,
+		"NpcAct": 1,
+		"IsHide": false,
+		"CraftMaterialList": [
+		  {
+			"ItemId": 21247,
+			"Num": 3,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17888,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17889,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  }
+		]
+	  },
+	  {
+		"RecipeID": 2958,
+		"ItemID": 17900,
+		"Time": 60,
+		"Cost": 500,
+		"Exp": 10,
+		"NeedRank": 1,
+		"NpcAct": 1,
+		"IsHide": false,
+		"CraftMaterialList": [
+		  {
+			"ItemId": 18879,
+			"Num": 3,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17888,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17889,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  }
+		]
+	  },
+	  {
+		"RecipeID": 2959,
+		"ItemID": 17899,
+		"Time": 60,
+		"Cost": 500,
+		"Exp": 10,
+		"NeedRank": 1,
+		"NpcAct": 1,
+		"IsHide": false,
+		"CraftMaterialList": [
+		  {
+			"ItemId": 18878,
+			"Num": 3,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17888,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17889,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  }
+		]
+	  },
+	  {
+		"RecipeID": 2960,
+		"ItemID": 19645,
+		"Time": 60,
+		"Cost": 500,
+		"Exp": 10,
+		"NeedRank": 1,
+		"NpcAct": 1,
+		"IsHide": false,
+		"CraftMaterialList": [
+		  {
+			"ItemId": 19644,
+			"Num": 3,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17888,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17889,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  }
+		]
+	  },
+	  {
+		"RecipeID": 2962,
+		"ItemID": 17901,
+		"Time": 60,
+		"Cost": 500,
+		"Exp": 10,
+		"NeedRank": 1,
+		"NpcAct": 1,
+		"IsHide": false,
+		"CraftMaterialList": [
+		  {
+			"ItemId": 18880,
+			"Num": 3,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17888,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17889,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  }
+		]
+	  },
+	  {
+		"RecipeID": 2963,
+		"ItemID": 17903,
+		"Time": 60,
+		"Cost": 500,
+		"Exp": 10,
+		"NeedRank": 1,
+		"NpcAct": 1,
+		"IsHide": false,
+		"CraftMaterialList": [
+		  {
+			"ItemId": 18882,
+			"Num": 3,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17888,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17889,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  }
+		]
+	  },
+	  {
+		"RecipeID": 2964,
+		"ItemID": 17904,
+		"Time": 60,
+		"Cost": 500,
+		"Exp": 10,
+		"NeedRank": 1,
+		"NpcAct": 1,
+		"IsHide": false,
+		"CraftMaterialList": [
+		  {
+			"ItemId": 18883,
+			"Num": 3,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17888,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17889,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  }
+		]
+	  },
+	  {
+		"RecipeID": 2965,
+		"ItemID": 17898,
+		"Time": 60,
+		"Cost": 500,
+		"Exp": 10,
+		"NeedRank": 1,
+		"NpcAct": 1,
+		"IsHide": false,
+		"CraftMaterialList": [
+		  {
+			"ItemId": 18877,
+			"Num": 3,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17888,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  },
+		  {
+			"ItemId": 17889,
+			"Num": 5,
+			"SortNo": 1,
+			"IsSp": true
+		  }
+		]
+	  }
     ]
   },
   {

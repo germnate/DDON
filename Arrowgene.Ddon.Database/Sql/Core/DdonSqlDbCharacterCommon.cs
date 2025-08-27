@@ -270,7 +270,7 @@ public partial class DdonSqlDb : SqlDb
             {
                 while (reader.Read())
                 {
-                    uint abilityId = GetUInt32(reader, "ability_id");
+                    AbilityId abilityId = (AbilityId)GetUInt32(reader, "ability_id");
                     JobId job = (JobId)GetByte(reader, "job");
                     JobId equippedToJob = (JobId)GetByte(reader, "equipped_to_job");
                     byte slotNo = GetByte(reader, "slot_no");

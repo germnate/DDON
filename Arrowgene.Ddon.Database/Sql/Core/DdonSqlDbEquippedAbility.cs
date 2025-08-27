@@ -157,7 +157,7 @@ public partial class DdonSqlDb : SqlDb
         AddParameter(command, "equipped_to_job", (byte)equippedToJob);
         AddParameter(command, "job", (byte)ability.Job);
         AddParameter(command, "slot_no", slotNo);
-        AddParameter(command, "ability_id", ability.AbilityId);
+        AddParameter(command, "ability_id", (uint)ability.AbilityId);
         AddParameter(command, "ability_lv", ability.AbilityLv);
     }
 

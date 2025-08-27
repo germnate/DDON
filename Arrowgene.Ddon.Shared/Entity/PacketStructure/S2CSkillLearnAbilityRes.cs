@@ -10,8 +10,8 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
         public override PacketId Id => PacketId.S2C_SKILL_LEARN_ABILITY_RES;
 
         public JobId Job { get; set; }
-        public UInt32 NewJobPoint { get; set; }
-        public UInt32 AbilityId { get; set; }
+        public uint NewJobPoint { get; set; }
+        public AbilityId AbilityId { get; set; }
         public byte AbilityLv { get; set; }
 
         public class Serializer : PacketEntitySerializer<S2CSkillLearnAbilityRes>
@@ -21,7 +21,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
                 WriteServerResponse(buffer, obj);
                 WriteByte(buffer, (byte) obj.Job);
                 WriteUInt32(buffer, obj.NewJobPoint);
-                WriteUInt32(buffer, obj.AbilityId);
+                WriteUInt32(buffer, (uint) obj.AbilityId);
                 WriteByte(buffer, obj.AbilityLv);
             }
 
@@ -31,7 +31,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
                 ReadServerResponse(buffer, obj);
                 obj.Job = (JobId) ReadByte(buffer);
                 obj.NewJobPoint = ReadUInt32(buffer);
-                obj.AbilityId = ReadUInt32(buffer);
+                obj.AbilityId = (AbilityId) ReadUInt32(buffer);
                 obj.AbilityLv = ReadByte(buffer);
                 return obj;
             }

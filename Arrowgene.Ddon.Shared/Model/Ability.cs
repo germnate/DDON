@@ -4,18 +4,18 @@ namespace Arrowgene.Ddon.Shared.Model
 {
     public class Ability
     {
-        public JobId Job { get; set; }
-        public uint AbilityId { get; set; }
+        public JobId Job { get => AbilityId.JobId(); }
+        public AbilityId AbilityId { get; set; }
         public byte AbilityLv { get; set; }
 
         public CDataSetAcquirementParam AsCDataSetAcquirementParam(byte slotNo)
         {
             return new CDataSetAcquirementParam()
             {
-                Job = this.Job,
+                Job = Job,
                 SlotNo = slotNo,
-                AcquirementNo = this.AbilityId,
-                AcquirementLv = this.AbilityLv
+                AcquirementNo = (uint)AbilityId,
+                AcquirementLv = AbilityLv
             };
         }
 
@@ -24,8 +24,8 @@ namespace Arrowgene.Ddon.Shared.Model
             return new CDataContextAcquirementData()
             {
                 SlotNo = slotNo,
-                AcquirementNo = this.AbilityId,
-                AcquirementLv = this.AbilityLv
+                AcquirementNo = (uint)AbilityId,
+                AcquirementLv = AbilityLv
             };
         }
 
@@ -33,10 +33,10 @@ namespace Arrowgene.Ddon.Shared.Model
         {
             return new CDataLearnedSetAcquirementParam()
             {
-                Job = this.Job,
+                Job = Job,
                 Type = ReleaseType.Augment,
-                AcquirementNo = this.AbilityId,
-                AcquirementLv = this.AbilityLv,
+                AcquirementNo = (uint)AbilityId,
+                AcquirementLv = AbilityLv,
                 AcquirementParamId = 0
             };
         }

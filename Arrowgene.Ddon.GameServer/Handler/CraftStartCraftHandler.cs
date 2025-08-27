@@ -55,16 +55,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
             
             ClientItemInfo itemInfo = Server.AssetRepository.ClientItemInfos[recipe.ItemID];
 
-            ushort AddStatusID = request.AdditionalStatusId;
-            CDataAddStatusParam AddStat = new CDataAddStatusParam()
-            {
-                IsAddStat1 = false,
-                IsAddStat2 = false,
-                AdditionalStatus1 = 0,
-                AdditionalStatus2 = 0,
-            };
-            List<CDataAddStatusParam> AddStatList = new List<CDataAddStatusParam>();
-
             S2CItemUpdateCharacterItemNtc updateCharacterItemNtc = new S2CItemUpdateCharacterItemNtc()
             {
                 UpdateType = ItemNoticeType.StartCraft
@@ -84,7 +74,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             Server.Database.ExecuteInTransaction(connection =>
             {
                 // Remove crafting materials
-                foreach (var craftMaterial in request.CraftMaterialList)
+                foreach (var craftMaterial in request.CraftMaterialList.Union(request.AdditionalStatusMaterialList))
                 {
                     try
                     {
@@ -130,24 +120,38 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     isGreatSuccessConsumableQuantity = craftCalculationResult.IsGreatSuccess;
                 }
 
-                CraftProgress craftProgress = new CraftProgress
+                NpcActionType actionType = NpcActionType.NpcActionNone;
+                if (itemInfo.Category == (byte)StorageType.ItemBagConsumable)
                 {
-                    CraftCharacterId = client.Character.CharacterId,
-                    CraftLeadPawnId = request.CraftMainPawnID,
-                    CraftSupportPawnId1 = request.CraftSupportPawnIDList.ElementAtOrDefault(0)?.PawnId ?? 0,
-                    CraftSupportPawnId2 = request.CraftSupportPawnIDList.ElementAtOrDefault(1)?.PawnId ?? 0,
-                    CraftSupportPawnId3 = request.CraftSupportPawnIDList.ElementAtOrDefault(2)?.PawnId ?? 0,
-                    RecipeId = request.RecipeID,
-                    NpcActionId = NpcActionType.NpcActionSmithy,
-                    ItemId = recipe.ItemID,
-                    AdditionalStatusId = request.AdditionalStatusId,
-                    // TODO: implement mechanism to deduct time periodically
-                    RemainTime = Server.CraftManager.CalculateRecipeProductionSpeed(recipe.Time, itemInfo, craftPawns),
-                    CreateCount = recipe.Num * request.CreateCount,
-                    PlusValue = plusValue,
-                    GreatSuccess = isGreatSuccessEquipmentQuality || isGreatSuccessConsumableQuantity,
-                    AdditionalQuantity = consumableAdditionalQuantity
-                };
+                    actionType = NpcActionType.NpcActionCook;
+                }
+                else if (itemInfo.EquipSlot is not null && itemInfo.EquipSlot != EquipSlot.Jewelry1)
+                {
+                    actionType = NpcActionType.NpcActionSmithy;
+                }
+                else
+                {
+                    actionType = NpcActionType.NpcActionDesk;
+                }
+
+                CraftProgress craftProgress = new CraftProgress
+                    {
+                        CraftCharacterId = client.Character.CharacterId,
+                        CraftLeadPawnId = request.CraftMainPawnID,
+                        CraftSupportPawnId1 = request.CraftSupportPawnIDList.ElementAtOrDefault(0)?.PawnId ?? 0,
+                        CraftSupportPawnId2 = request.CraftSupportPawnIDList.ElementAtOrDefault(1)?.PawnId ?? 0,
+                        CraftSupportPawnId3 = request.CraftSupportPawnIDList.ElementAtOrDefault(2)?.PawnId ?? 0,
+                        RecipeId = request.RecipeID,
+                        NpcActionId = actionType,
+                        ItemId = recipe.ItemID,
+                        AdditionalStatusId = request.AdditionalStatusId,
+                        // TODO: implement mechanism to deduct time periodically
+                        RemainTime = Server.CraftManager.CalculateRecipeProductionSpeed(recipe.Time, itemInfo, craftPawns),
+                        CreateCount = recipe.Num * request.CreateCount,
+                        PlusValue = plusValue,
+                        GreatSuccess = isGreatSuccessEquipmentQuality || isGreatSuccessConsumableQuantity,
+                        AdditionalQuantity = consumableAdditionalQuantity
+                    };
 
                 // TODO: check if course bonus provides exp bonus for crafting & calculate bonus EXP
                 // TODO: Decide whether bonus exp should be calculated when craft is started vs. received

@@ -154,7 +154,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 }
                 else if (completedOrder.ReleaseType == ReleaseType.Augment)
                 {
-                    Server.CharacterManager.UnlockAbility(client.Character, jobId, releasedElement.ReleaseId, releasedElement.ReleaseLv);
+                    Server.CharacterManager.UnlockAbility(client.Character, jobId, (AbilityId)releasedElement.ReleaseId, releasedElement.ReleaseLv);
                 }
                 else
                 {
@@ -202,7 +202,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
             var match = Server.AssetRepository.JobMasterAsset.JobOrders[jobId][ReleaseType.Augment]
                 .SelectMany(x => x.Value)
-                .Where(x => x.ReleaseLv == (ability.AbilityLv + 1) && x.ReleaseId == ability.AbilityId)
+                .Where(x => x.ReleaseLv == (ability.AbilityLv + 1) && x.ReleaseId == (uint)ability.AbilityId)
                 .FirstOrDefault();
             if (match == null)
             {

@@ -21,7 +21,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             Pawn pawn = client.Character.PawnById(request.PawnId, PawnType.Main);
 
-            var ability = SkillData.AllAbilities.Concat(SkillData.AllSecretAbilities)
+            var ability = Server.AssetRepository.SkillData.AllAbilities
                 .Where(aug => aug.AbilityNo == request.AbilityId)
                 .SingleOrDefault()
                 ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_SKILL_INVALID_SKILL_ID);

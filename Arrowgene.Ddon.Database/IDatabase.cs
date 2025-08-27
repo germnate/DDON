@@ -347,37 +347,7 @@ public interface IDatabase
     );
 
     bool DeleteSystemMailAttachment(ulong messageId);
-
-    // Additional Status
-    bool InsertIfNotExistsAddStatus(
-        string itemUid,
-        uint characterId,
-        byte isAddStat1,
-        byte isAddStat2,
-        ushort addStat1,
-        ushort addStat2
-    );
-
-    bool InsertAddStatus(
-        string itemUid,
-        uint characterId,
-        byte isAddStat1,
-        byte isAddStat2,
-        ushort addStat1,
-        ushort addStat2
-    );
-
-    List<CDataAddStatusParam> GetAddStatusByUID(string itemUid);
-
-    bool UpdateAddStatus(
-        string itemUid,
-        uint characterId,
-        byte isAddStat1,
-        byte isAddStat2,
-        ushort addStat1,
-        ushort addStat2
-    );
-
+    
     // Play points
     bool ReplaceCharacterPlayPointData(
         uint id,
@@ -530,8 +500,6 @@ public interface IDatabase
     bool UpsertRecycleEquipmentRecord(uint characterId, byte numAttempts, DbConnection? connectionIn = null);
 
     // Equipment Limit Break
-    bool InsertEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null);
-    bool UpdateEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null);
     bool HasEquipmentLimitBreakRecord(uint characterId, string itemUID, DbConnection? connectionIn = null);
     bool UpsertEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null);
     List<CDataAddStatusParam> GetEquipmentLimitBreakRecord(string itemUID, DbConnection? connectionIn = null);

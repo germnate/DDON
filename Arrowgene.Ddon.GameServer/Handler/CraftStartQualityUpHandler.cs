@@ -27,69 +27,56 @@ namespace Arrowgene.Ddon.GameServer.Handler
         {
             PacketQueue queue = new();
 
-            string equipItemUID = request.ItemUID;
-            Character character = client.Character;
-            var ramItem = character.Storage.FindItemByUIdInStorage(ItemManager.EquipmentStorages, equipItemUID);
-            Item equipItem = ramItem.Item2.Item2;
+            var (storageType, (slotno, equipItem, _)) = client.Character.Storage.FindItemByUIdInStorage(ItemManager.EquipmentStorages, request.ItemUID)
+                ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_NOT_FOUND, $"Item with UID {request.ItemUID} not found.");
             ClientItemInfo itemInfo = Server.AssetRepository.ClientItemInfos[equipItem.ItemId];
-            byte itemRank = itemInfo.Rank;
-            uint craftpawnid = request.CraftMainPawnID;
-            string RefineMaterialUID = request.RefineUID;
-            ushort AddStatusID = request.AddStatusID;
+
+            // The client seems to think that attaching a slayer stone is free and grants no XP.
             uint pawnExp = 0;
-            uint totalCost = Math.Min(100, (uint)itemRank) * 300;
-            List<CDataItemUpdateResult> updateResults;
-            S2CItemUpdateCharacterItemNtc updateCharacterItemNtc = new S2CItemUpdateCharacterItemNtc();
+            uint totalCost = string.IsNullOrEmpty(request.RefineUID) ? 0 : itemInfo.Rank * 300u;
+            S2CItemUpdateCharacterItemNtc updateCharacterItemNtc = new();
 
-            CDataAddStatusParam AddStat = new CDataAddStatusParam()
+            CDataCurrentEquipInfo currentEquipInfo = new()
             {
-                IsAddStat1 = false,
-                IsAddStat2 = false,
-                AdditionalStatus1 = 0,
-                AdditionalStatus2 = 0,
+                ItemUId = request.ItemUID,
             };
-            List<CDataAddStatusParam> AddStatList = new List<CDataAddStatusParam>()
-            {
-                new CDataAddStatusParam(),
-            };
-            CDataCurrentEquipInfo CurrentEquipInfo = new CDataCurrentEquipInfo()
-            {
-                ItemUId = equipItemUID,
-            };
-
-            // TODO: Revisit AdditionalStatus down the line. It appears it might be apart of a larger system involving craig? 
-            // Definitely a potential huge rabbit hole that I think we should deal with in a different PR.
 
             // Lead pawn is always owned by player.
             Pawn leadPawn = Server.CraftManager.FindPawn(client, request.CraftMainPawnID);
 
-            List<CraftPawn> craftPawns = new()
-            {
-                new CraftPawn(leadPawn, CraftPosition.Leader)
-            };
-            craftPawns.AddRange(request.CraftSupportPawnIDList.Select(p => new CraftPawn(Server.CraftManager.FindPawn(client, p.PawnId), CraftPosition.Assistant)));
-            craftPawns.AddRange(request.CraftMasterLegendPawnIDList.Select(p => new CraftPawn(Server.AssetRepository.PawnCraftMasterLegendAsset.Single(m => m.PawnId == p.PawnId))));
-
-            double calculatedOdds = CraftManager.CalculateEquipmentQualityIncreaseRate(craftPawns);
+            List<CraftPawn> craftPawns =
+            [
+                new CraftPawn(leadPawn, CraftPosition.Leader),
+                .. request.CraftSupportPawnIDList.Select(p => new CraftPawn(Server.CraftManager.FindPawn(client, p.PawnId), CraftPosition.Assistant)),
+                .. request.CraftMasterLegendPawnIDList.Select(p => new CraftPawn(Server.AssetRepository.PawnCraftMasterLegendAsset.Single(m => m.PawnId == p.PawnId))),
+            ];
 
             uint plusValue = 0;
             bool isGreatSuccessEquipmentQuality = false;
 
+            var consumedMaterials = request.CraftMaterialList.Union([new() {
+                ItemNum = 1,
+                ItemUId = request.RefineUID,
+            }]).Where(x => !string.IsNullOrEmpty(x.ItemUId));
+
             Server.Database.ExecuteInTransaction(connection =>
             {
-                //TODO: Need to calculate the Gold cost and remove it. Cost is based on the Equipments IR.
-                // Probably do what Crests do and make a JSON for it?
-                if (!string.IsNullOrEmpty(RefineMaterialUID))
+                if (!string.IsNullOrEmpty(request.RefineUID))
                 {
-                    Item refineMaterialItem = Server.Database.SelectStorageItemByUId(RefineMaterialUID);
-                    CraftCalculationResult craftCalculationResult = CraftManager.CalculateEquipmentQuality(refineMaterialItem, (uint)calculatedOdds, itemRank);
+                    double calculatedOdds = CraftManager.CalculateEquipmentQualityIncreaseRate(craftPawns);
+
+                    var (_, (_, refineMaterialItem, _)) = client.Character.Storage.FindItemByUIdInStorage(ItemManager.BothStorageTypes, request.RefineUID);
+                    CraftCalculationResult craftCalculationResult = CraftManager.CalculateEquipmentQuality(refineMaterialItem, (uint)calculatedOdds, itemInfo.Rank);
                     plusValue = craftCalculationResult.CalculatedValue;
                     isGreatSuccessEquipmentQuality = craftCalculationResult.IsGreatSuccess;
                     pawnExp = craftCalculationResult.Exp;
+                }
 
+                foreach(var material in consumedMaterials)
+                {
                     try
                     {
-                        updateResults = Server.ItemManager.ConsumeItemByUIdFromMultipleStorages(Server, client.Character, ItemManager.BothStorageTypes, RefineMaterialUID, 1, connection);
+                        var updateResults = Server.ItemManager.ConsumeItemByUIdFromMultipleStorages(Server, client.Character, ItemManager.BothStorageTypes, material.ItemUId, material.ItemNum, connection);
                         updateCharacterItemNtc.UpdateItemList.AddRange(updateResults);
                     }
                     catch (NotEnoughItemsException)
@@ -98,61 +85,62 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     }
                 }
 
-                // TODO: figuring out what this is
-                // I've tried plugging Crest IDs & Equipment ID/RandomQuality n such, and just random numbers Unk0 - Unk4 just don't seem to change anything.
-                CDataS2CCraftStartQualityUpResUnk0 dummydata = new CDataS2CCraftStartQualityUpResUnk0()
-                {
-                    IsGreatSuccess = isGreatSuccessEquipmentQuality
-                };
-
                 // Updating the item.
-                equipItem.ItemId = equipItem.ItemId;
-                equipItem.PlusValue = (byte)plusValue;
-                equipItem.AddStatusParamList = equipItem.AddStatusParamList;
+                equipItem.PlusValue = Math.Max(equipItem.PlusValue, (byte)plusValue);
 
-                var (storageType, foundItem) = character.Storage.FindItemByUIdInStorage(ItemManager.EquipmentStorages, equipItemUID);
-                if (foundItem != null)
+                if (request.AddStatusID != 0)
                 {
-                    var (slotno, item, itemnum) = foundItem;
-                    CharacterCommon characterCommon = null;
-                    if (storageType == StorageType.CharacterEquipment || storageType == StorageType.PawnEquipment)
+                    var param = equipItem.AddStatusParamList.Find(x => x.EnhanceType == EquipEnhanceType.AdditionalCraftMaterial);
+                    
+                    if (param is null)
                     {
-                        CurrentEquipInfo.EquipSlot.EquipSlotNo = EquipManager.DetermineEquipSlot(slotno);
-                        CurrentEquipInfo.EquipSlot.EquipType = EquipManager.GetEquipTypeFromSlotNo(slotno);
-                    }
-
-                    if (storageType == StorageType.PawnEquipment)
-                    {
-                        uint pawnId = Storages.DeterminePawnId(client.Character, storageType, slotno);
-                        CurrentEquipInfo.EquipSlot.PawnId = pawnId;
-                        characterCommon = client.Character.Pawns.SingleOrDefault(x => x.PawnId == pawnId);
-                    }
-                    else if (storageType == StorageType.CharacterEquipment)
-                    {
-                        CurrentEquipInfo.EquipSlot.CharacterId = character.CharacterId;
-                        characterCommon = character;
-                    }
-
-                    updateCharacterItemNtc.UpdateType = ItemNoticeType.StartEquipGradeUp;
-                    updateCharacterItemNtc.UpdateItemList.Add(Server.ItemManager.CreateItemUpdateResult(characterCommon, equipItem, storageType, slotno, 0, 0));
-
-                    if (foundItem != null)
-                    {
-                        (slotno, item, itemnum) = foundItem;
-                        Server.ItemManager.UpgradeStorageItem(Server, client, character.CharacterId, storageType, equipItem, slotno, connection);
-                        updateCharacterItemNtc.UpdateItemList.Add(Server.ItemManager.CreateItemUpdateResult(characterCommon, equipItem, storageType, slotno, 1, 1));
+                        param = new CDataAddStatusParam()
+                        {
+                            EnhanceId = Server.AssetRepository.CraftAddStatusAsset.AddStatuses.GetValueOrDefault(request.AddStatusID)?.BuffId ?? 0,
+                            EnhanceType = EquipEnhanceType.AdditionalCraftMaterial
+                        };
+                        equipItem.AddStatusParamList.Add(param);
                     }
                     else
                     {
-                        Logger.Error($"Item with UID {equipItemUID} not found in {storageType}");
-                        throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_INVALID_STORAGE_TYPE, $"Item with UID {equipItemUID} not found in {storageType}");
+                        param.EnhanceId = Server.AssetRepository.CraftAddStatusAsset.AddStatuses.GetValueOrDefault(request.AddStatusID)?.BuffId ?? 0;
                     }
+
+                    Server.Database.UpsertEquipmentLimitBreakRecord(client.Character.CharacterId, equipItem.UId, param, connection);
                 }
 
+                CharacterCommon characterCommon = null;
+                if (storageType == StorageType.CharacterEquipment || storageType == StorageType.PawnEquipment)
+                {
+                    currentEquipInfo.EquipSlot.EquipSlotNo = EquipManager.DetermineEquipSlot(slotno);
+                    currentEquipInfo.EquipSlot.EquipType = EquipManager.GetEquipTypeFromSlotNo(slotno);
+                }
+
+                if (storageType == StorageType.PawnEquipment)
+                {
+                    uint pawnId = Storages.DeterminePawnId(client.Character, storageType, slotno);
+                    currentEquipInfo.EquipSlot.PawnId = pawnId;
+                    characterCommon = client.Character.Pawns.Find(x => x.PawnId == pawnId)
+                        ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED);
+                }
+                else if (storageType == StorageType.CharacterEquipment)
+                {
+                    currentEquipInfo.EquipSlot.CharacterId = client.Character.CharacterId;
+                    characterCommon = client.Character;
+                }
+
+                updateCharacterItemNtc.UpdateType = ItemNoticeType.StartEquipGradeUp;
+                Server.ItemManager.UpgradeStorageItem(Server, client, client.Character.CharacterId, storageType, equipItem, slotno, connection);
+                updateCharacterItemNtc.UpdateItemList.Add(Server.ItemManager.CreateItemUpdateResult(characterCommon, equipItem, storageType, slotno, 1, 1));
+
                 uint cost = Server.CraftManager.CalculateRecipeCost(totalCost, itemInfo, craftPawns);
-                CDataUpdateWalletPoint updateWalletPoint = Server.WalletManager.RemoveFromWallet(client.Character, WalletType.Gold, cost, connection)
-                    ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_CRAFT_INSUFFICIENT_GOLD, $"Insufficient gold. {cost} > {Server.WalletManager.GetWalletAmount(client.Character, WalletType.Gold)}"); updateCharacterItemNtc.UpdateWalletList.Add(updateWalletPoint);
-                updateCharacterItemNtc.UpdateWalletList.Add(updateWalletPoint);
+                if (cost > 0)
+                {
+                    CDataUpdateWalletPoint updateWalletPoint = Server.WalletManager.RemoveFromWallet(client.Character, WalletType.Gold, cost, connection)
+                        ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_CRAFT_INSUFFICIENT_GOLD, 
+                        $"Insufficient gold. {cost} > {Server.WalletManager.GetWalletAmount(client.Character, WalletType.Gold)}"); 
+                    updateCharacterItemNtc.UpdateWalletList.Add(updateWalletPoint);
+                }
 
                 if (request.CraftMasterLegendPawnIDList.Count > 0)
                 {
@@ -164,9 +152,12 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
                 var res = new S2CCraftStartQualityUpRes()
                 {
-                    Unk0 = dummydata,
-                    AddStatusDataList = AddStatList,
-                    CurrentEquip = CurrentEquipInfo
+                    Unk0 = new()
+                    {
+                        IsGreatSuccess = isGreatSuccessEquipmentQuality,
+                    },
+                    AddStatusDataList = equipItem.AddStatusParamList,
+                    CurrentEquip = currentEquipInfo
                 };
 
                 if (CraftManager.CanPawnExpUp(leadPawn))

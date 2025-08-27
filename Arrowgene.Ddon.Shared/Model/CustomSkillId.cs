@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Arrowgene.Ddon.Shared.Model
 {
@@ -244,14 +245,30 @@ namespace Arrowgene.Ddon.Shared.Model
     {
         public static uint ReleaseId(this CustomSkillId skillId)
         {
-            if (!gCustomSkillReleaseIdMap.ContainsKey(skillId))
+            if (!gCustomSkillReleaseIdMap.TryGetValue(skillId, out uint value))
             {
                 return 0;
             }
-            return gCustomSkillReleaseIdMap[skillId];
+            return value;
         }
 
-        private static readonly Dictionary<CustomSkillId, uint> gCustomSkillReleaseIdMap = new Dictionary<CustomSkillId, uint>()
+        public static JobId JobId(this CustomSkillId skillId)
+        {
+            foreach (var (job, skills) in gCustomSkillJobIdMap)
+            {
+                if (skills.Contains(skillId)) {
+                    return job;
+                }
+            }
+            return Model.JobId.None;
+        }
+
+        public static bool IsEx(this CustomSkillId skillId)
+        {
+            return skillId.ReleaseId() > 100;
+        }
+
+        private static readonly Dictionary<CustomSkillId, uint> gCustomSkillReleaseIdMap = new()
         {
             // Fighter
             [CustomSkillId.BlinkStrike] = 1,
@@ -497,5 +514,262 @@ namespace Arrowgene.Ddon.Shared.Model
             [CustomSkillId.EclipseBright] = 7,
             [CustomSkillId.TerrorBlast] = 8,
         };
+
+		private static readonly Dictionary<JobId, HashSet<CustomSkillId>> gCustomSkillJobIdMap = new()
+		{
+			[Model.JobId.Fighter] = [
+				CustomSkillId.BlinkStrike,
+				CustomSkillId.Downthrust,
+				CustomSkillId.CymbalAttack,
+				CustomSkillId.ShelteredSpike,
+				CustomSkillId.TuskToss,
+				CustomSkillId.SkywardLash,
+				CustomSkillId.CompassSlash,
+				CustomSkillId.HindsightSlash,
+				CustomSkillId.IntimateStrike,
+				CustomSkillId.BravesRaid,
+				CustomSkillId.MovingCastle,
+				CustomSkillId.FlowingSwordFlash,
+				CustomSkillId.PierceSlash,
+				CustomSkillId.FlowingShieldSpiral,
+				CustomSkillId.TuskTossP,
+				CustomSkillId.TuskTossT,
+				CustomSkillId.CymbalAttackP,
+				CustomSkillId.CymbalAttackT,
+				CustomSkillId.DownthrustP,
+				CustomSkillId.DownthrustT,
+				CustomSkillId.SkywardLashP,
+				CustomSkillId.SkywardLashT,
+			],
+			[Model.JobId.Seeker] = [
+				CustomSkillId.BitingWind,
+                CustomSkillId.TossAndTrigger,
+                CustomSkillId.Ensnare,
+                CustomSkillId.SteppingStone,
+                CustomSkillId.BackKick,
+                CustomSkillId.Reset,
+                CustomSkillId.PowderCharge,
+                CustomSkillId.Backfire,
+                CustomSkillId.EasyKill,
+                CustomSkillId.FalconKick,
+                CustomSkillId.WhirlwindBlade,
+                CustomSkillId.SlidingRope,
+                CustomSkillId.ExplosiveFlameBlade,
+                CustomSkillId.SoaringHawkSlash,
+                CustomSkillId.ExplosiveFlameBladeP,
+                CustomSkillId.ExplosiveFlameBladeT,
+                CustomSkillId.EasyKillP,
+                CustomSkillId.EasyKillT,
+                CustomSkillId.SteppingStoneP,
+                CustomSkillId.SteppingStoneT,
+                CustomSkillId.TossAndTriggerP,
+                CustomSkillId.TossAndTriggerT,
+			],
+			[Model.JobId.Hunter] = [
+                CustomSkillId.ThreefoldArrow,
+                CustomSkillId.TriadShot,
+                CustomSkillId.FlyingDin,
+                CustomSkillId.FullBend,
+                CustomSkillId.CloudburstVolley,
+                CustomSkillId.PunctureDart,
+                CustomSkillId.WhirlingArrow,
+                CustomSkillId.CrimsonArrow,
+                CustomSkillId.ExplosiveArrowVolley,
+                CustomSkillId.StormArrow,
+                CustomSkillId.BackwardRetreat,
+                CustomSkillId.DemonArrow,
+                CustomSkillId.SkyBurstShot,
+                CustomSkillId.CombinedPierceShot,
+                CustomSkillId.ThreefoldArrowP,
+                CustomSkillId.ThreefoldArrowT,
+                CustomSkillId.WhirlingArrowP,
+                CustomSkillId.WhirlingArrowT,
+                CustomSkillId.FullBendP,
+                CustomSkillId.FullBendT,
+                CustomSkillId.ExplosiveArrowVolleyP,
+                CustomSkillId.ExplosiveArrowVolleyT,
+            ],
+			[Model.JobId.Priest] = [
+                CustomSkillId.HealingSpot,
+                CustomSkillId.CuringSpot,
+                CustomSkillId.SeraphimFlap,
+                CustomSkillId.SacredShine,
+                CustomSkillId.AttackRiser,
+                CustomSkillId.DefenseRiser,
+                CustomSkillId.GuardBit,
+                CustomSkillId.QuickCharge,
+                CustomSkillId.EnergySpot,
+                CustomSkillId.HolyGlare,
+                CustomSkillId.SoulExplosion,
+                CustomSkillId.SolidRiser,
+                CustomSkillId.SolaceRiser,
+                CustomSkillId.BlastAddition,
+                CustomSkillId.SolaceRiserP,
+                CustomSkillId.SolaceRiserT,
+                CustomSkillId.SeraphimFlapP,
+                CustomSkillId.SeraphimFlapT,
+                CustomSkillId.CuringSpotT,
+                CustomSkillId.CuringSpotP,
+                CustomSkillId.DefenseRiserP,
+                CustomSkillId.DefenseRiserT,
+            ],
+			[Model.JobId.ShieldSage] = [
+                CustomSkillId.ForceShield,
+                CustomSkillId.HolyWall,
+                CustomSkillId.SlowLight,
+                CustomSkillId.HypnosLight,
+                CustomSkillId.RampartRaid,
+                CustomSkillId.EarthShake,
+                CustomSkillId.ElementGlow,
+                CustomSkillId.BindingAnchor,
+                CustomSkillId.HandsOfGod,
+                CustomSkillId.ElementLight,
+                CustomSkillId.StunBurst,
+                CustomSkillId.ForceAnchor,
+                CustomSkillId.StoneLight,
+                CustomSkillId.ProtectionSwing,
+                CustomSkillId.EarthShakeP,
+                CustomSkillId.EarthShakeT,
+                CustomSkillId.ForceShieldP,
+                CustomSkillId.ForceShieldT,
+                CustomSkillId.RampartRaidP,
+                CustomSkillId.RampartRaidT,
+                CustomSkillId.HolyWallP,
+                CustomSkillId.HolyWallT,
+            ],
+			[Model.JobId.Sorcerer] = [
+                CustomSkillId.Firestorm,
+                CustomSkillId.Comestion,
+                CustomSkillId.Bolide,
+                CustomSkillId.Frigor,
+                CustomSkillId.Fulmination,
+                CustomSkillId.CrescentBlade,
+                CustomSkillId.BlackHaze,
+                CustomSkillId.Seism,
+                CustomSkillId.Levin,
+                CustomSkillId.Gicel,
+                CustomSkillId.DarknessMist,
+                CustomSkillId.ProminentSphere,
+                CustomSkillId.IciclePierce,
+                CustomSkillId.LightningStake,
+                CustomSkillId.DarknessMistP,
+                CustomSkillId.DarknessMistT,
+                CustomSkillId.FulminationP,
+                CustomSkillId.FulminationT,
+                CustomSkillId.ComestionP,
+                CustomSkillId.ComestionT,
+                CustomSkillId.FrigorP,
+                CustomSkillId.FrigorT,
+            ],
+			[Model.JobId.Warrior] = [
+                CustomSkillId.UpwardStrike,
+                CustomSkillId.PommelStrike,
+                CustomSkillId.SavageLunge,
+                CustomSkillId.EscapeSlash,
+                CustomSkillId.SparkSlash,
+                CustomSkillId.DevilBurst,
+                CustomSkillId.Clarity,
+                CustomSkillId.HeavenThrust,
+                CustomSkillId.AnnihilatorsWindSlash,
+                CustomSkillId.GreatWindmill,
+                CustomSkillId.DefensiveStance,
+                CustomSkillId.FlyingDragonCrash,
+                CustomSkillId.GreatGougingFang,
+                CustomSkillId.EarthquakeFang,
+                CustomSkillId.SavageLungeP,
+                CustomSkillId.SavageLungeT,
+                CustomSkillId.PommelStrikeP,
+                CustomSkillId.PommelStrikeT,
+                CustomSkillId.EscapeSlashP,
+                CustomSkillId.EscapeSlashT,
+                CustomSkillId.SparkSlashP,
+                CustomSkillId.SparkSlashT,
+            ],
+			[Model.JobId.ElementArcher] = [
+                CustomSkillId.HealingBolt,
+                CustomSkillId.CuringBolt,
+                CustomSkillId.FlamingBow,
+                CustomSkillId.FourfoldBolt,
+                CustomSkillId.RicochetSeeker,
+                CustomSkillId.MagickalFlare,
+                CustomSkillId.EnfeeblingBow,
+                CustomSkillId.CripplingBow,
+                CustomSkillId.EnergizingBolt,
+                CustomSkillId.ExhaustingBow,
+                CustomSkillId.WeakeningBow,
+                CustomSkillId.GambleDraw,
+                CustomSkillId.HealingFlash,
+                CustomSkillId.TearingTentacleArrow,
+                CustomSkillId.FlamingBowP,
+                CustomSkillId.FlamingBowT,
+                CustomSkillId.ExhaustingBowP,
+                CustomSkillId.ExhaustingBowT,
+                CustomSkillId.HealingFlashP,
+                CustomSkillId.HealingFlashT,
+                CustomSkillId.CripplingBowP,
+                CustomSkillId.CripplingBowT,
+            ],
+			[Model.JobId.Alchemist] = [
+                CustomSkillId.AlmaWave,
+                CustomSkillId.AlmaPillar,
+                CustomSkillId.PileBinder,
+                CustomSkillId.AlmaWindust,
+                CustomSkillId.RexElementa,
+                CustomSkillId.RexCatapulta,
+                CustomSkillId.DolusMorsus,
+                CustomSkillId.GoldaAurum,
+                CustomSkillId.AlchemicalBurst,
+                CustomSkillId.DolusAeris,
+                CustomSkillId.AlmaSector,
+                CustomSkillId.RegalBarrier,
+                CustomSkillId.PileBinderP,
+                CustomSkillId.PileBinderT,
+                CustomSkillId.AlmaPillarP,
+                CustomSkillId.AlmaPillarT,
+                CustomSkillId.AlmaWaveP,
+                CustomSkillId.AlmaWaveT,
+                CustomSkillId.RexElementaP,
+                CustomSkillId.RexElementaT,
+            ],
+			[Model.JobId.SpiritLancer] = [
+                CustomSkillId.AuromFang,
+                CustomSkillId.AuromSlay,
+                CustomSkillId.CorrStorm,
+                CustomSkillId.CorrSpike,
+                CustomSkillId.ScriosBlast,
+                CustomSkillId.ScriosGuard,
+                CustomSkillId.WallGlasta,
+                CustomSkillId.CureGlasta,
+                CustomSkillId.CorrMeteor,
+                CustomSkillId.EadromCounter,
+                CustomSkillId.AuromFangP,
+                CustomSkillId.AuromFangT,
+                CustomSkillId.WallGlastaP,
+                CustomSkillId.WallGlastaT,
+                CustomSkillId.CorrSpikeP,
+                CustomSkillId.CorrSpikeT,
+                CustomSkillId.CureGlastaP,
+                CustomSkillId.CureGlastaT,
+            ],
+			[Model.JobId.HighScepter] = [
+                CustomSkillId.FullMoonLight,
+                CustomSkillId.WallBarrier,
+                CustomSkillId.EclipseBright,
+                CustomSkillId.BlackFlashFang,
+                CustomSkillId.MirageShift,
+                CustomSkillId.TerrorBlast,
+                CustomSkillId.PhantomEdge,
+                CustomSkillId.DimSlice,
+            ]
+		};
+
+        public static readonly Dictionary<(JobId, uint), CustomSkillId> gJobIdReleaseIdCustomSkillMap =
+            gCustomSkillJobIdMap.SelectMany(jobIdList => jobIdList.Value.Select(skillId => new
+            {
+                JobId = jobIdList.Key,
+                SkillId = skillId,
+                ReleaseId = gCustomSkillReleaseIdMap[skillId]
+            }
+            )).ToDictionary(key => (key.JobId, key.ReleaseId), val => val.SkillId);
     }
 }

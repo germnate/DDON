@@ -10,21 +10,18 @@ namespace Arrowgene.Ddon.GameServer.Handler
     {
         private static readonly ServerLogger Logger = LogProvider.Logger<ServerLogger>(typeof(SkillSetAbilityHandler));
 
-        private readonly JobManager jobManager;
-
         public SkillSetAbilityHandler(DdonGameServer server) : base(server)
         {
-            jobManager = server.JobManager;
         }
 
         public override S2CSkillSetAbilityRes Handle(GameClient client, C2SSkillSetAbilityReq packet)
         {
-            if(packet.SlotNo == 0)
+            if (packet.SlotNo == 0)
             {
-                Logger.Error(client, $"Requesting to set an ability to slot 0");
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_SKILL_INVALID_SLOT_NO, $"Requesting to set an ability to slot 0");
             }
 
-            Ability abilitySlot = jobManager.SetAbility(Server.Database, client, client.Character, packet.Job, packet.SlotNo, packet.SkillId, packet.SkillLv);
+            Ability abilitySlot = Server.JobManager.SetAbility(Server.Database, client, client.Character, packet.SlotNo, packet.AbilityId, packet.AbilityLv);
 
             return new S2CSkillSetAbilityRes() {
                 SlotNo = packet.SlotNo,

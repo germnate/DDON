@@ -258,12 +258,12 @@ namespace Arrowgene.Ddon.GameServer.Handler
             )).ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
 
             // In BBM, all custom skills are already learned so add them
-            bbmCharacter.LearnedCustomSkills = SkillData.AllSkills.Select(x => new CustomSkill()
+            bbmCharacter.LearnedCustomSkills = [.. Server.AssetRepository.SkillData.AllSkills.Select(x => new CustomSkill()
             {
                 Job = x.Job,
                 SkillId = x.SkillNo,
                 SkillLv = x.Params.Max(x => x.Lv)
-            }).ToList();
+            })];
             
             bbmCharacter.Storage = new Storages(Server.AssetRepository.StorageAsset.ToDictionary(x => x.StorageType, x => x.SlotMax));
 

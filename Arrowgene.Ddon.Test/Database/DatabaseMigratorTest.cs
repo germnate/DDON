@@ -368,10 +368,6 @@ namespace Arrowgene.Ddon.Test.Database
         public bool UpdateSystemMailAttachmentReceivedStatus(ulong messageId, ulong attachmentId, bool isReceived) {  return true; }
         public bool DeleteSystemMailAttachment(ulong messageId) { return true; }
         public bool UpdateItemEquipPoints(string itemUID, uint equipPoints, DbConnection? connectionIn = null) {return true; }
-        public bool InsertIfNotExistsAddStatus(string itemUid, uint characterId, byte isAddStat1, byte isAddStat2, ushort addStat1, ushort addStat2) { return true; }
-        public bool InsertAddStatus(string itemUid, uint characterId, byte isAddStat1, byte isAddStat2, ushort addStat1, ushort addStat2) { return true; }
-        public List<CDataAddStatusParam> GetAddStatusByUID(string itemUid) { return new List<CDataAddStatusParam>(); }
-        public bool UpdateAddStatus(string itemUid, uint characterId, byte isAddStat1, byte isAddStat2, ushort addStat1, ushort addStat2) { return true; }
         public bool ReplaceCharacterPlayPointData(uint id, CDataJobPlayPoint updatedCharacterPlayPointData, DbConnection? connectionIn = null) { return true; }
         public bool UpdateCharacterPlayPointData(uint id, CDataJobPlayPoint updatedCharacterPlayPointData, DbConnection? connectionIn = null) { return true; }
         public bool InsertCharacterStampData(uint id, CharacterStampBonus stampData) { return true; }
@@ -475,8 +471,6 @@ namespace Arrowgene.Ddon.Test.Database
         public void ResetRecyleEquipmentRecords(DbConnection? connectionIn = null) { }
         public bool UpsertRecycleEquipmentRecord(uint characterId, byte numAttempts, DbConnection? connectionIn = null) { return true; }
 
-        public bool InsertEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null) { return true; }
-        public bool UpdateEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null) { return true; }
         public bool HasEquipmentLimitBreakRecord(uint characterId, string itemUID, DbConnection? connectionIn = null) { return true; }
         public bool UpsertEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null) { return true; }
         public List<CDataAddStatusParam> GetEquipmentLimitBreakRecord(string itemUID, DbConnection? connectionIn = null) { return new(); }

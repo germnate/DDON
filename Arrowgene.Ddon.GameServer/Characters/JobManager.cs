@@ -423,8 +423,8 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 }
             }
 
-            uint jpCost = SkillData.AllSkills
-                .Where(skill => skill.Job == job && skill.SkillNo == skillId)
+            uint jpCost = Server.AssetRepository.SkillData.Skills.GetValueOrDefault(job, [])
+                .Where(skill => skill.SkillNo == skillId)
                 .SelectMany(skill => skill.Params)
                 .Where(skillParams => skillParams.Lv == skillLv)
                 .Select(skillParams => skillParams.RequireJobPoint)
@@ -497,6 +497,27 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 }
             }
             return queue;
+        }
+
+        public bool UnlockSpecialCustomSkill(CharacterCommon character, CustomSkillId skillId, DbConnection? connectionIn = null)
+        {
+            // Check if there is a learned skill of the same ID (This unlock is a level upgrade)
+            CustomSkill lowerLevelSkill = character.LearnedCustomSkills.Where(skill => skill != null && skill.Job == skillId.JobId() && skill.SkillId == (uint)skillId).SingleOrDefault();
+            if (lowerLevelSkill == null)
+            {
+                // Add new skill
+                CustomSkill newSkill = new()
+                {
+                    Job = skillId.JobId(),
+                    SkillId = skillId.ReleaseId(),
+                    SkillLv = 1
+                };
+                character.LearnedCustomSkills.Add(newSkill);
+                Server.Database.InsertLearnedCustomSkill(character.CommonId, newSkill, connectionIn);
+                return true;
+            }
+
+            return false;
         }
 
         public CustomSkill SetSkill(IDatabase database, GameClient client, CharacterCommon character, JobId job, byte slotNo, uint skillId, byte skillLv)
@@ -675,7 +696,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return queue;
         }
 
-        public PacketQueue UnlockAbility(GameClient client, CharacterCommon character, JobId job, uint abilityId, byte abilityLv, DbConnection? connectionIn = null)
+        public PacketQueue UnlockAbility(GameClient client, CharacterCommon character, JobId job, AbilityId abilityId, byte abilityLv, DbConnection? connectionIn = null)
         {
             PacketQueue queue = new();
 
@@ -683,7 +704,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             //By using the Augment search, you can buy augments from other jobs while passing a job parameter from the character's *current* job.
             //As such, always look up the ID to make sure you know what job it's really coming from.
 
-            CDataAbilityParam abilityData = SkillGetAcquirableAbilityListHandler.GetAbilityFromId(abilityId);
+            var abilityData = Server.AssetRepository.SkillData.AllAbilities.Where(x => x.AbilityNo == abilityId).First();
             JobId owningJob = abilityData.Job;
 
             Logger.Debug($"Unlocking/upgrading ability {owningJob.ToString()}: {abilityId}");
@@ -696,7 +717,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 // New ability
                 Ability newAbility = new Ability()
                 {
-                    Job = owningJob,
+                    //Job = owningJob,
                     AbilityId = abilityId,
                     AbilityLv = abilityLv
                 };
@@ -750,10 +771,30 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return queue;
         }
 
-        public Ability SetAbility(IDatabase database, GameClient client, CharacterCommon character, JobId abilityJob, byte slotNo, uint abilityId, byte abilityLv)
+        public bool UnlockSpecialAbility(CharacterCommon character, AbilityId abilityId, DbConnection? connectionIn = null)
+        {
+            Ability lowerLevelAbility = character.LearnedAbilities.SingleOrDefault(aug => aug != null && aug.AbilityId == abilityId);
+
+            if (lowerLevelAbility == null)
+            {
+                // New ability
+                Ability newAbility = new()
+                {
+                    AbilityId = abilityId,
+                    AbilityLv = 1
+                };
+                character.LearnedAbilities.Add(newAbility);
+                Server.Database.InsertLearnedAbility(character.CommonId, newAbility, connectionIn);
+                return true;
+            }
+
+            return false;
+        }
+
+        public Ability SetAbility(IDatabase database, GameClient client, CharacterCommon character, byte slotNo, AbilityId abilityId, byte abilityLv)
         {
             Ability ability = character.LearnedAbilities
-                .Where(aug =>aug.AbilityId == abilityId)
+                .Where(aug => aug.AbilityId == abilityId)
                 .SingleOrDefault();
 
             if (ability is null)
@@ -791,22 +832,22 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
             var newAbility = new Ability()
             {
-                Job = 0,
-                AbilityId = (uint)abilityId,
+                AbilityId = abilityId,
                 AbilityLv = 1
             };
             Server.JobManager.UnlockAbility(client, client.Character, JobId.None, newAbility.AbilityId, 1, connectionIn);
+            client.Character.AcquirableAbilities[JobId.None].Add(Server.AssetRepository.SkillData.GetAbility(abilityId));
 
             return new S2CSkillAcquirementLearnNtc()
             {
-                AbilityParamList = new List<CDataAbilityLevelBaseParam>()
-                {
-                    new CDataAbilityLevelBaseParam()
+                AbilityParamList =
+                [
+                    new()
                     {
                         AbilityNo = (uint) abilityId,
                         AbilityLv = 1
                     }
-                }
+                ]
             };
         }
 
@@ -835,11 +876,11 @@ namespace Arrowgene.Ddon.GameServer.Characters
             foreach (var presetAbility in preset.AbilityList)
             {
                 Ability? ability = character.LearnedAbilities
-                    .Where(aug => aug.AbilityId == presetAbility.AcquirementNo)
+                    .Where(aug => (uint)aug.AbilityId == presetAbility.AcquirementNo)
                     .SingleOrDefault()
                     ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_SKILL_NOT_YET_LEARN);
 
-                cost += SkillGetAcquirableAbilityListHandler.GetAbilityFromId(presetAbility.AcquirementNo).Cost;
+                cost += Server.AssetRepository.SkillData.GetAbility(presetAbility.AcquirementNo).Cost;
 
                 if (cost > costMax)
                 {
@@ -861,7 +902,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 else
                 {
                     Ability? ability = character.LearnedAbilities
-                    .Where(aug => aug.AbilityId == preset.AbilityList[i].AcquirementNo)
+                    .Where(aug => (uint)aug.AbilityId == preset.AbilityList[i].AcquirementNo)
                     .SingleOrDefault() 
                     ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_SKILL_NOT_YET_LEARN);
 

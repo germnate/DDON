@@ -5,6 +5,7 @@ using Arrowgene.Ddon.Shared.Model;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Characters
 {
@@ -100,15 +101,15 @@ namespace Arrowgene.Ddon.GameServer.Characters
             foreach (var jobId in jobOrbUpgrades.Keys)
             {
                 character.ExtendedJobParams[jobId] = new CDataOrbGainExtendParam();
-                character.UnlockedCustomSkills[jobId] = new HashSet<uint>();
-                character.UnlockedAbilities[jobId] = new HashSet<uint>();
+                character.UnlockedCustomSkills[jobId] = [];
+                character.UnlockedAbilities[jobId] = [];
                 foreach (var element in jobOrbUpgrades[jobId])
                 {
                     if (character.ReleasedExtendedJobParams[jobId].Contains(element.ElementId))
                     {
                         if (element.IsAbility())
                         {
-                            character.UnlockedAbilities[jobId].Add((uint) element.AbilityId);
+                            character.UnlockedAbilities[jobId].Add(element.AbilityId);
                         }
                         else if (element.IsCustomSkill())
                         {
@@ -121,6 +122,16 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     }
                 }
             }
+        }
+
+        public IEnumerable<CustomSkillId> GetExSkills(Character character)
+        {
+            return GetAllUpgrades()
+                .SelectMany(x => x.Value
+                    .Where(y => character.ReleasedExtendedJobParams[x.Key].Contains(y.ElementId))
+                    .Where(y => y.IsCustomSkill() && y.CustomSkillId.IsEx())
+                    .Select(y => y.CustomSkillId)
+                );
         }
 
         public float CalculatePercentCompleted(Character character, OrbTreeType orbTreeType, JobId jobId)
@@ -174,25 +185,25 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
             if (upgrade.IsAbility())
             {
-                Server.CharacterManager.UnlockAbility(client.Character, jobId, (uint)upgrade.AbilityId, 1);
+                Server.CharacterManager.UnlockAbility(client.Character, jobId, upgrade.AbilityId, 1);
 
                 // Handle players who had existing abilities blocked by addition of S2 tree
-                var existing = client.Character.LearnedAbilities.Where(x => x.AbilityId == (uint) upgrade.AbilityId).FirstOrDefault();
+                var existing = client.Character.LearnedAbilities.Where(x => x.AbilityId == upgrade.AbilityId).FirstOrDefault();
                 if (existing == null)
                 {
-                    Server.JobManager.UnlockAbility(client, client.Character, jobId, (uint)upgrade.AbilityId, 1, connectionIn);
+                    Server.JobManager.UnlockAbility(client, client.Character, jobId, upgrade.AbilityId, 1, connectionIn);
                 }
 
                 packets.Enqueue(client, new S2CSkillAcquirementLearnNtc()
                 {
-                    AbilityParamList = new List<CDataAbilityLevelBaseParam>()
-                    {
-                       new CDataAbilityLevelBaseParam()
+                    AbilityParamList =
+                    [
+                       new()
                        {
                            AbilityNo = (uint) upgrade.AbilityId,
                            AbilityLv = existing?.AbilityLv ?? 1,
                        }
-                    }
+                    ]
                 });
             }
             else if (upgrade.IsCustomSkill())
@@ -208,16 +219,28 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
                 packets.Enqueue(client, new S2CSkillAcquirementLearnNtc()
                 {
-                    SkillParamList = new List<CDataSkillLevelBaseParam>()
-                    {
-                       new CDataSkillLevelBaseParam()
+                    SkillParamList =
+                    [
+                       new()
                        {
                            Job = jobId,
                            SkillNo = upgrade.CustomSkillId.ReleaseId(),
                            SkillLv = existing?.SkillLv ?? 1,
                        }
-                    }
+                    ]
                 });
+
+                // Propagate to Pawns.
+                if (upgrade.CustomSkillId.IsEx())
+                {
+                    foreach (var pawn in client.Character.Pawns)
+                    {
+                        if (pawn.LearnedCustomSkills.Where(x => x.SkillId == upgrade.CustomSkillId.ReleaseId() && x.Job == jobId).FirstOrDefault() == null)
+                        {
+                            Server.JobManager.UnlockSpecialCustomSkill(pawn, upgrade.CustomSkillId, connectionIn);
+                        }
+                    }
+                }
             }
             UpdateExtendedParams(client.Character.ExtendedJobParams, jobId, upgrade);
 

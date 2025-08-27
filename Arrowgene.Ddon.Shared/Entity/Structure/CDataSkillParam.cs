@@ -6,15 +6,10 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
 {
     public class CDataSkillParam
     {
-        public CDataSkillParam()
-        {
-            Params = new List<CDataSkillLevelParam>();
-        }
-
         public uint SkillNo { get; set; }
         public JobId Job { get; set; }
-        public ReleaseType Type { get; set; }
-        public List<CDataSkillLevelParam> Params { get; set; }
+        public ReleaseType Type { get; set; } = ReleaseType.CustomSkill;
+        public List<CDataSkillLevelParam> Params { get; set; } = [];
 
         public class Serializer : EntitySerializer<CDataSkillParam>
         {

@@ -190,7 +190,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
             byte greatSuccessValue = 1;
             int greatSuccessOdds = GreatSuccessOddsDefault;
-            byte RandomQuality = 0;
+            byte randomQuality = 0;
             uint exp = 0;
 
             if (refineMaterialItem != null)
@@ -199,20 +199,20 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 {
                     // Quality Rocks (Tier2)
                     case 8036 or 8068:
-                        RandomQuality = 2;
+                        randomQuality = 2;
                         greatSuccessValue = 3;
                         exp = CalculateQualityExp(itemRank, false, false);
                         break;
                     // WhiteDragon Rocks (Tier3)
                     case 8052 or 8084:
-                        RandomQuality = 2;
+                        randomQuality = 2;
                         greatSuccessValue = 3;
                         greatSuccessOdds = 25;
                         exp = CalculateQualityExp(itemRank, true, false);
                         break;
                     // Standard Rocks (Tier1)
                     case 8035 or 8067:
-                        RandomQuality = 1;
+                        randomQuality = 1;
                         greatSuccessValue = 2;
                         exp = CalculateQualityExp(itemRank, false, true);
                         break;
@@ -223,12 +223,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
             if (isGreatSuccess)
             {
-                RandomQuality = greatSuccessValue;
+                randomQuality = greatSuccessValue;
             }
 
             return new CraftCalculationResult()
             {
-                CalculatedValue = RandomQuality,
+                CalculatedValue = randomQuality,
                 IsGreatSuccess = isGreatSuccess,
                 Exp = exp
             };

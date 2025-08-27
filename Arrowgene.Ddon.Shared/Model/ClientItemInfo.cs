@@ -30,19 +30,19 @@ namespace Arrowgene.Ddon.Shared.Model
 
     public class ClientItemInfo
     {
-        public ItemId ItemId;
-        public byte Category;
-        public ushort Price;
-        public byte StackLimit;
-        public byte Rank;
-        public string Name;
-        public ItemSubCategory SubCategory;
+        public ItemId ItemId { get; set; }
+        public byte Category { get; set; }
+        public ushort Price { get; set; }
+        public byte StackLimit { get; set; }
+        public byte Rank { get; set; }
+        public string Name { get; set; }
+        public ItemSubCategory SubCategory { get; set; }
 
-        public byte? Level;
-        public EquipJobList? JobGroup;
-        public byte? CrestSlots;
-        public byte? Quality;
-        public Gender? Gender;
+        public byte? Level { get; set; }
+        public EquipJobList? JobGroup { get; set; }
+        public byte? CrestSlots { get; set; }
+        public byte? Quality { get; set; }
+        public Gender? Gender { get; set; }
 
         public StorageType StorageType
         { 

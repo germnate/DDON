@@ -471,10 +471,6 @@ public abstract class SqlDb : IDatabase
     public abstract List<SystemMailAttachment> SelectAttachmentsForSystemMail(ulong messageId);
     public abstract bool UpdateSystemMailAttachmentReceivedStatus(ulong messageId, ulong attachmentId, bool isReceived);
     public abstract bool DeleteSystemMailAttachment(ulong messageId);
-    public abstract bool InsertIfNotExistsAddStatus(string itemUid, uint characterId, byte isAddStat1, byte isAddStat2, ushort addStat1, ushort addStat2);
-    public abstract bool InsertAddStatus(string itemUid, uint characterId, byte isAddStat1, byte isAddStat2, ushort addStat1, ushort addStat2);
-    public abstract List<CDataAddStatusParam> GetAddStatusByUID(string itemUid);
-    public abstract bool UpdateAddStatus(string itemUid, uint characterId, byte isAddStat1, byte isAddStat2, ushort addStat1, ushort addStat2);
     public abstract bool ReplaceCharacterPlayPointData(uint id, CDataJobPlayPoint updatedCharacterPlayPointData, DbConnection? connectionIn = null);
     public abstract bool UpdateCharacterPlayPointData(uint id, CDataJobPlayPoint updatedCharacterPlayPointData, DbConnection? connectionIn = null);
     public abstract bool InsertCharacterStampData(uint id, CharacterStampBonus stampData);
@@ -555,8 +551,6 @@ public abstract class SqlDb : IDatabase
     public abstract byte GetRecycleEquipmentAttempts(uint characterId, DbConnection? connectionIn = null);
     public abstract void ResetRecyleEquipmentRecords(DbConnection? connectionIn = null);
     public abstract bool UpsertRecycleEquipmentRecord(uint characterId, byte numAttempts, DbConnection? connectionIn = null);
-    public abstract bool InsertEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null);
-    public abstract bool UpdateEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null);
     public abstract bool HasEquipmentLimitBreakRecord(uint characterId, string itemUID, DbConnection? connectionIn = null);
     public abstract bool UpsertEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null);
     public abstract List<CDataAddStatusParam> GetEquipmentLimitBreakRecord(string itemUID, DbConnection? connectionIn = null);

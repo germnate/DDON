@@ -35,8 +35,7 @@ public partial class DdonSqlDb : SqlDb
     private Ability ReadLearnedAbility(DbDataReader reader)
     {
         Ability ability = new();
-        ability.Job = (JobId)GetByte(reader, "job");
-        ability.AbilityId = GetUInt32(reader, "ability_id");
+        ability.AbilityId = (AbilityId)GetUInt32(reader, "ability_id");
         ability.AbilityLv = GetByte(reader, "ability_lv");
         return ability;
     }
@@ -45,7 +44,7 @@ public partial class DdonSqlDb : SqlDb
     {
         AddParameter(command, "character_common_id", commonId);
         AddParameter(command, "job", (byte)ability.Job);
-        AddParameter(command, "ability_id", ability.AbilityId);
+        AddParameter(command, "ability_id", (uint)ability.AbilityId);
         AddParameter(command, "ability_lv", ability.AbilityLv);
     }
 }

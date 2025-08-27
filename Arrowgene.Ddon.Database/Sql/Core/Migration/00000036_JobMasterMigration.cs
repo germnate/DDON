@@ -1,3 +1,4 @@
+using Arrowgene.Ddon.Shared.Asset;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Logging;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ namespace Arrowgene.Ddon.Database.Sql.Core.Migration
             db.Execute(conn, adaptedSchema);
 
             var refundedJp = new Dictionary<uint, Dictionary<JobId, long>>();
+            var skillData = new SkillDataAssetDeserializer().ReadPath("Script/migration_job_master_skill_data.json");
 
             Logger.Info("Collecting information about characters ...");
             var normalCharacters = new HashSet<uint>();
@@ -63,8 +65,7 @@ namespace Arrowgene.Ddon.Database.Sql.Core.Migration
 
                        var ability = new Ability();
                        ability.AbilityLv = db.GetByte(reader, "ability_lv");
-                       ability.Job = (JobId) db.GetByte(reader, "job");
-                       ability.AbilityId = db.GetUInt32(reader, "ability_id");
+                       ability.AbilityId =(AbilityId)db.GetUInt32(reader, "ability_id");
                        abilityMap[characterCommonId].Add(ability);
                    }
                }
@@ -120,7 +121,7 @@ namespace Arrowgene.Ddon.Database.Sql.Core.Migration
                         continue;
                     }
 
-                    refundedJp[characterCommonId][ability.Job] += SkillData.AllAbilities
+                    refundedJp[characterCommonId][ability.Job] += skillData.AllAbilities
                         .Where(x => x.AbilityNo == ability.AbilityId)
                         .SelectMany(x => x.Params)
                         .Where(x => x.Lv > 3 && x.Lv <= ability.AbilityLv)
@@ -151,8 +152,8 @@ namespace Arrowgene.Ddon.Database.Sql.Core.Migration
                         continue;
                     }
 
-                    refundedJp[characterCommonId][customSkill.Job] += SkillData.AllSkills
-                        .Where(x => x.Job == customSkill.Job)
+                    refundedJp[characterCommonId][customSkill.Job] += skillData.Skills
+                        .GetValueOrDefault(customSkill.Job, [])
                         .Where(x => x.SkillNo == customSkill.SkillId)
                         .SelectMany(x => x.Params)
                         .Where(x => x.Lv > 4 && x.Lv <= customSkill.SkillId)
@@ -203,7 +204,7 @@ namespace Arrowgene.Ddon.Database.Sql.Core.Migration
                     {
                         db.AddParameter(command, "character_common_id", characterCommonId);
                         db.AddParameter(command, "job", (byte)ability.Job);
-                        db.AddParameter(command, "ability_id", ability.AbilityId);
+                        db.AddParameter(command, "ability_id", (uint)ability.AbilityId);
                         db.AddParameter(command, "ability_lv", ability.AbilityLv);
                     });
                 }
