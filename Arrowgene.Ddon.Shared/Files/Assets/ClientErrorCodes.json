@@ -114,5 +114,9 @@
     {
         "code": "ERROR_CODE_PAWN_ALREADY_RENTED",
         "en": "This pawn has already been rented."
+    },
+    {
+        "code": "ERROR_CODE_DISPEL_NO_OPTIONS",
+        "en": "You've sealed all available effects for this item; it cannot be redeemed at the moment."
     }
 ]

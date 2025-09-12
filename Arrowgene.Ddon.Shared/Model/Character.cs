@@ -55,6 +55,8 @@ namespace Arrowgene.Ddon.Shared.Model
             AcquirableAbilities = new();
 
             JobEmblems = new();
+
+            DispelSeals = [];
         }
 
         public int AccountId { get; set; }
@@ -157,6 +159,8 @@ namespace Arrowgene.Ddon.Shared.Model
         public Dictionary<JobId, List<CDataActiveJobOrder>> JobMasterActiveOrders { get; set; }
         public Dictionary<JobId, List<CDataSkillParam>> AcquirableSkills { get; set; }
         public Dictionary<JobId, List<CDataAbilityParam>> AcquirableAbilities { get; set; }
+
+        public HashSet<uint> DispelSeals { get; set; }
 
         // TODO: Move to a more sensible place
         public uint LastEnteredShopId { get; set; }

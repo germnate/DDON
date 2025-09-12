@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Arrowgene.Ddon.Shared.Model.BattleContent
 {
-    public class BitterblackMazeRewards
+    public class BitterblackMazeMarkRewards
     {
-        public uint GoldMarks {  get; set; }
+        public uint StageId { get; set; }
+        public uint GoldMarks { get; set; }
         public uint SilverMarks { get; set; }
         public uint RedMarks { get; set; }
     }

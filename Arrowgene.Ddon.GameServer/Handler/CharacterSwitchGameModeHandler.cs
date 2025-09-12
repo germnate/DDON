@@ -35,6 +35,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             var achievements = (client.Character.AchievementStatus, client.Character.AchievementProgress, client.Character.AchievementUniqueCrafts);
             var acquirableSkills = client.Character.AcquirableSkills;
             var acquirableAbilities = client.Character.AcquirableAbilities;
+            var dispelSeals = client.Character.DispelSeals;
 
             var serverInfo = client.Character.Server;
             if (client.GameMode == GameMode.Normal)
@@ -77,6 +78,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             client.Character.AchievementUniqueCrafts = achievements.AchievementUniqueCrafts;
             client.Character.AcquirableSkills = acquirableSkills;
             client.Character.AcquirableAbilities = acquirableAbilities;
+            client.Character.DispelSeals = dispelSeals;
 
             client.Send(new S2CCharacterSwitchGameModeNtc()
             {

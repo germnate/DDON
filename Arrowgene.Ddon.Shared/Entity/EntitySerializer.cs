@@ -167,6 +167,10 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new CDataDispelLotItem.Serializer());
             Create(new CDataDispelLotPlus.Serializer());
             Create(new CDataDispelResultInfo.Serializer());
+            Create(new CDataDispelLockSettingUpdate.Serializer());
+            Create(new CDataDispelLockPageData.Serializer());
+            Create(new CDataDispelLockCostData.Serializer());
+            Create(new CDataDispelLockSealData.Serializer());
             Create(new CDataDragonAbility.Serializer());
             Create(new CDataDropItemSetInfo.Serializer());
 
@@ -669,6 +673,8 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new C2SDispelExchangeDispelItemReq.Serializer());
             Create(new C2SDispelGetDispelItemListReq.Serializer());
             Create(new C2SDispelGetDispelItemSettingsReq.Serializer());
+            Create(new C2SDispelGetLockSettingReq.Serializer());
+            Create(new C2SDispelLockSettingReq.Serializer());
 
             Create(new C2SEntryBoardEntryBoardItemCreateReq.Serializer());
             Create(new C2SEntryBoardEntryBoardItemEntryReq.Serializer());
@@ -1261,6 +1267,8 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new S2CDispelExchangeDispelItemRes.Serializer());
             Create(new S2CDispelGetDispelItemListRes.Serializer());
             Create(new S2CDispelGetDispelItemSettingsRes.Serializer());
+            Create(new S2CDispelGetLockSettingRes.Serializer());
+            Create(new S2CDispelLockSettingRes.Serializer());
 
             Create(new S2CEntryBoardEntryBoardItemChangeMemberNtc.Serializer());
             Create(new S2CEntryBoardEntryBoardItemCreateRes.Serializer());

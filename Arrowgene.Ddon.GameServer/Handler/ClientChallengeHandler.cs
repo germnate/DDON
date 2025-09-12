@@ -1,5 +1,6 @@
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
+using Arrowgene.Ddon.Shared;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Logging;
 
@@ -22,6 +23,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
             {
                 Logger.Error(client, "Failed CertChallenge");
                 throw new ResponseErrorException(Shared.Model.ErrorCode.ERROR_CODE_SYSTEM_INTERNAL);
+            }
+
+            if (Server.ServerSetting.ServerSetting.ServerSocketSettings.DebugMode)
+            {
+                Logger.Info(client, $"CamelliaKey: {Util.ToHexString(challenge.CamelliaKey)}");
             }
 
             return new S2CCertClientChallengeRes()

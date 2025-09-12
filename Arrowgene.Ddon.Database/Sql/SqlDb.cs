@@ -486,15 +486,17 @@ public abstract class SqlDb : IDatabase
     public abstract bool UpdateBBMProgress(uint characterId, BitterblackMazeProgress progress, DbConnection? connectionIn = null);
     public abstract BitterblackMazeProgress SelectBBMProgress(uint characterId);
     public abstract bool RemoveBBMProgress(uint characterId);
-    public abstract bool InsertBBMRewards(uint characterId, uint goldMarks, uint silverMarks, uint redMarks);
-    public abstract bool UpdateBBMRewards(uint characterId, BitterblackMazeRewards rewards, DbConnection? connectionIn = null);
-    public abstract bool RemoveBBMRewards(uint characterId);
-    public abstract BitterblackMazeRewards SelectBBMRewards(uint characterId, DbConnection? connectionIn = null);
-    public abstract bool InsertBBMContentTreasure(uint characterId, BitterblackMazeTreasure treasure, DbConnection? connectionIn = null);
-    public abstract bool InsertBBMContentTreasure(uint characterId, uint contentId, uint amount, DbConnection? connectionIn = null);
-    public abstract bool UpdateBBMContentTreasure(uint characterId, BitterblackMazeTreasure treasure);
-    public abstract bool UpdateBBMContentTreasure(uint characterId, uint contentId, uint amount);
-    public abstract bool RemoveBBMContentTreasure(uint characterId);
+    public abstract bool InsertBBMRewards(uint characterId, uint goldMarks, uint silverMarks, uint redMarks, uint stageId, DbConnection? connectionIn = null);
+    public abstract bool UpdateBBMRewards(uint characterId, BitterblackMazeMarkRewards rewards, DbConnection? connectionIn = null);
+    public abstract bool RemoveBBMRewards(uint characterId, DbConnection? connectionIn = null);
+    public abstract Dictionary<uint, BitterblackMazeMarkRewards> SelectBBMRewards(uint characterId, DbConnection? connectionIn = null);
+    public abstract bool ResetBBMResetTicketStatus(DbConnection? connectionIn = null);
+    public abstract bool InsertBBMResetTicketStatus(uint characterId, DbConnection? connectionIn = null);
+    public abstract uint SelectBBMGGReset(uint characterId, DbConnection? connectionIn = null);
+    public abstract bool InsertBBMGGReset(uint characterId, DbConnection? connectionIn = null);
+    public abstract bool ResetBBMGGReset(DbConnection? connectionIn = null);
+    public abstract bool InsertBBMContentTreasure(uint characterId, uint stageId, uint groupId, uint index, DbConnection? connectionIn = null);
+    public abstract bool RemoveBBMContentTreasure(uint characterId, DbConnection? connectionIn = null);
     public abstract List<BitterblackMazeTreasure> SelectBBMContentTreasure(uint characterId, DbConnection? connectionIn = null);
     public abstract bool CreateClan(CDataClanParam clanParam);
     public abstract bool DeleteClan(CDataClanParam clan, DbConnection? connectionIn = null);
@@ -622,6 +624,11 @@ public abstract class SqlDb : IDatabase
     public abstract bool InsertRentalPawnFeedback(uint characterId, RentalPawn pawn, List<CDataPawnFeedback> pawnFeedbacks, DbConnection? connectionIn = null);
     public abstract List<CDataPawnHistory> SelectPawnHistory(uint pawnId, DbConnection? connectionIn = null);
     public abstract CDataPawnTotalScore SelectPawnTotalScore(uint pawnId, DbConnection? connectionIn = null);
+
+    public abstract HashSet<uint> SelectDispelSeals(uint characterId, DbConnection? connectionIn = null);
+    public abstract bool InsertDispelSeal(uint characterId, uint sealIndex, DbConnection? connectionIn = null);
+    public abstract bool DeleteDispelSeal(uint characterId, uint sealIndex, DbConnection? connectionIn = null);
+
 
     protected virtual DbCommand Command(string query, DbConnection connection)
     {
