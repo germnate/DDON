@@ -165,7 +165,7 @@ namespace Arrowgene.Ddon.WebServer
                     account = CreatePasswordToken(req.Email);
                     if (account != null && string.IsNullOrEmpty(req.PasswordToken))
                     {
-                        res.Message = "Token generated";
+                        res.Message = "Password token generated";
                         break;
                     }
                     else if (account == null && !string.IsNullOrEmpty(req.Email))
@@ -182,7 +182,7 @@ namespace Arrowgene.Ddon.WebServer
                     account = ResetPassword(req.Account, req.Password, req.PasswordToken);
                     if (account == null)
                     {
-                        res.Error = "Invalid token or password";
+                        res.Error = "Invalid account or token";
                         break;
                     }
 
@@ -270,10 +270,16 @@ namespace Arrowgene.Ddon.WebServer
             return account.LoginToken;
         }
 
-        private Account ResetPassword(string name, string password, string passwordToken)
+        private Account ResetPassword(string name, string newPassword, string passwordToken)
         {
             Account account = _database.SelectAccountByName(name);
-            if (account == null && account.PasswordToken != passwordToken && account.MailVerified)
+            if (account == null)
+            {
+                Logger.Error($"{name} - ResetPassword: account does not exist");
+                return null;
+            }
+
+            if (account.PasswordToken != passwordToken)
             {
                 Logger.Error($"{name} - ResetPassword: invalid token");
                 account.PasswordToken = null;
@@ -281,7 +287,7 @@ namespace Arrowgene.Ddon.WebServer
                 return null;
             }
 
-            if (string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(newPassword))
             {
                 Logger.Error($"{name} - ResetPassword: invalid password");
                 account.PasswordToken = null;
@@ -290,23 +296,37 @@ namespace Arrowgene.Ddon.WebServer
             }
 
             account.PasswordToken = null;
-            account.Hash = PasswordHash.CreateHash(password);
+            account.Hash = PasswordHash.CreateHash(newPassword);
             _database.UpdateAccount(account);
             return account;
         }
 
-        private Account CreatePasswordToken(string email)
+        private Account CreatePasswordToken(string mail)
         {
-            Account? account = _database.SelectAccountByEmail(email);
-            if (account == null || (!string.IsNullOrEmpty(account.PasswordToken) && account.MailVerified))
+            Account account = _database.SelectAccountByEmail(mail);
+            if (account == null)
             {
-                Logger.Info($"{email} - CreatePasswordToken: A valid token exists");
+                Logger.Error($"{mail} - CreatePasswordToken: account does not exist");
+                return null;
+            }
+            
+            if (!string.IsNullOrEmpty(account.PasswordToken))
+            {
+                Logger.Info($"{mail} - CreatePasswordToken: a valid password token exists");
                 return null;
             }
 
+            if (!account.MailVerified)
+            {
+                Logger.Error($"{mail} - CreatePasswordToken: email not verified yet");
+                return account;
+            }
+
             account.PasswordToken = GameToken.GenerateToken();
-            account.MailVerifiedAt = DateTime.UtcNow;
             _database.UpdateAccount(account);
+            /*
+                Some SMTP code to send {account.PasswordToken} to user
+            */
             return account;
         }
 
