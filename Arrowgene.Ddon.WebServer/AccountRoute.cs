@@ -133,6 +133,12 @@ namespace Arrowgene.Ddon.WebServer
                         break;
                     }
 
+                    if (token == "mail")
+                    {
+                        res.Error = "Email not verified yet.";
+                        break;
+                    }
+
                     res.Message = "Login Success";
                     res.Token = token;
                     break;
@@ -167,6 +173,11 @@ namespace Arrowgene.Ddon.WebServer
                         res.Error = "E-mail not found";
                         break;
                     }
+                    else if (!account.MailVerified)
+                    {
+                        res.Error = "E-mail not verified yet";
+                        break;
+                    }
 
                     account = ResetPassword(req.Account, req.Password, req.PasswordToken);
                     if (account == null)
@@ -176,6 +187,28 @@ namespace Arrowgene.Ddon.WebServer
                     }
 
                     res.Message = "Password changed";
+                    break;
+
+                case "verify":
+                    bool verification = VerifyEmail(req.Email, req.EmailToken);
+                    if (!verification)
+                    {
+                        res.Error = "Email not found";
+                        break;
+                    }
+                    
+                    res.Message = "Email verified";
+                    break;
+
+                case "resend":
+                    bool resend = ResendEmailVerification(req.Email);
+                    if (!resend)
+                    {
+                        res.Error = "Email not found";
+                        break;
+                    }
+                    
+                    res.Message = "Verification token resent";
                     break;
 
             }
@@ -204,6 +237,9 @@ namespace Arrowgene.Ddon.WebServer
 
             string hash = PasswordHash.CreateHash(password);
             account = _database.CreateAccount(name, mail, hash);
+            /*
+                Some SMTP code to send {account.MailToken} to user
+            */
             return account;
         }
 
@@ -220,6 +256,12 @@ namespace Arrowgene.Ddon.WebServer
             {
                 Logger.Error($"{name} - CreateToken: wrong password provided");
                 return null;
+            }
+
+            if (!account.MailVerified)
+            {
+                Logger.Error($"{name} - CreateToken: email not verified yet");
+                return "mail";
             }
 
             account.LoginToken = GameToken.GenerateToken();
@@ -266,6 +308,46 @@ namespace Arrowgene.Ddon.WebServer
             account.MailVerifiedAt = DateTime.UtcNow;
             _database.UpdateAccount(account);
             return account;
+        }
+
+        private bool VerifyEmail(string mail, string emailToken)
+        {
+            
+            Account account = _database.SelectAccountByEmail(mail);
+            if (account == null)
+            {
+                Logger.Error($"{mail} - VerifyEmail: account does not exist");
+                return false;
+            }
+
+            if (account.MailToken != emailToken)
+            {
+                Logger.Error($"{mail} - VerifyEmail: invalid email token");
+                return false;
+            }
+
+            account.MailToken = null;
+            account.MailVerified = true;
+            account.MailVerifiedAt = DateTime.UtcNow;
+            _database.UpdateAccount(account);
+            return true;
+        }
+
+        private bool ResendEmailVerification(string mail)
+        {
+            Account account = _database.SelectAccountByEmail(mail);
+            if (account == null)
+            {
+                Logger.Error($"{mail} - ResendEmailVerification: account does not exist");
+                return false;
+            }
+
+            account.MailToken = GameToken.GenerateToken();
+            _database.UpdateAccount(account);
+            /*
+                Some SMTP code to send {account.MailToken} to user
+            */
+            return true;
         }
     }
 }
