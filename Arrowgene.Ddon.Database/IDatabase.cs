@@ -30,7 +30,6 @@ public interface IDatabase
     void Stop();
 
     // Generic functions for getting/setting
-    void AddParameter(DbCommand command, string name, object? value, DbType type);
     void AddParameter(DbCommand command, string name, string value);
     void AddParameter(DbCommand command, string name, int value);
     void AddParameter(DbCommand command, string name, float value);
@@ -221,7 +220,7 @@ public interface IDatabase
     bool UpdateAbilityPreset(uint characterId, CDataPresetAbilityParam preset);
 
     bool InsertSecretAbilityUnlock(uint commonId, AbilityId secretAbility, DbConnection? connectionIn = null);
-    List<AbilityId> SelectAllUnlockedSecretAbilities(uint commonId);
+    List<AbilityId> SelectAllUnlockedSecretAbilities(uint commonId, DbConnection? connectionIn = null);
 
     // (Learned) Normal Skills / Learned Core Skills
     bool InsertIfNotExistsNormalSkillParam(uint commonId, CDataNormalSkillParam normalSkillParam);

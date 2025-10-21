@@ -75,7 +75,7 @@ public abstract class SqlDb : IDatabase
         }
     }
 
-    public int ExecuteNonQuery(DbConnection conn, string query, Action<DbCommand> nonQueryAction, bool rethrowException = false)
+    public int ExecuteNonQuery(DbConnection conn, string query, Action<DbCommand> nonQueryAction, bool rethrowException = true)
     {
         try
         {
@@ -158,7 +158,7 @@ public abstract class SqlDb : IDatabase
         }
     }
 
-    public virtual void AddParameter(DbCommand command, string name, object? value, DbType type)
+    private void AddParameter(DbCommand command, string name, object? value, DbType type)
     {
         DbParameter parameter = Parameter(command, name, value, type);
         command.Parameters.Add(parameter);
@@ -180,6 +180,11 @@ public abstract class SqlDb : IDatabase
     }
 
     public virtual void AddParameter(DbCommand command, string name, byte value)
+    {
+        AddParameter(command, name, value, DbType.Byte);
+    }
+
+    public virtual void AddParameter(DbCommand command, string name, byte? value)
     {
         AddParameter(command, name, value, DbType.Byte);
     }
@@ -394,7 +399,7 @@ public abstract class SqlDb : IDatabase
     public abstract bool ReplaceAbilityPreset(uint characterId, CDataPresetAbilityParam preset);
     public abstract bool UpdateAbilityPreset(uint characterId, CDataPresetAbilityParam preset);
     public abstract bool InsertSecretAbilityUnlock(uint commonId, AbilityId secretAbility, DbConnection? connectionIn = null);
-    public abstract List<AbilityId> SelectAllUnlockedSecretAbilities(uint commonId);
+    public abstract List<AbilityId> SelectAllUnlockedSecretAbilities(uint commonId, DbConnection? connectionIn = null);
     public abstract bool InsertIfNotExistsNormalSkillParam(uint commonId, CDataNormalSkillParam normalSkillParam);
     public abstract bool InsertNormalSkillParam(uint commonId, CDataNormalSkillParam normalSkillParam);
     public abstract bool ReplaceNormalSkillParam(uint commonId, CDataNormalSkillParam normalSkillParam);

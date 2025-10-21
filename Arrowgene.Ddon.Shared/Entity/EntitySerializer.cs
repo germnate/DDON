@@ -86,6 +86,7 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new CDataCharacterReleaseElement.Serializer());
             Create(new CDataCharacterSearchParam.Serializer());
             Create(new CDataCharacterSearchParameter.Serializer());
+            Create(new CDataCheatInfo.Serializer());
             Create(new CDataClanConciergeInfo.Serializer());
             Create(new CDataClanConciergeNpc.Serializer());
             Create(new CDataClanHistoryElement.Serializer());
@@ -153,6 +154,7 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new CDataCycleContentsNews.Serializer());
             Create(new CDataCycleContentsNewsDetail.Serializer());
             Create(new CDataCycleContentsRank.Serializer());
+            Create(new CDataCycleContentsUnk.Serializer());
 
             Create(new CDataDeliveredItem.Serializer());
             Create(new CDataDeliveredItemRecord.Serializer());
@@ -502,6 +504,7 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new CDataURLInfo.Serializer());
             Create(new CDataUpdateMatchingProfileInfo.Serializer());
             Create(new CDataUpdateWalletPoint.Serializer());
+            Create(new CDataValuableItem.Serializer());
 
             Create(new CDataWalletLimit.Serializer());
             Create(new CDataWalletPoint.Serializer());
@@ -736,6 +739,7 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new C2SInstanceEnemyGroupLeaveNtc.Serializer());
             Create(new C2SInstanceEnemyKillReq.Serializer());
             Create(new C2SInstanceExchangeOmInstantKeyValueReq.Serializer());
+            Create(new C2SInstanceGetOmInstantKeyValueAllReq.Serializer());
             Create(new C2SInstanceGetDropItemListReq.Serializer());
             Create(new C2SInstanceGetDropItemReq.Serializer());
             Create(new C2SInstanceGetEnemySetListReq.Serializer());
@@ -765,6 +769,7 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new C2SItemUseBagItemReq.Serializer());
             Create(new C2SItemUseJobItemsReq.Serializer());
             Create(new C2SItemGetEquipRareTypeItemsReq.Serializer());
+            Create(new C2SItemRecoveryValuableItemReq.Serializer());
 
             Create(new C2SJobChangeJobReq.Serializer());
             Create(new C2SJobChangePawnJobReq.Serializer());
@@ -1393,6 +1398,7 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new S2CItemUseBagItemRes.Serializer());
             Create(new S2CItemUseJobItemsRes.Serializer());
             Create(new S2CItemGetEquipRareTypeItemsRes.Serializer());
+            Create(new S2CItemRecoveryValuableItemRes.Serializer());
 
             Create(new S2CJobChangeJobNtc.Serializer());
             Create(new S2CJobChangeJobRes.Serializer());
