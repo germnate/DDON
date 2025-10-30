@@ -145,13 +145,23 @@ namespace Arrowgene.Ddon.Cli
             ShowCopyright();
             CommandResultType result = ProcessArguments(parameter);
 
-            if (result != CommandResultType.Exit)
+            /*if (result != CommandResultType.Exit)
             {
                 Logger.Info("Press `e'-key to exit.");
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
                 while (keyInfo.Key != ConsoleKey.E)
                 {
                     keyInfo = Console.ReadKey();
+                }
+            }*/
+
+            if (result != CommandResultType.Exit)
+            {
+                Logger.Info("Press 'e' to exit.");
+                int input = Console.Read();
+                while (char.ToLower((char)input) != 'e')
+                {
+                    input = Console.Read();
                 }
             }
 
