@@ -117,6 +117,15 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                 }
             }
             
+            var starterConsumableItems = document.RootElement.GetProperty("starter_consumable_items").EnumerateArray();
+            foreach(var consumableItem in starterConsumableItems) 
+            {
+                uint itemId = consumableItem.GetProperty("item_id").GetUInt32();
+                uint itemQuantity = consumableItem.GetProperty("quantity").GetUInt32();
+                asset.StarterConsumableItems.Add((itemId, itemQuantity));
+            }
+
+
             var starterJobItems = document.RootElement.GetProperty("starter_job_items").EnumerateArray();
             foreach(var jobItem in starterJobItems) 
             {

@@ -1,4 +1,6 @@
+using Arrowgene.Ddon.GameServer.Dump;
 using Arrowgene.Ddon.Server;
+using Arrowgene.Ddon.Shared.Entity;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model.Quest;
@@ -18,19 +20,25 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         // A list of spot IDs that occurs in all zones in the pcap.
         // Corresponds to the "time-limited" spots from S3.
-        private static readonly List<CDataCommonU32> TimeLimitedList = new List<uint>() { 1036, 1037, 1038, 1070, 1076, 1080, 1108, 1109, 1110, 1111, 1212, 1213 }
-            .Select(x => new CDataCommonU32(x)).ToList();
+        public static readonly HashSet<uint> TimeLimitedList = [1036, 1037, 1038, 1070, 1076, 1080, 1108, 1109, 1110, 1111, 1212, 1213];
 
         public override S2CAreaGetLeaderAreaReleaseListRes Handle(GameClient client, C2SAreaGetLeaderAreaReleaseListReq request)
         {
-            var result = new S2CAreaGetLeaderAreaReleaseListRes();
+            var pcap = EntitySerializer.Get<S2CAreaGetLeaderAreaReleaseListRes>().Read(GameFull.data_Dump_117);
+
             var leader = client.Party.Leader;
 
             if (client.Party.Leader is null)
             {
                 // No unlocks without a leader to pull AR from.
-                return result;
+                return new();
             }
+
+            var result = new S2CAreaGetLeaderAreaReleaseListRes
+            {
+                PeriodicallyReleasedSpots = Server.AreaRankManager.CheckPeriodicallyReleasedSpots(client),
+                MonsterGatheringSpots = Server.AreaRankManager.CheckMonsterGatheringSpots(client)
+            };
 
             var leaderRank = leader.Client.Character.AreaRanks;
             var completedQuests = leader.Client.Character.CompletedQuests;
@@ -39,10 +47,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 var releaseList = Server.AssetRepository.AreaRankSpotInfoAsset[area]
                 .Where(spot => spot.UnlockRank > 0 || spot.UnlockQuest > 0)
                 .Where(spot => Server.AreaRankManager.CheckSpot(leader.Client, spot))
-                .Select(spot => new CDataCommonU32(spot.SpotId))
+                .Select(spot => spot.SpotId)
+                //.Union(TimeLimitedList)
+                .ToHashSet()
+                .Select(spot => new CDataCommonU32(spot))
                 .ToList();
-
-                //releaseList.AddRange(TimeLimitedList);
 
                 result.ReleaseAreaInfoSetList.Add(new()
                 {
@@ -50,7 +59,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     ReleaseList = releaseList
                 });
             }
-
+         
             //These are given in the pcap despite not being areas with normal ranks.
             for (var area = QuestAreaId.MemoryOfMegadosys; area <= QuestAreaId.BitterblackMaze; area++)
             {

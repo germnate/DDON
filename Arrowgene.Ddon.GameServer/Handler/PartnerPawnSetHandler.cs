@@ -3,6 +3,7 @@ using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Logging;
+using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -18,13 +19,15 @@ namespace Arrowgene.Ddon.GameServer.Handler
         {
             S2CPartnerPawnSetRes res = new S2CPartnerPawnSetRes();
 
-            Pawn pawn = client.Character.Pawns.Find(p => p.PawnId == request.PawnId);
+            Pawn pawn = client.Character.Pawns.Where(p => p.PawnId == request.PawnId).FirstOrDefault() ??
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED, $"A pawn with the ID {request.PawnId} doesn't exist");
 
             client.Character.PartnerPawnId = pawn.PawnId;
             Server.Database.ExecuteInTransaction(connection =>
             {
                 Server.Database.SetPartnerPawn(client.Character.CharacterId, pawn.PawnId, connection);
-                var record = pawn.PartnerPawnData;
+
+                var record = Server.PartnerPawnManager.GetPartnerPawnData(client, connection);
                 if (record == null)
                 {
                     record = new PartnerPawnData()
@@ -34,12 +37,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         NumCrafts = 0,
                         NumAdventures = 0,
                     };
+                    pawn.PartnerPawnData = record;
                     Server.Database.InsertPartnerPawnRecord(client.Character.CharacterId, record, connection);
                 }
-                res.PartnerInfo = record.ToCDataPartnerPawnData(pawn);
+                res.PartnerInfo = Server.PartnerPawnManager.GetCDataPartnerPawnData(client, connection) ?? new CDataPartnerPawnData();
             });
-
-            // TODO: Store partner pawn
 
             return res;
         }

@@ -1,4 +1,5 @@
 using Arrowgene.Buffers;
+using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Network;
 
 namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
@@ -9,7 +10,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
 
         public uint PawnId { get; set; }
         public byte SlotNo { get; set; }
-        public uint AbilityId { get; set; }
+        public AbilityId AbilityId { get; set; }
         public byte AbilityLv { get; set; }
 
         public class Serializer : PacketEntitySerializer<S2CSkillSetPawnAbilityRes>
@@ -19,7 +20,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
                 WriteServerResponse(buffer, obj);
                 WriteUInt32(buffer, obj.PawnId);
                 WriteByte(buffer, obj.SlotNo);
-                WriteUInt32(buffer, obj.AbilityId);
+                WriteUInt32(buffer, (uint)obj.AbilityId);
                 WriteByte(buffer, obj.AbilityLv);
             }
 
@@ -29,7 +30,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
                 ReadServerResponse(buffer, obj);
                 obj.PawnId = ReadUInt32(buffer);
                 obj.SlotNo = ReadByte(buffer);
-                obj.AbilityId = ReadUInt32(buffer);
+                obj.AbilityId = (AbilityId)ReadUInt32(buffer);
                 obj.AbilityLv = ReadByte(buffer);
                 return obj;
             }

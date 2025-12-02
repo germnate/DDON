@@ -42,7 +42,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
         /// </summary>
         private static readonly HashSet<uint> KnownBadQuestScheduleIds = new HashSet<uint>()
         {
-            25077, 43645, 43646, 47734, 47736, 47737, 47738, 47739, 49692, 77644, 151381, 208640, 233576, 259411, 259412, 287378, 315624
+            25077, 43645, 43646, 47734, 47735, 47736, 47737, 47738, 47739, 49692, 77644, 151381, 208640, 233576, 259411, 259412, 287378, 315624
         };
 
         private static void AddQuestToCategory(Quest quest)
@@ -86,15 +86,16 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     gAreaTrialRanks[quest.QuestAreaId] = new Dictionary<uint, uint>();
                 }
 
-                var orderCondition = quest.OrderConditions.Where(x => x.Type == QuestOrderConditionType.AreaRank).First();
-                gAreaTrialRanks[quest.QuestAreaId][quest.QuestScheduleId] = (uint) orderCondition.Param02;
+                // Nightmarish
+                var requiredRank = quest.ToCDataQuestList(0).QuestProcessStateList.First().CheckCommandList.First().ResultCommandList.First().Param02;
+                gAreaTrialRanks[quest.QuestAreaId][quest.QuestScheduleId] = (uint) requiredRank;
             }
         }
 
         public static void LoadScriptedQuest(DdonGameServer server, IQuest questScript)
         {
-            gQuests[questScript.QuestScheduleId] = questScript.GenerateQuest(server);
-            var quest = gQuests[questScript.QuestScheduleId];
+            var quest = questScript.GenerateQuest(server);
+            gQuests[quest.QuestScheduleId] = quest;
             if (quest.Enabled)
             {
                 AddQuestToCategory(quest);
@@ -103,18 +104,36 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public static void LoadQuests(DdonGameServer server)
         {
-            var assetRepository = server.AssetRepository;
-
             // Iterate over quests generated from json
-            foreach (var questAsset in assetRepository.QuestAssets.Quests)
+            foreach (var questAsset in server.AssetRepository.QuestAssets.Quests)
             {
-                gQuests[questAsset.QuestScheduleId] = GenericQuest.FromAsset(server, questAsset);
+                var quest = GenericQuest.FromAsset(server, questAsset);
+                gQuests[quest.QuestScheduleId] = quest;
 
-                var quest = gQuests[questAsset.QuestScheduleId];
                 if (quest.Enabled)
                 {
                     AddQuestToCategory(quest);
                 }
+            }
+
+            LoadLightQuests(server);
+        }
+
+        public static void LoadLightQuests(DdonGameServer server)
+        {
+            foreach(var quest in server.LightQuestManager.ReadQuests(true))
+            {
+                gQuests[quest.QuestScheduleId] = quest;
+                AddQuestToCategory(quest);
+            }
+        }
+
+        public static void AddQuests(DdonGameServer server, IEnumerable<Quest> quests)
+        {
+            foreach(var quest in quests)
+            {
+                gQuests[quest.QuestScheduleId] = quest;
+                AddQuestToCategory(quest);
             }
         }
 
@@ -169,7 +188,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
         {
             if (!gQuests.ContainsKey(questScheduleId))
             {
-                if (!KnownBadQuestScheduleIds.Contains(questScheduleId))
+                if (!KnownBadQuestScheduleIds.Contains(questScheduleId) && !IsBoardQuest(questScheduleId))
                 {
                     Logger.Error($"GetQuestByScheduleId: Invalid questScheduleId {questScheduleId}");
                 }
@@ -189,6 +208,14 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             return questScheduleIds.Count > 0 ? QuestManager.GetQuestByScheduleId(questScheduleIds.ToList()[0]) : null;
+        }
+
+        public static HashSet<Quest> GetQuestsByQuestId(QuestId questId)
+        {
+            var questScheduleIds = GetQuestScheduleIdsForQuestId(questId);
+            return questScheduleIds.Select(x => QuestManager.GetQuestByScheduleId(x))
+                .Where(x => x is not null)
+                .ToHashSet();
         }
 
         public static HashSet<uint> GetQuestScheduleIdsForQuestId(QuestId questId)
@@ -289,6 +316,61 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return new();
             }
             return gAreaTrialRanks[areaId];
+        }
+
+        public static uint GetScheduleId(DdonGameServer server, QuestId questId, uint variantNumber)
+        {
+            if (IsDatabaseManaged(questId, out uint baseScheduleId))
+            {
+                int bits = 27;
+                int maxVariant = 2 << bits;
+                if (variantNumber >= maxVariant)
+                {
+                    throw new Exception($"Invalid variant number {variantNumber} > {maxVariant} for quest {questId}.");
+                }
+                return baseScheduleId + variantNumber;
+            }
+            else
+            {
+                if (variantNumber >= 128)
+                {
+                    throw new Exception($"Invalid variant number {variantNumber} > 127 for quest {questId}.");
+                }
+
+                return server.AssetRepository.QuestScheduleIdAsset[questId] + variantNumber;
+            }
+        }
+
+        public static uint GetVariantIndex(DdonGameServer server, QuestId questId, uint questScheduleId)
+        {
+            if (IsDatabaseManaged(questId, out uint baseScheduleId))
+            {
+                return QuestScheduleId.GetRotatingVariant(questScheduleId);
+            }
+            else
+            {
+                return QuestScheduleId.GetVariant(questScheduleId);
+            }
+        }
+
+        /// <summary>
+        /// For quests that are managed from the database.
+        /// These quests have schedule IDs that are defined solely by type + offset, and so accept larger offsets.
+        /// </summary>
+        public static bool IsDatabaseManaged(QuestId questId, out uint baseScheduleId)
+        {
+            baseScheduleId = 0;
+
+            // Light Quests
+            if (IsBoardQuest(questId))
+            {
+                baseScheduleId = QuestScheduleId.GenerateRotatingId(4, 0);
+                return true;
+            }
+
+            // TODO: Clan Quests, Wild Hunt
+
+            return false;
         }
 
         public static List<QuestProgressWork> CollectWorkItems(GameClient client, QuestProgressWorkType workType)
@@ -3361,6 +3443,11 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return IsBoardQuest(quest.QuestId);
         }
 
+        public static bool IsBoardQuest(uint questScheduleId)
+        {
+            return QuestScheduleId.GetType(questScheduleId) == QuestScheduleId.ScheduleIdType.Board;
+        }
+
         public static bool IsTutorialQuest(QuestId questId)
         {
             return QuestUtils.IsTutorialQuest(questId);
@@ -3389,6 +3476,52 @@ namespace Arrowgene.Ddon.GameServer.Characters
         public static bool IsClanQuest(Quest quest)
         {
             return IsClanQuest(quest.QuestId);
+        }
+
+        public static bool IsExmQuest(QuestId questId)
+        {
+            return QuestUtils.IsExmQuest(questId);
+        }
+
+        public static bool IsExmQuest(uint questScheduleId)
+        {
+            var quest = GetQuestByScheduleId(questScheduleId);
+            if (quest == null)
+            {
+                return false;
+            }
+            return IsExmQuest(quest.QuestId);
+        }
+
+        private static Dictionary<QuestAreaId, ContentsRelease> WorldQuestRequiredUnlocks = new Dictionary<QuestAreaId, ContentsRelease>()
+        {
+            // S2
+            [QuestAreaId.BloodbaneIsle] = ContentsRelease.BloodbaneIsleWorldQuests,
+            [QuestAreaId.ElanWaterGrove] = ContentsRelease.ElanWaterGroveWorldQuests,
+            [QuestAreaId.FaranaPlains] = ContentsRelease.FaranaPlainsWorldQuests,
+            [QuestAreaId.MorrowForest] = ContentsRelease.MorrowForestWorldQuests,
+            [QuestAreaId.KingalCanyon] = ContentsRelease.KingalCanyonWorldQuests,
+            // S3
+            [QuestAreaId.RathniteFoothills] = ContentsRelease.RathniteFoothillsWorldQuests,
+            [QuestAreaId.FeryanaWilderness] = ContentsRelease.FeryanaWildernessWorldQuests,
+            [QuestAreaId.MegadosysPlateau] = ContentsRelease.MegadosysPlateauWorldQuests,
+            [QuestAreaId.UrtecaMountains] = ContentsRelease.UrtecaMountainsWorldQuests,
+        };
+
+        public static bool HasWorldQuestAreaReleased(Character character, QuestAreaId questAreaId)
+        {
+            if (!character.HasContentReleased(ContentsRelease.WorldQuests))
+            {
+                return false;
+            }
+
+            if (!WorldQuestRequiredUnlocks.ContainsKey(questAreaId))
+            {
+                return true;
+            }
+
+            var releaseId = WorldQuestRequiredUnlocks[questAreaId];
+            return character.HasContentReleased(releaseId);
         }
     }
 }

@@ -28,9 +28,9 @@ namespace Arrowgene.Ddon.Server.Scripting.modules
 
         public string TemplatesDirectory {get; private set;}
 
-        public GameServerSettingsModule()
+        public GameServerSettingsModule(string scriptsRoot)
         {
-            TemplatesDirectory = Path.Combine("Files/Assets/scripts/settings", "templates");
+            TemplatesDirectory = Path.Combine(scriptsRoot, "settings/templates");
 
             SettingsData = new ScriptableSettings();
             GameSettings = new GameSettings(SettingsData);
@@ -39,10 +39,12 @@ namespace Arrowgene.Ddon.Server.Scripting.modules
             // that defaults need to be assigned for
             DefaultSettings = new List<IGameSettings>()
             {
+                GameSettings.DebugSettings,
                 GameSettings.GameServerSettings,
                 GameSettings.ChatCommandsSettings,
                 GameSettings.SeasonalEventsSettings,
                 GameSettings.PointModifiersSettings,
+                GameSettings.EmblemSettings,
             };
         }
 
@@ -78,7 +80,7 @@ namespace Arrowgene.Ddon.Server.Scripting.modules
                 .AddImports("Arrowgene.Ddon.Shared.Model.Quest");
         }
 
-        public override bool EvaluateResult(string path, ScriptState<object> result)
+        public override bool EvaluateResult(string path, object result, IDictionary<string, object> variables)
         {
             if (path.Contains(TemplatesDirectory))
             {
@@ -87,9 +89,9 @@ namespace Arrowgene.Ddon.Server.Scripting.modules
 
             var scriptName = Path.GetFileNameWithoutExtension(path);
 
-            foreach (var variable in result.Variables)
+            foreach (var (name, value) in variables)
             {
-                SettingsData.Set(scriptName, variable.Name, variable.Value);
+                SettingsData.Set(scriptName, name, value);
             }
 
             return true;

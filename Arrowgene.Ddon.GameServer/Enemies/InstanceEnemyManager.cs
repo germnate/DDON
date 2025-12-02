@@ -72,14 +72,20 @@ public class InstanceEnemyManager : InstanceAssetManager<Enemy, InstancedEnemy>
                 if(gameTimeMSec <= original.SpawnTimeEnd || gameTimeMSec >= original.SpawnTimeStart)
                 {
                     var enemy = new InstancedEnemy(original);
-                    enemy.Index = (byte)filteredEnemyList.Count;
+                    if (enemy.Index == Enemy.INVALID_INDEX)
+                    {
+                        enemy.Index = (byte)filteredEnemyList.Count;
+                    }
                     filteredEnemyList.Add(enemy);
                 }
             }
             else if(gameTimeMSec >= original.SpawnTimeStart && gameTimeMSec <= original.SpawnTimeEnd)
             {
                 var enemy = new InstancedEnemy(original);
-                enemy.Index = (byte)filteredEnemyList.Count;
+                if (enemy.Index == Enemy.INVALID_INDEX)
+                {
+                    enemy.Index = (byte)filteredEnemyList.Count;
+                }
                 filteredEnemyList.Add(enemy);
             }
         }
@@ -94,11 +100,7 @@ public class InstanceEnemyManager : InstanceAssetManager<Enemy, InstancedEnemy>
             {
                 _EnemyData[stageId] = new Dictionary<int, InstancedEnemy>();
             }
-
-            if (!_EnemyData[stageId].ContainsKey(index))
-            {
-                _EnemyData[stageId][index] = enemy;
-            }
+            _EnemyData[stageId][index] = enemy;
         }
     }
 

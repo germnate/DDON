@@ -9,7 +9,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
         public PacketId Id => PacketId.C2S_SKILL_LEARN_ABILITY_REQ;
 
         public JobId Job { get; set; }
-        public uint AbilityId { get; set; }
+        public AbilityId AbilityId { get; set; }
         public byte AbilityLv { get; set; }
 
         public class Serializer : PacketEntitySerializer<C2SSkillLearnAbilityReq>
@@ -17,7 +17,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
             public override void Write(IBuffer buffer, C2SSkillLearnAbilityReq obj)
             {
                 WriteByte(buffer, (byte) obj.Job);
-                WriteUInt32(buffer, obj.AbilityId);
+                WriteUInt32(buffer, (uint)obj.AbilityId);
                 WriteByte(buffer, obj.AbilityLv);
             }
 
@@ -25,7 +25,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
             {
                 C2SSkillLearnAbilityReq obj = new C2SSkillLearnAbilityReq();
                 obj.Job = (JobId) ReadByte(buffer);
-                obj.AbilityId = ReadUInt32(buffer);
+                obj.AbilityId = (AbilityId)ReadUInt32(buffer);
                 obj.AbilityLv = ReadByte(buffer);
                 return obj;
             }

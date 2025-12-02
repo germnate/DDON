@@ -1,19 +1,11 @@
-using Arrowgene.Buffers;
 using Arrowgene.Ddon.GameServer.Characters;
-using Arrowgene.Ddon.GameServer.Dump;
-using Arrowgene.Ddon.GameServer.Quests;
 using Arrowgene.Ddon.Server;
-using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
-using Arrowgene.Ddon.Shared.Network;
 using Arrowgene.Logging;
-using Arrowgene.Networking.Tcp.Consumer.BlockingQueueConsumption;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
@@ -34,15 +26,21 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             bool createCharacter = false;
             uint originalCharacterId = client.Character.CharacterId;
-            var storagesA = client.Character.Storage;
+            var previousStorage = client.Character.Storage;
             var bbmProgress = client.Character.BbmProgress;
             var walletPointList = client.Character.WalletPointList;
             var warpPointList = client.Character.ReleasedWarpPoints;
             var clanId = client.Character.ClanId;
             var clanName = client.Character.ClanName;
             var achievements = (client.Character.AchievementStatus, client.Character.AchievementProgress, client.Character.AchievementUniqueCrafts);
+            var acquirableSkills = client.Character.AcquirableSkills;
+            var acquirableAbilities = client.Character.AcquirableAbilities;
+            var dispelSeals = client.Character.DispelSeals;
 
             var serverInfo = client.Character.Server;
+
+            Server.HubManager.LeaveAllHubs(client);
+
             if (client.GameMode == GameMode.Normal)
             {
                 uint characterId = Server.Database.SelectBBMNormalCharacterId(client.Character.BbmCharacterId);
@@ -78,72 +76,42 @@ namespace Arrowgene.Ddon.GameServer.Handler
             client.Character.OnlineStatus = OnlineStatus.Online;
             client.Character.ClanId = clanId;
             client.Character.ClanName = clanName;
-            client.Character.AchievementStatus = achievements.Item1;
-            client.Character.AchievementProgress = achievements.Item2;
-            client.Character.AchievementUniqueCrafts = achievements.Item3;
+            client.Character.AchievementStatus = achievements.AchievementStatus;
+            client.Character.AchievementProgress = achievements.AchievementProgress;
+            client.Character.AchievementUniqueCrafts = achievements.AchievementUniqueCrafts;
+            client.Character.AcquirableSkills = acquirableSkills;
+            client.Character.AcquirableAbilities = acquirableAbilities;
+            client.Character.DispelSeals = dispelSeals;
 
-            S2CCharacterSwitchGameModeNtc ntc = new S2CCharacterSwitchGameModeNtc()
+            client.Send(new S2CCharacterSwitchGameModeNtc()
             {
-                Unk0 = (uint)packet.GameMode, // Probably not right? int vs uint
+                GameMode = packet.GameMode, // Probably not right? int vs uint
                 CreateCharacter = createCharacter,
-                CharacterInfo = new CDataCharacterInfo()
-                {
-                    CharacterId = client.Character.CharacterId,
-                    UserId = client.Character.UserId,
-                    Version = client.Character.Version,
-                    FirstName = client.Character.FirstName,
-                    LastName = client.Character.LastName,
-                    EditInfo = client.Character.EditInfo,
-                    StatusInfo = client.Character.StatusInfo,
-                    Job = client.Character.Job,
-                    CharacterJobDataList = client.Character.CharacterJobDataList,
-                    PlayPointList = client.Character.PlayPointList,
-                    CharacterEquipDataList = new List<CDataCharacterEquipData>() { new CDataCharacterEquipData() {
-                            Equips = client.Character.Equipment.AsCDataEquipItemInfo(EquipType.Performance)
-                        }},
-                    CharacterEquipViewDataList = new List<CDataCharacterEquipData>() { new CDataCharacterEquipData() {
-                            Equips = client.Character.Equipment.AsCDataEquipItemInfo(EquipType.Visual)
-                        }},
-                    CharacterEquipJobItemList = client.Character.EquipmentTemplate.JobItemsAsCDataEquipJobItem(client.Character.Job),
-                    JewelrySlotNum = client.Character.JewelrySlotNum,
-                    // Unk0 = 
-                    CharacterItemSlotInfoList = client.Character.Storage.GetAllStoragesAsCDataCharacterItemSlotInfoList(),
-                    WalletPointList = client.Character.WalletPointList,
-                    MyPawnSlotNum = client.Character.MyPawnSlotNum,
-                    RentalPawnSlotNum = client.Character.RentalPawnSlotNum,
-                    OrbStatusList = client.Character.OrbStatusList,
-                    MsgSetList = client.Character.MsgSetList,
-                    ShortCutList = client.Character.ShortCutList,
-                    CommunicationShortCutList = client.Character.CommunicationShortCutList,
-                    MatchingProfile = client.Character.MatchingProfile,
-                    ArisenProfile = client.Character.ArisenProfile,
-                    HideEquipHead = client.Character.HideEquipHead,
-                    HideEquipLantern = client.Character.HideEquipLantern,
-                    HideEquipHeadPawn = client.Character.HideEquipHeadPawn,
-                    HideEquipLanternPawn = client.Character.HideEquipLanternPawn,
-                    ArisenProfileShareRange = client.Character.ArisenProfileShareRange,
-                    OnlineStatus = client.Character.OnlineStatus
-                }
-            };
+                CharacterInfo = client.Character.CDataCharacterInfo,
+            });
 
-            client.Send(ntc);
+            client.Send(new S2CItemUpdateCharacterItemNtc()
+            {
+                UpdateType = ItemNoticeType.SwitchingStorage,
+                UpdateItemList = SwapCharacterInventories(client.Character, previousStorage, ItemManager.ItemBagStorageTypes.Concat([StorageType.CharacterEquipment]).ToList())
+            });
 
-            S2CEquipChangeCharacterEquipLobbyNtc characterEquipLobbyNtc = new S2CEquipChangeCharacterEquipLobbyNtc()
+            client.Send(new S2CEquipChangeCharacterEquipLobbyNtc()
             {
                 CharacterId = client.Character.CharacterId,
                 Job = client.Character.Job,
                 EquipItemList = client.Character.Equipment.AsCDataEquipItemInfo(EquipType.Performance),
                 VisualEquipItemList = client.Character.Equipment.AsCDataEquipItemInfo(EquipType.Visual),
-            };
-            client.Send(characterEquipLobbyNtc);
+            });
 
-            var itemStorages = ItemManager.ItemBagStorageTypes.Concat(new List<StorageType>() { StorageType.CharacterEquipment}).ToList();
-            S2CItemUpdateCharacterItemNtc updateCharacterItemNtc = new S2CItemUpdateCharacterItemNtc()
+            client.Send(new S2CItemSortGetItemSortdataBinNtc()
             {
-                UpdateType = ItemNoticeType.SwitchingStorage,
-                UpdateItemList = SwapCharacterInventories(client.Character, storagesA, client.Character.Storage, itemStorages)
-            };
-            client.Send(updateCharacterItemNtc);
+                SortData = [.. ItemManager.ItemBagStorageTypes.Select(x => new CDataItemSort()
+                {
+                    StorageType = x,
+                    Bin = client.Character.Storage.GetStorage(x).SortData
+                })]
+            });
 
             return new S2CCharacterSwitchGameModeRes()
             {
@@ -169,7 +137,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             bbmCharacter.MyPawnSlotNum = 0;
             bbmCharacter.RentalPawnSlotNum = 0;
             bbmCharacter.MatchingProfile = normalCharacter.MatchingProfile;
-            bbmCharacter.ArisenProfile = normalCharacter.ArisenProfile;
+            bbmCharacter.CharacterProfile = normalCharacter.CharacterProfile;
             bbmCharacter.HideEquipHead = normalCharacter.HideEquipHead;
             bbmCharacter.HideEquipLantern = normalCharacter.HideEquipLantern;
             bbmCharacter.HideEquipHeadPawn = normalCharacter.HideEquipHeadPawn;
@@ -211,7 +179,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 DownPower = arisenPreset.DownPower,
                 ShakePower = arisenPreset.ShakePower,
                 StunPower = arisenPreset.StunPower,
-                Consitution = arisenPreset.Consitution,
+                Constitution = arisenPreset.Consitution,
                 Guts = arisenPreset.Guts,
                 FireResist = arisenPreset.FireResist,
                 IceResist = arisenPreset.IceResist,
@@ -295,144 +263,16 @@ namespace Arrowgene.Ddon.GameServer.Handler
             )).ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
 
             // In BBM, all custom skills are already learned so add them
-            bbmCharacter.LearnedCustomSkills = SkillData.AllSkills.Select(x => new CustomSkill()
+            bbmCharacter.LearnedCustomSkills = [.. Server.AssetRepository.SkillData.AllSkills.Select(x => new CustomSkill()
             {
                 Job = x.Job,
                 SkillId = x.SkillNo,
                 SkillLv = x.Params.Max(x => x.Lv)
-            }).ToList();
+            })];
             
-            bbmCharacter.EquippedAbilitiesDictionary = Server.AssetRepository.ArisenAsset.Select(arisenPreset => new Tuple<JobId, List<Ability>>(arisenPreset.Job, new List<Ability>() {
-                new Ability() {
-                    Job = arisenPreset.Ab1Jb,
-                    AbilityId = arisenPreset.Ab1Id,
-                    AbilityLv = arisenPreset.Ab1Lv
-                },
-                new Ability() {
-                    Job = arisenPreset.Ab2Jb,
-                    AbilityId = arisenPreset.Ab2Id,
-                    AbilityLv = arisenPreset.Ab2Lv
-                },
-                new Ability() {
-                    Job = arisenPreset.Ab3Jb,
-                    AbilityId = arisenPreset.Ab3Id,
-                    AbilityLv = arisenPreset.Ab3Lv
-                },
-                new Ability() {
-                    Job = arisenPreset.Ab4Jb,
-                    AbilityId = arisenPreset.Ab4Id,
-                    AbilityLv = arisenPreset.Ab4Lv
-                },
-                new Ability() {
-                    Job = arisenPreset.Ab5Jb,
-                    AbilityId = arisenPreset.Ab5Id,
-                    AbilityLv = arisenPreset.Ab5Lv
-                },
-                new Ability() {
-                    Job = arisenPreset.Ab6Jb,
-                    AbilityId = arisenPreset.Ab6Id,
-                    AbilityLv = arisenPreset.Ab6Lv
-                },
-                new Ability() {
-                    Job = arisenPreset.Ab7Jb,
-                    AbilityId = arisenPreset.Ab7Id,
-                    AbilityLv = arisenPreset.Ab7Lv
-                },
-                new Ability() {
-                    Job = arisenPreset.Ab8Jb,
-                    AbilityId = arisenPreset.Ab8Id,
-                    AbilityLv = arisenPreset.Ab8Lv
-                },
-                new Ability() {
-                    Job = arisenPreset.Ab9Jb,
-                    AbilityId = arisenPreset.Ab9Id,
-                    AbilityLv = arisenPreset.Ab9Lv
-                },
-                new Ability() {
-                    Job = arisenPreset.Ab10Jb,
-                    AbilityId = arisenPreset.Ab10Id,
-                    AbilityLv = arisenPreset.Ab10Lv
-                }
-            }.Select(aug => aug?.AbilityId == 0 ? null : aug).ToList()
-            )).ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
-
-            // In BBM, all abilities are already learned so add them
-            bbmCharacter.LearnedAbilities = SkillData.AllAbilities.Select(x => new Ability()
-            {
-                Job = x.Job,
-                AbilityId = x.AbilityNo,
-                AbilityLv = x.Params.Max(x => x.Lv)
-            }).ToList();
-
             bbmCharacter.Storage = new Storages(Server.AssetRepository.StorageAsset.ToDictionary(x => x.StorageType, x => x.SlotMax));
 
-            bbmCharacter.WalletPointList = new List<CDataWalletPoint>()
-            {
-                new CDataWalletPoint() {
-                    Type = WalletType.Gold,
-                    Value = 0
-                },
-                new CDataWalletPoint() {
-                    Type = WalletType.RiftPoints,
-                    Value = 0
-                },
-                new CDataWalletPoint() {
-                    Type = WalletType.BloodOrbs,
-                    Value = 0
-                },
-                new CDataWalletPoint() {
-                    Type = WalletType.SilverTickets,
-                    Value = 0
-                },
-                new CDataWalletPoint() {
-                    Type = WalletType.GoldenGemstones,
-                    Value = 0
-                },
-                new CDataWalletPoint() {
-                    Type = WalletType.RentalPoints,
-                    Value = 0
-                },
-                new CDataWalletPoint() {
-                    Type = WalletType.ResetJobPoints,
-                    Value = 0
-                },
-                new CDataWalletPoint() {
-                    Type = WalletType.ResetCraftSkills,
-                    Value = 0
-                },
-                new CDataWalletPoint() {
-                    Type = WalletType.HighOrbs,
-                    Value = 0
-                },
-                new CDataWalletPoint() {
-                    Type = WalletType.DominionPoints,
-                    Value = 0
-                },
-                new CDataWalletPoint() {
-                    Type = WalletType.AdventurePassPoints,
-                    Value = 0
-                },
-                new CDataWalletPoint() {
-                    Type = WalletType.CustomMadeServiceTickets,
-                    Value = 0
-                },
-                new CDataWalletPoint() {
-                    Type = WalletType.BitterblackMazeResetTicket,
-                    Value = 0
-                },
-                new CDataWalletPoint() {
-                    Type = WalletType.GoldenDragonMark,
-                    Value = 0
-                },
-                new CDataWalletPoint() {
-                    Type = WalletType.SilverDragonMark,
-                    Value = 0
-                },
-                new CDataWalletPoint() {
-                    Type = WalletType.RedDragonMark,
-                    Value = 0
-                }
-            };
+            bbmCharacter.WalletPointList = [.. Enum.GetValues<WalletType>().Select(x => new CDataWalletPoint() { Type = x, Value = 0 })];
 
             // Add starting storage items
             foreach (var tuple in Server.AssetRepository.StorageItemAsset)
@@ -465,10 +305,15 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 }
             }
 
+            foreach (var jobId in  Enum.GetValues(typeof(JobId)).Cast<JobId>())
+            {
+                bbmCharacter.ExtendedJobParams[jobId] = new CDataOrbGainExtendParam();
+            }
+
             Server.CharacterManager.UpdateCharacterExtendedParams(bbmCharacter, true);
 
-            bbmCharacter.GreenHp = CharacterManager.BBM_BASE_HEALTH;
-            bbmCharacter.WhiteHp = CharacterManager.BBM_BASE_HEALTH;
+            bbmCharacter.GreenHp = CharacterCommon.BBM_BASE_HEALTH;
+            bbmCharacter.WhiteHp = CharacterCommon.BBM_BASE_HEALTH;
             if (!Database.CreateCharacter(bbmCharacter))
             {
                 return null;
@@ -535,7 +380,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
          * This swap is a visual swap in the client UI -- by this we mean the server will use different inventory storage which shows up in
          * the players storage in the client UI. It doesn't impact the actual storage during normal gameplay.
          */
-        private List<CDataItemUpdateResult> SwapCharacterInventories(Character character, Storages storageA, Storages storageB, List<StorageType> storageTypes)
+        private List<CDataItemUpdateResult> SwapCharacterInventories(Character character, Storages previousStorage, List<StorageType> storageTypes)
         {
             var results = new List<CDataItemUpdateResult>();
             foreach (var storageType in storageTypes)
@@ -544,25 +389,20 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     ushort slotNo = (ushort)(i + 1);
 
-                    var storageItemA = storageA.GetStorage(storageType).GetItem(slotNo);
-                    if (storageItemA != null)
+                    var previousItem = previousStorage.GetStorage(storageType).GetItem(slotNo);
+                    if (previousItem != null)
                     {
-                        results.Add(Server.ItemManager.CreateItemUpdateResult(null, storageItemA.Item1, storageType, slotNo, 0, 0));
+                        results.Add(Server.ItemManager.CreateItemUpdateResult(character, previousItem.Item1, storageType, slotNo, 0, 0));
                     }
 
-                    var storageItemB = storageB.GetStorage(storageType).GetItem(slotNo);
-                    if (storageItemB != null)
+                    var currentItem = character.Storage.GetStorage(storageType).GetItem(slotNo);
+                    if (currentItem != null)
                     {
-                        results.Add(Server.ItemManager.CreateItemUpdateResult(null, storageItemB.Item1, storageType, slotNo, storageItemB.Item2, storageItemB.Item2));
+                        results.Add(Server.ItemManager.CreateItemUpdateResult(null, currentItem.Item1, storageType, slotNo, currentItem.Item2, currentItem.Item2));
                     }
-                    else if (storageItemA != null)
+                    else if (previousItem != null)
                     {
-                        Item item = new Item()
-                        {
-                            ItemId = 0,
-                            UId = ""
-                        };
-                        results.Add(Server.ItemManager.CreateItemUpdateResult(null, item, storageType, slotNo, storageItemA.Item2, storageItemA.Item2));
+                        results.Add(Server.ItemManager.CreateItemUpdateResult(null, new Item() { ItemId = 0, UId = ""}, storageType, slotNo, previousItem.Item2, previousItem.Item2));
                     }
                 }
             }

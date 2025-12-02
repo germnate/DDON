@@ -12,10 +12,7 @@ using Arrowgene.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Metrics;
-using System.IO;
 using System.Linq;
-using System.Numerics;
 
 namespace Arrowgene.Ddon.GameServer.Party
 {
@@ -38,14 +35,18 @@ namespace Arrowgene.Ddon.GameServer.Party
         public bool ExmInProgress;
 
         public InstanceEnemyManager InstanceEnemyManager { get; }
-
         public SharedQuestStateManager QuestState { get; }
-
         public Dictionary<uint, Dictionary<ulong, uint>> InstanceOmData { get; }
+
+        // Contexts[UID] = ContextData
+        public Dictionary<ulong, Tuple<CDataContextSetBase, CDataContextSetAdditional>> Contexts { get; set; }
+
+        public uint MaxSlots { get; }
+        public uint Id { get; }
 
         public PartyGroup(uint id, PartyManager partyManager, ulong contentId)
         {
-            MaxSlots = contentId != 0 ? MaxPartyMember : partyManager.Server.GameSettings.GameServerSettings.NormalPartySize;
+            MaxSlots = (contentId != 0) ? MaxPartyMember : partyManager.Server.GameSettings.GameServerSettings.NormalPartySize;
             _lock = new object();
             _slots = new PartyMember[MaxSlots];
             _partyManager = partyManager;
@@ -63,12 +64,6 @@ namespace Arrowgene.Ddon.GameServer.Party
 
             QuestState = new SharedQuestStateManager(this, partyManager.Server);
         }
-
-        // Contexts[UID] = ContextData
-        public Dictionary<ulong, Tuple<CDataContextSetBase, CDataContextSetAdditional>> Contexts { get; set; }
-
-        public uint MaxSlots { get; }
-        public uint Id { get; }
 
         public PlayerPartyMember Host
         {
@@ -140,7 +135,7 @@ namespace Arrowgene.Ddon.GameServer.Party
             }
         }
 
-        public PlayerPartyMember Invite(GameClient invitee, GameClient host)
+        public PlayerPartyMember Invite(GameClient invitee, GameClient host, bool createTimeout = true)
         {
             if (invitee == null)
             {
@@ -155,7 +150,7 @@ namespace Arrowgene.Ddon.GameServer.Party
             PlayerPartyMember partyMember = CreatePartyMember(invitee);
             lock (_lock)
             {
-                _partyManager.InviteParty(invitee, host, this);
+                _partyManager.InviteParty(invitee, host, this, createTimeout);
                 int slotIndex = TakeSlot(partyMember);
                 Logger.Info(host, $"[PartyId:{Id}][Invite] invited {invitee.Identity}");
                 partyMember.JoinState = JoinState.Prepare;
@@ -179,6 +174,15 @@ namespace Arrowgene.Ddon.GameServer.Party
                 PlayerPartyMember partyMember = GetPlayerPartyMember(client)
                     ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_PARTY_INVITE_CANCEL_REASON_LOBBY_NUM_OVER,
                     $"[PartyId:{Id}][RefuseInvite] has no slot");
+
+                invitation.CancelTimer();
+
+                Leader.Client.Send(new S2CPartyPartyInviteFailNtc
+                {
+                    ErrorCode = ErrorCode.ERROR_CODE_PARTY_INVITE_TARGET_REFUSE,
+                    ServerId = Leader.Client.Character.Server.Id,
+                    PartyId = invitation.Party.Id
+                });
                 
                 FreeSlot(partyMember.MemberIndex);
                 Logger.Info(client, $"[PartyId:{Id}][RefuseInvite] refused invite");
@@ -214,6 +218,13 @@ namespace Arrowgene.Ddon.GameServer.Party
                         $"[PartyId:{Id}][Accept] invitation expired");
                 }
 
+                if (ContentId == 0 && Leader is null)
+                {
+                    // Leaderless check only applies for regular parties.
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_PARTY_INVITE_FAIL_REASON_NO_LEADER,
+                        $"[PartyId:{Id}][Accept] has no leader");
+                }
+
                 PlayerPartyMember partyMember = GetPlayerPartyMember(client);
                 if (partyMember == null)
                 {
@@ -239,6 +250,22 @@ namespace Arrowgene.Ddon.GameServer.Party
             }
         }
 
+        public PlayerPartyMember ForceAccept(GameClient client)
+        {
+            if (client == null)
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_PARTY_MEMBER_NOT_FOUND, $"[PartyId:{Id}][Accept] (client == null)");
+            }
+
+            PlayerPartyMember partyMember = CreatePartyMember(client);
+
+            lock (_lock)
+            {
+                int slotIndex = TakeSlot(partyMember);
+                partyMember.JoinState = JoinState.Prepare;
+                return partyMember;
+            }
+        }
         public PlayerPartyMember AddHost(GameClient client)
         {
             if (client == null)
@@ -314,9 +341,12 @@ namespace Arrowgene.Ddon.GameServer.Party
 
             lock (_lock)
             {
-                if (client.Party != this)
+                if (!Clients.Contains(client))
                 {
-                    Logger.Error(client, $"[PartyId:{Id}][Leave(GameClient)] not part of this party");
+                    // TODO: Suppressing this log message for now; it spams the log and is usually not helpful.
+                    // This is partly due to an order of operations problem when quitting the game.
+
+                    //Logger.Error(client, $"[PartyId:{Id}][Leave(GameClient)] not part of this party");
                     return;
                 }
 
@@ -338,18 +368,14 @@ namespace Arrowgene.Ddon.GameServer.Party
                 // We need to get rid of pawn players associated with the person who left
                 foreach (var member in client.Party.Members)
                 {
-                    if (!member.IsPawn)
+                    if (member is PawnPartyMember pawnMember
+                        && pawnMember.Pawn.CharacterId == client.Character.CharacterId
+                    )
                     {
-                        continue;
-                    }
-
-                    PawnPartyMember pawnMember = (PawnPartyMember)member;
-                    foreach (var pawn in client.Character.Pawns)
-                    {
-                        if (pawn.CommonId == pawnMember.Pawn.CommonId)
+                        lock (pawnMember.TimerLock)
                         {
+                            _partyManager.Server.TimerManager.CancelTimer(pawnMember.AdventureTimer);
                             FreeSlot(pawnMember.MemberIndex);
-                            break;
                         }
                     }
                 }
@@ -374,11 +400,6 @@ namespace Arrowgene.Ddon.GameServer.Party
 
         private void CleanupClientPawns(GameClient client)
         {
-            if (client.Character.PartnerPawnId != 0)
-            {
-                _partyManager.Server.PartnerPawnManager.HandleLeaveFromParty(client);
-            }
-
             foreach (var member in client.Party.Members)
             {
                 if (member is PawnPartyMember pawnMember)
@@ -393,8 +414,46 @@ namespace Arrowgene.Ddon.GameServer.Party
                         {
                             MemberIndex = (byte) pawnMember.MemberIndex
                         });
+                        lock (pawnMember.TimerLock)
+                        {
+                            _partyManager.Server.TimerManager.CancelTimer(pawnMember.AdventureTimer);
+                        }
                         FreeSlot(pawnMember.MemberIndex);
                     }
+                }
+            }
+        }
+
+        private void CleanupRentalPawns(GameClient client)
+        {
+            bool hasMainPawn = Members.Any(x => x is PawnPartyMember pawnMember
+                && pawnMember.Pawn.PawnType == PawnType.Main
+                && pawnMember.Pawn.CharacterId == client.Character.CharacterId);
+
+            if (hasMainPawn)
+            {
+                return;
+            }
+
+            foreach (var members in Members)
+            {
+                if (members is PawnPartyMember pawnMember
+                    && pawnMember.Pawn is RentalPawn rentalPawn
+                    && rentalPawn.CharacterId == client.Character.CharacterId)
+                {
+                    Logger.Info(client, $"[PartyId:{Id}][Kick] removed pawn {pawnMember.PawnId} for player {client.Identity}");
+
+                    // TODO: The pawn vanishes already, do we still need the NTC
+                    // TODO: or just need to update and maintain internal state?
+                    client.Party.SendToAll(new S2CPartyPartyMemberKickNtc()
+                    {
+                        MemberIndex = (byte)pawnMember.MemberIndex
+                    });
+                    lock (pawnMember.TimerLock)
+                    {
+                        _partyManager.Server.TimerManager.CancelTimer(pawnMember.AdventureTimer);
+                    }
+                    FreeSlot(pawnMember.MemberIndex);
                 }
             }
         }
@@ -435,15 +494,24 @@ namespace Arrowgene.Ddon.GameServer.Party
                     return member;
                 }
 
-                if (member is PawnPartyMember pawn)
+                if (member is PawnPartyMember pawnMember)
                 {
-                    if (pawn.Pawn.CharacterId != changeRequester.Client.Character.CharacterId)
+                    if (pawnMember.Pawn.CharacterId != changeRequester.Client.Character.CharacterId)
                     {
                         throw new ResponseErrorException(ErrorCode.ERROR_CODE_PARTY_IS_NOT_PAWN_OWNER, $"[PartyId:{Id}][Kick] is not authorized (not pawn owner)");
                     }
 
                     FreeSlot(member.MemberIndex);
-                    Logger.Info(client, $"[PartyId:{Id}][Kick] kicked pawnId: {pawn.PawnId}");
+                    Logger.Info(client, $"[PartyId:{Id}][Kick] kicked pawnId: {pawnMember.PawnId}");
+                    lock (pawnMember.TimerLock)
+                    {
+                        _partyManager.Server.TimerManager.CancelTimer(pawnMember.AdventureTimer);
+                    }
+                    
+                    if (pawnMember.Pawn.PawnType == PawnType.Main)
+                    {
+                        CleanupRentalPawns(client);
+                    }
                     return member;
                 }
 
@@ -524,6 +592,13 @@ namespace Arrowgene.Ddon.GameServer.Party
                 List<PartyMember> members = Members;
                 for (int i = 0; i < MaxSlots; i++)
                 {
+                    if (_slots[i] is PawnPartyMember pawnMember)
+                    {
+                        lock (pawnMember.TimerLock)
+                        {
+                            _partyManager.Server.TimerManager.CancelTimer(pawnMember.AdventureTimer);
+                        }
+                    }
                     FreeSlot(i);
                 }
 
@@ -672,18 +747,16 @@ namespace Arrowgene.Ddon.GameServer.Party
                             continue;
                         }
 
-                        if (member is PawnPartyMember pawnMember && characterCommon is Pawn)
+                        if (member is PawnPartyMember pawnMember && characterCommon is Pawn pawnCharacter)
                         {
-                            Pawn pawn = (Pawn)characterCommon;
-                            if (pawnMember.PawnId == pawn.PawnId)
+                            if (pawnMember.PawnId == pawnCharacter.PawnId)
                             {
                                 return member;
                             }
                         }
-                        else if (member is PlayerPartyMember playerMember && characterCommon is Character)
+                        else if (member is PlayerPartyMember playerMember && characterCommon is Character characterCharacter)
                         {
-                            Character character = (Character)characterCommon;
-                            if (playerMember.Client.Character.CharacterId == character.CharacterId)
+                            if (playerMember.Client.Character.CharacterId == characterCharacter.CharacterId)
                             {
                                 return member;
                             }

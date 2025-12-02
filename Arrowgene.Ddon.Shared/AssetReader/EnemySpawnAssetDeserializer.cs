@@ -20,8 +20,8 @@ namespace Arrowgene.Ddon.Shared.AssetReader
 
         private static readonly ILogger Logger = LogProvider.Logger(typeof(EnemySpawnAssetDeserializer));
 
-        private static readonly string[] ENEMY_HEADERS = new string[]{"StageId", "LayerNo", "GroupId", "SubGroupId", "EnemyId", "NamedEnemyParamsId", "RaidBossId", "Scale", "Lv", "HmPresetNo", "StartThinkTblNo", "RepopNum", "RepopCount", "EnemyTargetTypesId", "MontageFixNo", "SetType", "InfectionType", "IsBossGauge", "IsBossBGM", "IsManualSet", "IsAreaBoss", "IsBloodOrbEnemy", "BloodOrbs", "IsHighOrbEnemy", "HighOrbs", "Experience", "DropsTableId", "SpawnTime", "PPDrop"};
-        private static readonly string[] DROPS_TABLE_HEADERS = new string[]{"ItemId", "ItemNum", "MaxItemNum", "Quality", "IsHidden", "DropChance"};
+        private static readonly string[] ENEMY_HEADERS = {"StageId", "LayerNo", "GroupId", "SubGroupId", "PositionIndex", "EnemyId", "NamedEnemyParamsId", "RaidBossId", "Scale", "Lv", "HmPresetNo", "StartThinkTblNo", "RepopNum", "RepopCount", "EnemyTargetTypesId", "MontageFixNo", "SetType", "InfectionType", "IsBossGauge", "IsBossBGM", "IsManualSet", "IsAreaBoss", "IsBloodOrbEnemy", "BloodOrbs", "IsHighOrbEnemy", "HighOrbs", "Experience", "DropsTableId", "SpawnTime", "PPDrop"};
+        private static readonly string[] DROPS_TABLE_HEADERS = {"ItemId", "ItemNum", "MaxItemNum", "Quality", "IsHidden", "DropChance"};
 
         private Dictionary<uint, NamedParam> namedParams;
 
@@ -93,7 +93,7 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                 List<Enemy> enemies = asset.Enemies.GetValueOrDefault(layoutId) ?? new List<Enemy>();
                 Enemy enemy = new Enemy()
                 {
-                    EnemyId = ParseHexUInt(row[enemySchemaIndexes["EnemyId"]].GetString()),
+                    EnemyId = (EnemyId)ParseHexUInt(row[enemySchemaIndexes["EnemyId"]].GetString()),
                     NamedEnemyParams = this.namedParams.GetValueOrDefault(row[enemySchemaIndexes["NamedEnemyParamsId"]].GetUInt32(), NamedParam.DEFAULT_NAMED_PARAM),
                     RaidBossId = row[enemySchemaIndexes["RaidBossId"]].GetUInt32(),
                     Scale = row[enemySchemaIndexes["Scale"]].GetUInt16(),
@@ -113,28 +113,27 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                     BloodOrbs = row[enemySchemaIndexes["BloodOrbs"]].GetUInt32(),
                     HighOrbs = row[enemySchemaIndexes["HighOrbs"]].GetUInt32(),
                     Experience = row[enemySchemaIndexes["Experience"]].GetUInt32(),
-
                     Subgroup = subGroupId,
                 };
 
+                enemy.Index = Enemy.INVALID_INDEX;
+                if (enemySchemaIndexes.ContainsKey("PositionIndex"))
+                {
+                    enemy.Index = row[enemySchemaIndexes["PositionIndex"]].GetByte();
+                }
+
+                // Fallback for old style schema
+                enemy.IsBloodOrbEnemy = enemy.BloodOrbs > 0;
                 if (enemySchemaIndexes.ContainsKey("IsBloodOrbEnemy"))
                 {
                     enemy.IsBloodOrbEnemy = row[enemySchemaIndexes["IsBloodOrbEnemy"]].GetBoolean();
                 }
-                else
-                {
-                    // Fallback for old style schema
-                    enemy.IsBloodOrbEnemy = enemy.BloodOrbs > 0;
-                }
 
+                // Fallback for old style schema
+                enemy.IsHighOrbEnemy = enemy.HighOrbs > 0;
                 if (enemySchemaIndexes.ContainsKey("IsHighOrbEnemy"))
                 {
-                    enemy.IsBloodOrbEnemy = row[enemySchemaIndexes["IsHighOrbEnemy"]].GetBoolean();
-                }
-                else
-                {
-                    // Fallback for old style schema
-                    enemy.IsHighOrbEnemy = enemy.HighOrbs > 0;
+                    enemy.IsHighOrbEnemy = row[enemySchemaIndexes["IsHighOrbEnemy"]].GetBoolean();
                 }
 
                 // checking if the file has spawntime, if yes we convert the time and pass it along to enemy.cs
@@ -166,7 +165,7 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                 }
                 
                 int dropsTableId = row[enemySchemaIndexes["DropsTableId"]].GetInt32();
-                if(dropsTableId >= 0)
+                if(dropsTableId >= 0 && asset.DropsTables.ContainsKey((uint)dropsTableId))
                 {
                     enemy.DropsTable = asset.DropsTables[(uint) dropsTableId];
                 }

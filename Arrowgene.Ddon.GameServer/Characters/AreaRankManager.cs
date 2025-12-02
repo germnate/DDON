@@ -1,5 +1,4 @@
 using Arrowgene.Ddon.GameServer.Quests;
-using Arrowgene.Ddon.GameServer.Scripting.Interfaces;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
@@ -14,29 +13,24 @@ using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Characters
 {
-    public class AreaRankManager
+    public class AreaRankManager(DdonGameServer server)
     {
         private static readonly ServerLogger Logger = LogProvider.Logger<ServerLogger>(typeof(ClanManager));
 
-        private readonly DdonGameServer Server;
-
-        public AreaRankManager(DdonGameServer server)
-        {
-            Server = server;
-        }
+        private readonly DdonGameServer Server = server;
 
         public List<CDataRewardItemInfo> GetSupplyRewardList(QuestAreaId areaId, uint rank, uint points)
         {
 
             if (!IsValidAreaId(areaId))
             {
-                return new();
+                return [];
             }
-            List<CDataRewardItemInfo> list = new();
+            List<CDataRewardItemInfo> list = [];
 
             var areaSupplies = Server.AssetRepository.AreaRankSupplyAsset.GetValueOrDefault(areaId)
                 ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_AREAMASTER_AREA_INFO_NOT_FOUND);
-            if (!areaSupplies.Any())
+            if (areaSupplies.Count == 0)
             {
                 throw new ResponseErrorException(ErrorCode.ERROR_CODE_AREAMASTER_SUPPLY_NOT_AVAILABLE, $"No valid asset for {areaId} found in AreaRankSupply asset.");
             }
@@ -49,12 +43,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
             var rewardMult = Server.GpCourseManager.AreaMasterSupply() ? 2 : 1;
 
-            return pointSupplies.SupplyItemList.Select((x, i) => new CDataRewardItemInfo()
+            return [.. pointSupplies.SupplyItemList.Select((x, i) => new CDataRewardItemInfo()
             {
                 Index = (uint)i,
-                ItemId = x.ItemId,
+                ItemId = (uint) x.ItemId,
                 Num = (byte)(x.ItemNum * rewardMult),
-            }).ToList();
+            })];
         }
 
         public uint MaxRank(QuestAreaId areaId)
@@ -66,7 +60,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
         {
             var requirements = Server.AssetRepository.AreaRankRequirementAsset[areaId];
 
-            if (rank >= requirements.Count())
+            if (rank >= requirements.Count)
             {
                 return 0;
             }
@@ -87,7 +81,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             Dictionary<QuestId, CompletedQuest> completedQuests = client.Character.CompletedQuests;
             List<AreaRankRequirement> requirements = Server.AssetRepository.AreaRankRequirementAsset[areaId];
 
-            if (clientRank.Rank >= requirements.Count())
+            if (clientRank.Rank >= requirements.Count)
             {
                 return false;
             }
@@ -111,14 +105,13 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public List<CDataAreaRankUpQuestInfo> RankUpQuestInfo(QuestAreaId areaId)
         {
-            return Server.AssetRepository.AreaRankRequirementAsset[areaId]
+            return [.. Server.AssetRepository.AreaRankRequirementAsset[areaId]
                 .Where(x => x.AreaTrial > 0 || x.ExternalQuest > 0)
                 .Select(x => new CDataAreaRankUpQuestInfo()
                 {
                     Rank = x.Rank - 1,
                     QuestId = x.AreaTrial > 0 ? x.AreaTrial : x.ExternalQuest
-                })
-                .ToList();
+                })];
         }
 
         public PacketQueue AddAreaPoint(GameClient client, QuestAreaId areaId, (uint BasePoints, uint BonusPoints) points, DbConnection? connectionIn = null)
@@ -126,6 +119,11 @@ namespace Arrowgene.Ddon.GameServer.Characters
             PacketQueue queue = new PacketQueue();
 
             if (!IsValidAreaId(areaId))
+            {
+                return queue;
+            }
+
+            if (points.BasePoints + points.BonusPoints == 0)
             {
                 return queue;
             }
@@ -157,7 +155,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             {
                 client.Enqueue(new S2CAreaRankUpReadyNtc()
                 {
-                    AreaRankList = new() { new() { AreaId = areaId, Rank = nextRank.Rank } }
+                    AreaRankList = [new() { AreaId = areaId, Rank = nextRank.Rank }]
                 }, queue);
             }
 
@@ -196,13 +194,18 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public static uint GetAreaPointReward(Quest quest)
         {
-            uint amount;
             QuestAreaId areaId = quest.QuestAreaId;
             if (QuestManager.IsBoardQuest(quest))
             {
                 areaId = (QuestAreaId)quest.LightQuestDetail.AreaId;
             }
 
+            return GetAreaPointReward(quest.BaseLevel, areaId, QuestManager.IsBoardQuest(quest));
+        }
+
+        public static uint GetAreaPointReward(uint level, QuestAreaId areaId, bool isBoardQuest)
+        {
+            uint amount;
             if (!IsValidAreaId(areaId))
             {
                 return 0;
@@ -213,11 +216,11 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
             else
             {
-                uint tier = quest.BaseLevel / 5;
+                uint tier = level / 5;
                 amount = 5 * tier * tier + 5 * tier + 30;
             }
 
-            if (QuestManager.IsBoardQuest(quest))
+            if (isBoardQuest)
             {
                 amount /= 2;
             }
@@ -272,7 +275,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 }
             }
 
-            if (ntc.AreaRankList.Any())
+            if (ntc.AreaRankList.Count != 0)
             {
                 client.Enqueue(ntc, queue);
             }
@@ -290,8 +293,8 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return true;
             }
 
-            // Temporarily while S2 trials in development.
-            if (spot.AreaId >= QuestAreaId.ElanWaterGrove)
+            // Until S3.
+            if (spot.AreaId >= QuestAreaId.RathniteFoothills)
             {
                 return true;
             }
@@ -324,12 +327,45 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             var areaTrialRanks = QuestManager.GetAreaTrialRankings(quest.QuestAreaId);
-            if (!areaTrialRanks.ContainsKey(quest.QuestScheduleId) || areaTrialRanks[quest.QuestScheduleId] > plAreaRank)
+            if (!areaTrialRanks.TryGetValue(quest.QuestScheduleId, out uint value) || value > plAreaRank)
             {
                 return false;
             }
 
             return true;
+        }
+
+        // TODO: Implement this properly.
+        public List<CDataAreaRankMonsterGatheringSpot> CheckMonsterGatheringSpots(GameClient client)
+        {
+            List<CDataAreaRankMonsterGatheringSpot> spots = [];
+            foreach (uint spot in new List<uint> { 1081, 1082, 1085, 1086, 1087, 1088, 1089, 1090 })
+            {
+                spots.Add(new()
+                {
+                    SpotId = spot,
+                    SpotState = 3,
+                    Unk2 = DateTimeOffset.UtcNow // No idea what this time controls.
+                });
+            }
+
+            return spots;
+        }
+
+        // TODO: Implement this properly.
+        public List<CDataAreaRankPeriodicallyReleasedSpot> CheckPeriodicallyReleasedSpots(GameClient client)
+        {
+            List<CDataAreaRankPeriodicallyReleasedSpot> spots = [];
+            foreach (uint spot in new List<uint> { 1068, 1070, 1076, 1080 })
+            {
+                spots.Add(new()
+                {
+                    SpotId = spot,
+                    ChangeTime = DateTimeOffset.UtcNow,
+                    IsOpen = true
+                });
+            }
+            return spots;
         }
     }
 }

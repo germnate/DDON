@@ -18,21 +18,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
         {
         }
 
-        private Dictionary<QuestAreaId,ContentsRelease> WorldQuestRequiredUnlocks = new Dictionary<QuestAreaId, ContentsRelease>()
-        {
-            // S2
-            [QuestAreaId.BloodbaneIsle] = ContentsRelease.BloodbaneIsleWorldQuests,
-            [QuestAreaId.ElanWaterGrove] = ContentsRelease.ElanWaterGroveWorldQuests,
-            [QuestAreaId.FaranaPlains] = ContentsRelease.FaranaPlainsWorldQuests,
-            [QuestAreaId.MorrowForest] = ContentsRelease.MorrowForestWorldQuests,
-            [QuestAreaId.KingalCanyon] = ContentsRelease.KingalCanyonWorldQuests,
-            // S3
-            [QuestAreaId.RathniteFoothills] = ContentsRelease.RathniteFoothillsWorldQuests,
-            [QuestAreaId.FeryanaWilderness] = ContentsRelease.FeryanaWildernessWorldQuests,
-            [QuestAreaId.MegadosysPlateau] = ContentsRelease.MegadosysPlateauWorldQuests,
-            [QuestAreaId.UrtecaMountains] = ContentsRelease.UrtecaMountainsWorldQuests,
-        };
-
         public override S2CQuestGetAdventureGuideQuestListRes Handle(GameClient client, C2SQuestGetAdventureGuideQuestListReq request)
         {
             // var pcap0 = EntitySerializer.Get<S2CQuestGetAdventureGuideQuestListRes>().Read(GameFull.Dump_196.AsBuffer());
@@ -42,6 +27,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             var questScheduleIds = QuestManager.GetQuestsByAdventureGuideCategory(QuestAdventureGuideCategory.CollaborationOrSeasonalQuest);
             questScheduleIds.UnionWith(QuestManager.GetQuestsByAdventureGuideCategory(QuestAdventureGuideCategory.WildHunt));
             questScheduleIds.UnionWith(QuestManager.GetQuestsByAdventureGuideCategory(QuestAdventureGuideCategory.AreaTrialOrMission));
+            questScheduleIds.UnionWith(QuestManager.GetQuestsByAdventureGuideCategory(QuestAdventureGuideCategory.VocationQuest));
             questScheduleIds.UnionWith(QuestManager.GetQuestsByAdventureGuideCategory(QuestAdventureGuideCategory.QuestUsefulForAdventure));
             questScheduleIds.UnionWith(QuestManager.GetActiveQuestScheduleIds(client));
 
@@ -66,47 +52,23 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 foreach (var questScheduleId in matches)
                 {
                     var quest = QuestManager.GetQuestByScheduleId(questScheduleId);
-                    if (quest == null || !quest.IsActive(client) || client.Character.CompletedQuests.ContainsKey(quest.QuestId))
+                    if (quest == null || !quest.ShowInGuide(client) || client.Character.CompletedQuests.ContainsKey(quest.QuestId))
                     {
                         continue;
                     }
 
                     var questState = QuestManager.GetQuestStateManager(client, quest).GetQuestState(quest);
 
-                    var step = (questState == null) ? 0 : questState.Step;
+                    var step = questState?.Step ?? 0;
                     if (quest.QuestType == QuestType.World)
                     {
-                        // Skip the debug /warp quest
-                        if ((uint)quest.QuestId == 70000001)
-                        {
-                            continue;
-                        }
-
-                        if (!client.Character.HasContentReleased(ContentsRelease.WorldQuests))
-                        {
-                            // Don't reccomend world quests until they get unlocked
-                            continue;
-                        }
-
-                        if (WorldQuestRequiredUnlocks.ContainsKey(quest.QuestAreaId) &&
-                            !client.Character.HasContentReleased(WorldQuestRequiredUnlocks[quest.QuestAreaId]))
-                        {
-                            // Don't show world quests in extended areas if they are not unlocked
-                            continue;
-                        }
-
-                        if (!IsQuestInLvRange(client, quest.BaseLevel))
-                        {
-                            continue;
-                        }
-
-                        if (step == 0 && !quest.IsDiscoverable)
-                        {
-                            // Don't show hidden quests that are not started
-                            continue;
-                        }
+                        // World quests are identified by lestania news
+                        // This feature seems to make that obsolete
+                        // Defer world quests to lestania news for now
+                        continue;
                     }
-                    else if (quest.AdventureGuideCategory == QuestAdventureGuideCategory.AreaTrialOrMission && 
+
+                    if (quest.AdventureGuideCategory == QuestAdventureGuideCategory.AreaTrialOrMission && 
                         !Server.AreaRankManager.PlayerCanParticipateInTrial(client, quest))
                     {
                         continue;
@@ -116,7 +78,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                             (quest.BaseLevel > client.Character.ActiveCharacterJobData.Lv) &&
                             (step == 0))
                     {
-                        // Don't reccomend quests that most likely can't be completed by the player
+                        // Don't recommend quests that most likely can't be completed by the player
                         // at their current level
                         continue;
                     }

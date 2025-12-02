@@ -1,5 +1,6 @@
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
+using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Logging;
 using System.Linq;
 
@@ -17,7 +18,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
         {
             return new S2CSkillGetLearnedSkillListRes()
             {
-                SetAcquierementParam = client.Character.LearnedCustomSkills.Select(x => x.AsCDataLearnedSetAcquirementParam()).ToList()
+                SetAcquirementParam = [.. client.Character.LearnedCustomSkills.Select(x => x.AsCDataLearnedSetAcquirementParam())]
             };
         }
     }

@@ -14,6 +14,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         public override S2CShopGetShopGoodsListRes Handle(GameClient client, C2SShopGetShopGoodsListReq request)
         {
+            Logger.Info($"ShopId={request.ShopId}");
+
             client.Character.LastEnteredShopId = request.ShopId;
 
             return client.InstanceShopManager.GetAssets(request.ShopId);

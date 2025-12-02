@@ -22,6 +22,7 @@ namespace Arrowgene.Ddon.GameServer.GatheringItems
             InstancedItems = new();
             Generators = new()
             {
+                new OneOffGatheringItemGenerator(server),
                 new DefaultGatheringItemGenerator(server),
                 new GatheringTableGatheringItemGenerator(server),
                 new BitterblackGatheringItemGenerator(server),
@@ -78,15 +79,28 @@ namespace Arrowgene.Ddon.GameServer.GatheringItems
             InstancedItems.Clear();
         }
 
+        public HashSet<byte> GatheredSpots(CDataStageLayoutId stageLayout)
+        {
+            return [.. InstancedItems.GetValueOrDefault(stageLayout.AsStageLayoutId(), [])
+                .Select(x => (byte)x.Key)];
+        }
+
+        public HashSet<byte> EmptySpots(CDataStageLayoutId stageLayout)
+        {
+            return [.. InstancedItems.GetValueOrDefault(stageLayout.AsStageLayoutId(), [])
+                .Where(x => x.Value.DefaultIfEmpty().Sum(y => y?.ItemNum) == 0)
+                .Select(x => (byte)x.Key)];
+        }
+
         public string Report(StageLayoutId stageId, uint index)
         {
-            var infoStrings = FetchOrGenerate(stageId, index).Items.Select(x => $"{ClientItemInfo.GetInfoForItemId(Server.AssetRepository.ClientItemInfos, (uint) x.ItemId).Name} x{x.ItemNum}");
+            var infoStrings = FetchOrGenerate(stageId, index).Items.Select(x => $"{Server.AssetRepository.ClientItemInfos[x.ItemId].Name} x{x.ItemNum}");
             return string.Join("\n\t", infoStrings);
         }
 
         public string Report(Dictionary<Type, List<InstancedGatheringItem>> generateResult)
         {
-            var infoStrings = generateResult.SelectMany(t => t.Value.Select(x => $"{ClientItemInfo.GetInfoForItemId(Server.AssetRepository.ClientItemInfos, (uint) x.ItemId).Name}\tx{x.ItemNum}\t({t.Key.Name})"));
+            var infoStrings = generateResult.SelectMany(t => t.Value.Select(x => $"{Server.AssetRepository.ClientItemInfos[x.ItemId].Name}\tx{x.ItemNum}\t({t.Key.Name})"));
             return string.Join("\n\t", infoStrings);
         }
     }

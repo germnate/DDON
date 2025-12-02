@@ -16,8 +16,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         public override S2CPawnJoinPartyRentedPawnRes Handle(GameClient client, C2SPawnJoinPartyRentedPawnReq request)
         {
-
-            Pawn pawn = client.Character.RentedPawnBySlotNo(request.SlotNo);
+            RentalPawn pawn = client.Character.RentedPawnBySlotNo(request.SlotNo);
             PawnPartyMember partyMember = client.Party.Join(pawn);
 
             // Rented pawn need to have character ID of the player using them
@@ -25,8 +24,9 @@ namespace Arrowgene.Ddon.GameServer.Handler
             pawn.CharacterId = client.Character.CharacterId;
             pawn.IsRented = true;
             pawn.PawnType = PawnType.Support;
+            Server.RentalPawnManager.SetupTimer(client, partyMember, true);
 
-            client.Party.SendToAll(new S2CPawnJoinPartyPawnNtc() { PartyMember = partyMember.GetCDataPartyMember() });
+            client.Party.SendToAll(new S2CPawnJoinPartyPawnNtc() { PartyMember = partyMember.CDataPartyMember });
             client.Party.SendToAll(partyMember.GetS2CContextGetPartyRentedPawn_ContextNtc());
 
             return new S2CPawnJoinPartyRentedPawnRes();

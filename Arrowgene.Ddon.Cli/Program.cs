@@ -73,6 +73,10 @@ namespace Arrowgene.Ddon.Cli
 
         private static void Main(string[] args)
         {
+            AppDomain currentDomain = default(AppDomain);
+            currentDomain = AppDomain.CurrentDomain;
+            // Handler for unhandled exceptions.
+            currentDomain.UnhandledException += GlobalUnhandledExceptionHandler;
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 
             Console.WriteLine("Program started");
@@ -143,11 +147,11 @@ namespace Arrowgene.Ddon.Cli
 
             if (result != CommandResultType.Exit)
             {
-                Logger.Info("Press `e'-key to exit.");
-                ConsoleKeyInfo keyInfo = Console.ReadKey();
-                while (keyInfo.Key != ConsoleKey.E)
+                Logger.Info("Type 'e' and press enter to exit.");
+                int input = Console.Read();
+                while (char.ToLower((char)input) != 'e')
                 {
-                    keyInfo = Console.ReadKey();
+                    input = Console.Read();
                 }
             }
 
@@ -411,6 +415,13 @@ namespace Arrowgene.Ddon.Cli
                 using StreamWriter sw = new StreamWriter(filePath, append: true);
                 sw.WriteLine(text);
             }
+        }
+
+        private static void GlobalUnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
+        {
+            Exception ex = default(Exception);
+            ex = (Exception)e.ExceptionObject;
+            Logger.Error(ex.Message + "\n" + ex.StackTrace);
         }
     }
 }

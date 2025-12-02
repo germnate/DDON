@@ -1,9 +1,7 @@
 using Arrowgene.Ddon.Server;
-using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
-using Arrowgene.Ddon.Shared.Network;
 using Arrowgene.Logging;
 using System.Collections.Generic;
 
@@ -17,13 +15,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
         {
         }
 
-        //TODO: Figure out what the updateTypes actually are.
-
-        public static readonly uint BEAUTY_PARLOR_GG_PRICE = 0;
-        public static readonly uint BEAUTY_PARLOR_ST_PRICE = 0;
-        public static readonly uint REINCARNATION_GG_PRICE = 0;
-        public static readonly uint UNK_TYPE_GG_PRICE = 0;
-
         public override S2CCharacterEditGetShopPriceRes Handle(GameClient client, C2SCharacterEditGetShopPriceReq request)
         {
             S2CCharacterEditGetShopPriceRes res = new S2CCharacterEditGetShopPriceRes();
@@ -35,12 +26,12 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     new()
                     {
                         Type = WalletType.GoldenGemstones,
-                        Value = BEAUTY_PARLOR_GG_PRICE,
+                        Value = Server.GameSettings.GameServerSettings.BeautyParlorGGPrice,
                     },
                     new()
                     {
                         Type = WalletType.SilverTickets,
-                        Value = BEAUTY_PARLOR_ST_PRICE,
+                        Value = Server.GameSettings.GameServerSettings.BeautyParlorSTPrice,
                     },
                 }
             });
@@ -53,20 +44,20 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     new()
                     {
                         Type = WalletType.GoldenGemstones,
-                        Value = REINCARNATION_GG_PRICE,
+                        Value = Server.GameSettings.GameServerSettings.ReincarnationGGPrice,
                     },
                 }
             });
 
             res.PriceInfo.Add(new CDataCharacterEditPriceInfo()
             {
-                UpdateType = 3, //Unknown Reincarnation (gender change?)
+                UpdateType = 3, // Pawn Beauty Parlor
                 Prices = new List<CDataWalletPoint>()
                 {
                     new()
                     {
                         Type = WalletType.GoldenGemstones,
-                        Value = UNK_TYPE_GG_PRICE,
+                        Value = Server.GameSettings.GameServerSettings.BeautyParlorGGPrice,
                     },
                 }
             });
@@ -74,19 +65,19 @@ namespace Arrowgene.Ddon.GameServer.Handler
             return res;
         }
 
-        public static void CheckPrice(byte updateType, WalletType priceType, uint value)
+        public static void CheckPrice(DdonGameServer server, byte updateType, WalletType priceType, uint value)
         {            
             switch (updateType)
             {
                 case 1:
-                    if (priceType == WalletType.GoldenGemstones && value == BEAUTY_PARLOR_GG_PRICE) return;
-                    if (priceType == WalletType.SilverTickets && value == BEAUTY_PARLOR_ST_PRICE) return;
+                    if (priceType == WalletType.GoldenGemstones && value == server.GameSettings.GameServerSettings.BeautyParlorGGPrice) return;
+                    if (priceType == WalletType.SilverTickets && value == server.GameSettings.GameServerSettings.BeautyParlorSTPrice) return;
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_SHOP_PRICE_NO_MATCH);
                 case 2:
-                    if (priceType == WalletType.GoldenGemstones && value == REINCARNATION_GG_PRICE) return;
+                    if (priceType == WalletType.GoldenGemstones && value == server.GameSettings.GameServerSettings.ReincarnationGGPrice) return;
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_SHOP_PRICE_NO_MATCH);
                 case 3:
-                    if (priceType == WalletType.GoldenGemstones && value == UNK_TYPE_GG_PRICE) return;
+                    if (priceType == WalletType.GoldenGemstones && value == server.GameSettings.GameServerSettings.BeautyParlorGGPrice) return;
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_SHOP_PRICE_NO_MATCH);
                 default:
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_SHOP_PRICE_NO_MATCH);

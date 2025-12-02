@@ -33,7 +33,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
         private static readonly HashSet<uint> SafeStageIds = new HashSet<StageInfo>()
             {
                 //WDT
-                Stage.TheWhiteDragonTemple0, // TODO: The other WDT stage?
+                Stage.TheWhiteDragonTemple0,
                 Stage.CraftRoom,
                 Stage.CaveHarbor,
                 Stage.ClanHall,
@@ -47,13 +47,14 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 Stage.RedCrystalInn,
                 Stage.SleepingWolfInn,
                 Stage.GoldenTankardInn,
-                Stage.GrittenFort0, // TODO: The others are used for EXMs and other stuff?
+                Stage.GrittenFort0,
                 Stage.PawnCathedral,
                 Stage.HobolicCave,
                 Stage.MysreeGroveShrine,
                 Stage.ZandoraWastelandsShrine,
                 Stage.MergodaResidentialArea,
                 Stage.SecretBowmakersHome,
+                Stage.KinozaMineralSprings,
 
                 //BBI
                 Stage.ExpeditionGarrison,
@@ -73,9 +74,10 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 Stage.FortressCityMegadoResidentialLevel1,
                 Stage.FortressCityMegadoResidentialLevel2,
                 Stage.FortressCityMegadoResidentialLevel3,
+                Stage.FortressCityMegadoCraftRoom,
                 Stage.FortThines1, // TODO: The other ones?
                 Stage.FortThinesGreatDiningHall,
-                Stage.LookoutCastle0, // TODO: The other ones?
+                Stage.LookoutCastle1, // TODO: The other ones?
                 Stage.BerthasBanditGroupHideout,
                 Stage.PiremothTravelersInn,
                 Stage.RothgillTravelersInn,
@@ -106,8 +108,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
         public static readonly HashSet<uint> HubStageIds = new HashSet<StageInfo>(){
             Stage.TheWhiteDragonTemple0,
             Stage.BreyaCoast, // (Summer Event Hub Area)
-            Stage.DanaCentrum, 
+            Stage.DanaCentrum,
+            Stage.MorfaulCentrum,
+            Stage.GlyndwrCentrum,
             Stage.ClanHall, //  (has special handling)
+            Stage.FortThines1,
+            Stage.LookoutCastle1,
             Stage.FortressCityMegadoResidentialLevel0, 
             Stage.FortressCityMegadoResidentialLevel1, 
             Stage.FortressCityMegadoResidentialLevel2, 

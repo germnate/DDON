@@ -9,18 +9,15 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
     {
         public override PacketId Id => PacketId.S2C_AREA_GET_SPOT_INFO_LIST_RES;
 
-        public S2CAreaGetSpotInfoListRes()
-        {
-            SpotInfoList = new();
-            Unk0 = new();
-            Unk1 = new();
-            Unk2 = new();
-        }
+        public List<CDataSpotInfo> SpotInfoList { get; set; } = [];
+        public List<CDataAreaRankMonsterGatheringSpot> MonsterGatheringSpots { get; set; } = [];
+        public List<CDataAreaRankPeriodicallyReleasedSpot> PeriodicallyReleasedSpots { get; set; } = [];
 
-        public List<CDataSpotInfo> SpotInfoList { get; set; }
-        public List<CDataAreaRankUnk0> Unk0 { get; set; }
-        public List<CDataAreaRankSeason3> Unk1 { get; set; }
-        public List<CDataCommonU32> Unk2 { get; set; }
+        /// <summary>
+        /// Is a list of SpotIds.
+        /// Flags certain SpotIds for "Spot Boss has appeared!". Possibly does other things.
+        /// </summary>
+        public List<CDataCommonU32> SpotAlertList { get; set; } = [];
 
         public class Serializer : PacketEntitySerializer<S2CAreaGetSpotInfoListRes>
         {
@@ -28,9 +25,9 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
             {
                 WriteServerResponse(buffer, obj);
                 WriteEntityList(buffer, obj.SpotInfoList);
-                WriteEntityList(buffer, obj.Unk0);
-                WriteEntityList(buffer, obj.Unk1);
-                WriteEntityList(buffer, obj.Unk2);
+                WriteEntityList(buffer, obj.MonsterGatheringSpots);
+                WriteEntityList(buffer, obj.PeriodicallyReleasedSpots);
+                WriteEntityList(buffer, obj.SpotAlertList);
             }
 
             public override S2CAreaGetSpotInfoListRes Read(IBuffer buffer)
@@ -38,9 +35,9 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
                 S2CAreaGetSpotInfoListRes obj = new S2CAreaGetSpotInfoListRes();
                 ReadServerResponse(buffer, obj);
                 obj.SpotInfoList = ReadEntityList<CDataSpotInfo>(buffer);
-                obj.Unk0 = ReadEntityList<CDataAreaRankUnk0>(buffer);
-                obj.Unk1 = ReadEntityList<CDataAreaRankSeason3>(buffer);
-                obj.Unk2 = ReadEntityList<CDataCommonU32>(buffer);
+                obj.MonsterGatheringSpots = ReadEntityList<CDataAreaRankMonsterGatheringSpot>(buffer);
+                obj.PeriodicallyReleasedSpots = ReadEntityList<CDataAreaRankPeriodicallyReleasedSpot>(buffer);
+                obj.SpotAlertList = ReadEntityList<CDataCommonU32>(buffer);
                 return obj;
             }
         }

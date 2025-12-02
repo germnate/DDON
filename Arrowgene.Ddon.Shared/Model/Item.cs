@@ -1,45 +1,42 @@
-using System.Security.Cryptography;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 
 namespace Arrowgene.Ddon.Shared.Model
 {
     public class Item
     {
-        public const int UIdLength = 8;
-
-        public string UId { 
+        public string UId
+        {
             get
             {
-                if(this._uid == null)
+                if (_uid == null)
                 {
                     UpdateUId();
                 }
-                return this._uid;
+
+                return _uid;
             }
-            set
-            {
-                this._uid = value;
-            }
+            set => _uid = value;
         }
-        
+
         public uint ItemId { get; set; }
         public byte SafetySetting { get; set; } // This is safety setting.
         public byte Color { get; set; }
         public byte PlusValue { get; set; } // This is Equipment Quality, +0/1/2/3/
         public uint EquipPoints { get; set; }
         public List<CDataEquipElementParam> EquipElementParamList { get; set; }
-        public List<CDataAddStatusParam> AddStatusParamList { get; set; } // Actually LimitBreak/Bonus from Craig I guess.
-        public List<CDataEquipItemInfoUnk2> Unk2List { get; set; } // Am thinking this might be addstatus but struggling to get this to work ingame.
+        public List<CDataAddStatusParam> AddStatusParamList { get; set; } // Used for Limit Break and Extreme Synthesis
+        public List<CDataEquipStatParam> EquipStatParamList { get; set; } // used for emblem, vocation stones, etc.
 
         private string _uid;
 
         public Item()
         {
-            EquipElementParamList = new List<CDataEquipElementParam>();
-            AddStatusParamList = new List<CDataAddStatusParam>();
-            Unk2List = new List<CDataEquipItemInfoUnk2>();
+            EquipElementParamList = [];
+            AddStatusParamList = [];
+            EquipStatParamList = [];
         }
 
         public Item(Item obj)
@@ -50,17 +47,15 @@ namespace Arrowgene.Ddon.Shared.Model
             this.Color = obj.Color;
             this.PlusValue = obj.PlusValue;
             this.EquipPoints = obj.EquipPoints;
-            // TODO: Make a copy constructor for these
-            this.EquipElementParamList = obj.EquipElementParamList;
-            this.AddStatusParamList = obj.AddStatusParamList;
-            this.Unk2List = obj.Unk2List;
+            this.EquipElementParamList = [.. obj.EquipElementParamList.Select(x => new CDataEquipElementParam(x))];
+            this.AddStatusParamList = [.. obj.AddStatusParamList.Select(x => new CDataAddStatusParam(x))];
+            this.EquipStatParamList = [.. obj.EquipStatParamList.Select(x => new CDataEquipStatParam(x))];
         }
 
-        public string UpdateUId()
+        private string UpdateUId()
         {
-            Random rnd = new Random();
-            this._uid = $"{rnd.Next():X08}";
-            return this._uid;
+            _uid = Guid.CreateVersion7(DateTimeOffset.UtcNow).ToString();
+            return _uid;
         }
     }
 }

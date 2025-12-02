@@ -1,3 +1,4 @@
+using Arrowgene.Ddon.GameServer.Party;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
@@ -30,6 +31,15 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return null;
             }
             return client.Character.Pawns.Where(x => x.PawnId == client.Character.PartnerPawnId).FirstOrDefault();
+        }
+
+        public PawnPartyMember GetPartnerPawnPartyMember(GameClient client)
+        {
+            if (client.Character.PartnerPawnId == 0)
+            {
+                return null;
+            }
+            return (PawnPartyMember)(client.Party?.Members.Where(x => x.IsPawn && x.PawnId == client.Character.PartnerPawnId).FirstOrDefault() ?? null);
         }
 
         public PartnerPawnData? GetPartnerPawnData(GameClient client, DbConnection? connectionIn = null)
@@ -68,24 +78,29 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return new();
             }
 
-            PartnerPawnData partnerPawnData = client.Character.Pawns.Find(x => x.PawnId == client.Character.PartnerPawnId)?.PartnerPawnData;
-            var previousLikability = partnerPawnData.CalculateLikability();
+            Pawn partnerPawn = GetPartnerPawn(client);
+            if (partnerPawn == null)
+            {
+                return new();
+            }
+
+            var previousLikability = partnerPawn.PartnerPawnData.CalculateLikability();
             switch (action)
             {
                 case PartnerPawnAffectionAction.Gift:
-                    partnerPawnData.NumGifts += 1;
+                    partnerPawn.PartnerPawnData.NumGifts += 1;
                     break;
                 case PartnerPawnAffectionAction.Craft:
-                    partnerPawnData.NumCrafts += 1;
+                    partnerPawn.PartnerPawnData.NumCrafts += 1;
                     break;
                 case PartnerPawnAffectionAction.Adventure:
-                    partnerPawnData.NumAdventures += 1;
+                    partnerPawn.PartnerPawnData.NumAdventures += 1;
                     break;
             }
-            Server.Database.UpdatePartnerPawnRecord(client.Character.CharacterId, partnerPawnData, connectionIn);
+            Server.Database.UpdatePartnerPawnRecord(client.Character.CharacterId, partnerPawn.PartnerPawnData, connectionIn);
             Server.Database.InsertPartnerPawnLastAffectionIncreaseRecord(client.Character.CharacterId, client.Character.PartnerPawnId, action, connectionIn);
 
-            var currentLikability = partnerPawnData.CalculateLikability();
+            var currentLikability = partnerPawn.PartnerPawnData.CalculateLikability();
             if (previousLikability < currentLikability)
             {
                 packets.Enqueue(client, new S2CPartnerPawnLikabilityUpNtc()
@@ -113,13 +128,19 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return Server.Database.HasPartnerPawnLastAffectionIncreaseRecord(client.Character.CharacterId, client.Character.PartnerPawnId, action, connectionIn);
         }
 
+        public bool IsPartnerPawnInParty(GameClient client)
+        {
+            return client.Party.Members.Where(x => x.IsPawn).Any(x => x.PawnId == client.Character.PartnerPawnId);
+        }
+
         public uint GetLikabilityForCurrentPartnerPawn(GameClient client, DbConnection? connectionIn = null)
         {
-            if (client.Character.PartnerPawnId == 0)
+            var partnerPawnData = GetPartnerPawnData(client, connectionIn);
+            if (partnerPawnData == null)
             {
                 return 0;
             }
-            return Server.Database.GetPartnerPawnRecord(client.Character.CharacterId, client.Character.PartnerPawnId, connectionIn).CalculateLikability();
+            return partnerPawnData.CalculateLikability();
         }
 
         public List<CDataPartnerPawnReward> GetUnclaimedRewardsForCurrentPartnerPawn(GameClient client, DbConnection? connectionIn = null)
@@ -166,116 +187,114 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 .FirstOrDefault();
         }
 
-        public bool CreateAdventureTimer(GameClient client)
+        public bool CreateAdventureTimer(GameClient client, PawnPartyMember pawnPartyMember)
         {
-            lock (client.Character.PartnerTimerLockObj)
+            lock (pawnPartyMember.TimerLock)
             {
                 if (client.Character.PartnerPawnId == 0 || IsActionConsumedForDay(client, PartnerPawnAffectionAction.Adventure))
                 {
                     // No partner pawn or
                     // can't start another adventure for credit
                     // until the next reset
-                    return true;
+                    return false;
                 }
 
-                if (client.Character.PartnerPawnAdventureTimerId != 0 || !StageManager.IsSafeArea(client.Character.Stage))
+                if (!StageManager.IsSafeArea(client.Character.Stage))
                 {
                     Logger.Error(client, "Attempted to create an adventure timer in an invalid state");
                     return false;
                 }
 
-                client.Character.PartnerPawnAdventureTimerId = Server.TimerManager.CreateTimer(Server.GameSettings.GameServerSettings.PartnerPawnAdventureDurationInSeconds, () =>
+                if (pawnPartyMember.AdventureTimer != 0)
                 {
-                    Logger.Info($"(PartnerPawn) Adventure timer for PartnerPawnId={client.Character.PartnerPawnAdventureTimerId} met");
-                    CancelAdventureTimer(client);
+                    Logger.Error(client, "Attempted to create an adventure timer for a pawn that already has one.");
+                    return false;
+                }
+
+                uint timerId = Server.TimerManager.CreateTimer(Server.GameSettings.GameServerSettings.PartnerPawnAdventureDurationInSeconds, () =>
+                {
+                    Logger.Info($"(PartnerPawn) Adventure timer for PartnerPawnId={pawnPartyMember.PawnId} met");
+                    CancelAdventureTimer(client, pawnPartyMember);
                     UpdateLikabilityIncreaseAction(client, PartnerPawnAffectionAction.Adventure);
                 });
-                Logger.Info(client, $"(PartnerPawn) Adventure timer for PartnerPawnId={client.Character.PartnerPawnAdventureTimerId} created");
+                Logger.Info(client, $"(PartnerPawn) Adventure timer for PartnerPawnId={pawnPartyMember.PawnId} created");
+                return true;
             }
-
-            return true;
         }
 
-        public void HandleStageAreaChange(GameClient client)
+        public void HandleStageAreaChange(GameClient client, uint fromStage, uint toStage)
         {
-            lock (client.Character.PartnerTimerLockObj)
+            bool fromSafe = StageManager.IsSafeArea(fromStage);
+            bool toSafe = StageManager.IsSafeArea(toStage);
+            PawnPartyMember partnerPartyMember = GetPartnerPawnPartyMember(client);
+            if (partnerPartyMember is null)
             {
-                var timerId = client.Character.PartnerPawnAdventureTimerId;
-                if (timerId == 0)
+                return;
+            }
+
+            lock (partnerPartyMember.TimerLock)
+            {
+                if (partnerPartyMember.AdventureTimer == 0 || fromSafe == toSafe)
                 {
+                    // Base->Base or Adventure->Adventure transition, so no need to adjust the timers.
                     return;
                 }
-
-                // Handle transitioning from safe to dangerous area
-                // Handle transitioning from dangerous to safe area
-                // Dangerous to Dangerous can be considered ignored since the timer should be running still
-                if (!Server.TimerManager.IsTimerStarted(timerId) && !StageManager.IsSafeArea(client.Character.Stage) ||
-                    Server.TimerManager.IsTimerPaused(timerId) && !StageManager.IsSafeArea(client.Character.Stage))
+                else if (fromSafe && !toSafe)
                 {
-                    StartAdventureTimer(client);
+                    // Base->Adventure, so start the timers.
+                    StartAdventureTimer(client, partnerPartyMember);
                 }
-                else if (Server.TimerManager.IsTimerStarted(timerId) && StageManager.IsSafeArea(client.Character.Stage))
+                else if (!fromSafe && toSafe)
                 {
-                    PauseAdventureTimer(client);
+                    // Adventure->Base, so pause the timers.
+                    PauseAdventureTimer(client, partnerPartyMember);
                 }
             }
         }
 
-        private bool StartAdventureTimer(GameClient client)
+        private bool StartAdventureTimer(GameClient client, PawnPartyMember pawnPartyMember)
         {
-            lock (client.Character.PartnerTimerLockObj)
+            lock (pawnPartyMember.TimerLock)
             {
-                if (client.Character.PartnerPawnAdventureTimerId == 0)
+                if (pawnPartyMember?.AdventureTimer == 0)
                 {
                     Logger.Error(client, "Attempted to start/resume the adventure timer but the timer id is invalid");
                     return false;
                 }
-                return Server.TimerManager.StartTimer(client.Character.PartnerPawnAdventureTimerId);
+                return Server.TimerManager.StartTimer(pawnPartyMember.AdventureTimer);
             }
         }
 
-        private bool PauseAdventureTimer(GameClient client)
+        private bool PauseAdventureTimer(GameClient client, PawnPartyMember pawnPartyMember)
         {
-            lock (client.Character.PartnerTimerLockObj)
+            lock (pawnPartyMember.TimerLock)
             {
-                if (client.Character.PartnerPawnAdventureTimerId == 0)
+                if (pawnPartyMember?.AdventureTimer == 0)
                 {
                     Logger.Error(client, "Attempted to start/resume the adventure timer but the timer id is invalid");
                     return false;
                 }
 
-                Server.TimerManager.PauseTimer(client.Character.PartnerPawnAdventureTimerId);
-                Logger.Info(client, $"(PartnerPawn) Adventure timer for PartnerPawnId={client.Character.PartnerPawnAdventureTimerId} paused");
+                Server.TimerManager.PauseTimer(pawnPartyMember.AdventureTimer);
+                Logger.Info(client, $"(PartnerPawn) Adventure timer for PartnerPawnId={pawnPartyMember.PawnId} paused");
 
                 return true;
             }
         }
 
-        public bool HandleLeaveFromParty(GameClient client)
+        
+        private bool CancelAdventureTimer(GameClient client, PawnPartyMember pawnPartyMember)
         {
-            lock (client.Character.PartnerTimerLockObj)
+            lock (pawnPartyMember.TimerLock)
             {
-                if (client.Character.PartnerPawnAdventureTimerId == 0)
-                {
-                    return true;
-                }
-                Logger.Info(client, $"(PartnerPawn) PartnerPawnId={client.Character.PartnerPawnAdventureTimerId} kicked/left party, canceling timer");
-                return CancelAdventureTimer(client);
-            }
-        }
-
-        private bool CancelAdventureTimer(GameClient client)
-        {
-            lock (client.Character.PartnerTimerLockObj)
-            {
-                if (client.Character.PartnerPawnAdventureTimerId == 0)
+                if (pawnPartyMember?.AdventureTimer == 0)
                 {
                     Logger.Error(client, "Attempted to cancel the adventure timer but the timer id is invalid");
                     return false;
                 }
 
-                Server.TimerManager.CancelTimer(client.Character.PartnerPawnAdventureTimerId);
-                client.Character.PartnerPawnAdventureTimerId = 0;
+                Server.TimerManager.CancelTimer(pawnPartyMember.AdventureTimer);
+                pawnPartyMember.AdventureTimer = 0;
                 return true;
             }
         }
@@ -283,29 +302,29 @@ namespace Arrowgene.Ddon.GameServer.Characters
         private static readonly Dictionary<uint,CDataPartnerPawnReward> gLikabilityRewards = new Dictionary<uint, CDataPartnerPawnReward>()
         {
             [1] = PartnerReward.CreateEmoteReward(EmoteId.ImHerePose1),
-            // [2], TODO: Recipe: Achievement/Recipe: Dinner Set
-            [3] = PartnerReward.CreateAbilityReward(SecretAbility.CompanionHealth),
-            [4] = PartnerReward.CreateAbilityReward(SecretAbility.CompanionAttack),
+            // [2], Recipe: Achievement/Recipe: Dinner Set
+            [3] = PartnerReward.CreateAbilityReward(AbilityId.CompanionHealth),
+            [4] = PartnerReward.CreateAbilityReward(AbilityId.CompanionAttack),
             [5] = PartnerReward.CreateEmoteReward(EmoteId.ImHerePose2),
-            // [6], TODO: Achievement/Recipe: Lestanian Puppet - Giant Cyclops
+            // [6], Achievement/Recipe: Lestanian Puppet - Giant Cyclops
             [7] = PartnerReward.CreateCommunicationReward(2),
             [8] = PartnerReward.CreateHairstyleReward(HairStyleId.Ex1Men, 2),
-            [9] = PartnerReward.CreateAbilityReward(SecretAbility.CompanionDefense),
+            [9] = PartnerReward.CreateAbilityReward(AbilityId.CompanionDefense),
             [10] = PartnerReward.CreateEmoteReward(EmoteId.OriginalPose2),
             [11] = PartnerReward.CreateCommunicationReward(3),
             [12] = PartnerReward.CreateHairstyleReward(HairStyleId.Ex2Women, 2),
-            [13] = PartnerReward.CreateAbilityReward(SecretAbility.CompanionStamina),
+            [13] = PartnerReward.CreateAbilityReward(AbilityId.CompanionStamina),
             [14] = PartnerReward.CreateEmoteReward(EmoteId.ImHerePose3),
             [15] = PartnerReward.CreateCommunicationReward(4),
             [16] = PartnerReward.CreateHairstyleReward(HairStyleId.Ex3Women, 2),
-            [17] = PartnerReward.CreateAbilityReward(SecretAbility.CompanionMagick),
-            [18] = PartnerReward.CreateAbilityReward(SecretAbility.CompanionMagickDefense),
+            [17] = PartnerReward.CreateAbilityReward(AbilityId.CompanionMagick),
+            [18] = PartnerReward.CreateAbilityReward(AbilityId.CompanionMagickDefense),
             [19] = PartnerReward.CreateEmoteReward(EmoteId.ImHerePose4),
-            // [20] = TODO: Achievement 愛を叫んだ覚者
+            // [20] = Achievement 愛を叫んだ覚者
             [21] = PartnerReward.CreateHairstyleReward(HairStyleId.Ex4Women, 2),
-            // [22], TODO: Recipe: Achievement/Recipe: Servant's Sleepwear (Type 1)
+            // [22], Recipe: Achievement/Recipe: Servant's Sleepwear (Type 1)
             [23] = PartnerReward.CreateCommunicationReward(5),
-            // [24], TODO: Recipe: Achievement/Recipe: Servant's Sleepwear (Type 2)
+            // [24], Recipe: Achievement/Recipe: Servant's Sleepwear (Type 2)
             [25] = PartnerReward.CreateCommunicationReward(6),
         };
     }

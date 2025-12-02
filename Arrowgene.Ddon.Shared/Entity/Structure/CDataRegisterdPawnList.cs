@@ -17,7 +17,7 @@ public class CDataRegisterdPawnList
     public string Name { get; set; }
     public byte Sex { get; set; }
     public uint RentalCost {  get; set; }
-    public ulong Updated {  get; set; }
+    public DateTimeOffset Updated {  get; set; }
     public CDataPawnListData PawnListData { get; set; }
 
     public class Serializer : EntitySerializer<CDataRegisterdPawnList>
@@ -28,7 +28,7 @@ public class CDataRegisterdPawnList
             WriteMtString(buffer, obj.Name);
             WriteByte(buffer, obj.Sex);
             WriteUInt32(buffer, obj.RentalCost);
-            WriteUInt64(buffer, obj.Updated);
+            WriteInt64(buffer, obj.Updated.ToUnixTimeSeconds());
             WriteEntity(buffer, obj.PawnListData);
         }
 
@@ -39,7 +39,7 @@ public class CDataRegisterdPawnList
             obj.Name = ReadMtString(buffer);
             obj.Sex = ReadByte(buffer);
             obj.RentalCost = ReadUInt32(buffer);
-            obj.Updated = ReadUInt64(buffer);
+            obj.Updated = DateTimeOffset.FromUnixTimeSeconds(ReadInt64(buffer));
             obj.PawnListData = ReadEntity<CDataPawnListData>(buffer);
             return obj;
         }

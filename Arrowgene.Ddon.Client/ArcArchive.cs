@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Linq;
 using Arrowgene.Buffers;
 using Arrowgene.Ddon.Shared;
 using Arrowgene.Ddon.Shared.Crypto;
@@ -227,35 +228,19 @@ namespace Arrowgene.Ddon.Client
         }
 
         /// <summary>
-        /// Returns the first file that matches the search criteria.
+        /// Returns the only file that matches the search criteria, raises an exception if none or more than one file is found.
         /// </summary>
         public ArcFile GetFile(FileIndexSearch search)
         {
-            return GetFiles(search)[0];
+            return GetFiles(search).Single();
         }
 
-        public ArcFile PutFile(string path, byte[] fileData)
+        public ArcFile PutFile(string arcPath, string ext, byte[] fileData)
         {
-            ArcFile existingFile = null;
-            foreach (ArcFile file in _files)
-            {
-                if (path == file.Index.Path)
-                {
-                    existingFile = file;
-                    break;
-                }
-            }
-
-            if (existingFile != null)
-            {
-                DeleteFile(existingFile);
-            }
-
             FileIndex newFileIndex = new FileIndex();
-            newFileIndex.Path = path;
-            string ext = Path.GetExtension(path);
-            newFileIndex.ArcPath = path.Substring(0, path.Length - ext.Length);
-            ext = ext.TrimStart('.');
+            newFileIndex.IsCyphered = IsCypheredArc(MagicTag);
+
+            newFileIndex.ArcPath = arcPath;
 
             foreach (uint jamCrc in JamCrcLookup.Keys)
             {
@@ -274,6 +259,8 @@ namespace Arrowgene.Ddon.Client
                 // todo calculate jamcrc?
                 newFileIndex.Extension = $"{newFileIndex.JamCrc:X8}";
             }
+
+            newFileIndex.Path = arcPath+"."+ newFileIndex.Extension;
 
             newFileIndex.Directory = Path.GetDirectoryName(newFileIndex.ArcPath);
             if (newFileIndex.Directory == null)
@@ -331,7 +318,7 @@ namespace Arrowgene.Ddon.Client
             File.WriteAllBytes(fileInfo.FullName, file.Data);
         }
 
-        protected override void Read(IBuffer buffer)
+        public override void Read(IBuffer buffer)
         {
             _files.Clear();
 
@@ -380,7 +367,7 @@ namespace Arrowgene.Ddon.Client
             }
         }
 
-        protected override void Write(IBuffer buffer)
+        public override void Write(IBuffer buffer)
         {
             byte[] magicTag = Encoding.UTF8.GetBytes(MagicTag);
             buffer.WriteBytes(magicTag);
@@ -539,15 +526,15 @@ namespace Arrowgene.Ddon.Client
                 {
                     if (decompressor.IsNeedingDictionary)
                     {
-                        Logger.Error("ecompressor.IsNeedingDictionary");
+                        throw new Exception("Corrupted Arc file. decompressor.IsNeedingDictionary");
                     }
                     else if (decompressor.IsNeedingInput)
                     {
-                        Logger.Error("decompressor.IsNeedingInput");
+                        throw new Exception("Corrupted Arc file. decompressor.IsNeedingInput");
                     }
                     else
                     {
-                        Logger.Error("Unknown Decompression Error");
+                        throw new Exception("Corrupted Arc file. Unknown Decompression Error");
                     }
                 }
             }

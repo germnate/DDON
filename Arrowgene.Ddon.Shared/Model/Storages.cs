@@ -5,6 +5,7 @@ using Arrowgene.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Arrowgene.Ddon.Shared.Model
 {
@@ -38,22 +39,37 @@ namespace Arrowgene.Ddon.Shared.Model
                 .ToList();
         }
 
-        public Tuple<StorageType, Tuple<ushort, Item, uint>> FindItemByUIdInStorage(List<StorageType> storageTypes, string uId)
+        public Tuple<StorageType, Tuple<ushort, Item, uint>> FindItemByUIdInStorage(IEnumerable<StorageType> storageTypes, string uId)
         {
-            foreach (var storage in storages)
+            foreach (var storage in storageTypes)
             {
-                var foundItem = storage.Value.FindItemByUId(uId);
+                var foundItem = storages.GetValueOrDefault(storage)?.FindItemByUId(uId);
                 if (foundItem != null)
                 {
-                    return (storage.Key, foundItem).ToTuple();
+                    return (storage, foundItem).ToTuple();
                 }
             }
             return null;
         }
 
+        public List<(StorageType StorageType, (ushort Index, Item Item, uint Amount))> FindItemsByIdInStorage(IEnumerable<StorageType> storageTypes, ItemId itemId)
+        {
+            var result = new List<(StorageType StorageType, (ushort Index, Item Item, uint Amount))>();
+            foreach (var storage in GetAllStorages().Where(x => storageTypes.Contains(x.Key)).ToList())
+            {
+                foreach (var match in storage.Value.FindItemsById((uint)itemId))
+                {
+                    result.Add(new(storage.Key, (match.Item1, match.Item2, match.Item3)));
+                }
+            }
+            return result;
+        }
+
         public Storage GetStorage(StorageType storageType)
         {
-            return storages[storageType];
+            return storages.GetValueOrDefault(storageType)
+                ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_INVALID_STORAGE_TYPE, 
+                $"Invalid storage type {storageType}");
         }
 
         public bool HasStorage(StorageType storageType)
@@ -117,7 +133,7 @@ namespace Arrowgene.Ddon.Shared.Model
                     EquipPawnID = DeterminePawnId(character, storageType, tuple.slot),
                     EquipElementParamList = tuple.item.Item1.EquipElementParamList,
                     AddStatusParamList = tuple.item.Item1.AddStatusParamList,
-                    Unk2List = tuple.item.Item1.Unk2List
+                    EquipStatParamList = tuple.item.Item1.EquipStatParamList
                 })
                 .ToList();
         }
@@ -163,6 +179,8 @@ namespace Arrowgene.Ddon.Shared.Model
 
         public StorageType Type { get; private set; }
         public List<Tuple<Item, uint>?> Items { get; set; }
+
+        [JsonIgnore]
         public byte[] SortData { get; set; }
 
         public Storage(StorageType type, ushort slotMax) : this(type, slotMax, new byte[1024])
@@ -175,6 +193,14 @@ namespace Arrowgene.Ddon.Shared.Model
             Type = type;
             Items = Enumerable.Repeat<Tuple<Item, uint>?>(null, slotMax).ToList();
             SortData = sortData;
+        }
+
+        [JsonConstructor]
+        public Storage(StorageType type, List<Tuple<Item, uint>?> items)
+        {
+            Type = type;
+            Items = items;
+            SortData = new byte[1024];
         }
 
         public void Clear()
@@ -274,16 +300,10 @@ namespace Arrowgene.Ddon.Shared.Model
         }
     }
 
-    public class Equipment
+    public class Equipment(Storage storage, int offset)
     {
-        public Storage Storage { get; private set; }
-        public int Offset { get; private set; }
-
-        public Equipment(Storage equipmentStorage, int offset)
-        {
-            Storage = equipmentStorage;
-            Offset = offset;
-        }
+        public Storage Storage { get; private set; } = storage;
+        public int Offset { get; private set; } = offset;
 
         public List<Item?> GetItems(EquipType equipType)
         {
@@ -307,9 +327,9 @@ namespace Arrowgene.Ddon.Shared.Model
                 {
                     ItemId = (ushort) x.ItemId,
                     ColorNo = x.Color,
-                    PlusValue = x.SafetySetting,
+                    PlusValue = x.PlusValue,
                     EquipElementParamList = x.EquipElementParamList,
-                    AddStatusParamList = x.AddStatusParamList
+                    AddStatusParamList = x.AddStatusParamList,
                 })
                 .ToList();
         }
@@ -321,14 +341,14 @@ namespace Arrowgene.Ddon.Shared.Model
                 .Select(tuple => new CDataEquipItemInfo()
                 {
                     ItemId = tuple.item?.ItemId ?? 0,
-                    Unk0 = tuple.item?.SafetySetting ?? 0,
+                    SafetySetting = tuple.item?.SafetySetting ?? 0,
                     EquipType = equipType,
                     EquipSlot = tuple.slot,
                     Color = tuple.item?.Color ?? 0,
                     PlusValue = tuple.item?.PlusValue ?? 0,
                     EquipElementParamList = tuple.item?.EquipElementParamList ?? new List<CDataEquipElementParam>(),
                     AddStatusParamList = tuple.item?.AddStatusParamList ?? new List<CDataAddStatusParam>(),
-                    Unk2List = tuple.item?.Unk2List ?? new List<CDataEquipItemInfoUnk2>()
+                    EquipStatParamList = tuple.item?.EquipStatParamList ?? new List<CDataEquipStatParam>()
                 })
                 .ToList();
         }
@@ -367,7 +387,7 @@ namespace Arrowgene.Ddon.Shared.Model
         StorageChestDrawer2 = 0x9,
         StorageChestDrawer3 = 0xA,
         Unk11 = 0xB,
-        Unk12 = 0xC,
+        Unk12 = 0xC, 
         ItemPost = 0xD,
         CharacterEquipment = 0xE,
         PawnEquipment = 0xF,

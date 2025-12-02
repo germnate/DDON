@@ -14,8 +14,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
         
         public override S2CPawnGetPawnTotalScoreRes Handle(GameClient client, C2SPawnGetPawnTotalScoreReq request)
         {
-            // TODO: Implement.
-            return new();
+            return new()
+            {
+                PawnId = request.PawnId,
+                PawnTotalScore = Server.Database.SelectPawnTotalScore(request.PawnId),
+            };
         }
     }
 }

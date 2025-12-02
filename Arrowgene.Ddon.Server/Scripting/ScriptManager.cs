@@ -1,14 +1,20 @@
 using Arrowgene.Ddon.GameServer.Scripting;
 using Arrowgene.Ddon.Server;
+using Arrowgene.Ddon.Server.Scripting;
+using Arrowgene.Ddon.Shared.Csv;
 using Arrowgene.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Scripting;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Arrowgene.Ddon.Shared.Scripting
 {
@@ -18,23 +24,37 @@ namespace Arrowgene.Ddon.Shared.Scripting
 
         protected Dictionary<string, ScriptModule> ScriptModules { get; private set; }
         public string ScriptsRoot { get; private set; }
+        public string HashPath { get; private set; }
         public string LibsRoot { get; private set; } = string.Empty;
         public T GlobalVariables { get; protected set; }
         public List<string> PathsToIgnore { get; protected set; }
+        protected ConcurrentDictionary<string, (string DllPath, string Hash)> ScriptHashes { get; private set; }
 
         public ScriptManager(string assetsPath, string libsPath)
         {
             ScriptModules = new Dictionary<string, ScriptModule>();
             ScriptsRoot = Path.Combine(assetsPath, "scripts");
+            HashPath = Path.GetFullPath(Path.Combine(ScriptsRoot, "../../script_assemblies/hashes.csv"));
+
             PathsToIgnore = new List<string>();
 
+            ScriptHashes = [];
+            if (File.Exists(HashPath))
+            {
+                try
+                {
+                    ScriptHashes = new(new ScriptHashReader().ReadPath(HashPath).ToDictionary(k => k.ScriptPath, v => (v.DllPath, v.Hash)));
+                }
+                catch { }
+            }
+            
             if (libsPath != "")
             {
-                LibsRoot = $"{ScriptsRoot}{Path.DirectorySeparatorChar}{libsPath}";
+                LibsRoot = Path.Combine(ScriptsRoot, libsPath);
             }
         }
 
-        public void AddModule(ScriptModule module)
+        protected void AddModule(ScriptModule module)
         {
             ScriptModules[module.ModuleRoot] = module;
         }
@@ -49,26 +69,33 @@ namespace Arrowgene.Ddon.Shared.Scripting
             SetupFileWatchers();
         }
 
+        private (string AssemblyPath, string OutputPath) EmitScriptAsDllPath(ScriptModule module, string path)
+        {
+            var assembliesPath = Path.GetFullPath(Path.Combine(ScriptsRoot, "../../script_assemblies", module.ModuleRoot));
+            return (assembliesPath, Path.Combine(assembliesPath, $"{Path.GetFileNameWithoutExtension(path)}.dll"));
+        }
+
         /// <summary>
         /// To debug scripts which include other scripts, we need emit
         /// the compiled script as a dll so the debugger can find the 
         /// symbols and source files.
         /// </summary>
+        /// <param name="module">The script module object</param>
         /// <param name="script">The compiled script object</param>
         /// <param name="path">Path to the main script being executed</param>
-        private void EmitScriptsAsDllForDebug(Script script, string path)
+        private void EmitScriptsAsDllForDebug(ScriptModule module, Script script, string path)
         {
-            if (!Directory.Exists("script_assemblies"))
+            // Put the debug assemblies in <asset_path>/net9.0/Files
+            var (assembliesPath, outputPath) = EmitScriptAsDllPath(module, path);
+            if (!Directory.Exists(assembliesPath))
             {
-                Directory.CreateDirectory("script_assemblies");
+                Directory.CreateDirectory(assembliesPath);
             }
 
             var compilation = script.GetCompilation();
 
-            var outputPath = Path.Combine("script_assemblies", $"{Path.GetFileNameWithoutExtension(path)}.dll");
             var emitOptions = new EmitOptions()
-                .WithDebugInformationFormat(DebugInformationFormat.Pdb)
-                .WithPdbFilePath(outputPath);
+                .WithDebugInformationFormat(DebugInformationFormat.Embedded);
 
             using (var stream = new FileStream(outputPath, FileMode.Create))
             {
@@ -89,8 +116,19 @@ namespace Arrowgene.Ddon.Shared.Scripting
             {
                 Logger.Info(path);
 
-                var code = Util.ReadAllText(path);
+#if DEBUG
+                string hash = "";
+                using (FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    hash = stream.GetHash<MD5>();
+                    if (RestoreScriptFromStoredDll(module, path, hash))
+                    {
+                        return;
+                    }
+                }
+#endif
 
+                var code = Util.ReadAllText(path);
                 var options = module.Options()
 #if DEBUG
                     .WithFilePath(path)
@@ -113,14 +151,22 @@ namespace Arrowgene.Ddon.Shared.Scripting
                 );
 
 #if DEBUG
-                EmitScriptsAsDllForDebug(script, path);
+                EmitScriptsAsDllForDebug(module, script, path);
 #endif
 
                 var result = await script.RunAsync(globals: GlobalVariables);
-                if (!module.EvaluateResult(path, result))
+                var variables = result?.Variables.ToDictionary(k => k.Name, v => v.Value);
+                if (!module.EvaluateResult(path, result?.ReturnValue, variables))
                 {
                     Logger.Error($"Failed to evaluate the result of executing '{path}'");
                 }
+#if DEBUG       
+                // Flag to prevent script cacheing.
+                else if (!variables.ContainsKey("PREVENT_SCRIPT_CACHE"))
+                {
+                    ScriptHashes[path] = (EmitScriptAsDllPath(module, path).OutputPath, hash);
+                }
+#endif
             }
             catch (Exception ex)
             {
@@ -139,7 +185,7 @@ namespace Arrowgene.Ddon.Shared.Scripting
         /// Returns if pathA contain pathB.
         /// </summary>
         /// <param name="pathA">The path to find pathB in.</param>
-        /// <param name="pathB">The path to find pathA in.</param>
+        /// <param name="pathB">The path to find in pathA.</param>
         /// <returns>Returns true if pathB is in pathA, otherwise false.</returns>
         private bool PathContains(string pathA, string pathB)
         {
@@ -148,7 +194,7 @@ namespace Arrowgene.Ddon.Shared.Scripting
             return normalizedA.Contains(normalizedB);
         }
 
-        private bool ShouldIgnoreFile(string path)
+        private bool ShouldIgnoreFile(ScriptModule module, string path)
         {
             foreach (var pathToIgnore in PathsToIgnore)
             {
@@ -157,18 +203,29 @@ namespace Arrowgene.Ddon.Shared.Scripting
                     return true;
                 }
             }
+
+            if (module != null)
+            {
+                var fileName = Path.GetFileName(path);
+                if (module.IgnoredScripts.Contains(fileName))
+                {
+                    return true;
+                }
+            }
+
             return false;
         }
 
-        protected void CompileScripts()
+        protected virtual void CompileScripts(List<ScriptModule> modules = null)
         {
-            foreach (var module in ScriptModules.Values)
+            var scriptModules = modules ?? ScriptModules.Values.ToList();
+            Parallel.ForEach(scriptModules, module =>
             {
                 var path = Path.Combine(ScriptsRoot, module.ModuleRoot);
                 if (!module.IsEnabled)
                 {
                     Logger.Info($"The module '{module.ModuleRoot}' is disabled. Skipping.");
-                    continue;
+                    return;
                 }
 
                 module.Initialize();
@@ -177,7 +234,7 @@ namespace Arrowgene.Ddon.Shared.Scripting
                 foreach (var filePath in Directory.GetFiles(path, "*.csx", SearchOption.AllDirectories))
                 {
                     var fileToCompile = filePath;
-                    if (ShouldIgnoreFile(fileToCompile))
+                    if (ShouldIgnoreFile(module, fileToCompile))
                     {
                         continue;
                     }
@@ -191,7 +248,11 @@ namespace Arrowgene.Ddon.Shared.Scripting
                     module.Scripts.Add(fileToCompile);
                     CompileScript(module, fileToCompile);
                 }
-            }
+            });
+
+#if DEBUG
+            WriteScriptHashesToFile();
+#endif
         }
 
         private void SetupFileWatchers()
@@ -244,16 +305,7 @@ namespace Arrowgene.Ddon.Shared.Scripting
 
         protected ScriptModule GetModuleFromFilePath(string path)
         {
-            ScriptModule module = null;
-            foreach (var m in ScriptModules.Values)
-            {
-                if (m.Scripts.Contains(path))
-                {
-                    module = m;
-                    break;
-                }
-            }
-            return module;
+            return ScriptModules.Values.FirstOrDefault(m => m.Scripts.Contains(path));
         }
 
         protected virtual void OnChanged(object sender, FileSystemEventArgs e)
@@ -263,7 +315,7 @@ namespace Arrowgene.Ddon.Shared.Scripting
                 return;
             }
 
-            if (ShouldIgnoreFile(e.FullPath))
+            if (ShouldIgnoreFile(null, e.FullPath))
             {
                 return;
             }
@@ -295,7 +347,7 @@ namespace Arrowgene.Ddon.Shared.Scripting
 
         private void OnCreate(object sender, FileSystemEventArgs e)
         {
-            if (ShouldIgnoreFile(e.FullPath))
+            if (ShouldIgnoreFile(null, e.FullPath))
             {
                 return;
             }
@@ -338,6 +390,57 @@ namespace Arrowgene.Ddon.Shared.Scripting
                 Logger.Error($"{ex.Message}");
                 Logger.Error($"Stacktrace:");
                 PrintException(ex.InnerException);
+            }
+        }
+
+        private void WriteScriptHashesToFile()
+        {
+            try
+            {
+                var hashes = ScriptHashes.Select(x => $"{x.Key},{x.Value.DllPath},{x.Value.Hash}").ToArray();
+                File.WriteAllLines(HashPath, hashes);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error when writing script hashes to file.");
+                Logger.Error(ex.ToString());
+            }
+        }
+
+        private bool RestoreScriptFromStoredDll(ScriptModule module, string path, string hash)
+        {
+            try
+            {
+                if (ScriptHashes.TryGetValue(path, out var pastResult))
+                {
+                    if (pastResult.Hash != hash)
+                    {
+                        return false;
+                    }
+
+                    ScriptProxy script = new(pastResult.DllPath);
+                    script.LoadAssembly();
+                    script.Execute(module, path);
+                    script.UnloadAssembly();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to restore stored DLL for '{path}', doing a fresh compilation.");
+                Logger.Error(ex.ToString());
+                return false;
+            }
+            return false;
+        }
+
+        private class ScriptHashReader : CsvReaderWriter<(string ScriptPath, string DllPath, string Hash)>
+        {
+            protected override int NumExpectedItems => 3;
+
+            protected override (string ScriptPath, string DllPath, string Hash) CreateInstance(string[] properties)
+            {
+                return (properties[0], properties[1], properties[2]);
             }
         }
     }

@@ -20,7 +20,10 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         public override S2CRecycleStartExchangeRes Handle(GameClient client, C2SRecycleStartExchangeReq request)
         {
-            var updateCharacterItemNtc = new S2CItemUpdateCharacterItemNtc();
+            var updateCharacterItemNtc = new S2CItemUpdateCharacterItemNtc()
+            {
+                UpdateType = ItemNoticeType.GetCraftProduct
+            };
             
             var equipmentRecycleMixin = Server.ScriptManager.MixinModule.Get<IEquipmentRecycleMixin>("equipment_recycle") ??
                 throw new ResponseErrorException(ErrorCode.ERROR_CODE_REQUIRED_SERVER_SCRIPT_MISSING, "Couldn't find an object for the script 'equipment_cycle.csx'");
@@ -34,7 +37,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_CLIENT_ITEM_INFO_MISSING, $"Unable to find item information for '{request.ItemUID}'");
 
                 var recycleRewards = equipmentRecycleMixin.GetRecycleRewards(Server.AssetRepository, itemInfo, item);
-                for (var i = 0; i < recycleRewards.NumRewards; i++)
+                for (var i = 0; i < Math.Min(recycleRewards.ItemRewards.Count, recycleRewards.NumRewards); i++)
                 {
                     var rolledSlot = Random.Shared.Next(0, recycleRewards.ItemRewards.Count);
                     var item = recycleRewards.ItemRewards[rolledSlot];
@@ -65,11 +68,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
             {
                 Unk0 = 0,
                 ItemUpdateResultList = updateCharacterItemNtc.UpdateItemList,
-                WalletPointList = updateCharacterItemNtc.UpdateWalletList.Select(x => new CDataWalletPoint()
+                WalletPointList = [.. updateCharacterItemNtc.UpdateWalletList.Select(x => new CDataWalletPoint()
                 {
                     Type = x.Type,
                     Value = x.Value
-                }).ToList(),
+                })],
             };
         }
     }

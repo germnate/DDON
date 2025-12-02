@@ -66,25 +66,6 @@ namespace Arrowgene.Ddon.Server.Settings
         private const uint _PartnerPawnAdventureDurationInSeconds = 1800;
 
         /// <summary>
-        /// Controls whether to pass lobby context packets on demand or only on entry to the server.
-        /// True = Server entry only. Lower packet load, but also causes invisible people in lobbies.
-        /// False = On-demand. May cause performance issues due to packet load.
-        /// </summary>
-        [DefaultValue(_NaiveLobbyContextHandling)]
-        public bool NaiveLobbyContextHandling
-        {
-            set
-            {
-                SetSetting("NaiveLobbyContextHandling", value);
-            }
-            get
-            {
-                return TryGetSetting("NaiveLobbyContextHandling", _NaiveLobbyContextHandling);
-            }
-        }
-        private const bool _NaiveLobbyContextHandling = true;
-
-        /// <summary>
         /// Determines the maximum amount of consumable items that can be crafted in one go with a pawn.
         /// The default is a value of 10 which is equivalent to the original game's behavior.
         /// </summary>
@@ -138,10 +119,12 @@ namespace Arrowgene.Ddon.Server.Settings
 
         /// <summary>
         /// Modifier used to skew the randomness during equipment unlimit.
-        /// Bias of 1.0 has a uniform distribution
-        /// Bias of 2.0 has a moderate bias towards lower numbers
-        /// Bias of 3.0 has a high bias towards lower numbers
-        /// Bias of 4.0 has an extreme bias towards lower numbers
+        ///
+        /// Example bias values (note that fractional amounts are also valid):
+        /// Bias of -1.0 Inverts the bias, favoring higher indices
+        /// Bias of 0.0 No bias, equal probabilty for all.
+        /// Bias of 1.0 Balanced bias towers lower indices
+        /// Bias of 2.0 strongly prefers lower indices
         /// </summary>
         [DefaultValue(_EquipmentLimitBreakBias)]
         public double EquipmentLimitBreakBias
@@ -155,7 +138,7 @@ namespace Arrowgene.Ddon.Server.Settings
                 return TryGetSetting("EquipmentLimitBreakBias", _EquipmentLimitBreakBias);
             }
         }
-        private const double _EquipmentLimitBreakBias = 3.0;
+        private const double _EquipmentLimitBreakBias = 1.5;
 
 
         /// <summary>
@@ -352,19 +335,23 @@ namespace Arrowgene.Ddon.Server.Settings
         /// Maximum level for each job. 
         /// Shared with the login server.
         /// Level caps based on season release
-        /// Season 1.0: 40
-        /// Season 1.1: 45
-        /// Season 1.2: 55
-        /// Season 1.3: 60
-        /// Season 2.0: 65
-        /// Season 2.1: 70
-        /// Season 2.2: 75
-        /// Season 2.3: 80
-        /// Season 3.0: 85
-        /// Season 3.1: 90
-        /// Season 3.2: 95
-        /// Season 3.3: 100
-        /// Season 3.4: 120
+        /// Alpha:        10
+        /// CBT           15
+        /// Season 1.0:   40
+        /// Season 1.1:   45
+        /// Season 1.2:   55
+        /// Season 1.3:   60
+        /// Season 2.0:   65
+        /// Season 2.1:   70
+        /// Season 2.2:   75
+        /// Season 2.3:   80
+        /// Season 3.0:   85
+        /// Season 3.1:   90
+        /// Season 3.2:   95
+        /// Season 3.3:  100
+        /// Season 3.41: 105
+        /// Season 3.42: 110
+        /// Season 3.43: 120
         /// </summary>
         [DefaultValue(_JobLevelMax)]
         public uint JobLevelMax
@@ -832,6 +819,58 @@ namespace Arrowgene.Ddon.Server.Settings
         }
 
         /// <summary>
+        /// Minimum price in G for a single item on the bazaar.
+        /// </summary>
+        [DefaultValue(_BazaarExhibitionMinPrice)]
+        public uint BazaarExhibitionMinPrice
+        {
+            set
+            {
+                SetSetting("BazaarExhibitionMinPrice", value);
+            }
+            get
+            {
+                return TryGetSetting("BazaarExhibitionMinPrice", _BazaarExhibitionMinPrice);
+            }
+        }
+        private const uint _BazaarExhibitionMinPrice = 1;
+
+        /// <summary>
+        /// Maximum price in G for a single item on the bazaar.
+        /// This ends up being interpreted as a signed integer by the client, so its capped at ~2 billion.
+        /// </summary>
+        [DefaultValue(_BazaarExhibitionMaxPrice)]
+        public uint BazaarExhibitionMaxPrice
+        {
+            set
+            {
+                SetSetting("BazaarExhibitionMaxPrice", value);
+            }
+            get
+            {
+                return TryGetSetting("BazaarExhibitionMaxPrice", _BazaarExhibitionMaxPrice);
+            }
+        }
+        private const uint _BazaarExhibitionMaxPrice = 99999;
+
+        /// <summary>
+        /// Number of items that can be included in a single exhibition on the bazaar.
+        /// </summary>
+        [DefaultValue(_BazaarExhibitionMaxItemNum)]
+        public ushort BazaarExhibitionMaxItemNum
+        {
+            set
+            {
+                SetSetting("BazaarExhibitionMaxItemNum", value);
+            }
+            get
+            {
+                return TryGetSetting("BazaarExhibitionMaxItemNum", _BazaarExhibitionMaxItemNum);
+            }
+        }
+        private const ushort _BazaarExhibitionMaxItemNum = 20;
+
+        /// <summary>
         /// Ties area rank progress to various paths to dungeons.
         /// </summary>
         [DefaultValue(_EnableAreaRankSpotLocks)]
@@ -846,24 +885,42 @@ namespace Arrowgene.Ddon.Server.Settings
                 return TryGetSetting("EnableAreaRankSpotLocks", _EnableAreaRankSpotLocks);
             }
         }
-        private const bool _EnableAreaRankSpotLocks = false;
+        private const bool _EnableAreaRankSpotLocks = true;
+
+        /// <summary>
+        /// Confgures the amount of AP to be rewarded when clearing an area or dungeon boss
+        /// in the normal game mode.
+        /// </summary>
+        [DefaultValue(_AreaBossApReward)]
+        public uint AreaBossApReward
+        {
+            set
+            {
+                SetSetting("AreaBossApReward", value);
+            }
+            get
+            {
+                return TryGetSetting("AreaBossApReward", _AreaBossApReward);
+            }
+        }
+        private const uint _AreaBossApReward = 500;
 
         /// <summary>
         /// Configures the chance that various gathering tools can break
         /// when the player performs a gathering action.
         /// </summary>
         [DefaultValue(@"new Dictionary<ItemId,double>
-        {
-            [ItemId.Pickaxe] = 0.3,
-            [ItemId.EnhancedPickaxe] = 0.2,
-            [ItemId.ArtisansPickaxe] = 0.1,
-            [ItemId.LumberKnife] = 0.3,
-            [ItemId.EnhancedLumberKnife] = 0.2,
-            [ItemId.ArtisansLumberKnife] = 0.1,
-            [ItemId.Lockpick] = 0.3,
-            [ItemId.EnhancedLockpick] = 0.2,
-            [ItemId.AllPurposeLockpick] = 0.1,
-        };")]
+{
+    [ItemId.Pickaxe] = 0.3,
+    [ItemId.EnhancedPickaxe] = 0.2,
+    [ItemId.ArtisansPickaxe] = 0.1,
+    [ItemId.LumberKnife] = 0.3,
+    [ItemId.EnhancedLumberKnife] = 0.2,
+    [ItemId.ArtisansLumberKnife] = 0.1,
+    [ItemId.Lockpick] = 0.3,
+    [ItemId.EnhancedLockpick] = 0.2,
+    [ItemId.AllPurposeLockpick] = 0.1,
+};")]
         public Dictionary<ItemId,double> ToolBreakChance
         {
             set
@@ -979,6 +1036,92 @@ namespace Arrowgene.Ddon.Server.Settings
             }
         }
         private const bool _EnableDefaultGatheringDrops = false;
+
+        /// <summary>
+        /// The amount of golden gemstones it costs to use the beauty parlor.
+        /// </summary>
+        [DefaultValue(_BeautyParlorGGPrice)]
+        public uint BeautyParlorGGPrice
+        {
+            set
+            {
+                SetSetting("BeautyParlorGGPrice", value);
+            }
+            get
+            {
+                return TryGetSetting("BeautyParlorGGPrice", _BeautyParlorGGPrice);
+            }
+        }
+        private const uint _BeautyParlorGGPrice = 5;
+
+        /// <summary>
+        /// The amount of silver tickets it costs to use the beauty parlor.
+        /// </summary>
+        [DefaultValue(_BeautyParlorSTPrice)]
+        public uint BeautyParlorSTPrice
+        {
+            set
+            {
+                SetSetting("BeautyParlorSTPrice", value);
+            }
+            get
+            {
+                return TryGetSetting("BeautyParlorSTPrice", _BeautyParlorSTPrice);
+            }
+        }
+        private const uint _BeautyParlorSTPrice = 200;
+
+        /// <summary>
+        /// The amount of golden gemstones it costs to use the reincarnation menu.
+        /// </summary>
+        [DefaultValue(_ReincarnationGGPrice)]
+        public uint ReincarnationGGPrice
+        {
+            set
+            {
+                SetSetting("ReincarnationGGPrice", value);
+            }
+            get
+            {
+                return TryGetSetting("ReincarnationGGPrice", _ReincarnationGGPrice);
+            }
+        }
+        private const uint _ReincarnationGGPrice = 5;
+
+        /// <summary>
+        /// Controls the relative weight of drop items to gathering items when generating delivery board quests.
+        /// Values less than 1 encourage gathering items, values greater than 1 encourage drop items.
+        /// </summary>
+        [DefaultValue(_LightQuestGenerationDropItemWeight)]
+        public double LightQuestGenerationDropItemWeight
+        {
+            set
+            {
+                SetSetting("LightQuestGenerationDropItemWeight", value);
+            }
+            get
+            {
+                return TryGetSetting("LightQuestGenerationDropItemWeight", _LightQuestGenerationDropItemWeight);
+            }
+        }
+        private const double _LightQuestGenerationDropItemWeight = 0.5;
+
+        /// <summary>
+        /// When generating light quests, controls the amount of attempts that will be made to meet restraints on level bounds and uniqueness.
+        /// </summary>
+        [DefaultValue(_LightQuestGenerationAttemptsPerQuest)]
+        public int LightQuestGenerationAttemptsPerQuest
+        {
+            set
+            {
+                SetSetting("LightQuestGenerationAttemptsPerQuest", value);
+            }
+            get
+            {
+                return TryGetSetting("LightQuestGenerationAttemptsPerQuest", _LightQuestGenerationAttemptsPerQuest);
+            }
+        }
+        private const int _LightQuestGenerationAttemptsPerQuest = 20;
 
         /// <summary>
         /// 
@@ -1320,5 +1463,305 @@ namespace Arrowgene.Ddon.Server.Settings
             }
         }
         private const string _UrlCompanionImage = "http://localhost:{52099}/";
+        
+        /// <summary>
+        /// How many pawns to consider for random sampling e.g. for clan hall pawns.
+        /// Specifically this affects how many rows of the DB should be considered for randomization.
+        /// 0 disables random pawns, which might cause undefined behavior, a minimum of 100 is advised.
+        /// Avoid very large values like Integer.MAX_VALUE to not degrade performance.
+        /// </summary>
+        [DefaultValue(_RandomPawnMaxSample)]
+        public uint RandomPawnMaxSample
+        {
+            set
+            {
+                SetSetting("RandomPawnMaxSample", value);
+            }
+            get
+            {
+                return TryGetSetting("RandomPawnMaxSample", _RandomPawnMaxSample);
+            }
+        }
+        private const uint _RandomPawnMaxSample = 10000;
+
+        /// <summary>
+        /// The bonus for Job Training kills with a Partner Pawn present.
+        /// Setting this to 0 effectively disables bonus kills with a Partner Pawn.
+        /// </summary>
+        [DefaultValue(_JobTrainingPartnerBonus)]
+        public uint JobTrainingPartnerBonus
+        {
+            set
+            {
+                SetSetting("JobTrainingPartnerBonus", value);
+            }
+            get
+            {
+                return TryGetSetting("JobTrainingPartnerBonus", _JobTrainingPartnerBonus);
+            }
+        }
+        private const uint _JobTrainingPartnerBonus = 1;
+
+        /// <summary>
+        /// Configures the amount BO that that 1 HO will convert to.
+        /// </summary>
+        [DefaultValue(_HighOrbConversionRate)]
+        public uint HighOrbConversionRate
+        {
+            set
+            {
+                SetSetting("HighOrbConversionRate", value);
+            }
+            get
+            {
+                return TryGetSetting("HighOrbConversionRate", _HighOrbConversionRate);
+            }
+        }
+        private const uint _HighOrbConversionRate = 100;
+
+        /// <summary>
+        /// Configures if the HO exchange is enabled or not.
+        /// @warning Current implementation is able to be exploited for infinite conversion.
+        /// </summary>
+        [DefaultValue(_EnableHighOrbConversion)]
+        public bool EnableHighOrbConversion
+        {
+            set
+            {
+                SetSetting("EnableHighOrbConversion", value);
+            }
+            get
+            {
+                return TryGetSetting("EnableHighOrbConversion", _EnableHighOrbConversion);
+            }
+        }
+        private const bool _EnableHighOrbConversion = false;
+
+        /// <summary>
+        /// When set to true, allows pawns to bypass Job Training requirements
+        /// and learn any skill or augment they otherwise meet the requirements of.
+        /// </summary>
+        [DefaultValue(_PawnSkipJobTraining)]
+        public bool PawnSkipJobTraining
+        {
+            set
+            {
+                SetSetting("PawnSkipJobTraining", value);
+            }
+            get
+            {
+                return TryGetSetting("PawnSkipJobTraining", _PawnSkipJobTraining);
+            }
+        }
+        private const bool _PawnSkipJobTraining = true;
+
+        /// <summary>
+        /// The number of adventure charges that a support pawn has when hired.
+        /// Other pieces of the UI seemingly expect this to be 10, but it may be more flexible.
+        /// </summary>
+        [DefaultValue(_RentalPawnAdventureCount)]
+        public byte RentalPawnAdventureCount
+        {
+            set
+            {
+                SetSetting("RentalPawnAdventureCount", value);
+            }
+            get
+            {
+                return TryGetSetting("RentalPawnAdventureCount", _RentalPawnAdventureCount);
+            }
+        }
+        private const byte _RentalPawnAdventureCount = 10;
+
+        /// <summary>
+        /// The number of crafting charges that a support pawn has when hired.
+        /// Other pieces of the UI seemingly expect this to be 5, but it may be more flexible.
+        /// </summary>
+        [DefaultValue(_RentalPawnCraftCount)]
+        public byte RentalPawnCraftCount
+        {
+            set
+            {
+                SetSetting("RentalPawnCraftCount", value);
+            }
+            get
+            {
+                return TryGetSetting("RentalPawnCraftCount", _RentalPawnCraftCount);
+            }
+        }
+        private const byte _RentalPawnCraftCount = 10;
+
+        /// <summary>
+        /// Time, in seconds, that a support pawn must be adventuring before it loses one of its adventuring charges.
+        /// By default, 1350 seconds = 22.5 minutes, or 6 hours Lestanian time.
+        /// </summary>
+        [DefaultValue(_RentalPawnAdventureTimer)]
+        public uint RentalPawnAdventureTimer
+        {
+            set
+            {
+                SetSetting("RentalPawnAdventureTimer", value);
+            }
+            get
+            {
+                return TryGetSetting("RentalPawnAdventureTimer", _RentalPawnAdventureTimer);
+            }
+        }
+        private const uint _RentalPawnAdventureTimer = 1350;
+
+        /// <summary>
+        /// If true, active rental pawn timers are automatically reset upon returning to a safe area, even if the instance wouldn't normally reset.
+        /// This is a QOL feature, since removing and readding them to the party would reset the timer anyways.
+        /// </summary>
+        [DefaultValue(_RentalPawnAdventureTimerAutoReset)]
+        public bool RentalPawnAdventureTimerAutoReset
+        {
+            set
+            {
+                SetSetting("RentalPawnAdventureTimerAutoReset", value);
+            }
+            get
+            {
+                return TryGetSetting("RentalPawnAdventureTimerAutoReset", _RentalPawnAdventureTimerAutoReset);
+            }
+        }
+        private const bool _RentalPawnAdventureTimerAutoReset = true;
+
+        /// <summary>
+        /// If true, rental pawns will consume an adventure charge when starting an EXM, but won't have their usual adventure timer running.
+        /// </summary>
+        [DefaultValue(_RentalPawnAdventureConsumeOnEXM)]
+        public bool RentalPawnAdventureConsumeOnEXM
+        {
+            set
+            {
+                SetSetting("RentalPawnAdventureConsumeOnEXM", value);
+            }
+            get
+            {
+                return TryGetSetting("RentalPawnAdventureConsumeOnEXM", _RentalPawnAdventureConsumeOnEXM);
+            }
+        }
+        private const bool _RentalPawnAdventureConsumeOnEXM = true;
+
+        /// <summary>
+        /// The number of rental points (RP), gained by renting and returning pawns, required to buy one JP for a pawn.
+        /// </summary>
+        [DefaultValue(_RentalPointConversionRate)]
+        public uint RentalPointConversionRate
+        {
+            set
+            {
+                SetSetting("RentalPointConversionRate", value);
+            }
+            get
+            {
+                return TryGetSetting("RentalPointConversionRate", _RentalPointConversionRate);
+            }
+        }
+        private const uint _RentalPointConversionRate = 10;
+
+        /// <summary>
+        /// The maximum number of effects that can be sealed in BBM using red marks.
+        /// </summary>
+        [DefaultValue(_DispelSealMax)]
+        public uint DispelSealMax
+        {
+            set
+            {
+                SetSetting("DispelSealMax", value);
+            }
+            get
+            {
+                return TryGetSetting("DispelSealMax", _DispelSealMax);
+            }
+        }
+        private const uint _DispelSealMax = 80;
+
+        /// <summary>
+        /// The base rate for each seal in BBM, paid using red marks.
+        /// The first seal costs N, the second seal costs 2N, the third 3N, and so on.
+        /// </summary>
+        [DefaultValue(_DispelSealCostRate)]
+        public uint DispelSealCostRate
+        {
+            set
+            {
+                SetSetting("DispelSealCostRate", value);
+            }
+            get
+            {
+                return TryGetSetting("DispelSealCostRate", _DispelSealCostRate);
+            }
+        }
+        private const uint _DispelSealCostRate = 2;
+
+        /// <summary>
+        /// The cost of resetting the seals in BBM, paid using red marks.
+        /// </summary>
+        [DefaultValue(_DispelSealResetRate)]
+        public uint DispelSealResetRate
+        {
+            set
+            {
+                SetSetting("DispelSealResetRate", value);
+            }
+            get
+            {
+                return TryGetSetting("DispelSealResetRate", _DispelSealResetRate);
+            }
+        }
+        private const uint _DispelSealResetRate = 500;
+
+        /// <summary>
+        /// The number of reset tickets given for BBM weekly.
+        /// </summary>
+        [DefaultValue(_BBMWeeklyResetTickets)]
+        public uint BBMWeeklyResetTickets
+        {
+            set
+            {
+                SetSetting("BBMWeeklyResetTickets", value);
+            }
+            get
+            {
+                return TryGetSetting("BBMWeeklyResetTickets", _BBMWeeklyResetTickets);
+            }
+        }
+        private const uint _BBMWeeklyResetTickets = 3;
+
+        /// <summary>
+        /// The maximum number of times you can reset BBM using GG, each week.
+        /// </summary>
+        [DefaultValue(_BBMWeeklyGGResets)]
+        public uint BBMWeeklyGGResets
+        {
+            set
+            {
+                SetSetting("BBMWeeklyGGResets", value);
+            }
+            get
+            {
+                return TryGetSetting("BBMWeeklyGGResets", _BBMWeeklyGGResets);
+            }
+        }
+        private const uint _BBMWeeklyGGResets = 6;
+
+        /// <summary>
+        /// The cost of resetting BBM using GG.
+        /// </summary>
+        [DefaultValue(_BBMResetGGCost)]
+        public uint BBMResetGGCost
+        {
+            set
+            {
+                SetSetting("BBMResetGGCost", value);
+            }
+            get
+            {
+                return TryGetSetting("BBMResetGGCost", _BBMResetGGCost);
+            }
+        }
+        private const uint _BBMResetGGCost = 1;
     }
 }

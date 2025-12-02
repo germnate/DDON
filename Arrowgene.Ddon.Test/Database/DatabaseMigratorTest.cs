@@ -9,6 +9,7 @@ using Arrowgene.Ddon.Shared.Model.BattleContent;
 using Arrowgene.Ddon.Shared.Model.Clan;
 using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Ddon.Shared.Model.Scheduler;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -182,9 +183,9 @@ namespace Arrowgene.Ddon.Test.Database
             action.Invoke(null); return true; 
         }
 
-        public int ExecuteNonQuery(DbConnection conn, string command, Action<DbCommand> action) { return 1; }
-        public void ExecuteReader(string command, Action<DbDataReader> action) {}
-        public void ExecuteReader(DbConnection conn, string sql, Action<DbCommand> commandAction, Action<DbDataReader> readAction) {}
+        public int ExecuteNonQuery(DbConnection conn, string command, Action<DbCommand> action, bool rethrowException = false) { return 1; }
+        public void ExecuteReader(string command, Action<DbDataReader> action, bool rethrowException = false) {}
+        public void ExecuteReader(DbConnection conn, string sql, Action<DbCommand> commandAction, Action<DbDataReader> readAction, bool rethrowException = false) {}
         public void ExecuteQuerySafe(DbConnection? connectionIn, Action<DbConnection> work) {}
         T IDatabase.ExecuteQuerySafe<T>(DbConnection? connectionIn, Func<DbConnection, T> work) { throw new NotImplementedException(); }
 
@@ -223,8 +224,10 @@ namespace Arrowgene.Ddon.Test.Database
         public bool DeleteToken(string token) { return true; }
         public bool DeleteTokenByAccountId(int accountId) { return true; }
         public bool DeleteWalletPoint(uint characterId, WalletType type) { return true; }
-        public void Execute(string sql) {}
-        public void Execute(DbConnection conn, string sql) {}
+        public DbConnection OpenNewConnection() { return null; }
+        public DbConnection OpenExistingConnection() { return null; }
+        public void Execute(string sql, bool rethrowException = false) {}
+        public void Execute(DbConnection conn, string sql, bool rethrowException = false) {}
         public List<BazaarExhibition> FetchCharacterBazaarExhibitions(uint characterId) { return new List<BazaarExhibition>(); }
         public CompletedQuest GetCompletedQuestsById(uint characterCommonId, QuestId questId, DbConnection? connectionIn = null) { return new CompletedQuest(); }
         public List<CompletedQuest> GetCompletedQuestsByType(uint characterCommonId, QuestType questType, DbConnection? connectionIn = null) { return new List<CompletedQuest>(); }
@@ -235,15 +238,14 @@ namespace Arrowgene.Ddon.Test.Database
         public List<QuestProgress> GetQuestProgressByType(uint characterCommonId, QuestType questType, DbConnection? connectionIn = null) { return new List<QuestProgress>(); }
         public ulong InsertBazaarExhibition(BazaarExhibition exhibition) { return 1; }
         public bool InsertBoxRewardItems(uint commonId, QuestBoxRewards rewards, DbConnection? connectionIn = null) { return true; }
-        public bool InsertCommunicationShortcut(uint characterId, CDataCommunicationShortCut communicationShortcut) { return true; }
+        public bool InsertCommunicationShortcut(uint characterId, CDataCommunicationShortCut communicationShortcut, DbConnection? connectionIn = null) { return true; }
         public bool InsertConnection(Connection connection) { return true; }
         public int InsertContact(uint requestingCharacterId, uint requestedCharacterId, ContactListStatus status, ContactListType type, bool requesterFavorite, bool requestedFavorite) { return 1; }
         public bool InsertEquipItem(uint commonId, JobId job, EquipType equipType, byte equipSlot, string itemUId) { return true; }
-        public bool InsertEquipJobItem(string itemUId, uint commonId, JobId job, ushort slotNo) { return true; }
         public bool InsertEquippedAbility(uint commonId, JobId equipptedToJob, byte slotNo, Ability ability) { return true; }
         public bool InsertEquippedCustomSkill(uint commonId, byte slotNo, CustomSkill skill) { return true; }
         public bool InsertGainExtendParam(uint commonId, CDataOrbGainExtendParam Param) { return true; }
-        public bool InsertIfNotExistCompletedQuest(uint characterCommonId, QuestId questId, QuestType questType, DbConnection? connectionIn = null) { return true; }
+        public bool InsertCompletedQuest(uint characterCommonId, QuestId questId, QuestType questType, DbConnection? connectionIn = null) { return true; }
         public bool InsertIfNotExistsDragonForceAugmentation(uint commonId, uint elementId, uint pageNo, uint groupNo, uint indexNo, DbConnection? connectionIn = null) { return true; }
         public bool InsertIfNotExistsNormalSkillParam(uint commonId, CDataNormalSkillParam normalSkillParam) { return true; }
         public bool InsertIfNotExistsPawnTrainingStatus(uint pawnId, JobId job, byte[] pawnTrainingStatus) { return true; }
@@ -254,9 +256,12 @@ namespace Arrowgene.Ddon.Test.Database
         public bool InsertNormalSkillParam(uint commonId, CDataNormalSkillParam normalSkillParam) { return true; }
         public bool InsertPawnTrainingStatus(uint pawnId, JobId job, byte[] pawnTrainingStatus) { return true; }
         public bool InsertPriorityQuest(uint characterCommonId, uint questScheduleId, DbConnection? connectionIn = null) { return true; }
+
+        public bool UpdateCompletedQuest(uint characterCommonId, QuestId questId, QuestType questType, uint count = 1, DbConnection? connectionIn = null) { return true;}
+
         public bool InsertQuestProgress(uint characterCommonId, uint questScheduleId, QuestType questType, uint step, DbConnection? connectionIn = null) { return true; }
         public bool InsertReleasedWarpPoint(uint characterId, ReleasedWarpPoint ReleasedWarpPoint) { return true; }
-        public bool InsertSecretAbilityUnlock(uint commonId, SecretAbility secretAbility, DbConnection? connectionIn = null) { return true; }
+        public bool InsertSecretAbilityUnlock(uint commonId, AbilityId secretAbility, DbConnection? connectionIn = null) { return true; }
         public bool InsertShortcut(uint characterId, CDataShortCut shortcut) { return true; }
         public CraftProgress SelectPawnCraftProgress(uint craftCharacterId, uint craftLeadPawnId, DbConnection? connectionIn = null) { return new CraftProgress(); }
         public bool InsertSpSkill(uint pawnId, JobId job, CDataSpSkill spSkill) { return true; }
@@ -267,7 +272,6 @@ namespace Arrowgene.Ddon.Test.Database
         public bool ReplaceCharacterJobData(uint commonId, CDataCharacterJobData replacedCharacterJobData, DbConnection? connectionIn = null) { return true; }
         public bool ReplaceCommunicationShortcut(uint characterId, CDataCommunicationShortCut communicationShortcut, DbConnection? connectionIn = null) { return true; }
         public bool ReplaceEquipItem(uint commonId, JobId job, EquipType equipType, byte equipSlot, string itemUId, DbConnection? connectionIn = null) { return true; }
-        public bool ReplaceEquipJobItem(string itemUId, uint commonId, JobId job, ushort slotNo) { return true; }
         public bool ReplaceEquippedAbilities(uint commonId, JobId equippedToJob, List<Ability> abilities) { return true; }
         public bool ReplaceEquippedAbility(uint commonId, JobId equipptedToJob, byte slotNo, Ability ability) { return true; }
         public bool ReplaceEquippedCustomSkill(uint commonId, byte slotNo, CustomSkill skill) { return true; }
@@ -283,7 +287,7 @@ namespace Arrowgene.Ddon.Test.Database
         public Account SelectAccountByName(string accountName) { return new Account(); }
         public List<BazaarExhibition> SelectActiveBazaarExhibitionsByItemIdExcludingOwn(uint itemId, uint excludedCharacterId, DbConnection? connectionIn = null) { return new List<BazaarExhibition>(); }
         public List<BazaarExhibition> SelectActiveBazaarExhibitionsByItemIdsExcludingOwn(List<uint> itemIds, uint excludedCharacterId, DbConnection? connectionIn = null) { return new List<BazaarExhibition>(); }
-        public List<SecretAbility> SelectAllUnlockedSecretAbilities(uint commonId) { return new List<SecretAbility>(); }
+        public List<AbilityId> SelectAllUnlockedSecretAbilities(uint commonId, DbConnection? connectionIn = null) { return new List<AbilityId>(); }
         public BazaarExhibition SelectBazaarExhibitionByBazaarId(ulong bazaarId) { return new BazaarExhibition(); }
         public List<QuestBoxRewards> SelectBoxRewardItems(uint commonId, DbConnection? connectionIn = null) { return new List<QuestBoxRewards>(); }
         public Character SelectCharacter(uint characterId, DbConnection? connectionIn = null) { return new Character(); }
@@ -297,6 +301,12 @@ namespace Arrowgene.Ddon.Test.Database
         public ContactListEntity SelectContactsByCharacterId(uint characterId1, uint characterId2) { return new ContactListEntity(); }
         public List<(ContactListEntity, CDataCharacterListElement)> SelectFullContactListByCharacterId(uint characterId, DbConnection? connectionIn = null) { return new(); }
         public Item SelectStorageItemByUId(string uId, DbConnection? connectionIn = null) { return new Item(); }
+
+        public bool InsertStorage(uint characterId, StorageType storageType, Storage storage, DbConnection? connectionIn = null) { return true; }
+        public bool UpdateStorage(uint characterId, StorageType storageType, Storage storage, DbConnection? connectionIn = null) { return true; }
+        public bool DeleteStorage(uint characterId, StorageType storageType, DbConnection? connectionIn = null) { return true; }
+        public bool ReplaceStorage(uint characterId, StorageType storageType, Storage storage, DbConnection? connectionIn = null) { return true; }
+
         public List<CDataNormalSkillParam> SelectNormalSkillParam(uint commonId, JobId job) { return new List<CDataNormalSkillParam>(); }
         public CDataOrbGainExtendParam SelectOrbGainExtendParam(uint commonId, DbConnection? connectionIn = null) { return new CDataOrbGainExtendParam(); }
         public List<CDataReleaseOrbElement> SelectOrbReleaseElementFromDragonForceAugmentation(uint commonId, DbConnection? connectionIn = null) { return new List<CDataReleaseOrbElement>(); }
@@ -312,12 +322,12 @@ namespace Arrowgene.Ddon.Test.Database
         public bool SetToken(GameToken token) { return true; }
         public bool UpdateAccount(Account account) { return true; }
         public int UpdateBazaarExhibiton(BazaarExhibition exhibition) { return 1; }
-        public bool UpdateCharacterArisenProfile(Character character) { return true; }
+        public bool UpdateCharacterProfile(CharacterCommon characterCommon, DbConnection? connectionIn = null) { return true; }
         public bool UpdateCharacterBaseInfo(Character character) { return true; }
         public bool UpdateCharacterCommonBaseInfo(CharacterCommon common, DbConnection? connectionIn = null) { return true; }
         public bool UpdateCharacterJobData(uint commonId, CDataCharacterJobData updatedCharacterJobData, DbConnection? connectionIn = null) { return true; }
         public bool UpdateCharacterMatchingProfile(Character character) { return true; }
-        public bool UpdateCommunicationShortcut(uint characterId, uint oldPageNo, uint oldButtonNo, CDataCommunicationShortCut updatedCommunicationShortcut) { return true; }
+        public bool UpdateCommunicationShortcut(uint characterId, uint oldPageNo, uint oldButtonNo, CDataCommunicationShortCut updatedCommunicationShortcut, DbConnection? connectionIn = null) { return true; }
         public int UpdateContact(uint requestingCharacterId, uint requestedCharacterId, ContactListStatus status, ContactListType type, bool requesterFavorite, bool requestedFavorite) { return 1; }
         public bool UpdateEditInfo(CharacterCommon character) { return true; }
         public bool UpdateEquipItem(uint commonId, JobId job, EquipType equipType, byte equipSlot, string itemUId) { return true; }
@@ -332,7 +342,6 @@ namespace Arrowgene.Ddon.Test.Database
         public bool ReplacePawnReaction(uint pawnId, CDataPawnReaction pawnReaction, DbConnection? connectionIn = null) { return true; }
         public bool ReplacePawnCraftProgress(CraftProgress craftProgress, DbConnection? connectionIn = null) { return true; }
         public bool InsertPawnCraftProgress(CraftProgress craftProgress, DbConnection? connectionIn = null) { return true; }
-        public bool InsertIfNotExistsPawnCraftProgress(CraftProgress craftProgress, DbConnection? connectionIn = null) { return true; }
         public bool UpdatePawnCraftProgress(CraftProgress craftProgress, DbConnection? connectionIn = null) { return true; }
         public bool DeletePawnCraftProgress(uint craftCharacterId, uint craftLeadPawnId, DbConnection? connectionIn = null) { return true; }
         public bool UpdateQuestProgress(uint characterCommonId, uint questScheduleId, QuestType questType, uint step, DbConnection? connectionIn = null) { return true; }
@@ -358,17 +367,13 @@ namespace Arrowgene.Ddon.Test.Database
         public bool UpdateSystemMailAttachmentReceivedStatus(ulong messageId, ulong attachmentId, bool isReceived) {  return true; }
         public bool DeleteSystemMailAttachment(ulong messageId) { return true; }
         public bool UpdateItemEquipPoints(string itemUID, uint equipPoints, DbConnection? connectionIn = null) {return true; }
-        public bool InsertIfNotExistsAddStatus(string itemUid, uint characterId, byte isAddStat1, byte isAddStat2, ushort addStat1, ushort addStat2) { return true; }
-        public bool InsertAddStatus(string itemUid, uint characterId, byte isAddStat1, byte isAddStat2, ushort addStat1, ushort addStat2) { return true; }
-        public List<CDataAddStatusParam> GetAddStatusByUID(string itemUid) { return new List<CDataAddStatusParam>(); }
-        public bool UpdateAddStatus(string itemUid, uint characterId, byte isAddStat1, byte isAddStat2, ushort addStat1, ushort addStat2) { return true; }
         public bool ReplaceCharacterPlayPointData(uint id, CDataJobPlayPoint updatedCharacterPlayPointData, DbConnection? connectionIn = null) { return true; }
         public bool UpdateCharacterPlayPointData(uint id, CDataJobPlayPoint updatedCharacterPlayPointData, DbConnection? connectionIn = null) { return true; }
         public bool InsertCharacterStampData(uint id, CharacterStampBonus stampData) { return true; }
         public bool UpdateCharacterStampData(uint id, CharacterStampBonus stampData) { return true; }
         public bool InsertCrest(uint characterCommonId, string itemUId, uint slot, uint crestId, uint crestAmount, DbConnection? connectionIn = null) { return true; }
-        public bool UpdateCrest(uint characterCommonId, string itemUId, uint slot, uint crestId, uint crestAmount) { return true; }
-        public bool RemoveCrest(uint characterCommonId, string itemUId, uint slot) { return true; }
+        public bool UpdateCrest(uint characterCommonId, string itemUId, uint slot, uint crestId, uint crestAmount, DbConnection? ConnectionIn = null) { return true; }
+        public bool RemoveCrest(uint characterCommonId, string itemUId, uint slot, DbConnection? connectionIn = null) { return true; }
         public List<Crest> GetCrests(uint characterCommonId, string itemUId) { return new List<Crest>(); }
         public bool ReplaceAbilityPreset(uint characterId, CDataPresetAbilityParam preset) {return true; }
         public bool UpdateAbilityPreset(uint characterId, CDataPresetAbilityParam preset) { return true; }
@@ -380,17 +385,19 @@ namespace Arrowgene.Ddon.Test.Database
         public bool UpdateBBMProgress(uint characterId, BitterblackMazeProgress progress, DbConnection? connectionIn = null) { return true; }
         public bool RemoveBBMProgress(uint characterId) { return true; }
         public BitterblackMazeProgress SelectBBMProgress(uint characterId) { return new BitterblackMazeProgress(); }
-        public bool InsertBBMRewards(uint characterId, uint goldMarks, uint silverMarks, uint redMarks) { return true; }
-        public bool UpdateBBMRewards(uint characterId, BitterblackMazeRewards rewards, DbConnection? connectionIn = null) { return true; }
-        public bool RemoveBBMRewards(uint characterId) { return true; }
-        public BitterblackMazeRewards SelectBBMRewards(uint characterId, DbConnection? connectionIn = null) { return new BitterblackMazeRewards(); }
-        public bool InsertBBMContentTreasure(uint characterId, BitterblackMazeTreasure treasure, DbConnection? connectionIn = null) { return true; }
-        public bool InsertBBMContentTreasure(uint characterId, uint contentId, uint amount, DbConnection? connectionIn = null) { return true; }
-        public bool UpdateBBMContentTreasure(uint characterId, BitterblackMazeTreasure treasure) { return true; }
-        public bool UpdateBBMContentTreasure(uint characterId, uint contentId, uint amount) { return true; }
-        public bool RemoveBBMContentTreasure(uint characterId) { return true; }
+        public bool InsertBBMRewards(uint characterId, uint goldMarks, uint silverMarks, uint redMarks, uint stageId, DbConnection? connectionIn = null) { return true; }
+        public bool UpdateBBMRewards(uint characterId, BitterblackMazeMarkRewards rewards, DbConnection? connectionIn = null) { return true; }
+        public bool RemoveBBMRewards(uint characterId, DbConnection? connectionIn = null) { return true; }
+        public Dictionary<uint, BitterblackMazeMarkRewards> SelectBBMRewards(uint characterId, DbConnection? connectionIn = null) { return new(); }
+        public bool ResetBBMResetTicketStatus(DbConnection? connectionIn = null) { return true; }
+        public bool InsertBBMResetTicketStatus(uint characterId, DbConnection? connectionIn = null) { return true; }
+        public uint SelectBBMGGReset(uint characterId, DbConnection? connectionIn = null) { return 0; }
+        public bool InsertBBMGGReset(uint characterId, DbConnection? connectionIn = null) { return true; }
+        public bool ResetBBMGGReset(DbConnection? connectionIn = null) { return true; }
+        public bool InsertBBMContentTreasure(uint characterId, uint stageId, uint groupId, uint index, DbConnection? connectionIn = null) { return true; }
+        public bool RemoveBBMContentTreasure(uint characterId, DbConnection? connectionIn = null) { return true; }
         public List<BitterblackMazeTreasure> SelectBBMContentTreasure(uint characterId, DbConnection? connectionIn = null) { return new List<BitterblackMazeTreasure>(); }
-        public List<uint> SelectOfficialPawns() { return new List<uint>(); }
+        public List<uint> SelectOfficialPawns(DbConnection? connectionIn = null) { return []; }
         public List<uint> SelectAllPlayerPawns(uint limit = 100) { return new List<uint>(); }
         public List<uint> SelectAllPlayerPawns(DbConnection connection, uint limit = 100) { return new List<uint>(); }
         public List<uint> SelectClanPawns(uint clanId, uint characterId = 0, uint limit = 100, DbConnection? connectionIn = null) { return new(); }
@@ -416,6 +423,7 @@ namespace Arrowgene.Ddon.Test.Database
         public List<(byte Type, uint Id)> SelectClanBaseCustomizations(uint clanId, DbConnection? connectionIn = null) { return new(); }
         public bool InsertOrUpdateClanBaseCustomization(uint clanId, byte type, uint furnitureId, DbConnection? connectionIn = null) { return true; }
         public bool DeleteClanBaseCustomization(uint clanId, byte type, DbConnection? connectionIn = null) { return true; }
+        public List<CDataClanSearchResult> SearchClans(CDataClanSearchParam param, DbConnection? connectionIn = null) { return new(); }
 
         public bool InsertEpitaphRoadUnlock(uint characterId, uint epitaphId, DbConnection? connectionIn = null) { return true; }
         public HashSet<uint> GetEpitaphRoadUnlocks(uint characterId, DbConnection? connectionIn = null) { return new(); }
@@ -424,8 +432,7 @@ namespace Arrowgene.Ddon.Test.Database
 
         public Dictionary<TaskType, SchedulerTaskEntry> SelectAllTaskEntries() { return new(); }
         public bool UpdateScheduleInfo(TaskType type, long timestamp) { return true; }
-        public List<CDataRegisterdPawnList> SelectRegisteredPawns(Character searchingCharacter, CDataPawnSearchParameter searchParams) { return new List<CDataRegisterdPawnList>(); }
-        public List<CDataRegisterdPawnList> SelectRegisteredPawns(DbConnection conn, Character searchingCharacter, CDataPawnSearchParameter searchParams) { return new List<CDataRegisterdPawnList>(); }
+        public List<CDataRegisterdPawnList> SelectRegisteredPawns(Character searchingCharacter, CDataPawnSearchParameter searchParams, DbConnection? connectionIn = null) { return new List<CDataRegisterdPawnList>(); }
         public void DeleteWeeklyEpitaphClaimedRewards(DbConnection? connectionIn = null) { }
         public bool InsertAreaRank(uint characterId, AreaRank areaRank, DbConnection? connectionIn = null) { return true; }
         public bool UpdateAreaRank(uint characterId, AreaRank areaRank, DbConnection? connectionIn = null) { return true; }
@@ -465,8 +472,6 @@ namespace Arrowgene.Ddon.Test.Database
         public void ResetRecyleEquipmentRecords(DbConnection? connectionIn = null) { }
         public bool UpsertRecycleEquipmentRecord(uint characterId, byte numAttempts, DbConnection? connectionIn = null) { return true; }
 
-        public bool InsertEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null) { return true; }
-        public bool UpdateEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null) { return true; }
         public bool HasEquipmentLimitBreakRecord(uint characterId, string itemUID, DbConnection? connectionIn = null) { return true; }
         public bool UpsertEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null) { return true; }
         public List<CDataAddStatusParam> GetEquipmentLimitBreakRecord(string itemUID, DbConnection? connectionIn = null) { return new(); }
@@ -483,6 +488,56 @@ namespace Arrowgene.Ddon.Test.Database
         public Dictionary<ItemId, byte> SelectMyRoomCustomization(uint characterId, DbConnection? connectionIn = null) { return new(); }
         public bool UpsertMyRoomCustomization(uint characterId, byte layoutId, uint itemId, DbConnection? connectionIn = null) { return true; }
         public bool DeleteMyRoomCustomization(uint characterId, uint itemId, DbConnection? connectionIn = null) { return true; }
+        public void Stop() { }
+
+        public bool InsertJobMasterReleasedElement(uint characterId, JobId jobId, CDataReleaseElement releasedElement, DbConnection? connectionIn = null) { return true; }
+        public bool HasJobMasterReleasedElement(uint characterId, JobId jobId, CDataReleaseElement releasedElement, DbConnection? connectionIn = null) { return true; }
+        public CDataReleaseElement GetJobMasterReleasedElement(uint characterId, JobId jobId, CDataReleaseElement releasedElement, DbConnection? connectionIn = null) { return new(); }
+        public List<CDataReleaseElement> GetJobMasterReleasedElements(uint characterId, JobId jobId, DbConnection? connectionIn = null) { return new(); }
+
+        public bool InsertJobMasterActiveOrder(uint characterId, JobId jobId, CDataActiveJobOrder activeJobOrder, DbConnection? connectionIn = null) { return true; }
+        public bool UpdateJobMasterActiveOrder(uint characterId, JobId jobId, CDataActiveJobOrder activeJobOrder, DbConnection? connectionIn = null) { return true; }
+        public bool HasJobMasterActiveOrder(uint characterId, JobId jobId, CDataActiveJobOrder activeJobOrder, DbConnection? connectionIn = null) { return true; }
+        public bool UpsertJobMasterActiveOrder(uint characterId, JobId jobId, CDataActiveJobOrder activeJobOrder, DbConnection? connectionIn = null) { return true; }
+        public CDataActiveJobOrder GetJobMasterActiveOrder(uint characterId, JobId jobId, CDataActiveJobOrder activeJobOrder, DbConnection? connectionIn = null) { return new(); }
+        public List<CDataActiveJobOrder> GetJobMasterActiveOrders(uint characterId, JobId jobId, DbConnection? connectionIn = null) { return new(); }
+        public bool DeleteJobMasterActiveOrder(uint characterId, JobId jobId, CDataActiveJobOrder activeJobOrder, DbConnection? connectionIn = null) { return true; }
+
+        public bool InsertJobMasterActiveOrderProgress(uint characterId, JobId jobId, ReleaseType releaseType, uint releaseId, CDataJobOrderProgress jobOrderProgress, DbConnection? connectionIn = null) { return true; }
+        public bool UpdateJobMasterActiveOrderProgress(uint characterId, JobId jobId, ReleaseType releaseType, uint releaseId, CDataJobOrderProgress jobOrderProgress, DbConnection? connectionIn = null) { return true; }
+        public bool HasJobMasterActiveOrderProgress(uint characterId, JobId jobId, ReleaseType releaseType, uint releaseId, CDataJobOrderProgress jobOrderProgress, DbConnection? connectionIn = null) { return true; }
+        public bool UpsertJobMasterActiveOrdersProgress(uint characterId, JobId jobId, ReleaseType releaseType, uint releaseId, CDataJobOrderProgress jobOrderProgress, DbConnection? connectionIn = null) { return true; }
+        public List<CDataJobOrderProgress> GetJobMasterActiveOrderProgress(uint characterId, JobId jobId, ReleaseType releaseType, uint releaseId, DbConnection? connectionIn = null) { return new(); }
+
+        public bool InsertSkillAugmentationReleasedElement(uint characterId, OrbTreeType orbTreeType, JobId jobId, uint releaseId, DbConnection? connectionIn = null) { return true; }
+        public HashSet<uint> GetSkillAugmentationReleasedElements(uint characterId, JobId jobId, DbConnection? connectionIn = null) { return new(); }
+
+        public bool UpsertJobEmblemData(uint characterId, JobEmblem jobEmblem, DbConnection? connectionIn = null) { return true; }
+        public JobEmblem GetJobEmblemData(uint characterId, JobId jobId, DbConnection? connectionIn = null) { return new(); }
+        public List<JobEmblem> GetAllJobEmblemData(uint characterId, DbConnection? connectionIn = null) { return new(); }
+
+        public bool InsertLightQuestRecord(LightQuestRecord lightQuestRecord, DbConnection? connectionIn = null) { return true; }
+        public List<LightQuestRecord> SelectLightQuestRecords(DbConnection? connectionIn = null) { return new(); }
+        public bool DeleteLightQuestRecord(uint scheduleId, DbConnection? connectionIn = null) { return true; }
+
+        public bool InsertPawnFavorite(uint characterId, uint pawnId, DbConnection? connectionIn = null) { return true; }
+        public bool DeletePawnFavorite(uint characterId, uint pawnId, DbConnection? connectionIn = null) { return true; }
+        public HashSet<uint> GetPawnFavorites(uint characterId, DbConnection? connectionIn = null) { return new(); }
+
+        public List<RentalPawn> SelectRentalPawns(uint characterId, DbConnection? connectionIn = null) { return new(); }
+        public bool InsertRentalPawn(uint characterId, RentalPawnRecord record, byte adventureCount, byte craftCount, DbConnection? connectionIn = null) { return true; }
+        public bool UpdateRentalPawn(uint characterId, RentalPawn pawn, DbConnection? connectionIn = null) { return true; }
+        public bool DeleteRentalPawn(uint characterId, uint pawnId, DbConnection? connectionIn = null) { return true; }
+        public CDataCommunityCharacterBaseInfo SelectCommunityCharacterBaseInfo(uint characterId, DbConnection? connectionIn = null) { return new(); }
+        public bool InsertRentalPawnFeedback(uint characterId, RentalPawn pawn, List<CDataPawnFeedback> pawnFeedbacks, DbConnection? connectionIn = null) { return true; }
+        public List<CDataPawnHistory> SelectPawnHistory(uint pawnId, DbConnection? connectionIn = null) { return []; }
+        public CDataPawnTotalScore SelectPawnTotalScore(uint pawnId, DbConnection? connectionIn = null) { return new(); }
+
+        public HashSet<uint> SelectDispelSeals(uint characterId, DbConnection? connectionIn = null) { return []; }
+        public bool InsertDispelSeal(uint characterId, uint sealIndex, DbConnection? connectionIn = null) { return true; }
+        public bool DeleteDispelSeal(uint characterId, uint sealIndex, DbConnection? connectionIn = null) { return true; }
+
+        public bool UpsertEquipJobItem(string itemUId, uint commonId, JobId job, ushort slotNo, DbConnection? connectionIn = null) { return true; }
 
         public void AddParameter(DbCommand command, string name, object? value, DbType type) { }
         public void AddParameter(DbCommand command, string name, string value) { }
@@ -515,6 +570,7 @@ namespace Arrowgene.Ddon.Test.Database
         public uint From { get; set; }
 
         public uint To { get; set; }
+        public bool DisableTransaction { get; }
 
         public bool Called { get; private set; } = false;
         public uint CallOrder { get; private set; }

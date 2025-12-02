@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
@@ -9,6 +6,9 @@ using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.Craft;
 using Arrowgene.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -28,7 +28,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             var (storageType, itemProps) = client.Character.Storage.FindItemByUIdInStorage(ItemManager.EquipmentStorages, request.EquipItemUId);
             var (slotNo, item, amount) = itemProps;
 
-            ClientItemInfo clientItemInfo = ClientItemInfo.GetInfoForItemId(Server.AssetRepository.ClientItemInfos, item.ItemId);
+            ClientItemInfo clientItemInfo = Server.AssetRepository.ClientItemInfos[item.ItemId];
             var result = new S2CCraftStartAttachElementRes();
 
             ushort relativeSlotNo = slotNo;
@@ -63,7 +63,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
             {
                 foreach (var element in request.CraftElementList)
                 {
-                    uint crestId = Server.ItemManager.LookupItemByUID(Server, element.ItemUId);
+                    var crestId = client.Character.Storage.FindItemByUIdInStorage(ItemManager.AllItemStorages, element.ItemUId)?.Item2.Item2.ItemId
+                        ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_NOT_FOUND, $"Could not find item {element.ItemUId}.");
 
                     Server.Database.InsertCrest(client.Character.CommonId, request.EquipItemUId, element.SlotNo, crestId, 0, connection);
                     result.EquipElementParamList.Add(new CDataEquipElementParam()
@@ -82,13 +83,20 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     updateCharacterItemNtc.UpdateItemList.AddRange(Server.ItemManager.ConsumeItemByUIdFromMultipleStorages(Server, client.Character, ItemManager.BothStorageTypes, element.ItemUId, 1, connection));
                 }
 
-
                 Pawn leadPawn = Server.CraftManager.FindPawn(client, request.CraftMainPawnId);
-                List<CraftPawn> craftPawns = new()
+                List<CraftPawn> craftPawns =
+                [
+                    new CraftPawn(leadPawn, CraftPosition.Leader),
+                    .. request.CraftSupportPawnIDList.Select(p => new CraftPawn(Server.CraftManager.FindPawn(client, p.PawnId), CraftPosition.Assistant)),
+                ];
+
+                foreach(CraftPawn p in craftPawns)
                 {
-                    new CraftPawn(leadPawn, CraftPosition.Leader)
-                };
-                craftPawns.AddRange(request.CraftSupportPawnIDList.Select(p => new CraftPawn(Server.CraftManager.FindPawn(client, p.PawnId), CraftPosition.Assistant)));
+                    if (p.Pawn is RentalPawn rentalPawn)
+                    {
+                        Server.RentalPawnManager.HandleCraftCountDecrement(rentalPawn, connection);
+                    }
+                }
 
                 uint cost = Server.CraftManager.CalculateRecipeCost(totalCost, clientItemInfo, craftPawns);
                 updateCharacterItemNtc.UpdateType = ItemNoticeType.StartAttachElement;

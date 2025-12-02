@@ -1,10 +1,7 @@
-using System.Linq;
-using Arrowgene.Ddon.GameServer.Party;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Model;
-using Arrowgene.Ddon.Shared.Network;
 using Arrowgene.Logging;
 
 namespace Arrowgene.Ddon.GameServer.Handler
@@ -21,14 +18,15 @@ namespace Arrowgene.Ddon.GameServer.Handler
         {
             PacketQueue queue = new();
 
-            Pawn pawn = client.Character.PawnById(request.PawnId, PawnType.Support);
-            // TODO: Decrement by one the rented pawn's adventure count
+            RentalPawn pawn = (RentalPawn)client.Character.PawnById(request.PawnId, PawnType.Support);
+
+            queue.AddRange(Server.RentalPawnManager.HandleAdventureCountDecrement(client, pawn));
 
             S2CPawnRentalPawnLostNtc ntc = new S2CPawnRentalPawnLostNtc()
             {
                 PawnId = pawn.PawnId,
                 PawnName = pawn.Name,
-                AdventureCount = 5
+                AdventureCount = pawn.AdventureCount
             };
             client.Party.EnqueueToAll(ntc, queue);
 
@@ -36,19 +34,19 @@ namespace Arrowgene.Ddon.GameServer.Handler
             {
                 PawnId = pawn.PawnId,
                 PawnName = pawn.Name,
-                AdventureCount = 5
+                AdventureCount = pawn.AdventureCount
             }, queue);
 
-            int pawnIndex = client.Party.Members.FindIndex(x => x is PawnPartyMember xpawn && xpawn.PawnId == request.PawnId);
-            if (pawnIndex >= 0)
+            var pawnMember = client.Party.GetPartyMemberByCharacter(pawn);
+            if (pawnMember is not null)
             {
                 // Handle serverside tracking. C2SPawnPawnLostReq is only sent to the owner, and only they can kick their own pawn, so it works out.
-                client.Party.Kick(client, (byte)pawnIndex);
+                client.Party.Kick(client, (byte)pawnMember.MemberIndex);
 
                 // Free up the party slot so that the client allows new invites, if there are less than 4 people remaining.
-                client.Party.EnqueueToAll(new S2CPartyPartyMemberKickNtc()
+                client.Party.EnqueueToAll(new S2CPartyPartyMemberLostNtc()
                 {
-                    MemberIndex = (byte)pawnIndex
+                    MemberIndex = (byte)pawnMember.MemberIndex
                 }, queue);
             }
 

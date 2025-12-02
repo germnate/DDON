@@ -1,4 +1,5 @@
 using Arrowgene.Buffers;
+using System;
 
 namespace Arrowgene.Ddon.Shared.Entity.Structure
 {
@@ -10,13 +11,13 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
         }
     
         public uint PawnId { get; set; }
-        public CDataCommunityCharacterBaseInfo DebtorBaseInfo { get; set; }
-        public ulong ReturnDate { get; set; }
-        public ulong AdventureTime { get; set; }
+        public CDataCommunityCharacterBaseInfo DebtorBaseInfo { get; set; } = new();
+        public DateTimeOffset ReturnDate { get; set; }
+        public TimeSpan AdventureTime { get; set; }
         public byte AdventureCount { get; set; }
         public byte CraftCount { get; set; }
         public uint KillEnemyNum { get; set; }
-        public CDataPawnFeedback PawnFeedback { get; set; }
+        public CDataPawnFeedback PawnFeedback { get; set; } = new();
     
         public class Serializer : EntitySerializer<CDataPawnHistory>
         {
@@ -24,8 +25,8 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
             {
                 WriteUInt32(buffer, obj.PawnId);
                 WriteEntity<CDataCommunityCharacterBaseInfo>(buffer, obj.DebtorBaseInfo);
-                WriteUInt64(buffer, obj.ReturnDate);
-                WriteUInt64(buffer, obj.AdventureTime);
+                WriteInt64(buffer, obj.ReturnDate.ToUnixTimeSeconds());
+                WriteInt64(buffer, (long)obj.AdventureTime.TotalSeconds);
                 WriteByte(buffer, obj.AdventureCount);
                 WriteByte(buffer, obj.CraftCount);
                 WriteUInt32(buffer, obj.KillEnemyNum);
@@ -37,8 +38,8 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
                 CDataPawnHistory obj = new CDataPawnHistory();
                 obj.PawnId = ReadUInt32(buffer);
                 obj.DebtorBaseInfo = ReadEntity<CDataCommunityCharacterBaseInfo>(buffer);
-                obj.ReturnDate = ReadUInt64(buffer);
-                obj.AdventureTime = ReadUInt64(buffer);
+                obj.ReturnDate = DateTimeOffset.FromUnixTimeSeconds(ReadInt64(buffer));
+                obj.AdventureTime = TimeSpan.FromSeconds(ReadInt64(buffer));
                 obj.AdventureCount = ReadByte(buffer);
                 obj.CraftCount = ReadByte(buffer);
                 obj.KillEnemyNum = ReadUInt32(buffer);

@@ -1,3 +1,4 @@
+using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.GameServer.Party;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
@@ -87,8 +88,8 @@ namespace Arrowgene.Ddon.GameServer.Chat
         
         public void SendTellMessage(GameClient sender, GameClient receiver, C2SChatSendTellMsgReq request)
         {
-            var senderCharacterInfo = sender.Character.GetCommunityCharacterBaseInfo();
-            var receiverCharacterInfo = receiver.Character.GetCommunityCharacterBaseInfo();
+            var senderCharacterInfo = sender.Character.CDataCommunityCharacterBaseInfo;
+            var receiverCharacterInfo = receiver.Character.CDataCommunityCharacterBaseInfo;
             ChatResponse senderChatResponse = GetTellChatResponse(senderCharacterInfo.CharacterId, receiverCharacterInfo, request);
             senderChatResponse.Recipients.Add(sender);
             ChatResponse receiverChatResponse = GetTellChatResponse(senderCharacterInfo.CharacterId, senderCharacterInfo, request);
@@ -165,8 +166,39 @@ namespace Arrowgene.Ddon.GameServer.Chat
             switch (response.Type)
             {
                 case LobbyChatMsgType.Say:
+                    // Quick-chats are local/party-shared.
+                    if (response.MessageFlavor > 0)
+                    {
+                        HashSet<GameClient> recipients;
+                        if (StageManager.IsHubArea(client.Character.Stage))
+                        {
+                            recipients = [.. (client.Party?.Clients ?? [])
+                                .Union(
+                                    _Server.ClientLookup.GetAll()
+                                    .Where(x => x.Character?.StageNo == client.Character?.StageNo)
+                                )];
+                        }
+                        else
+                        {
+                            recipients = [.. client.Party?.Clients ?? []];
+                        }
+                            
+                        response.Recipients.AddRange(recipients);
+                        break;
+                    }
+                    else
+                    {
+                        response.Recipients.AddRange(_Server.ClientLookup.GetAll());
+                        break;
+                    }
                 case LobbyChatMsgType.Shout:
                     response.Recipients.AddRange(_Server.ClientLookup.GetAll());
+
+                    if (_Server.GameSettings.ChatCommandsSettings.CrossChannelShout)
+                    {
+                        _Server.RpcManager.AnnounceShoutChat(client, response);
+                    }
+
                     break;
                 case LobbyChatMsgType.Party:
                     PartyGroup party = client.Party;
@@ -183,7 +215,7 @@ namespace Arrowgene.Ddon.GameServer.Chat
                     }
 
                     response.Recipients.AddRange(_Server.ClientLookup.GetAll().Where(
-                        x => x.Character != null 
+                        x => x.Character != null
                         && client.Character != null
                         && x.Character.ClanId == client.Character.ClanId)
                     );
@@ -193,7 +225,7 @@ namespace Arrowgene.Ddon.GameServer.Chat
                 default:
                     response.Recipients.Add(client);
                     break;
-            }
+                }
 
             Send(response);
         }

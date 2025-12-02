@@ -1,9 +1,8 @@
-using System.Collections.Generic;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
-using Arrowgene.Ddon.Shared.Network;
 using Arrowgene.Logging;
+using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -17,9 +16,22 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         public override S2CEquipGetCraftLockedElementListRes Handle(GameClient client, C2SEquipGetCraftLockedElementListReq request)
         {
-            S2CEquipGetCraftLockedElementListRes res = new S2CEquipGetCraftLockedElementListRes();
-            
-            //TODO: Add list of items whose quality is locked, i.e. crests can not be destroyed and quality can not be upgraded
+            // TODO: Does this need to be ALL storages?
+            S2CEquipGetCraftLockedElementListRes res = new()
+            {
+                LockedElementList = [.. client.Character.Storage
+                    .GetAllStorages()
+                    .Values
+                    .SelectMany(storage =>
+                        storage.Items
+                            .Where(item => item is not null && item.Item1.SafetySetting > 0)
+                            .Select(item => new CDataItemEquipElement()
+                            {
+                                ItemUID = item.Item1.UId,
+                                EquipElementList = item.Item1.EquipElementParamList
+                            })
+                        )]
+            };
 
             return res;
         }

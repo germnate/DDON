@@ -39,15 +39,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
             {
                 // todo handle other party member pawn
                 pawnMember.Pawn.PawnState = PawnState.None;
-
-                if (!pawnMember.Pawn.IsRented)
-                {
-                    var memberClient = Server.ClientLookup.GetClientByCharacterId(pawnMember.Pawn.CharacterId);
-                    if (memberClient != null && (pawnMember.PawnId == memberClient.Character.PartnerPawnId))
-                    {
-                        Server.PartnerPawnManager.HandleLeaveFromParty(memberClient);
-                    }
-                }
             }
 
             return res;

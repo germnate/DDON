@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of Arrowgene.Ddon.LoginServer
  *
  * Arrowgene.Ddon.LoginServer is a server implementation for the game "Dragons Dogma Online".

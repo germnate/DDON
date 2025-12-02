@@ -1,9 +1,13 @@
 using Arrowgene.Ddon.GameServer;
+using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.Rpc.Command;
+using Arrowgene.Ddon.Server;
+using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Ddon.Shared.Model.Rpc;
 using Arrowgene.Logging;
 using Arrowgene.WebServer;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Arrowgene.Ddon.Rpc.Web.Route.Internal
@@ -12,7 +16,7 @@ namespace Arrowgene.Ddon.Rpc.Web.Route.Internal
     {
         public class InternalCommand : RpcBodyCommand<RpcUnwrappedObject>
         {
-            private static readonly ILogger Logger = LogProvider.Logger<Logger>(typeof(InternalCommand));
+            private static readonly ServerLogger Logger = LogProvider.Logger<ServerLogger>(typeof(InternalCommand));
 
             public InternalCommand(RpcUnwrappedObject entry) : base(entry)
             {
@@ -24,6 +28,13 @@ namespace Arrowgene.Ddon.Rpc.Web.Route.Internal
             {
                 switch (_entry.Command)
                 {
+                    case RpcInternalCommand.Ping:
+                        {
+                            return new RpcCommandResult(this, true)
+                            {
+                                Message = $"Ping {_entry.Origin}"
+                            };
+                        }
                     case RpcInternalCommand.NotifyPlayerList:
                         {
                             List<RpcCharacterData> data = _entry.GetData<List<RpcCharacterData>>();
@@ -58,6 +69,7 @@ namespace Arrowgene.Ddon.Rpc.Web.Route.Internal
                             {
                                 if (client.Account?.Id == target)
                                 {
+                                    Logger.Error(client, $"[AUTOKICK] Handling auto kick for account {target}");
                                     client.Close();
                                 }
                             }
@@ -100,6 +112,22 @@ namespace Arrowgene.Ddon.Rpc.Web.Route.Internal
                             return new RpcCommandResult(this, true)
                             {
                                 Message = "AreaRankResetEnd"
+                            };
+                        }
+                    case RpcInternalCommand.BoardQuestDailyRotation:
+                        {
+                            var questRecords = gameServer.Database.SelectLightQuestRecords();
+                            var extantQuests = QuestManager.GetQuestsByType(QuestType.Light);
+
+                            var quests = questRecords
+                                .Where(x => !extantQuests.Contains(x.QuestScheduleId))
+                                .Select(x => gameServer.LightQuestManager.GenerateQuestFromRecord(x));
+
+                            QuestManager.AddQuests(gameServer, quests);
+
+                            return new RpcCommandResult(this, true)
+                            {
+                                Message = "BoardQuestDailyRotation"
                             };
                         }
                     default:

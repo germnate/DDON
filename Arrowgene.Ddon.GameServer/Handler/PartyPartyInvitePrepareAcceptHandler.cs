@@ -35,25 +35,39 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             // The invited player doesn't move to the new party leader's server until this packet is sent
             // Why this wasn't included in the Response packet directly beats me
-            S2CPartyPartyInviteAcceptNtc inviteAcceptNtc = new S2CPartyPartyInviteAcceptNtc();
-            inviteAcceptNtc.ServerId = (ushort) Server.Id;
-            inviteAcceptNtc.PartyId = party.Id;
-            inviteAcceptNtc.StageId = party.Leader.Client.Character.Stage.Id;
-            inviteAcceptNtc.PositionId = 0; // TODO: Figure what this is about
-            inviteAcceptNtc.MemberIndex = (byte)partyMember.MemberIndex;
+            S2CPartyPartyInviteAcceptNtc inviteAcceptNtc = new()
+            {
+                ServerId = (ushort)Server.Id,
+                PartyId = party.Id,
+                StageId = party.Leader.Client.Character.LastSafeStageId,
+                PositionId = 0, // TODO: Figure what this is about
+                MemberIndex = (byte)partyMember.MemberIndex
+            };
+
+            // Temporary hacky fix for this stage in particular being a bad safe area.
+            if (inviteAcceptNtc.StageId == Stage.KinozaMineralSprings.StageId)
+            {
+                inviteAcceptNtc.StageId = Stage.RedCrystalInn.StageId;
+            }
+
             client.Enqueue(inviteAcceptNtc, queue);
 
             // Notify party leader of the accepted invitation
-            S2CPartyPartyInviteJoinMemberNtc inviteJoinMemberNtc = new S2CPartyPartyInviteJoinMemberNtc();
-            CDataPartyMemberMinimum newMemberMinimum = new CDataPartyMemberMinimum();
-            GameStructure.CDataCommunityCharacterBaseInfo(newMemberMinimum.CommunityCharacterBaseInfo,
-                partyMember.Client.Character);
-            newMemberMinimum.IsLeader = partyMember.IsLeader;
-            newMemberMinimum.MemberIndex = partyMember.MemberIndex;
-            newMemberMinimum.MemberType = partyMember.MemberType;
-            newMemberMinimum.PawnId = partyMember.PawnId;
+            S2CPartyPartyInviteJoinMemberNtc inviteJoinMemberNtc = new();
+            CDataPartyMemberMinimum newMemberMinimum = new()
+            {
+                IsLeader = partyMember.IsLeader,
+                MemberIndex = partyMember.MemberIndex,
+                MemberType = partyMember.MemberType,
+                PawnId = partyMember.PawnId,
+                CommunityCharacterBaseInfo = partyMember.Client.Character.CDataCommunityCharacterBaseInfo
+            };
             inviteJoinMemberNtc.MemberMinimumList.Add(newMemberMinimum);
             party.Leader.Client.Enqueue(inviteJoinMemberNtc, queue);
+
+            // Clean up invitation.
+            invitation.CancelTimer();
+            Server.PartyManager.RemovePartyInvitation(client);
 
             return queue;
         }

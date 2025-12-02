@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <RootNamespace>Arrowgene.Ddon.Database</RootNamespace>
         <Title>Dragons Dogma Online - Database</Title>
         <Company>DDON Team</Company>
         <Product>Ddon.Database</Product>
         <Version>$(Version)</Version>
         <Copyright>Copyright © 2019-2022 DDON Team</Copyright>
-        <LangVersion>10</LangVersion>
+        <LangVersion>13</LangVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -21,8 +21,8 @@
     <Import Project="./../SetSourceRevision.targets" />
     <ItemGroup>
         <PackageReference Include="Arrowgene.Logging" Version="1.2.1" />
-        <PackageReference Include="System.Data.SQLite" Version="1.0.115.5" />
-        <PackageReference Include="Npgsql" Version="7.0.7" />
+        <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
+        <PackageReference Include="Npgsql" Version="9.0.3" />
         <PackageReference Include="MySqlConnector" Version="2.2.7" />
     </ItemGroup>
 

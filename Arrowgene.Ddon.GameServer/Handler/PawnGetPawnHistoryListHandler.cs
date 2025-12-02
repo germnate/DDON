@@ -1,6 +1,7 @@
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Logging;
+using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -14,8 +15,10 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         public override S2CPawnGetPawnHistoryListRes Handle(GameClient client, C2SPawnGetPawnHistoryListReq request)
         {
-            // TODO: Implement.
-            return new();
+            return new()
+            {
+                PawnHistoryList = Server.Database.SelectPawnHistory(request.PawnId)
+            };
         }
     }
 }

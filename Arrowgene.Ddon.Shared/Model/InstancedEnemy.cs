@@ -19,7 +19,6 @@ namespace Arrowgene.Ddon.Shared.Model
         public InstancedEnemy(InstancedEnemy enemy) : base (enemy)
         {
             IsKilled = false;
-            Index = enemy.Index;
             IsRequired = enemy.IsRequired;
             RepopWaitSecond = enemy.RepopWaitSecond;
             StageLayoutId = enemy.StageLayoutId;
@@ -31,7 +30,6 @@ namespace Arrowgene.Ddon.Shared.Model
         }
 
         public StageLayoutId StageLayoutId { get; set; }
-        public byte Index { get; set; }
         public bool IsRequired { get; set; }
         public bool IsKilled { get; set; }
         public uint RepopWaitSecond {  get; set; }
@@ -45,8 +43,7 @@ namespace Arrowgene.Ddon.Shared.Model
 
         public InstancedEnemy(EnemyId enemyId, ushort lv, uint exp, byte index)
         {
-            Id = (uint) enemyId;
-            EnemyId = (uint) enemyId;
+            EnemyId = enemyId;
             Lv = lv;
             Experience = exp;
             Index = index;
@@ -69,10 +66,9 @@ namespace Arrowgene.Ddon.Shared.Model
             return new InstancedEnemy(this);
         }
 
-        public InstancedEnemy SetEnemyId(uint enemyId)
+        public InstancedEnemy SetEnemyId(EnemyId enemyId)
         {
             EnemyId = enemyId;
-            Id = enemyId;
             return this;
         }
 
@@ -112,12 +108,6 @@ namespace Arrowgene.Ddon.Shared.Model
             return this;
         }
 
-        public InstancedEnemy SetRepopWaitSecond(uint repopWaitSecond)
-        {
-            RepopWaitSecond = repopWaitSecond;
-            return this;
-        }
-
         public InstancedEnemy SetNamedEnemyParams(NamedParam namedParam)
         {
             NamedEnemyParams = namedParam;
@@ -128,6 +118,18 @@ namespace Arrowgene.Ddon.Shared.Model
         {
             IsBossBGM = isBoss;
             IsBossGauge = isBoss;
+            return this;
+        }
+
+        public InstancedEnemy SetIsBossBGM(bool isBossBgm)
+        {
+            IsBossBGM = isBossBgm;
+            return this;
+        }
+
+        public InstancedEnemy SetIsBossGauge(bool isBossGauge)
+        {
+            IsBossGauge = IsBossGauge;
             return this;
         }
 
@@ -161,9 +163,31 @@ namespace Arrowgene.Ddon.Shared.Model
             return this;
         }
 
-        public InstancedEnemy SetRepoCount(byte repopCount)
+        public InstancedEnemy SetRepopCount(byte repopCount)
         {
             RepopCount = repopCount;
+            return this;
+        }
+
+        public InstancedEnemy SetRepopWaitSecond(uint repopWaitSecond)
+        {
+            RepopWaitSecond = repopWaitSecond;
+            return this;
+        }
+
+        public InstancedEnemy SetRepopConditions(byte repopCount, uint waitTimeInSections)
+        {
+            RepopNum = 0;
+            RepopCount = repopCount;
+            RepopWaitSecond = waitTimeInSections;
+            return this;
+        }
+
+        public InstancedEnemy SetRespawnConditions(byte repopCount, uint repopWaitSeconds)
+        {
+            SetRepopWaitSecond(repopWaitSeconds);
+            SetRepopCount(repopCount);
+            SetRepopNum(0);
             return this;
         }
 

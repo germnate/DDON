@@ -4,6 +4,6 @@
     {
         SQLite,
         PostgreSQL,
-        MariaDb
+        SQLiteInMemory
     }
 }

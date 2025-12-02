@@ -53,9 +53,9 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     asset.ToCDataClanShopFunctionItem()
                 },
-                ClanPoint = clan.ClanServerParam.MoneyClanPoint
+                ClanPoint = clan.ClanServerParam.MoneyClanPoint,
+                BuyerName = client.Character.CDataCharacterName,
             };
-            GameStructure.CDataCharacterName(ntc.BuyerName, client.Character);
             Server.ClanManager.SendToClan(client.Character.ClanId, ntc);
             Server.RpcManager.AnnounceClanPacket(client.Character.ClanId, ntc);
 

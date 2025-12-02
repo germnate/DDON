@@ -64,6 +64,12 @@ namespace Arrowgene.Ddon.Shared
         public const string AchievementAssetKey = "Achievements.json";
         public const string GatheringSpotInfoKey = "GatheringSpotInfo.json";
         public const string DefaultGatheringDropsKey = "DefaultGatheringDrops.json";
+        public const string JobMastersKey = "JobMasters.json";
+        public const string LightQuestKey = "LightQuests.json";
+        public const string QuestScheduleIdKey = "QuestScheduleId.csv";
+        public const string CraftAddStatusKey = "CraftAddStatus.json";
+        public const string SkillDataKey = "SkillData.json";
+        public const string TrainingRoomKey = "TrainingRoom.json";
 
         public const string QuestAssestKey = "quests";
         public const string EpitaphAssestKey = "epitaph";
@@ -89,7 +95,7 @@ namespace Arrowgene.Ddon.Shared
             _fileSystemWatchers = new Dictionary<string, FileSystemWatcher>();
 
             ClientErrorCodes = new Dictionary<ErrorCode, ClientErrorCode>();
-            ClientItemInfos = new Dictionary<uint, ClientItemInfo>();
+            ClientItemInfos = new();
             NamedParamAsset = new Dictionary<uint, NamedParam>();
             EnemySpawnAsset = new EnemySpawnAsset();
             GatheringItems = new Dictionary<(StageLayoutId, uint), List<GatheringItem>>();
@@ -130,10 +136,15 @@ namespace Arrowgene.Ddon.Shared
             AchievementAsset = new();
             GatheringSpotInfoAsset = new();
             DefaultGatheringDropsAsset = new();
+            JobMasterAsset = new();
+            LightQuestAsset = new();
+            CraftAddStatusAsset = new();
+            SkillData = new([], [], []);
+            TrainingRoomAsset = [];
         }
 
         public Dictionary<ErrorCode, ClientErrorCode> ClientErrorCodes { get; private set; }
-        public Dictionary<uint, ClientItemInfo> ClientItemInfos { get; private set; } // May be incorrect, or incomplete
+        public ClientItemInfoAsset ClientItemInfos { get; private set; }
         public Dictionary<uint, NamedParam> NamedParamAsset { get; private set; }
         public EnemySpawnAsset EnemySpawnAsset { get; private set; }
         public Dictionary<(StageLayoutId, uint), List<GatheringItem>> GatheringItems { get; private set; }
@@ -176,11 +187,17 @@ namespace Arrowgene.Ddon.Shared
         public AchievementBackgroundAsset AchievementBackgroundAsset { get; private set; }
         public GatheringInfoAsset GatheringSpotInfoAsset { get; private set; }
         public DefaultGatheringDropsAsset DefaultGatheringDropsAsset { get; private set; }
+        public JobMasterAsset JobMasterAsset { get; private set; }
+        public LightQuestAsset LightQuestAsset { get; private set; }
+        public SkillDataAsset SkillData { get; private set; }
+        public Dictionary<QuestId, uint> QuestScheduleIdAsset { get; private set; }
+        public CraftAddStatusAsset CraftAddStatusAsset { get; private set; }
+        public List<TrainingRoomEntry> TrainingRoomAsset { get; private set; }
 
         public void Initialize()
         {
             RegisterAsset(value => ClientErrorCodes = value, ClientErrorCodesKey, new ClientErrorCodeAssetDeserializer());
-            RegisterAsset(value => ClientItemInfos = value.ToDictionary(key => key.ItemId, val => val), ItemListKey, new ClientItemInfoCsv());
+            RegisterAsset(value => ClientItemInfos = value, ItemListKey, new ClientItemInfoCsv());
             RegisterAsset(value => NamedParamAsset = value, NamedParamsKey, new NamedParamAssetDeserializer());
             RegisterAsset(value => EnemySpawnAsset = value, EnemySpawnsKey, new EnemySpawnAssetDeserializer(this.NamedParamAsset));
             RegisterAsset(value => GatheringItems = value, GatheringItemsKey, new GatheringItemCsv());
@@ -221,11 +238,17 @@ namespace Arrowgene.Ddon.Shared
             RegisterAsset(value => AchievementBackgroundAsset = value, AchievementAssetKey, new AchievementBackgroundAssetDeserializer());
             RegisterAsset(value => GatheringSpotInfoAsset = value, GatheringSpotInfoKey, new GatheringSpotInfoAssetDeserializer());
             RegisterAsset(value => DefaultGatheringDropsAsset = value, DefaultGatheringDropsKey, new DefaultGatheringDropsDeserializer());
+            RegisterAsset(value => JobMasterAsset = value, JobMastersKey, new JobMasterAssetDeserializer());
+            RegisterAsset(value => LightQuestAsset = value, LightQuestKey, new LightQuestAssetDeserializer());
+            RegisterAsset(value => QuestScheduleIdAsset = value, QuestScheduleIdKey, new QuestScheduleIdCsv());
+            RegisterAsset(value => SkillData = value, SkillDataKey, new SkillDataAssetDeserializer());
+            RegisterAsset(value => CraftAddStatusAsset = value, CraftAddStatusKey, new CraftAddStatusAssetReader());
+            RegisterAsset(value => TrainingRoomAsset = value, TrainingRoomKey, new JsonReaderWriter<List<TrainingRoomEntry>>());
 
-            // This must be set before calling QuestAssertDeserializer and EpitaphTrialAssertDeserializer
+            // This must be set before calling QuestAssetDeserializer and EpitaphTrialAssetDeserializer
             var commonEnemyDeserializer = new AssetCommonDeserializer(this.NamedParamAsset);
 
-            var questAssetDeserializer = new QuestAssetDeserializer(commonEnemyDeserializer, QuestDropItemAsset);
+            var questAssetDeserializer = new QuestAssetDeserializer(commonEnemyDeserializer, QuestDropItemAsset, QuestScheduleIdAsset);
             questAssetDeserializer.LoadQuestsFromDirectory(Path.Combine(_directory.FullName, QuestAssestKey), QuestAssets);
 
             var epitaphTrialDeserializer = new EpitaphTrialAssetDeserializer(commonEnemyDeserializer, QuestDropItemAsset);

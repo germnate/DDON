@@ -1,103 +1,98 @@
-using Arrowgene.Ddon.Shared.Entity.Structure;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
+using Arrowgene.Ddon.Shared.Entity.Structure;
+using Arrowgene.Ddon.Shared.Model;
 
-namespace Arrowgene.Ddon.Database.Sql.Core
+namespace Arrowgene.Ddon.Database.Sql.Core;
+
+public partial class DdonSqlDb : SqlDb
 {
-    public abstract partial class DdonSqlDb<TCon, TCom, TReader> : SqlDb<TCon, TCom, TReader>
-        where TCon : DbConnection
-        where TCom : DbCommand
-        where TReader : DbDataReader
+    /* ddon_equipment_limit_break */
+    protected static readonly string[] EquipmentLimitBreakFields = new[]
     {
-        /* ddon_equipment_limit_break */
-        protected static readonly string[] EquipmentLimitBreakFields = new string[]
-        {
-            "character_id", "item_uid", "effect_1", "effect_2", "is_effect1_valid", "is_effect2_valid"
-        };
+        "character_id", "item_uid", "effect_id", "unk1", "effect_type", "unk0"
+    };
 
-        private readonly string SqlSelectEquipmentLimitBreakRecord = $"SELECT {BuildQueryField(EquipmentLimitBreakFields)} FROM \"ddon_equipment_limit_break\" WHERE \"item_uid\"=@item_uid;";
-        private readonly string SqlInsertEquipmentLimitBreakRecord = $"INSERT INTO \"ddon_equipment_limit_break\" ({BuildQueryField(EquipmentLimitBreakFields)}) VALUES ({BuildQueryInsert(EquipmentLimitBreakFields)});";
-        private readonly string SqlUpdateEquipmentLimitBreakRecord = $"UPDATE \"ddon_equipment_limit_break\" SET {BuildQueryUpdate(EquipmentLimitBreakFields)} WHERE \"character_id\"=@character_id AND \"item_uid\"=@item_uid;";
+    // Identify key vs. non‑key fields for the upsert
+    protected static readonly string[] EquipmentLimitBreakKeyFields = new[]
+    {
+        "character_id", "item_uid", "effect_type"
+    };
 
-        public bool InsertEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null)
+    protected static readonly string[] EquipmentLimitBreakNonKeyFields
+        = EquipmentLimitBreakFields.Except(EquipmentLimitBreakKeyFields).ToArray();
+
+    protected readonly string SqlInsertEquipmentLimitBreakRecord =
+        $"INSERT INTO \"ddon_equipment_limit_break\" ({BuildQueryField(EquipmentLimitBreakFields)}) VALUES ({BuildQueryInsert(EquipmentLimitBreakFields)});";
+
+    protected readonly string SqlSelectEquipmentLimitBreakRecord =
+        $"SELECT {BuildQueryField(EquipmentLimitBreakFields)} FROM \"ddon_equipment_limit_break\" WHERE \"item_uid\"=@item_uid;";
+
+    protected readonly string SqlUpdateEquipmentLimitBreakRecord =
+        $"UPDATE \"ddon_equipment_limit_break\" SET {BuildQueryUpdate(EquipmentLimitBreakFields)} WHERE \"character_id\"=@character_id AND \"item_uid\"=@item_uid;";
+
+    private readonly string SqlUpsertEquipmentLimitBreakRecord =
+        $"""
+         INSERT INTO "ddon_equipment_limit_break" ({BuildQueryField(EquipmentLimitBreakFields)}) 
+                        VALUES ({BuildQueryInsert(EquipmentLimitBreakFields)}) 
+                        ON CONFLICT ("character_id","item_uid","effect_type") 
+                        DO UPDATE SET {BuildQueryUpdateWithPrefix("EXCLUDED.", EquipmentLimitBreakNonKeyFields)};
+         """;
+
+    public override bool HasEquipmentLimitBreakRecord(uint characterId, string itemUID, DbConnection? connectionIn = null)
+    {
+        bool foundRecord = false;
+        ExecuteQuerySafe(connectionIn, connection =>
         {
-            return ExecuteQuerySafe<bool>(connectionIn, (connection) =>
+            ExecuteReader(connection, SqlSelectEquipmentLimitBreakRecord, command =>
             {
-                return ExecuteNonQuery(connection, SqlInsertEquipmentLimitBreakRecord, command =>
-                {
-                    AddParameter(command, "character_id", characterId);
-                    AddParameter(command, "item_uid", itemUID);
-                    AddParameter(command, "effect_1", statusParam.AdditionalStatus1);
-                    AddParameter(command, "effect_2", statusParam.AdditionalStatus2);
-                    AddParameter(command, "is_effect1_valid", statusParam.IsAddStat1);
-                    AddParameter(command, "is_effect2_valid", statusParam.IsAddStat2);
-                }) == 1;
-            });
-        }
+                AddParameter(command, "character_id", characterId);
+                AddParameter(command, "item_uid", itemUID);
+            }, reader => { foundRecord = reader.Read(); });
+        });
+        return foundRecord;
+    }
 
-        public bool UpdateEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null)
+    /// <summary>
+    ///     Insert or update in one round‑trip using Postgres ON CONFLICT.
+    ///     Returns true if exactly one row was inserted or updated.
+    /// </summary>
+    public override bool UpsertEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null)
+    {
+        return ExecuteQuerySafe(connectionIn, connection =>
         {
-            return ExecuteQuerySafe<bool>(connectionIn, (connection) =>
+            return ExecuteNonQuery(connection, SqlUpsertEquipmentLimitBreakRecord, command =>
             {
-                return ExecuteNonQuery(connection, SqlUpdateEquipmentLimitBreakRecord, command =>
-                {
-                    AddParameter(command, "character_id", characterId);
-                    AddParameter(command, "item_uid", itemUID);
-                    AddParameter(command, "effect_1", statusParam.AdditionalStatus1);
-                    AddParameter(command, "effect_2", statusParam.AdditionalStatus2);
-                    AddParameter(command, "is_effect1_valid", statusParam.IsAddStat1);
-                    AddParameter(command, "is_effect2_valid", statusParam.IsAddStat2);
-                }) == 1;
-            });
-        }
+                AddParameter(command, "character_id", characterId);
+                AddParameter(command, "item_uid", itemUID);
+                AddParameter(command, "effect_id", statusParam.EnhanceId);
+                AddParameter(command, "unk1", statusParam.Unk1);
+                AddParameter(command, "effect_type", (byte)statusParam.EnhanceType);
+                AddParameter(command, "unk0", statusParam.Unk0);
+            }) == 1;
+        });
+    }
 
-        public bool HasEquipmentLimitBreakRecord(uint characterId, string itemUID, DbConnection? connectionIn = null)
+    public override List<CDataAddStatusParam> GetEquipmentLimitBreakRecord(string itemUID, DbConnection? connectionIn = null)
+    {
+        List<CDataAddStatusParam> results = new();
+        ExecuteQuerySafe(connectionIn, connection =>
         {
-            bool foundRecord = false;
-            ExecuteQuerySafe(connectionIn, (connection) =>
+            ExecuteReader(connection, SqlSelectEquipmentLimitBreakRecord, command => { AddParameter(command, "item_uid", itemUID); }, reader =>
             {
-                ExecuteReader(connection, SqlSelectEquipmentLimitBreakRecord, command =>
+                while (reader.Read())
                 {
-                    AddParameter(command, "character_id", characterId);
-                    AddParameter(command, "item_uid", itemUID);
-                }, reader =>
-                {
-                    foundRecord = reader.Read();
-                });
-            });
-            return foundRecord;
-        }
-
-        public bool UpsertEquipmentLimitBreakRecord(uint characterId, string itemUID, CDataAddStatusParam statusParam, DbConnection? connectionIn = null)
-        {
-            return HasEquipmentLimitBreakRecord(characterId, itemUID, connectionIn) ?
-                UpdateEquipmentLimitBreakRecord(characterId, itemUID, statusParam, connectionIn) :
-                InsertEquipmentLimitBreakRecord(characterId, itemUID, statusParam, connectionIn);
-        }
-
-        public List<CDataAddStatusParam> GetEquipmentLimitBreakRecord(string itemUID, DbConnection? connectionIn = null)
-        {
-            var results = new List<CDataAddStatusParam>();
-            ExecuteQuerySafe(connectionIn, (connection) =>
-            {
-                ExecuteReader(connection, SqlSelectEquipmentLimitBreakRecord, command =>
-                {
-                    AddParameter(command, "item_uid", itemUID);
-                }, reader =>
-                {
-                    while (reader.Read())
+                    results.Add(new CDataAddStatusParam
                     {
-                        results.Add(new CDataAddStatusParam()
-                        {
-                            AdditionalStatus1 = GetUInt16(reader, "effect_1"),
-                            AdditionalStatus2 = GetUInt16(reader, "effect_2"),
-                            IsAddStat1 = GetBoolean(reader, "is_effect1_valid"),
-                            IsAddStat2 = GetBoolean(reader, "is_effect2_valid"),
-                        });
-                    }
-                });
+                        EnhanceId = GetUInt16(reader, "effect_id"),
+                        Unk1 = GetUInt16(reader, "unk1"),
+                        EnhanceType = (EquipEnhanceType)GetByte(reader, "effect_type"),
+                        Unk0 = GetByte(reader, "unk0")
+                    });
+                }
             });
-            return results;
-        }
+        });
+        return results;
     }
 }

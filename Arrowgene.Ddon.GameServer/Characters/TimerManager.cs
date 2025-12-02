@@ -7,29 +7,22 @@ using System.Threading;
 
 namespace Arrowgene.Ddon.GameServer.Characters
 {
-    public class TimerManager
+    public class TimerManager(DdonGameServer server)
     {
         private static readonly ServerLogger Logger = LogProvider.Logger<ServerLogger>(typeof(TimerManager));
 
-        private DdonGameServer _Server;
-        private Dictionary<uint, TimerState> _Timers;
-        private UniqueIdPool _IdPool;
-
-        public TimerManager(DdonGameServer server)
-        {
-            _Server = server;
-            _Timers = new Dictionary<uint, TimerState>();
-            _IdPool = new UniqueIdPool(1);
-        }
+        private readonly DdonGameServer _Server = server;
+        private readonly Dictionary<uint, TimerState> _Timers = [];
+        private readonly UniqueIdPool _IdPool = new(1);
 
         internal class TimerState
         {
             public DateTime TimeStart { get; set; }
             public TimeSpan Duration { get; set; }
+            public TimeSpan CumulativeElapsed { get; set; } = TimeSpan.Zero;
             public Timer Timer { get; set; }
             public Action Action {  get; set; }
             public bool TimerStarted {  get; set; }
-            public bool TimerPaused { get; set; }
         }
 
         public uint CreateTimer(uint timeoutInSeconds, Action action)
@@ -46,7 +39,6 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 {
                     Action = action,
                     Duration = TimeSpan.FromSeconds(timeoutInSeconds),
-                    TimerPaused = false
                 };
             }
 
@@ -57,26 +49,18 @@ namespace Arrowgene.Ddon.GameServer.Characters
         {
             lock (_Timers)
             {
-                if (!_Timers.ContainsKey(timerId))
+                if (!_Timers.TryGetValue(timerId, out TimerState timerState))
                 {
                     return false;
                 }
 
-                var timerState = _Timers[timerId];
-                if (timerState.TimerStarted && !timerState.TimerPaused)
+                if (timerState.TimerStarted)
                 {
                     return false;
                 }
 
-                if (!timerState.TimerPaused)
-                {
-                    timerState.TimeStart = DateTime.Now;
-                    Logger.Info($"Starting {timerState.Duration.TotalSeconds} second timer for TimerId={timerId}");
-                }
-                else
-                {
-                    Logger.Info($"Resuming {GetTimeLeftInSeconds(timerId)} second timer for TimerId={timerId}");
-                }
+                timerState.TimeStart = DateTime.Now;
+                Logger.Info($"Starting {timerState.Duration.TotalSeconds} second timer for TimerId={timerId}");
 
                 timerState.Timer = new Timer(task =>
                 {
@@ -84,14 +68,10 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     if (alreadyElapsed > timerState.Duration)
                     {
                         Logger.Info($"TimerId={timerId} expired.");
-                        if (timerState.Action != null)
-                        {
-                            timerState.Action.Invoke();
-                        }
+                        timerState.Action?.Invoke();
                         CancelTimer(timerId);
                     }
                 }, null, 0, 1000);
-                timerState.TimerPaused = false;
                 timerState.TimerStarted = true;
             }
 
@@ -102,6 +82,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
         {
             lock (_Timers)
             {
+                // TODO: This needs some guards to check if the timer exists.
                 Logger.Info($"Extending timer by {amountInSeconds} seconds for TimerId={timerId}");
                 _Timers[timerId].Duration += TimeSpan.FromSeconds(amountInSeconds);
                 return (ulong)((DateTimeOffset)(_Timers[timerId].TimeStart + _Timers[timerId].Duration)).ToUnixTimeSeconds();
@@ -112,62 +93,53 @@ namespace Arrowgene.Ddon.GameServer.Characters
         {
             lock (_Timers)
             {
-                Logger.Info($"Pausing timer for TimerId={timerId}");
-                if (!_Timers[timerId].TimerPaused)
+                if (!_Timers.TryGetValue(timerId, out TimerState timerState))
                 {
-                    _Timers[timerId].Timer.Dispose();
-                    _Timers[timerId].TimerPaused = true;
+                    throw new Exception($"TimerId={timerId} does not exist.");
+                }
+
+                Logger.Info($"Pausing timer for TimerId={timerId}");
+                if (timerState.TimerStarted)
+                {
+                    timerState.Timer.Dispose();
+                    timerState.CumulativeElapsed += DateTime.Now.Subtract(timerState.TimeStart);
+                    timerState.Duration = GetTimeLeft(timerId);
+                    timerState.TimerStarted = false;
                 }
             }
         }
 
-        public ulong SetTimer(uint timerId, uint timeInSeconds)
+        public TimeSpan GetTimeLeft(uint timerId)
         {
             lock (_Timers)
             {
-                Logger.Info($"Setting timer to {timeInSeconds} seconds for TimerId={timerId}");
-                _Timers[timerId].Duration = TimeSpan.FromSeconds(timeInSeconds);
-                _Timers[timerId].TimeStart = DateTime.Now;
-                return (ulong)((DateTimeOffset)(_Timers[timerId].TimeStart + _Timers[timerId].Duration)).ToUnixTimeSeconds();
+                if (!_Timers.TryGetValue(timerId, out TimerState timer))
+                {
+                    return TimeSpan.Zero;
+                }
+
+                if (!timer.TimerStarted)
+                {
+                    return timer.Duration;
+                }
+
+                var timeLeft = timer.Duration - DateTime.Now.Subtract(timer.TimeStart);
+                timeLeft = timeLeft >= TimeSpan.Zero ? timeLeft : TimeSpan.Zero;
+
+                return timeLeft;
             }
         }
 
         public ulong GetTimeLeftInSeconds(uint timerId)
         {
-            lock (_Timers)
-            {
-                if (!_Timers.ContainsKey(timerId))
-                {
-                    return 0;
-                }
-
-                var timeLeft = (_Timers[timerId].Duration - (DateTime.Now.Subtract(_Timers[timerId].TimeStart))).TotalSeconds;
-
-                return (ulong) ((timeLeft < 0) ? 0 : timeLeft);
-            }
+            return (ulong) GetTimeLeft(timerId).TotalSeconds;            
         }
 
         public bool IsTimerStarted(uint timerId)
         {
             lock (_Timers)
             {
-                if (!_Timers.ContainsKey(timerId))
-                {
-                    return false;
-                }
-                return _Timers[timerId].TimerStarted;
-            }
-        }
-
-        public bool IsTimerPaused(uint timerId)
-        {
-            lock (_Timers)
-            {
-                if (!_Timers.ContainsKey(timerId))
-                {
-                    return false;
-                }
-                return _Timers[timerId].TimerPaused;
+                return _Timers.TryGetValue(timerId, out TimerState value) && value.TimerStarted;
             }
         }
 
@@ -175,18 +147,17 @@ namespace Arrowgene.Ddon.GameServer.Characters
         {
             lock (_Timers)
             {
-                if (_Timers.ContainsKey(timerId))
+                if (_Timers.TryGetValue(timerId, out TimerState timerState))
                 {
                     Logger.Info($"Canceling timer for TimerId={timerId}");
+                    TimeSpan elapsed = timerState.CumulativeElapsed;
                     if (_Timers[timerId].TimerStarted)
                     {
                         _Timers[timerId].Timer.Dispose();
+                        elapsed += DateTime.Now.Subtract(timerState.TimeStart);
                     }
 
-                    var timerState = _Timers[timerId];
-
-                    TimeSpan elapsed = DateTime.Now.Subtract(timerState.TimeStart);
-                    var results = (elapsed, timerState.Duration);
+                    var results = (elapsed, timerState.Duration + timerState.CumulativeElapsed);
                     _Timers.Remove(timerId);
                     _IdPool.ReclaimId(timerId);
                     return results;

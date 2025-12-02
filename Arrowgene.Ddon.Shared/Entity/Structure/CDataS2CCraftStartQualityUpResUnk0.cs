@@ -2,6 +2,8 @@ using Arrowgene.Buffers;
 
 namespace Arrowgene.Ddon.Shared.Entity.Structure
 {
+    // TODO: figuring out what this is
+    // I've tried plugging Crest IDs & Equipment ID/RandomQuality n such, and just random numbers Unk0 - Unk4 just don't seem to change anything.
     public class CDataS2CCraftStartQualityUpResUnk0
     {
         public uint Unk0 { get; set; }

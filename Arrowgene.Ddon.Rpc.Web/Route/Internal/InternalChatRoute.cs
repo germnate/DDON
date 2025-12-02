@@ -7,7 +7,6 @@ using Arrowgene.Logging;
 using Arrowgene.WebServer;
 using System.Linq;
 using System.Threading.Tasks;
-using static Arrowgene.Ddon.GameServer.RpcManager;
 
 namespace Arrowgene.Ddon.Rpc.Web.Route.Internal
 {
@@ -101,6 +100,36 @@ namespace Arrowgene.Ddon.Rpc.Web.Route.Internal
                             return new RpcCommandResult(this, true)
                             {
                                 Message = $"SendTellMessage ID {data.SourceData.CharacterId} -> {data.TargetData.CharacterId}"
+                            };
+                        }
+                    case RpcInternalCommand.SendShoutMessage:
+                        {
+                            RpcChatData data = _entry.GetData<RpcChatData>();
+
+                            ChatResponse response = new()
+                            {
+                                HandleId = 0,
+                                Deliver = false,
+                                FirstName = data.SourceData.FirstName,
+                                LastName = data.SourceData.LastName,
+                                ClanName = data.SourceData.ClanName,
+                                CharacterId = data.SourceData.CharacterId,
+                                Type = LobbyChatMsgType.Shout,
+                                Message = data.Message,
+                                MessageFlavor = data.MessageFlavor,
+                                PhrasesCategory = data.PhrasesCategory,
+                                PhrasesIndex = data.PhrasesIndex
+                            };
+
+                            response.Recipients.AddRange(gameServer.ClientLookup
+                                .GetAll()
+                                .Where(x => x.Character != null)
+                            );
+                            gameServer.ChatManager.Send(response);
+
+                            return new RpcCommandResult(this, true)
+                            {
+                                Message = $"SendShoutMessage {data.SourceData.FirstName} {data.SourceData.LastName}: {data.Message}"
                             };
                         }
                     default:

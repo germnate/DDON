@@ -32,15 +32,14 @@ namespace Arrowgene.Ddon.GameServer.Handler
             result.LastWeekPoint = clientRank.LastWeekPoint;
             result.ToNextPoint = Server.AreaRankManager.GetMaxPoints(request.AreaId, clientRank.Rank);
 
-            result.ReleaseList = Server.AssetRepository.AreaRankSpotInfoAsset[request.AreaId]
+            result.ReleaseList = [.. Server.AssetRepository.AreaRankSpotInfoAsset[request.AreaId]
                 .Where(x =>
                     x.UnlockRank <= clientRank.Rank
                     && (x.UnlockQuest == 0 || completedQuests.ContainsKey((QuestId)x.UnlockQuest))
                 )
-                .Select(x => new CDataCommonU32(x.SpotId))
-                .ToList();
+                .Select(x => new CDataCommonU32(x.SpotId))];
 
-            result.CanReceiveSupply = client.Character.AreaSupply.ContainsKey(request.AreaId) && client.Character.AreaSupply[request.AreaId].Any();
+            result.CanReceiveSupply = client.Character.AreaSupply.TryGetValue(request.AreaId, out var supply) && supply.Count != 0;
             result.CanRankUp = Server.AreaRankManager.CanRankUp(client, request.AreaId);
 
             result.SupplyItemInfoList = Server.AssetRepository.AreaRankSupplyAsset[request.AreaId]
@@ -49,7 +48,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             )
             .LastOrDefault()
             ?.SupplyItemInfoList
-            ?? new();
+            ?? [];
             result.AreaRankUpQuestInfoList = Server.AreaRankManager.RankUpQuestInfo(request.AreaId);
 
             return result;

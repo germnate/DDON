@@ -92,14 +92,24 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             Server.Database.ExecuteInTransaction(connectionIn =>
             {
-
                 List<InstancedEnemy> group = client.Party.InstanceEnemyManager.GetInstancedEnemies(stageId);
-                bool groupDestroyed = group.Where(x => x.IsRequired).All(x => x.IsKilled);
+
+                bool groupDestroyed;
+                if (isQuestControlled)
+                {
+                    groupDestroyed = group.Where(x => x.IsRequired && x.QuestScheduleId == quest.QuestScheduleId).All(x => x.IsKilled);
+                }
+                else
+                {
+                    groupDestroyed = group.Where(x => x.IsRequired).All(x => x.IsKilled);
+                }
+
                 if (groupDestroyed)
                 {
-                    bool IsAreaBoss = group.Any(x => x.IsAreaBoss);
+                    bool isAreaBoss = group.Any(x => x.IsAreaBoss);
                     bool isDungeon = StageManager.IsDungeon(stageId);
-                    
+                    bool isCautionSpot = Server.ScriptManager.MonsterCautionSpotModule.IsEnabledCautionSpotGroup(Server, client.Party, stageId, client.Character.AreaId);
+
                     if (isQuestControlled)
                     {
                         var ntcs = QuestManager.GetQuestStateManager(client, quest).HandleDestroyGroupWorkNotice(client.Party, quest, stageId, enemyKilled, connectionIn);
@@ -110,11 +120,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     S2CInstanceEnemyGroupDestroyNtc groupDestroyedNtc = new S2CInstanceEnemyGroupDestroyNtc()
                     {
                         LayoutId = packet.LayoutId,
-                        IsAreaBoss = IsAreaBoss && !isDungeon && (client.GameMode == GameMode.Normal)
+                        IsAreaBoss = isCautionSpot && (client.GameMode == GameMode.Normal)
                     };
                     client.Party.EnqueueToAll(groupDestroyedNtc, queuedPackets);
 
-                    if (IsAreaBoss && client.GameMode == GameMode.BitterblackMaze)
+                    if (isAreaBoss && client.GameMode == GameMode.BitterblackMaze)
                     {
                         foreach (var memberClient in client.Party.Clients)
                         {
@@ -122,7 +132,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                             queuedPackets.AddRange(ntcs);
                         }
                     }
-                    else if (IsAreaBoss && isDungeon && client.GameMode == GameMode.Normal)
+                    else if (isAreaBoss && isDungeon && client.GameMode == GameMode.Normal)
                     {
                         var boss = group.Where(x => x.IsAreaBoss).First();
                         client.Party.EnqueueToAll(new S2CInstanceEnemyStageBossAnnihilateNtc()
@@ -130,14 +140,17 @@ namespace Arrowgene.Ddon.GameServer.Handler
                             LayoutId = boss.StageLayoutId.ToCDataStageLayoutId(),
                         }, queuedPackets);
                     }
+
+                    if (isAreaBoss && client.GameMode == GameMode.Normal)
+                    {
+                        foreach (var memberClient in client.Party.Clients)
+                        {
+                            queuedPackets.AddRange(Server.AreaRankManager.AddAreaPoint(memberClient, client.Character.AreaId, (Server.GameSettings.GameServerSettings.AreaBossApReward, 0), connectionIn));
+                        }
+                    }
                 }
 
-                if (packet.IsNoBattleReward)
-                {
-                    queuedPackets.Send();
-                }
-
-                if (!client.QuestState.IsQuestActive(QuestId.ResolutionsAndOmens))
+                if (!packet.IsNoBattleReward && !client.QuestState.IsQuestActive(QuestId.ResolutionsAndOmens))
                 {
                     foreach (var partyMemberClient in client.Party.Clients)
                     {
@@ -236,7 +249,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                             }
 
                             queuedPackets.AddRange(Server.AchievementManager.HandleKillEnemy(memberClient, enemyKilled, connectionIn: connectionIn));
-
+                            queuedPackets.AddRange(Server.JobMasterManager.HandleEnemyKill(memberClient, enemyKilled, connectionIn));
                         }
                         else if (member is PawnPartyMember pawnMember)
                         {
@@ -257,6 +270,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
                                 var ntcs = _gameServer.ExpManager.AddExp(memberClient, memberCharacter, pawnExp, RewardSource.Enemy, connectionIn: connectionIn);
                                 queuedPackets.AddRange(ntcs);
                             }
+
+                            if (pawn is RentalPawn rentalPawn)
+                            {
+                                Server.RentalPawnManager.HandleEnemyKill(rentalPawn, connectionIn);
+                            }
                         }
                         else
                         {
@@ -271,7 +289,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             // TODO: EnemyId and KillNum
             return new S2CInstanceEnemyKillRes()
             {
-                EnemyId = packet.IsNoBattleReward ? 0u : enemyKilled.Id,
+                EnemyId = packet.IsNoBattleReward ? 0u : enemyKilled.EnemyId,
                 KillNum = packet.IsNoBattleReward ? 0u : 1u
             };
 

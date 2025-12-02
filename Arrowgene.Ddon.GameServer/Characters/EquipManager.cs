@@ -80,7 +80,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     // EQUIP
                     Item item = server.Database.SelectStorageItemByUId(changeEquipJobItem.EquipJobItemUId);
                     characterToEquipTo.EquipmentTemplate.SetJobItem(item, characterToEquipTo.Job, changeEquipJobItem.EquipSlotNo);
-                    server.Database.ReplaceEquipJobItem(item.UId, characterToEquipTo.CommonId, characterToEquipTo.Job, changeEquipJobItem.EquipSlotNo);
+                    server.Database.UpsertEquipJobItem(item.UId, characterToEquipTo.CommonId, characterToEquipTo.Job, changeEquipJobItem.EquipSlotNo);
                 }
             }
 
@@ -179,7 +179,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     );
 
                     //Check for ensemble requirements
-                    ClientItemInfo itemInfo = server.ItemManager.LookupInfoByUID(server, itemUId);
+                    ClientItemInfo itemInfo = server.ItemManager.LookupInfoByItem(server, result.Item2.Item2);
                     if (itemInfo.SubCategory == ItemSubCategory.EquipEnsemble)
                     {
                         foreach (EquipSlot slot in EnsembleSlots)
@@ -330,7 +330,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     continue;
                 }
 
-                var itemInfo = server.ItemManager.LookupInfoByItemID(server, equip.ItemId);
+                var itemInfo = server.AssetRepository.ClientItemInfos[equip.ItemId];
                 if (itemInfo.SubCategory == ItemSubCategory.EquipEnsemble)
                 {
                     return true;
@@ -386,7 +386,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             if (CharacterHasEnsembleEquipped(server, characterCommon))
             {
                 var mainHand = characterCommon.EquipmentTemplate.GetEquipItem(characterCommon.Job, EquipType.Performance, EquipSlot.WepMain);
-                itemRank = mainHand is not null ? server.ItemManager.LookupInfoByItemID(server, mainHand.ItemId).Rank : 0u;
+                itemRank = mainHand is not null ? server.AssetRepository.ClientItemInfos[mainHand.ItemId].Rank : 0u;
 
                 foreach (EquipSlot slot in EnsembleSlots)
                 {
@@ -396,7 +396,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                         continue;
                     }
 
-                    var itemInfo = server.ItemManager.LookupInfoByItemID(server, equip.ItemId);
+                    var itemInfo = server.AssetRepository.ClientItemInfos[equip.ItemId];
                     if (itemInfo.SubCategory == ItemSubCategory.EquipEnsemble)
                     {
                         itemRank += itemInfo.Rank;
@@ -413,7 +413,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     var equip = characterCommon.EquipmentTemplate.GetEquipItem(characterCommon.Job, EquipType.Performance, slot);
                     if (equip != null)
                     {
-                        var itemInfo = server.ItemManager.LookupInfoByItemID(server, equip.ItemId);
+                        var itemInfo = server.AssetRepository.ClientItemInfos[equip.ItemId];
                         itemRank += itemInfo.Rank;
                     }
                 }

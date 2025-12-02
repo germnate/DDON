@@ -48,20 +48,36 @@
 
 public class Mixin : IExpMixin
 {
-    private HashSet<uint> AutomaticExpQuestExceptions = new HashSet<uint>()
+    private HashSet<QuestId> AutomaticExpQuestExceptions = new HashSet<QuestId>()
     {
-        (uint) QuestId.ResolutionsAndOmens
+        QuestId.ResolutionsAndOmens
     };
 
     public override uint GetExpValue(CharacterCommon characterCommon, InstancedEnemy enemy)
     {
-        if (AutomaticExpQuestExceptions.Contains(enemy.QuestScheduleId))
+        uint result = 0;
+
+        if (enemy.QuestScheduleId != 0)
         {
-            return 0;
+            var quest = QuestManager.GetQuestByScheduleId(enemy.QuestScheduleId);
+            if (AutomaticExpQuestExceptions.Contains(quest.QuestId))
+            {
+                return 0;
+            }
         }
 
-        uint result = 0;
-        switch (enemy.ExpScheme)
+        var scheme = enemy.ExpScheme;
+        if (StageManager.IsBitterBlackMazeStageId(enemy.StageLayoutId))
+        {
+            // TODO: Change to special BBM scheme
+            scheme = EnemyExpScheme.Tool;
+        }
+        else if (enemy.QuestScheduleId != 0 && QuestManager.IsExmQuest(enemy.QuestScheduleId))
+        {
+            scheme = EnemyExpScheme.Exm;
+        }
+
+        switch (scheme)
         {
             case EnemyExpScheme.Automatic:
                 result = GetAutomaticExpCalculation(characterCommon, enemy);
@@ -133,9 +149,6 @@ public class Mixin : IExpMixin
             }
         }
         xp *= questModifier;
-
-        // Some enemy nameplates have an EXP modifier
-        xp *= (enemy.NamedEnemyParams.Experience / 100);
 
         // Put a cap on maximum amount of exp can be gained per kill
         // to slow down power leveling of early level players

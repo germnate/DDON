@@ -73,7 +73,6 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         public List<QuestProgressWork> QuestProgressWork { get; set; }
         
         public QuestTargetEnemy TargetEnemy { get; set; }
-
         public CDataQuestProcessState QuestProcessState { get; set; }
 
         public List<string> Annotations { get; set; } // Meta variable used to document quests
@@ -258,14 +257,15 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             return this;
         }
 
-        public QuestBlock AddQuestFlag(QuestFlagType type, QuestFlagAction action, uint value, QuestId questId = QuestId.None)
+        public QuestBlock AddQuestFlag(QuestFlagType type, QuestFlagAction action, uint value, QuestId questId = QuestId.None, bool preventReplay = false)
         {
             QuestFlags.Add(new QuestFlag()
             {
                 Type = type,
                 Action = action,
                 Value = (int) value,
-                QuestId = (int) questId
+                QuestId = (int) questId,
+                PreventReplay = preventReplay
             });
             return this;
         }
@@ -334,6 +334,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             return this;
         }
 
+/*
         public QuestBlock SetQuestEvent(StageLayoutId stageId, uint eventId, uint startPos, QuestJumpType jumpType = QuestJumpType.After)
         {
             QuestEvent = new QuestEvent()
@@ -342,6 +343,19 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
                 JumpStageId = stageId,
                 JumpType = jumpType,
                 StartPosNo = (int) startPos
+            };
+            return this;
+        }
+*/
+
+        public QuestBlock SetQuestEvent(StageInfo eventStageInfo, uint eventId, uint startPos, QuestJumpType jumpType, StageInfo jumpStageInfo)
+        {
+            QuestEvent = new QuestEvent()
+            {
+                EventId = (int)eventId,
+                JumpStageId = jumpStageInfo.AsStageLayoutId(0),
+                JumpType = jumpType,
+                StartPosNo = (int)startPos
             };
             return this;
         }
@@ -490,7 +504,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         {
             DeliveryRequests.Add(new QuestItem()
             {
-                ItemId = (uint) itemId,
+                ItemId = itemId,
                 Amount = amount
             });
             return this;
@@ -512,7 +526,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         {
             HandPlayerItems.Add(new QuestItem()
             {
-                ItemId = (uint) itemId,
+                ItemId = itemId,
                 Amount = amount
             });
             return this;
@@ -584,7 +598,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         {
             return SetTargetEnemy(new QuestTargetEnemy()
             {
-                EnemyId = (uint) enemyId,
+                EnemyId = enemyId.GetUIId(),
                 Amount = amount,
                 Level = level
             });

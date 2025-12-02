@@ -1,6 +1,5 @@
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
-using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Logging;
 using System;
@@ -35,10 +34,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     continue;
                 }
-
-                CDataCharacterListElement characterListElement = new CDataCharacterListElement();
-                GameStructure.CDataCharacterListElement(characterListElement, character);
-                res.CharacterList.Add(characterListElement);
+                res.CharacterList.Add(character.CDataCharacterListElement);
             }
 
             Logger.Info(client, $"Found: {res.CharacterList.Count} Characters matching for query " +

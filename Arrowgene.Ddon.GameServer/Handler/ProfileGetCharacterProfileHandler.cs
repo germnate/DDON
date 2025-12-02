@@ -21,27 +21,31 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 ?? Server.CharacterManager.SelectCharacter(request.CharacterId, fetchPawns:false)
                 ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_CHARACTER_DATA_INVALID_CHARACTER_ID);
 
-            S2CCharacterGetCharacterStatusNtc ntc = new S2CCharacterGetCharacterStatusNtc();
-            ntc.CharacterId = targetCharacter.CharacterId;
-            ntc.StatusInfo = targetCharacter.StatusInfo;
-            ntc.JobParam = targetCharacter.ActiveCharacterJobData;
-            GameStructure.CDataCharacterLevelParam(ntc.CharacterParam, targetCharacter);
-            ntc.EditInfo = targetCharacter.EditInfo;
-            ntc.EquipDataList = targetCharacter.Equipment.AsCDataEquipItemInfo(EquipType.Performance);
-            ntc.VisualEquipDataList = targetCharacter.Equipment.AsCDataEquipItemInfo(EquipType.Visual);
-            ntc.EquipJobItemList = targetCharacter.EquipmentTemplate.JobItemsAsCDataEquipJobItem(targetCharacter.Job);
-            ntc.HideHead = targetCharacter.HideEquipHead;
-            ntc.HideLantern = targetCharacter.HideEquipLantern;
-            ntc.JewelryNum = targetCharacter.ExtendedParams.JewelrySlot;
+            S2CCharacterGetCharacterStatusNtc ntc = new()
+            {
+                CharacterId = targetCharacter.CharacterId,
+                StatusInfo = targetCharacter.StatusInfo,
+                JobParam = targetCharacter.ActiveCharacterJobData,
+                CharacterParam = targetCharacter.CDataCharacterLevelParam,
+                EditInfo = targetCharacter.EditInfo,
+                EquipDataList = targetCharacter.Equipment.AsCDataEquipItemInfo(EquipType.Performance),
+                VisualEquipDataList = targetCharacter.Equipment.AsCDataEquipItemInfo(EquipType.Visual),
+                EquipJobItemList = targetCharacter.EquipmentTemplate.JobItemsAsCDataEquipJobItem(targetCharacter.Job),
+                HideHead = targetCharacter.HideEquipHead,
+                HideLantern = targetCharacter.HideEquipLantern,
+                JewelryNum = targetCharacter.ExtendedParams.JewelrySlot
+            };
 
             client.Send(ntc);
 
-            S2CProfileGetCharacterProfileRes res = new S2CProfileGetCharacterProfileRes();
-            res.CharacterId = targetCharacter.CharacterId;
-            GameStructure.CDataCharacterName(res.CharacterName, targetCharacter);
-            res.JobId = targetCharacter.Job;
-            res.JobLevel = (byte)targetCharacter.ActiveCharacterJobData.Lv;
-            res.ClanParam = Server.ClanManager.GetClan(targetCharacter.ClanId);
+            S2CProfileGetCharacterProfileRes res = new()
+            {
+                CharacterId = targetCharacter.CharacterId,
+                CharacterName = targetCharacter.CDataCharacterName,
+                JobId = targetCharacter.Job,
+                JobLevel = (byte)targetCharacter.ActiveCharacterJobData.Lv,
+                ClanParam = Server.ClanManager.GetClan(targetCharacter.ClanId)
+            };
 
             var (clanId, memberInfo) = Server.ClanManager.ClanMembership(targetCharacter.CharacterId);
             if (memberInfo != null)
@@ -49,13 +53,13 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 res.ClanMemberRank = (uint)memberInfo.Rank;
             }
 
-            res.JobLevelList = targetCharacter.CharacterJobDataList.Select(jobData => new CDataJobBaseInfo()
+            res.JobLevelList = [.. targetCharacter.CharacterJobDataList.Select(jobData => new CDataJobBaseInfo()
             {
                 Job = jobData.Job,
                 Level = (byte)jobData.Lv
-            }).ToList();
+            })];
             res.MatchingProfile = targetCharacter.MatchingProfile;
-            res.ArisenProfile = targetCharacter.ArisenProfile;
+            res.ArisenProfile = targetCharacter.CharacterProfile.CDataArisenProfile;
             // TODO: OnlineId
 
             return res;

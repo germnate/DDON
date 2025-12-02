@@ -1,4 +1,6 @@
 using Arrowgene.Ddon.Shared.Entity.Structure;
+using System.Collections.Generic;
+using YamlDotNet.Core.Tokens;
 
 namespace Arrowgene.Ddon.Shared.Model
 {
@@ -7,6 +9,28 @@ namespace Arrowgene.Ddon.Shared.Model
         public JobId Job { get; set; }
         public uint SkillId { get; set; }
         public byte SkillLv { get; set; }
+
+        public CustomSkill() { }
+
+        public CustomSkill(CustomSkillId customSkillId, byte skillLv = 1)
+        {
+            Job = customSkillId.JobId();
+            SkillId = customSkillId.ReleaseId();
+            SkillLv = skillLv;
+        }
+
+        public CustomSkillId CustomSkillId
+        {
+            get
+            {
+                return CustomSkillIdExtension.gJobIdReleaseIdCustomSkillMap.GetValueOrDefault((Job, SkillId));
+            }
+            set
+            {
+                Job = value.JobId();
+                SkillId = value.ReleaseId();
+            }
+        }
 
         public CDataSetAcquirementParam AsCDataSetAcquirementParam(byte slotNo)
         {
@@ -34,10 +58,20 @@ namespace Arrowgene.Ddon.Shared.Model
             return new CDataLearnedSetAcquirementParam()
             {
                 Job = this.Job,
-                Type = 0,
+                Type = ReleaseType.CustomSkill,
                 AcquirementNo = this.SkillId,
                 AcquirementLv = this.SkillLv,
                 AcquirementParamId = 0
+            };
+        }
+
+        public CDataSkillLevelBaseParam AsCDataSkillLevelBaseParam()
+        {
+            return new CDataSkillLevelBaseParam()
+            {
+                Job = this.Job,
+                SkillLv = this.SkillLv,
+                SkillNo = this.SkillId,
             };
         }
     }

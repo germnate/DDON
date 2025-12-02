@@ -20,10 +20,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             var targetCharacter = Server.ClientLookup.GetClientByCharacterId(request.CharacterId)?.Character
                 ?? throw new ResponseErrorException(Shared.Model.ErrorCode.ERROR_CODE_CHARACTER_DATA_INVALID_CHARACTER_ID);
 
-            S2CMyRoomOtherRoomLayoutGetRes res = new()
-            {
-                CharacterId = request.CharacterId
-            };
+            
 
             var customizations = Server.Database.SelectMyRoomCustomization(targetCharacter.CharacterId);
             foreach (var requiredCustom in MyRoomFurnitureListGetHandler.RequiredFurniturePlacements)
@@ -34,24 +31,27 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 }
             }
 
-            res.FurnitureList = customizations
-                .Where(x => x.Value < MyRoomMyRoomBgmUpdateHandler.MYROOM_BGM_LAYOUTNO) // Filter out the pseudo-customizations we use for other handlers.
-                .Select(x => new CDataFurnitureLayout()
-                {
-                    ItemID = x.Key,
-                    LayoutID = x.Value
-                })
-                .ToList();
-            res.BgmAcquirementNo = (uint)customizations.FirstOrDefault(x => x.Value == MyRoomMyRoomBgmUpdateHandler.MYROOM_BGM_LAYOUTNO).Key;
-            res.ActivePlanetariumNo = (uint)customizations.FirstOrDefault(x => x.Value == MyRoomUpdatePlanetariumHandler.MYROOM_PLANETARIUM_LAYOUTNO).Key;
-            res.PawnId = targetCharacter.PartnerPawnId;
+            S2CMyRoomOtherRoomLayoutGetRes res = new()
+            {
+                CharacterId = request.CharacterId,
+                FurnitureList = [.. customizations
+                    .Where(x => x.Value < MyRoomMyRoomBgmUpdateHandler.MYROOM_BGM_LAYOUTNO) // Filter out the pseudo-customizations we use for other handlers.
+                    .Select(x => new CDataFurnitureLayout()
+                    {
+                        ItemID = x.Key,
+                        LayoutID = x.Value
+                    })],
+                BgmAcquirementNo = (uint)customizations.FirstOrDefault(x => x.Value == MyRoomMyRoomBgmUpdateHandler.MYROOM_BGM_LAYOUTNO).Key,
+                ActivePlanetariumNo = (uint)customizations.FirstOrDefault(x => x.Value == MyRoomUpdatePlanetariumHandler.MYROOM_PLANETARIUM_LAYOUTNO).Key,
+                PawnId = targetCharacter.PartnerPawnId
+            };
 
             if (targetCharacter.PartnerPawnId > 0)
             {
                 Pawn partnerPawn = targetCharacter.Pawns.Find(x => x.PawnId == targetCharacter.PartnerPawnId)
                     ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_MY_ROOM_NO_PARTNER,
                     $"Attempting to enter other room of character {targetCharacter.CharacterId}; couldn't find partner pawn {targetCharacter.PartnerPawnId}");
-                GameStructure.CDataNoraPawnInfo(res.PawnInfo, partnerPawn, Server);
+                res.PawnInfo = partnerPawn.CDataNoraPawnInfo;
             }
             res.UnlockTerrace = targetCharacter.ContentsReleased.Contains(ContentsRelease.YourRoomsTerrace);
 

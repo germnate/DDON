@@ -1,10 +1,12 @@
 using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.GameServer.Chat;
+using Arrowgene.Ddon.GameServer.Utils;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
+using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Ddon.Shared.Model.Rpc;
 using Arrowgene.Logging;
 using System;
@@ -14,6 +16,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Arrowgene.Ddon.GameServer
@@ -23,21 +26,25 @@ namespace Arrowgene.Ddon.GameServer
         private class RpcTrackingMap : Dictionary<uint, RpcCharacterData>
         {
             public readonly DateTime TimeStamp;
+            public readonly ushort ChannelId;
 
-            public RpcTrackingMap() : base() 
-            { 
+            public RpcTrackingMap(ushort channelId) : base() 
+            {
+                ChannelId = channelId;
                 TimeStamp = DateTime.UtcNow;
             }
 
-            public RpcTrackingMap(List<RpcCharacterData> characterData) 
+            public RpcTrackingMap(ushort channelId, List<RpcCharacterData> characterData) 
                 : base(characterData.ToDictionary(key => key.CharacterId, val => val))
             {
+                ChannelId = channelId;
                 TimeStamp = DateTime.UtcNow;
             }
 
-            public RpcTrackingMap(List<RpcCharacterData> characterData, DateTime timeStamp)
+            public RpcTrackingMap(ushort channelId, List<RpcCharacterData> characterData, DateTime timeStamp)
                 : base(characterData.ToDictionary(key => key.CharacterId, val => val))
             {
+                ChannelId = channelId;
                 TimeStamp = timeStamp;
             }
         }
@@ -47,88 +54,86 @@ namespace Arrowgene.Ddon.GameServer
         private static readonly string[] TRAFFIC_LABELS = new string[] {
             "Empty", "Light", "Good", "Normal", "Busy", "Heavy"
         };
-        private static readonly uint COUNT_PER_TRAFFIC = 10;
 
-        private readonly HttpClient HttpClient = new HttpClient();
+        private readonly HttpClient HttpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(5) };
+        private static readonly double PING_TIMEOUT = 3000; // msec.
 
         private readonly DdonGameServer Server;
-        private readonly Dictionary<ushort, ServerInfo> ChannelInfo;
-
-        private readonly ConcurrentDictionary<ushort, RpcTrackingMap> CharacterTrackingMap;
+        private ConcurrentDictionary<ushort, RpcTrackingMap> CharacterTrackingMap { get; set; }
 
         public RpcManager(DdonGameServer server)
         {
             Server = server;
-            ChannelInfo = Server.AssetRepository.ServerList.ToDictionary(x => x.Id,
-                x => new ServerInfo()
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Brief = x.Brief,
-                    MaxLoginNum = x.MaxLoginNum,
-                    LoginNum = x.LoginNum,
-                    Addr = x.Addr,
-                    Port = x.Port,
-                    IsHide = x.IsHide,
-                    RpcPort = x.RpcPort,
-                    RpcAuthToken = x.RpcAuthToken,
-                });
+          
             CharacterTrackingMap = new();
-            foreach (var info in ChannelInfo.Values)
+            foreach (var info in server.AssetRepository.ServerList)
             {
-                CharacterTrackingMap[info.Id] = new();
+                CharacterTrackingMap[info.Id] = new(info.Id);
             }
 
-            string authToken = string.Empty;
-            if (ChannelInfo.ContainsKey((ushort)Server.Id))
-            {
-                authToken = ChannelInfo[(ushort)Server.Id].RpcAuthToken;
-            }
+            string authToken = GetServer((ushort) Server.Id)?.RpcAuthToken ?? 
+                throw new Exception("Failed to internally authenticate RPC Manager; ensure your GameServerList is correctly set up.");
 
             HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Internal", $"{server.Id}:{authToken}");
         }
 
         #region Server List
+
+        public ServerInfo GetServer(ushort id)
+        {
+            return Server.AssetRepository.ServerList.FirstOrDefault(x => x.Id == id);
+        }
+
         public List<CDataGameServerListInfo> ServerListInfo()
         {
-            return ChannelInfo.Keys.Select(x => ServerListInfo(x)).ToList();
+            return Server.AssetRepository.ServerList.Select(x => ServerListInfo(x)).ToList();
         }
 
         public ServerInfo HeadServer()
         {
-            return ChannelInfo.Values.ToList().OrderBy(x => x.Id).ToList()[0];
+            return Server.AssetRepository.ServerList.ToList().OrderBy(x => x.Id).FirstOrDefault();
         }
 
         public CDataGameServerListInfo ServerListInfo(ushort channelId)
         {
-            var info = ChannelInfo[channelId].ToCDataGameServerListInfo();
-            if (channelId == Server.Id)
+            return ServerListInfo(GetServer(channelId));
+        }
+
+        public CDataGameServerListInfo ServerListInfo(ServerInfo info)
+        {
+            var cdata = info.ToCDataGameServerListInfo();
+            if (cdata.Id == Server.Id)
             {
-                info.LoginNum = (uint)Server.ClientLookup.GetAll().Where(x => x.Character != null).Count();
+                cdata.LoginNum = (uint)Server.ClientLookup.GetAll().Where(x => x.Character != null).Count();
             }
             else
             {
-                info.LoginNum = (uint)CharacterTrackingMap[channelId].Count;
+                cdata.LoginNum = (uint)(CharacterTrackingMap.GetValueOrDefault(cdata.Id)?.Count ?? 0);
             }
-            
-            info.TrafficName = GetTrafficName(info.LoginNum);
-            return info;
+
+            cdata.TrafficName = GetTrafficName(cdata.LoginNum, cdata.MaxLoginNum);
+            return cdata;
         }
 
-        public static string GetTrafficName(uint count)
+        public static string GetTrafficName(uint count, uint maxLoginNum)
         {
             uint index = 0;
-            if (count > 0)
+            if (count >= maxLoginNum)
             {
-                index = count / COUNT_PER_TRAFFIC + 1;
-                index = (uint) Math.Min(index, TRAFFIC_LABELS.Length);
+                return $"Full ({count})";
+            }
+            else if (count > 0)
+            {
+                uint countPerTraffic = (uint)(maxLoginNum / (TRAFFIC_LABELS.Length-1));
+                index = count / countPerTraffic + 1;
+                index = (uint) Math.Min(index, TRAFFIC_LABELS.Length - 1);
             }
             return $"{TRAFFIC_LABELS[index]} ({count})";
         }
 
         public bool DoesGameServerExist(ushort channelId)
         {
-            return ChannelInfo.ContainsKey(channelId);
+            return GetServer(channelId) is not null;
         }
 
         #endregion
@@ -136,12 +141,12 @@ namespace Arrowgene.Ddon.GameServer
         #region RPC Machinery
         public bool Auth(ushort channelId, string token)
         {
-            return ChannelInfo.Values.Where(x => x.Id == channelId && x.RpcAuthToken == token).Any();
+            return GetServer(channelId)?.RpcAuthToken == token;
         }
 
         private string Route(ushort channelId, string route)
         {
-            var channel = ChannelInfo[channelId];
+            var channel = GetServer(channelId);
             return $"http://{channel.Addr}:{channel.RpcPort}/rpc/{route}";
         }
 
@@ -168,23 +173,35 @@ namespace Arrowgene.Ddon.GameServer
 
             var json = JsonSerializer.Serialize(wrappedObject);
 
-            _ = HttpClient.PostAsync(Route(channelId, route), new StringContent(json));
+            try
+            {
+                _ = HttpClient.PostAsync(Route(channelId, route), new StringContent(json));
+            }
+            catch (HttpRequestException ex)
+            {
+                Logger.Error($"RPC announce {command} > server {channelId} failed: {ex.Message}");
+            }
+        }
+
+        public void AnnounceAsync(ushort channelId, string route, RpcInternalCommand command, object data)
+        {
+            Task.Run(() => Announce(channelId, route, command, data));
         }
 
         public void AnnounceAll(string route, RpcInternalCommand command, object data)
         {
-            foreach (var id in ChannelInfo.Keys)
+            foreach (var channel in Server.AssetRepository.ServerList)
             {
-                Announce(id, route, command, data);
+                AnnounceAsync(channel.Id, route, command, data);
             }
         }
 
         public void AnnounceOthers(string route, RpcInternalCommand command, object data)
         {
-            foreach (var id in ChannelInfo.Keys)
+            foreach (var channel in Server.AssetRepository.ServerList)
             {
-                if (id == Server.Id) continue;
-                Announce(id, route, command, data);
+                if (channel.Id == Server.Id) continue;
+                AnnounceAsync(channel.Id, route, command, data);
             }
         }
 
@@ -199,8 +216,36 @@ namespace Arrowgene.Ddon.GameServer
 
                 if (channel.Value.Any(x => x.Value.ClanId == clanId))
                 {
-                    Announce(channel.Key, route, command, data);
+                    AnnounceAsync(channel.Key, route, command, data);
                 }
+            }
+        }
+
+        public bool PingServer(ushort serverId)
+        {
+            return PingServer(GetServer(serverId)).GetAwaiter().GetResult();
+        }
+
+        private async Task<bool> PingServer(ServerInfo targetServer)
+        {
+            try
+            {
+                // This is probably not the correct way to do this.
+                var route = $"http://{targetServer.Addr}:{targetServer.RpcPort}/rpc/internal/command";
+                var wrappedObject = new RpcWrappedObject()
+                {
+                    Command = RpcInternalCommand.Ping,
+                };
+                var json = JsonSerializer.Serialize(wrappedObject);
+                var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(PING_TIMEOUT));
+                var response = await HttpClient.PostAsync(route, new StringContent(json), cts.Token);
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex) when (ex is OperationCanceledException || ex is HttpRequestException)
+            {
+                Logger.Error($"Ping on server {targetServer.Id} failed; {ex.Message}");
+                return false;
             }
         }
         #endregion
@@ -249,7 +294,7 @@ namespace Arrowgene.Ddon.GameServer
             }
             Logger.Info($"Announcing player list for channel {Server.Id} with {rpcCharacterDatas.Count} players over RPC.");
             AnnounceOthers("internal/command", RpcInternalCommand.NotifyPlayerList, rpcCharacterDatas);
-            CharacterTrackingMap[(ushort) Server.Id] = new RpcTrackingMap(rpcCharacterDatas);
+            CharacterTrackingMap[(ushort) Server.Id] = new RpcTrackingMap((ushort) Server.Id, rpcCharacterDatas);
         }
 
         public void ReceivePlayerList(ushort channelId, DateTime timestamp, List<RpcCharacterData> characterDatas)
@@ -259,7 +304,7 @@ namespace Arrowgene.Ddon.GameServer
             {
                 if (timestamp > CharacterTrackingMap[channelId].TimeStamp)
                 {
-                    CharacterTrackingMap[channelId] = new RpcTrackingMap(characterDatas, timestamp);
+                    CharacterTrackingMap[channelId] = new RpcTrackingMap(channelId, characterDatas, timestamp);
                 }
                 else
                 {
@@ -287,6 +332,23 @@ namespace Arrowgene.Ddon.GameServer
         #endregion
 
         #region Chat
+        public void AnnounceShoutChat(GameClient client, ChatResponse chatResponse)
+        {
+            RpcChatData chatData = new RpcChatData()
+            {
+                HandleId = 0,
+                Type = LobbyChatMsgType.Shout,
+                MessageFlavor = chatResponse.MessageFlavor,
+                PhrasesCategory = chatResponse.PhrasesCategory,
+                PhrasesIndex = chatResponse.PhrasesIndex,
+                Message = chatResponse.Message,
+                Deliver = false,
+                SourceData = new RpcCharacterData(client.Character)
+            };
+
+            AnnounceOthers("internal/chat", RpcInternalCommand.SendShoutMessage, chatData);
+        }
+
         public void AnnounceClanChat(GameClient client, ChatResponse chatResponse)
         {
             if (client.Character.ClanId == 0) return;
@@ -332,7 +394,7 @@ namespace Arrowgene.Ddon.GameServer
                 }
             };
 
-            Announce(targetServer, "internal/chat", RpcInternalCommand.SendTellMessage, chatData);
+            AnnounceAsync(targetServer, "internal/chat", RpcInternalCommand.SendTellMessage, chatData);
         }
         #endregion
 

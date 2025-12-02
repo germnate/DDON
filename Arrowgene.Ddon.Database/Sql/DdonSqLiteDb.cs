@@ -1,111 +1,123 @@
-﻿using System;
+using System;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
 using Arrowgene.Ddon.Database.Sql.Core;
 using Arrowgene.Logging;
 
-namespace Arrowgene.Ddon.Database.Sql
+namespace Arrowgene.Ddon.Database.Sql;
+
+public class DdonSqLiteDb : DdonSqlDb
 {
-    public class DdonSqLiteDb : DdonSqlDb<SQLiteConnection, SQLiteCommand, SQLiteDataReader>, IDatabase
+    protected const SQLiteTraceFlags TraceLevel = SQLiteTraceFlags.SQLITE_TRACE_ALL;
+    private static readonly ILogger Logger = LogProvider.Logger<Logger>(typeof(DdonSqLiteDb));
+    private readonly string _databasePath;
+    protected readonly bool EnableTracing;
+    protected readonly bool EnablePooling;
+    /// <summary>
+    /// Check out https://sqlite.org/pragma.html#pragma_cache_size.
+    /// </summary>
+    protected readonly uint CacheSize;
+    private string _connectionString;
+
+    public DdonSqLiteDb(string databasePath, bool wipeOnStartup, uint cacheSize, bool enableTracing = false, bool enablePooling = true)
     {
-        private static readonly ILogger Logger = LogProvider.Logger<Logger>(typeof(DdonSqLiteDb));
+        _databasePath = databasePath;
+        EnableTracing = enableTracing;
+        EnablePooling = enablePooling;
+        CacheSize = cacheSize;
+        if (wipeOnStartup)
+            try
+            {
+                File.Delete(_databasePath);
+                Logger.Info("Database has been wiped.");
+            }
+            catch (Exception)
+            {
+                Logger.Error("Failed to wipe database.");
+            }
+    }
 
-
-        public const string MemoryDatabasePath = ":memory:";
-
-        private readonly string _databasePath;
-        private string _connectionString;
-        private SQLiteConnection _memoryConnection;
-
-        public DdonSqLiteDb(string databasePath, bool wipeOnStartup)
+    public override bool CreateDatabase()
+    {
+        _connectionString = BuildConnectionString(_databasePath, CacheSize, EnablePooling);
+        if (_connectionString == null)
         {
-            _memoryConnection = null;
-            _databasePath = databasePath;
-            if (wipeOnStartup)
-            {
-                try
-                {
-                    File.Delete(_databasePath);
-                    Logger.Info($"Database has been wiped.");
-                }
-                catch (Exception)
-                {
-                    Logger.Error($"Failed to wipe database.");
-                }
-            }
-        }
-
-        public override bool CreateDatabase()
-        {
-            _connectionString = BuildConnectionString(_databasePath);
-            if (_connectionString == null)
-            {
-                Logger.Error($"Failed to build connection string");
-                return false;
-            }
-
-            ReusableConnection = new SQLiteConnection(_connectionString);
-
-            if (_databasePath == MemoryDatabasePath)
-            {
-                throw new NotSupportedException("Connections are utilized via `using`, disposing the connection. In Memory DB only available for lifetime of connection");
-                _memoryConnection = new SQLiteConnection(_connectionString);
-                _memoryConnection.Open();
-                return true;
-            }
-
-            if (!File.Exists(_databasePath))
-            {
-                FileStream fs = File.Create(_databasePath);
-                fs.Close();
-                fs.Dispose();
-                return true;
-            }
-
+            Logger.Error("Failed to build connection string");
             return false;
         }
 
-        private string BuildConnectionString(string source)
+        ReusableConnection = new SQLiteConnection(_connectionString);
+        if (EnableTracing)
         {
-            SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder
-            {
-                DataSource = source,
-                Version = 3,
-                ForeignKeys = true,
-                Pooling = true,
-                // Set ADO.NET conformance flag https://system.data.sqlite.org/index.html/info/e36e05e299
-                Flags = SQLiteConnectionFlags.Default | SQLiteConnectionFlags.StrictConformance
-            };
-
-            string connectionString = builder.ToString();
-            Logger.Info($"Connection String: {connectionString}");
-            return connectionString;
+            ((SQLiteConnection)ReusableConnection).TraceFlags = TraceLevel;
+            ((SQLiteConnection)ReusableConnection).Trace2 += TraceSqLiteEvent;
         }
 
-        protected override SQLiteConnection OpenNewConnection()
+        if (!File.Exists(_databasePath))
         {
-            return new SQLiteConnection(_connectionString).OpenAndReturn();
+            FileStream fs = File.Create(_databasePath);
+            fs.Close();
+            fs.Dispose();
+            return true;
         }
 
-        protected override SQLiteCommand Command(string query, SQLiteConnection connection)
+        return false;
+    }
+
+    public override void Stop()
+    {
+        Logger.Info("Stopping database connection.");
+        ReusableConnection.Close();
+        ReusableConnection.Dispose();
+    }
+
+    private string BuildConnectionString(string source, uint cacheSize, bool enablePooling)
+    {
+        SQLiteConnectionStringBuilder builder = new()
         {
-            return new SQLiteCommand(query, connection);
+            DataSource = source,
+            Version = 3,
+            ForeignKeys = true,
+            Pooling = enablePooling,
+            CacheSize = -(int)cacheSize,
+            // Set ADO.NET conformance flag https://system.data.sqlite.org/index.html/info/e36e05e299
+            Flags = SQLiteConnectionFlags.Default | SQLiteConnectionFlags.StrictConformance
+        };
+
+        string connectionString = builder.ToString();
+        Logger.Info($"Connection String: {connectionString}");
+        return connectionString;
+    }
+
+    public override DbConnection OpenNewConnection()
+    {
+        SQLiteConnection openNewConnection = new SQLiteConnection(_connectionString).OpenAndReturn();
+        if (EnableTracing)
+        {
+            openNewConnection.TraceFlags = TraceLevel;
+            openNewConnection.Trace2 += TraceSqLiteEvent;
         }
 
-        /// <summary>
-        /// Thread Safe on Connection basis.
-        /// http://www.sqlite.org/c3ref/last_insert_rowid.html
-        /// </summary>
-        protected override long AutoIncrement(SQLiteConnection connection, SQLiteCommand command)
-        {
-            return connection.LastInsertRowId;
-        }
+        return openNewConnection;
+    }
 
-        public override int Upsert(string table, string[] columns, object[] values, string whereColumn,
-            object whereValue,
-            out long autoIncrement)
-        {
-            throw new NotImplementedException();
-        }
+    protected override DbCommand Command(string query, DbConnection connection)
+    {
+        return new SQLiteCommand(query, (SQLiteConnection)connection);
+    }
+
+    /// <summary>
+    ///     Thread Safe on Connection basis.
+    ///     http://www.sqlite.org/c3ref/last_insert_rowid.html
+    /// </summary>
+    protected override long AutoIncrement(DbConnection connection, DbCommand command)
+    {
+        return ((SQLiteConnection)connection).LastInsertRowId;
+    }
+
+    protected void TraceSqLiteEvent(object sender, TraceEventArgs e)
+    {
+        Logger.Debug($"statement={e.Statement};preparedStatement={e.PreparedStatement};elapsed={e.Elapsed}");
     }
 }

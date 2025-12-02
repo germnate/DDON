@@ -19,16 +19,14 @@ namespace Arrowgene.Ddon.Shared.Model
             Created = DateTime.SpecifyKind(DateTime.MinValue, DateTimeKind.Utc);
             PlayPointList = new List<CDataJobPlayPoint>();
             Storage = new Storages(new Dictionary<StorageType, ushort>());
-            CharacterEquipItemInfoUnk2 = new List<CDataEquipItemInfoUnk2>();
             WalletPointList = new List<CDataWalletPoint>();
             OrbStatusList = new List<CDataOrbPageStatus>();
             MsgSetList = new List<CDataCharacterMsgSet>();
             ShortCutList = new List<CDataShortCut>();
             CommunicationShortCutList = new List<CDataCommunicationShortCut>();
             MatchingProfile = new CDataMatchingProfile();
-            ArisenProfile = new CDataArisenProfile();
             Pawns = new List<Pawn>();
-            RentedPawns = new List<Pawn>();
+            RentedPawns = new();
             ReleasedWarpPoints = new List<ReleasedWarpPoint>();
             OnlineStatus = OnlineStatus.Offline;
             ContextOwnership = new Dictionary<ulong, bool>();
@@ -48,9 +46,17 @@ namespace Arrowgene.Ddon.Shared.Model
 
             UnlockableItems = new();
 
-            PartnerTimerLockObj = new();
             ContentsReleased = new HashSet<ContentsRelease>();
             WorldManageUnlocks = new Dictionary<QuestId, List<QuestFlagInfo>>();
+
+            JobMasterReleasedElements = new();
+            JobMasterActiveOrders = new();
+            AcquirableSkills = new();
+            AcquirableAbilities = new();
+
+            JobEmblems = new();
+
+            DispelSeals = [];
         }
 
         public int AccountId { get; set; }
@@ -88,7 +94,6 @@ namespace Arrowgene.Ddon.Shared.Model
         public string LastName { get; set; }
         public List<CDataJobPlayPoint> PlayPointList { get; set; }
         public Storages Storage { get; set; }
-        public List<CDataEquipItemInfoUnk2> CharacterEquipItemInfoUnk2 { get; set; }
         public List<CDataWalletPoint> WalletPointList { get; set; }
         public QuestAreaId AreaId { get; set; }
 
@@ -112,7 +117,6 @@ namespace Arrowgene.Ddon.Shared.Model
         public List<CDataShortCut> ShortCutList { get; set; }
         public List<CDataCommunicationShortCut> CommunicationShortCutList { get; set; }
         public CDataMatchingProfile MatchingProfile { get; set; }
-        public CDataArisenProfile ArisenProfile { get; set; }
         public bool HideEquipHeadPawn { get; set; }
         public bool HideEquipLanternPawn { get; set; }
         public byte ArisenProfileShareRange { get; set; }
@@ -121,10 +125,9 @@ namespace Arrowgene.Ddon.Shared.Model
         public GameMode GameMode {  get; set; }
         public Dictionary<uint, uint> LastSeenLobby { get; set; }
         public uint PartnerPawnId { get; set; }
-        public uint PartnerPawnAdventureTimerId { get; set; }
-        public object PartnerTimerLockObj { get; set; }
         public List<Pawn> Pawns { get; set; }
-        public List<Pawn> RentedPawns {  get; set; }
+        public List<RentalPawn> RentedPawns {  get; set; }
+        public HashSet<uint> FavoritedPawnIds { get; set; } = new();
         public uint FavWarpSlotNum { get; set; }
         public List<ReleasedWarpPoint> ReleasedWarpPoints { get; set; }
         public BitterblackMazeProgress BbmProgress;
@@ -134,8 +137,10 @@ namespace Arrowgene.Ddon.Shared.Model
         public uint LastSafeStageId { get; set; }
         public uint ClanId { get; set; }
         public ClanName ClanName { get; set; }
-        public bool IsLanternLit { get; set; }
+        public bool IsLanternLit => LanternTimer > 0;
         public uint LanternTimer { get; set; }
+
+        public Dictionary<JobId, JobEmblem> JobEmblems { get; set; }
 
         public EpitaphRoadState EpitaphRoadState { get; set; }
         public Dictionary<QuestAreaId, AreaRank> AreaRanks { get; set; }
@@ -150,12 +155,19 @@ namespace Arrowgene.Ddon.Shared.Model
         public HashSet<ContentsRelease> ContentsReleased { get; set; }
         public Dictionary<QuestId, List<QuestFlagInfo>> WorldManageUnlocks { get; set; }
 
+        public Dictionary<JobId, List<CDataReleaseElement>> JobMasterReleasedElements { get; set; }
+        public Dictionary<JobId, List<CDataActiveJobOrder>> JobMasterActiveOrders { get; set; }
+        public Dictionary<JobId, List<CDataSkillParam>> AcquirableSkills { get; set; }
+        public Dictionary<JobId, List<CDataAbilityParam>> AcquirableAbilities { get; set; }
+
+        public HashSet<uint> DispelSeals { get; set; }
+
         // TODO: Move to a more sensible place
         public uint LastEnteredShopId { get; set; }
 
         public Pawn PawnBySlotNo(byte slotNo)
         {
-            if (slotNo > Pawns.Count)
+            if (slotNo == 0 || slotNo > Pawns.Count)
             {
                 throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_INVALID_SLOT_NO,
                     $"Requesting invalid main pawn slot {slotNo} for character {CharacterId}");
@@ -164,7 +176,7 @@ namespace Arrowgene.Ddon.Shared.Model
             return Pawns[slotNo - 1];
         }
 
-        public Pawn RentedPawnBySlotNo(byte slotNo)
+        public RentalPawn RentedPawnBySlotNo(byte slotNo)
         {
             if (slotNo > RentedPawns.Count)
             {
@@ -175,7 +187,7 @@ namespace Arrowgene.Ddon.Shared.Model
             return RentedPawns[slotNo - 1];
         }
 
-        public void RemovedRentedPawnBySlotNo(byte slotNo)
+        public void RemoveRentedPawnBySlotNo(byte slotNo)
         {
             if (slotNo > RentedPawns.Count)
             {
@@ -217,20 +229,6 @@ namespace Arrowgene.Ddon.Shared.Model
         }
 
         public CharacterStampBonus StampBonus { get; set; }
-
-        public CDataCommunityCharacterBaseInfo GetCommunityCharacterBaseInfo()
-        {
-            return new CDataCommunityCharacterBaseInfo
-            {
-                CharacterId = CharacterId,
-                CharacterName = new CDataCharacterName
-                {
-                    FirstName = FirstName,
-                    LastName = LastName,
-                },
-                ClanName = ClanName.ShortName
-            };
-        }
 
         public List<CDataCharacterReleaseElement> GetReleasedContent()
         {
@@ -277,5 +275,107 @@ namespace Arrowgene.Ddon.Shared.Model
         {
             return CharacterJobDataList.Any(x => x.Job == jobId && x.Lv >= level);
         }
+
+        #region CData Conversions
+
+        public override CDataCommunityCharacterBaseInfo CDataCommunityCharacterBaseInfo { get
+            {
+                return new CDataCommunityCharacterBaseInfo()
+                {
+                    CharacterId = CharacterId,
+                    CharacterName = CDataCharacterName,
+                    ClanName = ClanName.ShortName,
+                };
+            }
+        }
+
+        public override CDataCharacterName CDataCharacterName { get 
+            {
+                return new CDataCharacterName()
+                {
+                    FirstName = FirstName,
+                    LastName = LastName,
+                };
+            } 
+        }
+
+        public override CDataContextBase CDataContextBase { get
+            {
+                var context = base.CDataContextBase;
+                context.CharacterId = CharacterId;
+                context.FirstName = FirstName;
+                context.LastName = LastName;
+
+                return context;
+            } 
+        }
+
+        public CDataLobbyContextPlayer CDataLobbyContextPlayer
+        {
+            get
+            {
+                return new()
+                {
+                    Base = CDataContextBase,
+                    PlayerInfo = CDataContextPlayerInfo,
+                    EditInfo = EditInfo
+                };
+            }
+        }
+
+        public CDataCharacterInfo CDataCharacterInfo
+        {
+            get
+            {
+                return new()
+                {
+                    CharacterId = CharacterId,
+                    UserId = UserId,
+                    Version = Version,
+                    FirstName = FirstName,
+                    LastName = LastName,
+                    EditInfo = EditInfo,
+                    StatusInfo = StatusInfo,
+                    Job = Job,
+                    CharacterJobDataList = CharacterJobDataList,
+                    PlayPointList = PlayPointList,
+                    CharacterEquipDataList = [new() { Equips = Equipment.AsCDataEquipItemInfo(EquipType.Performance) }],
+                    CharacterEquipViewDataList = [new() { Equips = Equipment.AsCDataEquipItemInfo(EquipType.Visual) }],
+                    CharacterEquipJobItemList = EquipmentTemplate.JobItemsAsCDataEquipJobItem(Job),
+                    JewelrySlotNum = JewelrySlotNum,
+                    EmblemStatList = EmblemStatList,
+                    CharacterItemSlotInfoList = Storage.GetAllStoragesAsCDataCharacterItemSlotInfoList(),
+                    WalletPointList = WalletPointList,
+                    MyPawnSlotNum = MyPawnSlotNum,
+                    RentalPawnSlotNum = RentalPawnSlotNum,
+                    OrbStatusList = OrbStatusList,
+                    MsgSetList = MsgSetList,
+                    ShortCutList = ShortCutList,
+                    CommunicationShortCutList = CommunicationShortCutList,
+                    MatchingProfile = MatchingProfile,
+                    ArisenProfile = CharacterProfile.CDataArisenProfile,
+                    HideEquipHead = HideEquipHead,
+                    HideEquipLantern = HideEquipLantern,
+                    HideEquipHeadPawn = HideEquipHeadPawn,
+                    HideEquipLanternPawn = HideEquipLanternPawn,
+                    ArisenProfileShareRange = ArisenProfileShareRange,
+                    OnlineStatus = OnlineStatus,
+                };
+            }
+        }
+
+        public S2CContextGetLobbyPlayerContextNtc S2CContextGetLobbyPlayerContextNtc
+        {
+            get {
+                return new()
+                {
+                    CharacterId = CharacterId,
+                    Context = CDataLobbyContextPlayer
+                };
+            }
+        }
+       
+
+        #endregion
     }
 }

@@ -19,8 +19,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
     {
         private static readonly ServerLogger Logger = LogProvider.Logger<ServerLogger>(typeof(QuestGetRewardBoxItemHandler));
 
-
-
         public QuestGetRewardBoxItemHandler(DdonGameServer server) : base(server)
         {
         }
@@ -76,7 +74,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     var reward = coalescedRewards[rewardUID];
 
-                    var (specialQueue, isSpecial) = Server.ItemManager.HandleSpecialItem(client, updateCharacterItemNtc, reward.ItemId, reward.Num, connection);
+                    var (specialQueue, isSpecial) = Server.ItemManager.HandleSpecialItem(client, updateCharacterItemNtc, reward.ItemId, reward.Num, false, connection);
                     if (isSpecial)
                     {
                         queue.AddRange(specialQueue);

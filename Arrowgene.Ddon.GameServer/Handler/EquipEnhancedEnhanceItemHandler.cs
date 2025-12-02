@@ -4,6 +4,7 @@ using Arrowgene.Ddon.GameServer.Shop;
 using Arrowgene.Ddon.GameServer.Utils;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
+using Arrowgene.Ddon.Shared;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
@@ -37,36 +38,52 @@ namespace Arrowgene.Ddon.GameServer.Handler
             {
                 foreach (var itemCost in request.UpgradeItemCostList)
                 {
-                    updateCharacterItemNtc.UpdateItemList.Add(Server.ItemManager.ConsumeItemByIdFromItemBag(Server, client.Character, (uint) itemCost.ItemId, itemCost.Amount, connection));
+                    updateCharacterItemNtc.UpdateItemList.AddRange(Server.ItemManager.ConsumeItemByIdFromMultipleStorages(Server, client.Character, ItemManager.AllItemStorages, (uint) itemCost.ItemId, itemCost.Amount, connection));
                 }
 
                 bool forceGreatSuccess = false;
                 foreach (var walletCost in request.UpgradeWalletCost)
                 {
                     updateCharacterItemNtc.UpdateWalletList.Add(Server.WalletManager.RemoveFromWallet(client.Character, walletCost.Type, walletCost.Value, connection));
-                    if (walletCost.Type == WalletType.GoldenGemstones || walletCost.Type == WalletType.CustomMadeServiceTickets)
-                    {
-                        forceGreatSuccess = true;
-                    }
+
+                    forceGreatSuccess |= category.PremiumCurrencies.Contains(walletCost.Type);
                 }
 
                 var statRolls = category.StatLottery.OrderBy(x => Random.Shared.Next()).First();
                 var statRoll = forceGreatSuccess ?
                     statRolls.Rolls[Random.Shared.Next((int) statRolls.MinGreatSuccessIndex, statRolls.Rolls.Count)] :
-                    statRolls.Rolls.GetWeightedRandomElement(Server.GameSettings.GameServerSettings.EquipmentLimitBreakBias, 0.5);
+                    statRolls.Rolls.GetWeightedRandomElement(Server.GameSettings.GameServerSettings.EquipmentLimitBreakBias);
 
-                var newAddStatusParam = new CDataAddStatusParam()
+                var param = item.AddStatusParamList.Find(x => x.EnhanceType == EquipEnhanceType.LimitBreak);
+                if (param is null)
                 {
-                    AdditionalStatus1 = statRoll,
-                    IsAddStat1 = true
-                };
+                    param = new CDataAddStatusParam()
+                    {
+                        EnhanceId = statRoll,
+                        EnhanceType = EquipEnhanceType.LimitBreak
+                    };
+                    item.AddStatusParamList.Add(param);
+                }
+                else
+                {
+                    param.EnhanceId = statRoll;
+                }
 
-                Server.Database.UpsertEquipmentLimitBreakRecord(client.Character.CharacterId, item.UId, newAddStatusParam, connection);
+                Server.Database.UpsertEquipmentLimitBreakRecord(client.Character.CharacterId, item.UId, param, connection);
+                
+                ushort relativeSlotNo = slotNo;
+                CharacterCommon characterCommon = client.Character;
+                if (storageType == StorageType.PawnEquipment)
+                {
+                    uint pawnId = Storages.DeterminePawnId(client.Character, storageType, relativeSlotNo);
+                    characterCommon = client.Character.Pawns.Where(x => x.PawnId == pawnId).SingleOrDefault()
+                        ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED, "Unable to locate the pawn that has this emblem item equipped");
+                    relativeSlotNo = EquipManager.DeterminePawnEquipSlot(relativeSlotNo);
+                }
 
-                item.AddStatusParamList.Clear();
-                item.AddStatusParamList.Add(newAddStatusParam);
-                updateCharacterItemNtc.UpdateItemList.Add(Server.ItemManager.CreateItemUpdateResult(client.Character, item, storageType, slotNo, 1, 1));
+                updateCharacterItemNtc.UpdateItemList.Add(Server.ItemManager.CreateItemUpdateResult(characterCommon, item, storageType, relativeSlotNo, 1, 1));
                 updateCharacterItemNtc.UpdateType = ItemNoticeType.GatherEquipItem;
+                
                 packets.Enqueue(client, updateCharacterItemNtc);
 
                 packets.Enqueue(client, new S2CEquipEnhancedEnhanceItemRes()

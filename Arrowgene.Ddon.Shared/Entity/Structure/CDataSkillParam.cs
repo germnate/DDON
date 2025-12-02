@@ -6,15 +6,10 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
 {
     public class CDataSkillParam
     {
-        public CDataSkillParam()
-        {
-            Params = new List<CDataSkillLevelParam>();
-        }
-
         public uint SkillNo { get; set; }
         public JobId Job { get; set; }
-        public byte Type { get; set; }
-        public List<CDataSkillLevelParam> Params { get; set; }
+        public ReleaseType Type { get; set; } = ReleaseType.CustomSkill;
+        public List<CDataSkillLevelParam> Params { get; set; } = [];
 
         public class Serializer : EntitySerializer<CDataSkillParam>
         {
@@ -22,7 +17,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
             {
                 WriteUInt32(buffer, obj.SkillNo);
                 WriteByte(buffer, (byte) obj.Job);
-                WriteByte(buffer, obj.Type);
+                WriteByte(buffer, (byte) obj.Type);
                 WriteEntityList<CDataSkillLevelParam>(buffer, obj.Params);
             }
 
@@ -31,7 +26,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
                 CDataSkillParam obj = new CDataSkillParam();
                 obj.SkillNo = ReadUInt32(buffer);
                 obj.Job = (JobId) ReadByte(buffer);
-                obj.Type = ReadByte(buffer);
+                obj.Type = (ReleaseType) ReadByte(buffer);
                 obj.Params = ReadEntityList<CDataSkillLevelParam>(buffer);
                 return obj;
             }

@@ -32,6 +32,21 @@ namespace Arrowgene.Ddon.GameServer.Scripting
                 return Server.AssetRepository;
             }
         }
+        public static EpitaphRoadManager EpitaphRoadMgr
+        {
+            get
+            {
+                return Server.EpitaphRoadManager;
+            }
+        }
+
+        public static AreaRankManager AreaRank
+        {
+            get
+            {
+                return Server.AreaRankManager;
+            }
+        }
 
         public static void SetServer(DdonGameServer server)
         {
@@ -107,7 +122,7 @@ namespace Arrowgene.Ddon.GameServer.Scripting
 
             public ClientItemInfo GetClientItemInfo(ItemId itemId)
             {
-                return Server.ItemManager.LookupInfoByItemID(Server, (uint) itemId);
+                return Server.AssetRepository.ClientItemInfos[itemId];
             }
 
             public GatheringItem CreateDropItem(ItemId itemId, uint minAmount, uint maxAmount, double dropChance)
@@ -136,7 +151,7 @@ namespace Arrowgene.Ddon.GameServer.Scripting
 
             public DropsTable GetDropsTable(InstancedEnemy enemy)
             {
-                return GetDropsTable((EnemyId)enemy.EnemyId, enemy.Lv);
+                return GetDropsTable(enemy.EnemyId, enemy.Lv);
             }
 
             public InstancedEnemy Create(EnemyId enemyId, ushort lv, uint exp, byte index, bool assignDefaultDrops = true)
@@ -198,6 +213,21 @@ namespace Arrowgene.Ddon.GameServer.Scripting
             public InstancedEnemy CreateRandom(ushort lv, uint exp, List<EnemyId> enemyIds, bool assignDefaultDrops = true)
             {
                 return CreateRandom(lv, exp, 0, enemyIds, assignDefaultDrops);
+            }
+
+            public List<InstancedEnemy> GetEnemiesForGroup(GameClient client, StageLayoutId stageLayoutId)
+            {
+                return client.Party.InstanceEnemyManager.GetInstancedEnemies(stageLayoutId);
+            }
+
+            public bool IsGroupDestroyed(GameClient client, StageLayoutId stageLayoutId)
+            {
+                return GetEnemiesForGroup(client, stageLayoutId).Where(x => x.IsRequired).All(x => x.IsKilled);
+            }
+
+            public bool IsGroupDestroyed(GameClient client, InstancedEnemy enemy)
+            {
+                return IsGroupDestroyed(client, enemy.StageLayoutId);
             }
         }
 

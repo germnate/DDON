@@ -31,27 +31,20 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public HashSet<GameClient> GetClientsInHub(uint stageId)
         {
-            if (Server.GameSettings.GameServerSettings.NaiveLobbyContextHandling)
+            HashSet<GameClient> clients = new();
+            if (!HubMembers.ContainsKey(stageId))
             {
-                return Server.ClientLookup.GetAll().Distinct().ToHashSet();
-            }
-            else
-            {
-                HashSet<GameClient> clients = new();
-                if (!HubMembers.ContainsKey(stageId))
-                {
-                    return clients;
-                }
-                
-                foreach (GameClient client in Server.ClientLookup.GetAll())
-                {
-                    if (client.Character != null && HubMembers[stageId].Contains(client.Character.CharacterId))
-                    {
-                        clients.Add(client);
-                    }
-                }
                 return clients;
             }
+
+            foreach (GameClient client in Server.ClientLookup.GetAll())
+            {
+                if (client.Character != null && HubMembers[stageId].Contains(client.Character.CharacterId))
+                {
+                    clients.Add(client);
+                }
+            }
+            return clients;
         }
 
         // The server maintains an authoritative list of who's in each hub stage.
@@ -62,13 +55,6 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public void UpdateLobbyContextOnStageChange(GameClient client, uint previousStageId, uint targetStageId)
         {
-            // Fallback to naive method.
-            if (Server.GameSettings.GameServerSettings.NaiveLobbyContextHandling)
-            {
-                NaiveLobbyHandling(client, previousStageId);
-                return;
-            }
-
             // Transitions that do not involve a hub stage don't concern us.
             if (!HubMembers.ContainsKey(previousStageId) && !HubMembers.ContainsKey(targetStageId))
             {
@@ -132,39 +118,59 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 }
             }
 
-            if (targetClients.Any())
+            if (previousStageId == 0)
+            {
+                targetClients.Add(client);
+            }
+
+            // HOTFIX: Seems to reduce the channel meltdown issues?
+            // Be really aggressive about making sure everybody has all the lobby contexts, even if it means sending extra packets.
+            // May cause people standing around in WDT oddly.
+            targetClients = [.. Server.ClientLookup.GetAll().Except([client])];
+            if (previousStageId == 0)
+            {
+                gatherClients = targetClients;
+            }
+            else
+            {
+                gatherClients = [];
+            }
+
+            if (targetClients.Count != 0)
             {
                 SendContext(client, targetClients);
             }
-            if (gatherClients.Any())
+
+            if (gatherClients.Count != 0)
             {
                 GatherContexts(gatherClients, client);
             }
         }
 
-        private static void SendContext(GameClient sourceClient, GameClient targetClient)
+        private void SendContext(GameClient sourceClient, GameClient targetClient)
         {
-            S2CContextGetLobbyPlayerContextNtc contextNtc = new S2CContextGetLobbyPlayerContextNtc();
-            GameStructure.S2CContextGetLobbyPlayerContextNtc(contextNtc, sourceClient.Character);
-            targetClient.Send(contextNtc);
+            targetClient.Send(sourceClient.Character.S2CContextGetLobbyPlayerContextNtc);
         }
 
-        private static void SendContext(GameClient sourceClient, IEnumerable<GameClient> targetClients)
+        private void SendContext(GameClient sourceClient, IEnumerable<GameClient> targetClients)
         {
-            S2CContextGetLobbyPlayerContextNtc contextNtc = new S2CContextGetLobbyPlayerContextNtc();
-            GameStructure.S2CContextGetLobbyPlayerContextNtc(contextNtc, sourceClient.Character);
+            S2CContextGetLobbyPlayerContextNtc contextNtc = sourceClient.Character.S2CContextGetLobbyPlayerContextNtc;
             foreach (GameClient client in targetClients)
             {
                 client.Send(contextNtc);
             }
         }
 
-        private static void GatherContexts(IEnumerable<GameClient> sourceClients, GameClient targetClient)
+        private void GatherContexts(IEnumerable<GameClient> sourceClients, GameClient targetClient)
         {
             foreach (GameClient source in sourceClients)
             {
-                S2CContextGetLobbyPlayerContextNtc contextNtc = new S2CContextGetLobbyPlayerContextNtc();
-                GameStructure.S2CContextGetLobbyPlayerContextNtc(contextNtc, source.Character);
+                if (source.Character is null)
+                {
+                    continue;
+                }
+
+                S2CContextGetLobbyPlayerContextNtc contextNtc = source.Character.S2CContextGetLobbyPlayerContextNtc;
                 targetClient.Send(contextNtc);
             }
         }
@@ -179,38 +185,6 @@ namespace Arrowgene.Ddon.GameServer.Characters
             foreach (var hub in HubMembers.Values)
             {
                 hub.Remove(client.Character.CharacterId);
-            }
-        }
-
-        // A fallback to the existing mechanism; broadcast/gather the entire server on entry.
-        private void NaiveLobbyHandling(GameClient client, uint sourceStageId)
-        {
-            // Designed to only trigger once on joining the server, the only time your StageId == 0.
-            if (sourceStageId != 0)
-            {
-                return;
-            } 
-
-            HashSet<GameClient> targetClients = new HashSet<GameClient>();
-            HashSet<GameClient> gatherClients = new HashSet<GameClient>();
-
-            foreach (GameClient otherClient in Server.ClientLookup.GetAll())
-            {
-                if (otherClient.Character is null)
-                {
-                    continue;
-                }
-                targetClients.Add(otherClient);
-                gatherClients.Add(otherClient);
-            }
-
-            if (targetClients.Any())
-            {
-                SendContext(client, targetClients);
-            }
-            if (gatherClients.Any())
-            {
-                GatherContexts(gatherClients, client);
             }
         }
     }

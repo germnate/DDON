@@ -4,21 +4,45 @@ using System.Linq;
 
 namespace Arrowgene.Ddon.Shared.Model
 {
+    public class ClientItemInfoAsset : Dictionary<ItemId, ClientItemInfo>
+    {
+        public ClientItemInfo this[uint itemId]
+        {
+            get => this[(ItemId)itemId];
+            set => this[(ItemId)itemId] = value;
+        }
+        
+        public ClientItemInfo this[Item item]
+        {
+            get => this[item.ItemId];
+        }
+
+        public void Add(uint itemId, ClientItemInfo item)
+        {
+            this[(ItemId)itemId] = item;
+        }
+
+        public bool ContainsKey(uint itemId)
+        {
+            return ContainsKey((ItemId)itemId);
+        }
+    }
+
     public class ClientItemInfo
     {
-        public uint ItemId;
-        public byte Category;
-        public ushort Price;
-        public byte StackLimit;
-        public byte Rank;
-        public string Name;
-        public ItemSubCategory? SubCategory;
+        public ItemId ItemId { get; set; }
+        public byte Category { get; set; }
+        public uint Price { get; set; }
+        public byte StackLimit { get; set; }
+        public byte Rank { get; set; }
+        public string Name { get; set; }
+        public ItemSubCategory SubCategory { get; set; }
 
-        public byte? Level;
-        public EquipJobList? JobGroup;
-        public byte? CrestSlots;
-        public byte? Quality;
-        public Gender? Gender;
+        public byte? Level { get; set; }
+        public EquipJobList? JobGroup { get; set; }
+        public byte? CrestSlots { get; set; }
+        public byte? Quality { get; set; }
+        public Gender? Gender { get; set; }
 
         public StorageType StorageType
         { 
@@ -40,37 +64,29 @@ namespace Arrowgene.Ddon.Shared.Model
             get
             {
                 if (JobGroup == null) return null;
-                switch (JobGroup)
+                return JobGroup switch
                 {
-                    case EquipJobList.All:
-                        return Enum.GetValues(typeof(JobId)).Cast<JobId>().ToHashSet();
-                    case EquipJobList.GroupHeavy:
-                        return new HashSet<JobId> { JobId.Fighter, JobId.Warrior };
-                    case EquipJobList.GroupLight:
-                        return new HashSet<JobId> { JobId.Seeker, JobId.Hunter, JobId.SpiritLancer };
-                    case EquipJobList.GroupPhysical:
-                        return new HashSet<JobId> {
+                    EquipJobList.All => [.. Enum.GetValues<JobId>()],
+                    EquipJobList.GroupHeavy => [JobId.Fighter, JobId.Warrior],
+                    EquipJobList.GroupLight => [JobId.Seeker, JobId.Hunter, JobId.SpiritLancer],
+                    EquipJobList.GroupPhysical => [
                         JobId.Fighter, JobId.Warrior,
                         JobId.Seeker, JobId.Hunter, JobId.SpiritLancer
-                    };
-                    case EquipJobList.GroupMagickRanged:
-                        return new HashSet<JobId> { JobId.Priest, JobId.Sorcerer, JobId.ElementArcher };
-                    case EquipJobList.GroupMagickMelee:
-                        return new HashSet<JobId> { JobId.ShieldSage, JobId.Alchemist, JobId.HighScepter };
-                    case EquipJobList.GroupMagickal:
-                        return new HashSet<JobId> {
+                    ],
+                    EquipJobList.GroupMagickRanged => [JobId.Priest, JobId.Sorcerer, JobId.ElementArcher],
+                    EquipJobList.GroupMagickMelee => [JobId.ShieldSage, JobId.Alchemist, JobId.HighScepter],
+                    EquipJobList.GroupMagickal => [
                         JobId.Priest, JobId.Sorcerer, JobId.ElementArcher,
                         JobId.ShieldSage, JobId.Alchemist, JobId.HighScepter
-                    };
-                    default:
-                        return new HashSet<JobId> { (JobId)((int)JobGroup) };
-                }
+                    ],
+                    _ => [(JobId)(int)JobGroup],
+                };
             }
         }
 
         public EquipSlot? EquipSlot { get
             {
-                if (SubCategory is null) return null;
+                if (SubCategory is ItemSubCategory.None) return null;
                 else if (SubCategory > ItemSubCategory.JewelrySubCategoryOffset) return Model.EquipSlot.Jewelry1; //All Jewelry
                 else if (SubCategory == ItemSubCategory.EquipEnsemble) return (Model.EquipSlot.ArmorBody); //Ensembles
                 else if (SubCategory == ItemSubCategory.EquipLantern) return (Model.EquipSlot.Lantern); //Lanterns
@@ -108,12 +124,6 @@ namespace Arrowgene.Ddon.Shared.Model
         public override string ToString()
         {
             return $"{Name} <{ItemId}>";
-        }
-
-        public static ClientItemInfo GetInfoForItemId(Dictionary<uint, ClientItemInfo> clientItemInfos, uint itemId)
-        {
-            if (clientItemInfos.ContainsKey(itemId)) return clientItemInfos[itemId];
-            throw new Exception("No item found with ID "+itemId);
         }
     }
 }

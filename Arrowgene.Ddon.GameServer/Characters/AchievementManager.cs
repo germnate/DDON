@@ -178,8 +178,15 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public PacketQueue HandleEmblemStone(GameClient client, uint level, DbConnection? connectionIn = null)
         {
-            // TODO: Implement.
             PacketQueue queue = new();
+            (AchievementType, uint) key = (AchievementType.EmblemStone, 0);
+            uint progress = client.Character.JobEmblems.Select(x => x.Value.EmblemLevel).DefaultIfEmpty().Max();
+
+            Server.Database.ExecuteQuerySafe(connectionIn, connection =>
+            {
+                queue.AddRange(CheckGainAchievement(client, key.Item1, key.Item2, progress, connection));
+            });
+
             return queue;
         }
 
@@ -234,7 +241,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 queue.AddRange(CheckGainAchievement(client, key.Item1, key.Item2, progress, connection));
 
                 // Handle specific kill groups
-                foreach (var group in EnemyIdParamLookup.GetValueOrDefault((EnemyId)enemy.EnemyId, new()))
+                foreach (var group in EnemyIdParamLookup.GetValueOrDefault(enemy.EnemyId, new()))
                 {
                     (AchievementType, uint) specificKey = (AchievementType.KillEnemyType, (uint)group);
                     uint specificProgress = client.Character.AchievementProgress.GetValueOrDefault(specificKey);
@@ -280,6 +287,11 @@ namespace Arrowgene.Ddon.GameServer.Characters
         public PacketQueue HandleMainLevel(GameClient client, DbConnection? connectionIn = null)
         {
             PacketQueue queue = new();
+
+            if (client.Character.GameMode != GameMode.Normal)
+            {
+                return queue;
+            }
 
             // Handle single jobs
             (AchievementType, uint) key = (AchievementType.MainLevel, (uint)client.Character.Job);
@@ -516,7 +528,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     continue;
                 }
 
-                // TODO: ClearSubstory, EmblemStone, EpitaphRoad, MandragoraSpecies
+                // TODO: ClearSubstory, MandragoraSpecies
                 switch (asset.Type)
                 {
                     case AchievementType.Appraisal:
@@ -543,16 +555,40 @@ namespace Arrowgene.Ddon.GameServer.Characters
                         progress.Add((uint)(client.Character.AchievementUniqueCrafts.GetValueOrDefault((AchievementCraftTypeParam)asset.Param) ?? new()).Count);
                         break;
                     case AchievementType.LearnAugments:
+                        if (client.Character.GameMode != GameMode.Normal)
+                        {
+                            progress.Add(0);
+                            break;
+                        }
+
                         progress.Add((uint)client.Character.LearnedAbilities.Select(x => (int)x.AbilityLv).Sum());
                         break;
                     case AchievementType.LearnSkills:
+                        if (client.Character.GameMode != GameMode.Normal)
+                        {
+                            progress.Add(0);
+                            break;
+                        }
+
                         progress.Add((uint)client.Character.LearnedCustomSkills.Select(x => (int)x.SkillLv).Sum());
                         break;
                     case AchievementType.MainLevel:
+                        if (client.Character.GameMode != GameMode.Normal)
+                        {
+                            progress.Add(0);
+                            break;
+                        }
+
                         progress.Add(client.Character.CharacterJobDataList.Where(x => x.Job == (JobId)asset.Param).FirstOrDefault()?.Lv ?? 0);
                         break;
                     case AchievementType.MainLevelGroup:
                         {
+                            if (client.Character.GameMode != GameMode.Normal)
+                            {
+                                progress.Add(0);
+                                break;
+                            }
+
                             HashSet<JobId> group = LevelGroupMap.GetValueOrDefault((AchievementLevelGroupParam)asset.Param);
                             int lowestLevel = group.Select(job => client.Character.CharacterJobDataList.Where(x => x.Job == job).Select(x => (int)x.Lv).FirstOrDefault()).Min();
                             uint result = lowestLevel >= asset.Count ? 1u : 0u;
@@ -588,6 +624,14 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     case AchievementType.OrbDevote:
                         {
                             progress.Add((uint)orbProgress.GetValueOrDefault((OrbGainParamType)asset.Param));
+                            break;
+                        }
+                    case AchievementType.EmblemStone:
+                        {
+                            progress.Add(client.Character.JobEmblems
+                                .Select(x => x.Value.EmblemLevel)
+                                .DefaultIfEmpty()
+                                .Max());
                             break;
                         }
                     default:
@@ -821,7 +865,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 EnemyId.CyclopsClub, EnemyId.CyclopsGiant, EnemyId.ArmoredCyclops, EnemyId.ArmoredCyclopsClub } },
             {AchievementEnemyParam.Death, new() { EnemyId.Death } },
             {AchievementEnemyParam.DeathKnight, new() { EnemyId.DeathKnight} },
-            {AchievementEnemyParam.Deer, new() { } }, // ???
+            {AchievementEnemyParam.Deer, new() { EnemyId.Doe, EnemyId.Buck } },
             {AchievementEnemyParam.Drake, new() { EnemyId.Drake0, EnemyId.Drake1 } },
             {AchievementEnemyParam.ElderDragon, new() { EnemyId.ElderDragon0, EnemyId.ElderDragon1, EnemyId.ElderDragonEpitathRoadTrial} },
             {AchievementEnemyParam.Eliminator, new() { EnemyId.Eliminator, EnemyId.EliminatorSlay } },
@@ -846,7 +890,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             {AchievementEnemyParam.Golem, new() { EnemyId.Golem } },
             {AchievementEnemyParam.Gorechimera, new() { EnemyId.Gorechimera0, EnemyId.Gorechimera1 } },
             {AchievementEnemyParam.Gorecyclops, new() { EnemyId.Gorecyclops0, EnemyId.Gorecyclops1, EnemyId.Gorecyclops2} },
-            {AchievementEnemyParam.GrandEnt, new() { EnemyId.GrandEnt0, EnemyId.GrandEnt1 } },
+            {AchievementEnemyParam.GrandEnt, new() { EnemyId.GrandEnt0, EnemyId.GrandEnt1, EnemyId.GrandEnt2 } },
             {AchievementEnemyParam.GreenGuardian, new() { EnemyId.GreenGuardian } },
             {AchievementEnemyParam.Griffin, new() { EnemyId.Griffin0, EnemyId.Griffin1 } },
             {AchievementEnemyParam.Grigori, new() { EnemyId.Grigori, EnemyId.BeardedGrigori, EnemyId.ShadowGrigori} },

@@ -29,6 +29,7 @@ using Arrowgene.Ddon.GameServer.Chat.Log;
 using Arrowgene.Ddon.GameServer.Dump;
 using Arrowgene.Ddon.GameServer.Handler;
 using Arrowgene.Ddon.GameServer.Party;
+using Arrowgene.Ddon.GameServer.Quests.LightQuests;
 using Arrowgene.Ddon.GameServer.Scripting;
 using Arrowgene.Ddon.GameServer.Shop;
 using Arrowgene.Ddon.Server;
@@ -43,6 +44,7 @@ using Arrowgene.Logging;
 using Arrowgene.Networking.Tcp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer
 {
@@ -87,9 +89,13 @@ namespace Arrowgene.Ddon.GameServer
             GameTimeManager = new GameTimeManager(this);
             PartnerPawnManager = new PartnerPawnManager(this);
             AchievementManager = new AchievementManager(this);
-
-            // Orb Management is slightly complex and requires updating fields across multiple systems
+            JobMasterManager = new JobMasterManager(this);
+            JobOrbUnlockManager = new JobOrbUnlockManager(this);
+            JobEmblemManager = new JobEmblemManager(this);
+            LightQuestManager = new LightQuestManager(this);
+            RentalPawnManager = new RentalPawnManager(this);
             OrbUnlockManager = new OrbUnlockManager(this);
+            BitterblackMazeManager = new BitterblackMazeManager(this);
 
             S2CStageGetStageListRes stageListPacket =
                 EntitySerializer.Get<S2CStageGetStageListRes>().Read(GameDump.data_Dump_19);
@@ -130,7 +136,13 @@ namespace Arrowgene.Ddon.GameServer
         public GameTimeManager GameTimeManager { get; }
         public PartnerPawnManager PartnerPawnManager { get; }
         public AchievementManager AchievementManager { get; }
+        public JobMasterManager JobMasterManager { get; private set; }
+        public JobOrbUnlockManager JobOrbUnlockManager { get; }
+        public JobEmblemManager JobEmblemManager { get; }
+        public RentalPawnManager RentalPawnManager { get; }
+        public BitterblackMazeManager BitterblackMazeManager { get; }
         public ChatLogHandler ChatLogHandler { get; }
+        public LightQuestManager LightQuestManager { get; }
 
         public List<CDataStageInfo> StageList { get; }
 
@@ -167,6 +179,8 @@ namespace Arrowgene.Ddon.GameServer
                     = new ClientConnectionChangeArgs(ClientConnectionChangeArgs.EventType.CONNECT, client);
                 connectionChangeEvent(this, connectionChangeEventArgs);
             }
+
+            Logger.Info($"ClientLookup, Connection: {ClientLookup.GetAll().Count}");
         }
 
         protected override void ClientDisconnected(GameClient client)
@@ -188,6 +202,8 @@ namespace Arrowgene.Ddon.GameServer
                     = new ClientConnectionChangeArgs(ClientConnectionChangeArgs.EventType.DISCONNECT, client);
                 connectionChangeEvent(this, connectionChangeEventArgs);
             }
+
+            Logger.Info($"ClientLookup, Disconnect: {ClientLookup.GetAll().Count}");
         }
 
         public override GameClient NewClient(ITcpSocket socket)
@@ -351,6 +367,8 @@ namespace Arrowgene.Ddon.GameServer
             AddHandler(new DispelGetDispelItemSettingsHandler(this));
             AddHandler(new DispelGetDispelItemListHandler(this));
             AddHandler(new DispelExchangeDispelItemHandler(this));
+            AddHandler(new DispelGetLockSettingsHandler(this));
+            AddHandler(new DispelLockSettingsHandler(this));
 
             AddHandler(new EquipChangeCharacterEquipHandler(this));
             AddHandler(new EquipChangeCharacterEquipJobItemHandler(this));
@@ -432,6 +450,7 @@ namespace Arrowgene.Ddon.GameServer
             AddHandler(new ItemEmbodyItemsHandler(this));
             AddHandler(new ItemChangeAttrDiscardHandler(this));
             AddHandler(new ItemGetEquipRareTypeItemsHandler(this));
+            AddHandler(new ItemRecoveryValuableItemHandler(this));
 
             AddHandler(new JobChangeJobHandler(this));
             AddHandler(new JobChangePawnJobHandler(this));
@@ -441,8 +460,21 @@ namespace Arrowgene.Ddon.GameServer
             AddHandler(new JobJobValueShopGetLineupHandler(this));
             AddHandler(new JobJobValueShopBuyItemHandler(this));
 
+            AddHandler(new JobEmblemAttachElementHandler(this));
+            AddHandler(new JobEmblemDetachElementHandler(this));
+            AddHandler(new JobEmblemGetEmblemListHandler(this));
+            AddHandler(new JobEmblemUpdateLevelHandler(this));
+            AddHandler(new JobEmblemUpdateParamLevelHandler(this));
+            AddHandler(new JobEmblemResetParamLevelHandler(this));
+
+            AddHandler(new JobMasterReportJobOrderProgressHandler(this));
+            AddHandler(new JobMasterGetJobMasterOrderProgressHandler(this));
+
             AddHandler(new JobOrbTreeGetJobOrbTreeStatusListHandler(this));
             AddHandler(new JobOrbTreeGetJobOrbTreeGetAllJobOrbElementListHandler(this));
+            AddHandler(new JobOrbTreeReleaseJobOrbElementHandler(this));
+            AddHandler(new JobOrbTreeGetCurrencyExchangeHandler(this));
+            AddHandler(new JobOrbTreeExchangeCurrencyHandler(this));
 
             AddHandler(new LoadingInfoLoadingGetInfoHandler(this));
 
@@ -540,6 +572,9 @@ namespace Arrowgene.Ddon.GameServer
             AddHandler(new PawnJoinPartyRentedPawnHandler(this));
             AddHandler(new PawnReturnRentedPawnHandler(this));
             AddHandler(new PawnUpdatePawnReactionListHandler(this));
+            AddHandler(new PawnGetFavoritePawnListHandler(this));
+            AddHandler(new PawnSetFavoritePawnHandler(this));
+            AddHandler(new PawnDeleteFavoritePawnHandler(this));
 
             AddHandler(new PawnExpeditionGetSallyInfoHandler(this));
 
@@ -550,6 +585,8 @@ namespace Arrowgene.Ddon.GameServer
             AddHandler(new ProfileGetMyCharacterProfileHandler(this));
             AddHandler(new ProfileSetArisenProfileHandler(this));
             AddHandler(new ProfileSetMatchingProfileHandler(this));
+            AddHandler(new ProfileSetPawnProfileHandler(this));
+            AddHandler(new ProfileSetPawnProfileCommentHandler(this));
 
             AddHandler(new Quest_11_60_16_Handler(this));
             AddHandler(new QuestCancelHandler(this));
@@ -688,6 +725,8 @@ namespace Arrowgene.Ddon.GameServer
             AddHandler(new SkillRegisterPresetAbilityHandler(this));
             AddHandler(new SkillSetPresetAbilityNameHandler(this));
             AddHandler(new SkillSetPresetAbilityListHandler(this));
+            AddHandler(new SkillGetReleaseSkillListHandler(this));
+            AddHandler(new SkillGetReleaseAbilityListHandler(this));
 
             AddHandler(new SetShortcutHandler(this));
             AddHandler(new ShopBuyShopGoodsHandler(this));
@@ -709,6 +748,9 @@ namespace Arrowgene.Ddon.GameServer
 			AddHandler(new StampBonusGetListHandler(this));
 			AddHandler(new StampBonusReceiveDailyHandler(this));
             AddHandler(new StampBonusReceiveTotalHandler(this));
+
+            AddHandler(new SupportPointSupportPointGetRateHandler(this));
+            AddHandler(new SupportPointSupportPointUseHandler(this));
 
             AddHandler(new WarpAreaWarpHandler(this));
             AddHandler(new WarpGetAreaWarpPointListHandler(this));

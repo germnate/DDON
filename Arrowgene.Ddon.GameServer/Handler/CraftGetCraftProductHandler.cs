@@ -1,11 +1,11 @@
-using System.Collections.Generic;
-using System.Linq;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Logging;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -34,11 +34,35 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     PlusValue = (byte)craftProgress.PlusValue
                 };
 
-                var (specialQueue, isSpecial) = Server.ItemManager.HandleSpecialItem(client, new(), (ItemId)craftProgress.ItemId, craftProgress.CreateCount, connection);
+                var (specialQueue, isSpecial) = Server.ItemManager.HandleSpecialItem(client, new(), (ItemId)craftProgress.ItemId, craftProgress.CreateCount, false, connection);
 
                 if (isSpecial)
                 {
                     queue.AddRange(specialQueue);
+                }
+                else if (craftProgress.AdditionalStatusId != 0 && Server.AssetRepository.CraftAddStatusAsset.AddStatuses.TryGetValue(craftProgress.AdditionalStatusId, out var addStatus))
+                {
+                    var craftItem = new Item()
+                    {
+                        ItemId = craftProgress.ItemId,
+                        PlusValue = (byte)craftProgress.PlusValue,
+                        AddStatusParamList = [
+                            new() {
+                                EnhanceType = EquipEnhanceType.AdditionalCraftMaterial,
+                                EnhanceId = addStatus.BuffId,
+                            }
+                        ]
+                    };
+
+                    // AddNewItem doesn't support merging stacks, while AddItem does.
+                    // This is split to maintain support for crafting consumables while still allowing us to create a custom item. 
+                    craftGetCraftProductRes.UpdateItemList.Add(Server.ItemManager.AddNewItem(
+                        Server,
+                        client.Character,
+                        request.StorageType != StorageType.ReceiveInStorageCraft,
+                        craftItem, craftProgress.CreateCount,
+                        connection)
+                    );
                 }
                 else
                 {
@@ -76,7 +100,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     }
                 }
 
-                var itemInfo = ClientItemInfo.GetInfoForItemId(Server.AssetRepository.ClientItemInfos, craftProgress.ItemId);
+                var itemInfo = Server.AssetRepository.ClientItemInfos[craftProgress.ItemId];
                 queue.AddRange(Server.AchievementManager.HandleCraft(client, itemInfo, connection));
             });
 

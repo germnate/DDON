@@ -6,6 +6,7 @@ using Arrowgene.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 
 namespace Arrowgene.Ddon.Shared.AssetReader
@@ -165,6 +166,7 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                     epiPath.DropTables[dropTable.TableId] = dropTable;
                 }
 
+                uint mergedTableId = 0x80000000;
                 foreach (var jChests in jEpiPath.GetProperty("chests").EnumerateArray())
                 {
                     EpitaphWeeklyReward.Type definitionType = EpitaphWeeklyReward.Type.Single;
@@ -180,7 +182,26 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                     var dropTableIds = new List<uint>();
                     foreach (var jTableId in jChests.GetProperty("drop_tables").EnumerateArray())
                     {
-                        dropTableIds.Add(jTableId.GetUInt32());
+                        if (jTableId.ValueKind == JsonValueKind.Array)
+                        {
+                            var dropTable = new EpitaphDropTable()
+                            {
+                                TableId = mergedTableId++
+                            };
+
+                            if (!CreateMergedTable(epiPath, dropTable, jTableId))
+                            {
+                                Logger.Error($"Failed to create a new merged table with ID 0x{dropTable.TableId:08x} for {epiPath.Name}");
+                                continue;
+                            }
+
+                            dropTableIds.Add(dropTable.TableId);
+                            epiPath.DropTables[dropTable.TableId] = dropTable;
+                        }
+                        else
+                        {
+                            dropTableIds.Add(jTableId.GetUInt32());
+                        }
                     }
 
                     if (definitionType == EpitaphWeeklyReward.Type.Range)
@@ -314,6 +335,35 @@ namespace Arrowgene.Ddon.Shared.AssetReader
             }
 
             return asset;
+        }
+
+        private bool CreateMergedTable(EpitaphPath epiPath, EpitaphDropTable dropTable, JsonElement jTableIds)
+        {
+            EpitaphItemReward reward = new()
+            {
+                Rolls = 1,
+                Type = SoulOrdealRewardType.Pool
+            };
+
+            foreach (var jTableId in jTableIds.EnumerateArray())
+            {
+                var tableId = jTableId.GetUInt32();
+                if (!epiPath.DropTables.ContainsKey(tableId))
+                {
+                    Logger.Error($"A drop table with the ID {tableId} doesn't exist in {epiPath.Name}");
+                    return false;
+                }
+
+                var oldTable = epiPath.DropTables[tableId];
+                foreach (var item in oldTable.Items)
+                {
+                    reward.Items.AddRange(item.Items);
+                }
+            }
+
+            dropTable.Items.Add(reward);
+
+            return true;
         }
     }
 }

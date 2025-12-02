@@ -1,4 +1,5 @@
 using Arrowgene.Ddon.GameServer.Characters;
+using Arrowgene.Ddon.GameServer.Scripting.Interfaces;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
@@ -68,34 +69,15 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
                     var purchase = AppraiseItem(client.Character, appraisalItems[item.Id]);
 
-                    var (specialQueue, isSpecial) = Server.ItemManager.HandleSpecialItem(client, updateCharacterItemNtc, (ItemId)purchase.ItemId, purchase.ItemNum, connection);
+                    var (specialQueue, isSpecial) = Server.ItemManager.HandleSpecialItem(client, updateCharacterItemNtc, (ItemId)purchase.ItemId, purchase.ItemNum, false, connection);
                     if (isSpecial)
                     {
                         queue.AddRange(specialQueue);
                     }
                     else
                     {
-                        List<CDataItemUpdateResult> itemUpdateResults = Server.ItemManager.AddItem(Server, client.Character, toBag, purchase.ItemId, purchase.ItemNum, connectionIn: connection);
-                        if (itemUpdateResults.Count != 1)
-                        {
-                            throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_INTERNAL_ERROR);
-                        }
-
-                        var newItem = client.Character.Storage.FindItemByUIdInStorage(ItemManager.BothStorageTypes, itemUpdateResults[0].ItemList.ItemUId).Item2.Item2;
-                        if (purchase.EquipElementParamList.Count > 0)
-                        {
-                            foreach (var elementParam in purchase.EquipElementParamList)
-                            {
-                                Server.Database.InsertCrest(client.Character.CommonId, itemUpdateResults[0].ItemList.ItemUId, elementParam.SlotNo, elementParam.CrestId, elementParam.Add, connection);
-                                newItem.EquipElementParamList.Add(elementParam);
-                            }
-
-                            itemUpdateResults[0].ItemList.EquipElementParamList = purchase.EquipElementParamList;
-                        }
-
-                        updateCharacterItemNtc.UpdateItemList.AddRange(itemUpdateResults);
+                        updateCharacterItemNtc.UpdateItemList.Add(Server.ItemManager.AddNewItem(Server, client.Character, toBag, purchase.ToItem(), purchase.ItemNum, connection));
                     }
-
 
                     client.Enqueue(updateCharacterItemNtc, queue);
                     res.DispelItemResultList.Add(purchase);
@@ -147,8 +129,14 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         equipElement.Add = appraisalCrest.Amount;
                         break;
                     case AppraisalCrestType.BitterBlackEarring:
-                        equipElement.CrestId = AppraisalManager.RollBitterBlackMazeEarringCrest(character.Job);
-                        equipElement.Add = AppraisalManager.RollBitterBlackMazeEarringPercent(character.Job);
+                        equipElement.CrestId = AppraisalManager.RollBitterBlackMazeEarringCrest(character.DispelSeals, character.Job);
+
+                        var mixin = Server.ScriptManager.MixinModule.Get<IBitterblackEarringMixin>("bitterblack_earring");
+                        equipElement.Add = mixin.RollBitterBlackMazeEarringPercent(character.Job);
+                        break;
+                    case AppraisalCrestType.BitterBlackBracelet:
+                        equipElement.CrestId = AppraisalManager.RollBitterBlackMazeBraceletCrest(character.DispelSeals);
+                        equipElement.Add = appraisalCrest.Amount;
                         break;
                 }
 

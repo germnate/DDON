@@ -1,4 +1,5 @@
 using Arrowgene.Buffers;
+using System.Text.Json.Serialization;
 
 namespace Arrowgene.Ddon.Shared.Entity.Structure
 {
@@ -7,7 +8,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
         public byte Lv { get; set; }
         public uint RequireJobLevel { get; set; }
         public uint RequireJobPoint { get; set; }
-        public bool IsRelease { get; set; }
+        public bool IsRelease { get; set; } = true;
 
         public class Serializer : EntitySerializer<CDataSkillLevelParam>
         {

@@ -27,8 +27,16 @@ namespace Arrowgene.Ddon.GameServer.Scripting
 
         public HashSet<string> Scripts { get; set; }
 
+        /// <summary>
+        /// A list of scripts in the module directory which should be ignored 
+        /// and not compiled directly. These files may be interfaces or abstract classes
+        /// which can't be instantiated directly.
+        /// </summary>
+        public HashSet<string> IgnoredScripts { get; set; }
+
         public ScriptModule()
         {
+            IgnoredScripts = new HashSet<string>();
             Scripts = new HashSet<string>();
             Watchers = new List<FileSystemWatcher>();
         }
@@ -51,7 +59,8 @@ namespace Arrowgene.Ddon.GameServer.Scripting
         /// </summary>
         /// <param name="path">Path to the script that was executed</param>
         /// <param name="result">The result object of the script that executed</param>
+        /// <param name="variables">The local variables of the script that executed</param>
         /// <returns></returns>
-        public abstract bool EvaluateResult(string path, ScriptState<object> result);
+        public abstract bool EvaluateResult(string path, object result, IDictionary<string, object> variables);
     }
 }

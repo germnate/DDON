@@ -1,5 +1,6 @@
 #nullable enable
 using Arrowgene.Ddon.Database;
+using Arrowgene.Ddon.Database.Model;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
@@ -42,7 +43,16 @@ namespace Arrowgene.Ddon.GameServer.Characters
             StorageType.StorageBoxNormal, StorageType.StorageBoxExpansion,
             StorageType.StorageChestDrawer1, StorageType.StorageChestDrawer2, StorageType.StorageChestDrawer3
         };
-        public static readonly List<StorageType> BbmEmbodyStorages = new List<StorageType> { StorageType.StorageBoxNormal, StorageType.ItemBagConsumable, StorageType.ItemBagMaterial, StorageType.ItemBagEquipment, StorageType.ItemBagJob };
+
+        public static readonly List<StorageType> BbmEmbodyStorages =
+        [
+            StorageType.StorageBoxNormal, 
+            StorageType.ItemBagConsumable,
+            StorageType.ItemBagMaterial, 
+            StorageType.ItemBagEquipment, 
+            StorageType.ItemBagJob,
+            StorageType.CharacterEquipment
+        ];
 
         private static readonly Dictionary<ItemId, (WalletType Type, uint Quantity)> ItemIdWalletTypeAndQuantity = new Dictionary<ItemId, (WalletType Type, uint Amount)>() {
             {ItemId.CoinPouch1G, (WalletType.Gold, 1)},
@@ -68,8 +78,19 @@ namespace Arrowgene.Ddon.GameServer.Characters
             {ItemId.CurrencyForResettingCraftP, (WalletType.ResetCraftSkills, 1)},
             {ItemId.SilverTicket, (WalletType.SilverTickets, 1) },
             {ItemId.CustomMadeServiceTicket, (WalletType.CustomMadeServiceTickets, 1) },
-            {ItemId.GoldenGemstone, (WalletType.GoldenGemstones, 1) }
+            {ItemId.GoldenGemstone, (WalletType.GoldenGemstones, 1) },
             // TODO: Find all items that add wallet points
+        };
+
+        private static Dictionary<ItemId, (PointType PointType, uint Quantity)> PointItems = new()
+        {
+            {ItemId.PlayPoint0, (PointType.PlayPoints, 18)},
+            {ItemId.PlayPoint1, (PointType.PlayPoints, 1)},
+            {ItemId.PlayPoint2, (PointType.PlayPoints, 10)},
+            {ItemId.PlayPoint3, (PointType.PlayPoints, 100)},
+            {ItemId.ExperienceCrystal0, (PointType.ExperiencePoints, 10)},
+            {ItemId.ExperienceCrystal1, (PointType.ExperiencePoints, 10000)},
+            {ItemId.ExperienceCrystal2, (PointType.ExperiencePoints, 63000)},
         };
 
         private static readonly Dictionary<ItemId, uint> AbilityItems = new Dictionary<ItemId, uint>()
@@ -194,53 +215,40 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return ItemIdWalletTypeAndQuantity[itemId];
         }
 
-        // [[item]]
-        // id = 16822 (Adds 100 XP)
-        // old = '経験値結晶'
-        // new = 'Experience Crystal'
-        // [[item]]
-        // id = 16831 (Adds 10000 XP)
-        // old = '経験値結晶'
-        // new = 'Experience Crystal'
-        // [[item]]
-        // id = 18831 (Adds 63000 XP)
-        // old = '経験値結晶'
-        // new = 'Experience Crystal'
-
-        // [[item]]
-        // id = 18832 (Adds 18 PP)
-        // old = 'プレイポイント'
-        // new = 'Play Point'
-        // [[item]]
-        // id = 25651 (Adds 1 PP)
-        // old = 'プレイポイント'
-        // new = 'Play Point'
-        // [[item]]
-        // id = 25652 (Adds 10 PP)
-        // old = 'プレイポイント'
-        // new = 'Play Point'
-        // [[item]]
-        // id = 25653 (Adds 100 PP)
-        // old = 'プレイポイント'
-        // new = 'Play Point'
-
-        public (PacketQueue queue, bool IsSpecial) HandleSpecialItem(GameClient client, S2CItemUpdateCharacterItemNtc ntc, ItemId item, uint count, DbConnection? connectionIn = null)
+        public (PacketQueue queue, bool IsSpecial) HandleSpecialItem(GameClient client, S2CItemUpdateCharacterItemNtc ntc, ItemId item, uint count, bool isOnUse, DbConnection? connectionIn = null)
         {
-            var itemInfo = ClientItemInfo.GetInfoForItemId(_Server.AssetRepository.ClientItemInfos, (uint)item);
+            var itemInfo = _Server.AssetRepository.ClientItemInfos[item];
             if (ItemIdWalletTypeAndQuantity.ContainsKey(item))
             {
                 var walletTypeAndQuantity = ItemIdWalletTypeAndQuantity[item];
                 uint totalQuantityToAdd = walletTypeAndQuantity.Quantity * count;
 
+                
                 ntc.UpdateWalletList.Add(
                     _Server.WalletManager.AddToWallet(client.Character, walletTypeAndQuantity.Type, totalQuantityToAdd, 0, connectionIn
                 ));
-
                 return (new(), true);
             }
             else if (AreaPointItems.TryGetValue(item, out var pointArea))
             {
                 return (_Server.AreaRankManager.AddAreaPoint(client, pointArea, (10 * count, 0), connectionIn), true);
+            }
+            else if (isOnUse && PointItems.ContainsKey(item))
+            {
+                PacketQueue queue = new();
+                var pointItem = PointItems[item];
+
+                var gainedPoints = (pointItem.Quantity * count, 0U);
+                switch (pointItem.PointType)
+                {
+                    case PointType.ExperiencePoints:
+                        queue = _Server.ExpManager.AddExp(client, client.Character, gainedPoints, RewardSource.Enemy, connectionIn: connectionIn);
+                        break;
+                    case PointType.PlayPoints:
+                        queue.Enqueue(client, _Server.PPManager.AddPlayPoint(client, gainedPoints, connectionIn: connectionIn));
+                        break;
+                }
+                return (queue, true);
             }
             else if (itemInfo?.Category == 6 || itemInfo?.Category == 7)
             {
@@ -265,7 +273,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public PacketQueue GatherItem(GameClient client, S2CItemUpdateCharacterItemNtc ntc, InstancedGatheringItem gatheringItem, uint pickedGatherItems, DbConnection? connectionIn = null)
         {
-            var (queue, isSpecial) = HandleSpecialItem(client, ntc, gatheringItem.ItemId, pickedGatherItems, connectionIn);
+            var (queue, isSpecial) = HandleSpecialItem(client, ntc, gatheringItem.ItemId, pickedGatherItems, false, connectionIn);
             if (!isSpecial)
             {
                 List<CDataItemUpdateResult> results = AddItem(_Server, client.Character, true, (uint)gatheringItem.ItemId, pickedGatherItems, connectionIn: connectionIn);
@@ -330,8 +338,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return results.Count > 0 ? results[0] : null;
         }
 
-        public CDataItemUpdateResult? ConsumeItemByIdFromMultipleStorages(DdonServer<GameClient> server, Character character, List<StorageType> storages, uint itemId, uint consumeNum, DbConnection? connectionIn = null)
+        public List<CDataItemUpdateResult> ConsumeItemByIdFromMultipleStorages(DdonServer<GameClient> server, Character character, List<StorageType> storages, uint itemId, uint consumeNum, DbConnection? connectionIn = null)
         {
+            uint amountToConsume = consumeNum;
+            var results = new List<CDataItemUpdateResult>();
+
+            var stacks = new List<(StorageType StorageType, string UID, uint amount)>();
             foreach (StorageType storageType in storages)
             {
                 var items = character.Storage.GetStorage(storageType).FindItemsById(itemId);
@@ -342,19 +354,38 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
                 foreach (var item in items)
                 {
-                    if (item.Item3 < consumeNum)
-                    {
-                        continue;
-                    }
+                    var amount = Math.Min(item.Item3, amountToConsume);
+                    stacks.Add((storageType, item.Item2.UId, amount));
 
-                    return ConsumeItemByUId(server, character, storageType, item.Item2.UId, consumeNum, connectionIn);
+                    amountToConsume -= amount;
+                    if (amountToConsume == 0)
+                    {
+                        break;
+                    }
+                }
+
+                if (amountToConsume == 0)
+                {
+                    break;
                 }
             }
 
-            return null;
+            if (amountToConsume > 0)
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_CHARACTER_ITEM_NOT_FOUND, $"Unable to locate {(ItemId)itemId} x{consumeNum} in the player inventories");
+            }
+
+            foreach (var stack in stacks)
+            {
+                var result = ConsumeItemByUId(server, character, stack.StorageType, stack.UID, stack.amount, connectionIn) ??
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_CHARACTER_ITEM_NOT_FOUND, $"Failed to comsume {stack.amount} from {stack.UID}");
+                results.Add(result);
+            }
+
+            return results;
         }
 
-        public CDataItemUpdateResult? ConsumeItemByIdFromItemBag(DdonServer<GameClient> server, Character character, uint itemId, uint consumeNum, DbConnection? connectionIn = null)
+        public List<CDataItemUpdateResult> ConsumeItemByIdFromItemBag(DdonServer<GameClient> server, Character character, uint itemId, uint consumeNum, DbConnection? connectionIn = null)
         {
             return ConsumeItemByIdFromMultipleStorages(server, character, ItemBagStorageTypes, itemId, consumeNum, connectionIn);
         }
@@ -391,7 +422,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             ntcData.ItemList.EquipPawnID = 0;
             ntcData.ItemList.EquipElementParamList = item.EquipElementParamList;
             ntcData.ItemList.AddStatusParamList = item.AddStatusParamList;
-            ntcData.ItemList.Unk2List = item.Unk2List;
+            ntcData.ItemList.EquipStatParamList = item.EquipStatParamList;
             ntcData.UpdateItemNum = -finalConsumeNum;
 
             Storage fromStorage = character.Storage.GetStorage(fromStorageType);
@@ -410,9 +441,37 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return ntcData;
         }
 
+        public void EmbodyItem(DdonGameServer server, Character character, StorageType storageType, Item item, uint amount, DbConnection connectionIn)
+        {
+            Storage destinationStorage = character.Storage.GetStorage(storageType);
+
+            ushort slot = destinationStorage.AddItem(item, amount);
+            InsertItem(server, character, item, destinationStorage, slot, amount, connectionIn);
+        }
+
+        public CDataItemUpdateResult AddNewItem(DdonGameServer server, Character character, bool itemBag, Item item, uint amount, DbConnection connectionIn)
+        {
+            Storage destinationStorage;
+
+            ClientItemInfo clientItemInfo = server.AssetRepository.ClientItemInfos[item.ItemId];
+            if (itemBag)
+            {
+                destinationStorage = character.Storage.GetStorage(clientItemInfo.StorageType);
+            }
+            else
+            {
+                destinationStorage = character.Storage.GetStorage(StorageType.StorageBoxNormal);
+            }
+
+            ushort slotNo = destinationStorage.AddItem(item, amount);
+            InsertItem(server, character, item, destinationStorage, slotNo, amount, connectionIn);
+
+            return CreateItemUpdateResult(null, item, destinationStorage, slotNo, amount, amount);
+        }
+
         public List<CDataItemUpdateResult> AddItem(DdonServer<GameClient> server, Character character, bool itemBag, uint itemId, uint num, byte plusvalue = 0, DbConnection? connectionIn = null)
         {
-            ClientItemInfo clientItemInfo = ClientItemInfo.GetInfoForItemId(server.AssetRepository.ClientItemInfos, itemId);
+            ClientItemInfo clientItemInfo = server.AssetRepository.ClientItemInfos[itemId];
             if(itemBag)
             {
                 // Limit stacks when adding to the item bag.
@@ -436,7 +495,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public List<CDataItemUpdateResult> AddItem(DdonServer<GameClient> server, Character character, StorageType destinationStorage, uint itemId, uint num, byte plusvalue = 0, DbConnection? connectionIn = null)
         {
-            ClientItemInfo clientItemInfo = ClientItemInfo.GetInfoForItemId(server.AssetRepository.ClientItemInfos, itemId);
+            ClientItemInfo clientItemInfo = server.AssetRepository.ClientItemInfos[itemId];
             if (destinationStorage == StorageType.ItemBagConsumable || destinationStorage == StorageType.ItemBagMaterial || destinationStorage == StorageType.ItemBagJob)
             {
                 // Limit stacks when adding to the item bag.
@@ -466,7 +525,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
         {
             long itemsToAdd = num;
             Storage storage = character.Storage.GetStorage(destinationStorageType);
-            ClientItemInfo clientItemInfo = ClientItemInfo.GetInfoForItemId(_Server.AssetRepository.ClientItemInfos, itemId);
+            ClientItemInfo clientItemInfo = _Server.AssetRepository.ClientItemInfos[itemId];
             uint stackLimit = clientItemInfo.StorageType != StorageType.ItemBagEquipment && BoxStorageTypes.Contains(destinationStorageType) ? STACK_BOX_MAX : clientItemInfo.StackLimit;
 
             long existingAvailableStackSlots = storage.Items
@@ -526,7 +585,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                         EquipPoints = 0,
                         EquipElementParamList = new List<CDataEquipElementParam>(),
                         AddStatusParamList = new List<CDataAddStatusParam>(),
-                        Unk2List = new List<CDataEquipItemInfoUnk2>()
+                        EquipStatParamList = new List<CDataEquipStatParam>()
                     };
                     slot = destinationStorage.AddItem(item, newItemNum);
                 }
@@ -538,7 +597,11 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 database.ReplaceStorageItem(character.ContentCharacterId, destinationStorageType, slot, newItemNum, item, connectionIn);
                 if (BitterblackMazeManager.IsMazeReward(item.ItemId))
                 {
-                    item = BitterblackMazeManager.ApplyCrest(database, character, item, connectionIn);
+                    item = _Server.BitterblackMazeManager.ApplyCrest(character, item, connectionIn);
+                }
+                else if (_Server.JobEmblemManager.IsEmblemItem((ItemId) item.ItemId))
+                {
+                    _Server.JobEmblemManager.AddNewEmblemItem(character, item.UId);
                 }
 
                 CDataItemUpdateResult result = new CDataItemUpdateResult();
@@ -556,7 +619,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 result.ItemList.EquipPawnID = 0;
                 result.ItemList.EquipElementParamList = item.EquipElementParamList;
                 result.ItemList.AddStatusParamList = item.AddStatusParamList;
-                result.ItemList.Unk2List = item.Unk2List;
+                result.ItemList.EquipStatParamList = item.EquipStatParamList;
                 result.UpdateItemNum = (int) addedItems;
                 results.Add(result);
             }
@@ -587,14 +650,14 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     EquipPoints = 0,
                     EquipElementParamList = new List<CDataEquipElementParam>(),
                     AddStatusParamList = new List<CDataAddStatusParam>(),
-                    Unk2List = new List<CDataEquipItemInfoUnk2>()
+                    EquipStatParamList = new List<CDataEquipStatParam>()
                 };
                 ushort slot = destinationStorage.AddItem(item, newItemNum);
 
                 database.ReplaceStorageItem(character.ContentCharacterId, destinationStorageType, slot, newItemNum, item, connectionIn);
                 if (BitterblackMazeManager.IsMazeReward(item.ItemId))
                 {
-                    item = BitterblackMazeManager.ApplyCrest(database, character, item, connectionIn);
+                    item = _Server.BitterblackMazeManager.ApplyCrest(character, item, connectionIn);
                 }
 
                 CDataItemUpdateResult result = new CDataItemUpdateResult();
@@ -612,7 +675,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 result.ItemList.EquipPawnID = 0;
                 result.ItemList.EquipElementParamList = item.EquipElementParamList;
                 result.ItemList.AddStatusParamList = item.AddStatusParamList;
-                result.ItemList.Unk2List = item.Unk2List;
+                result.ItemList.EquipStatParamList = item.EquipStatParamList;
                 result.UpdateItemNum = (int)addedItems;
                 results.Add(result);
             }
@@ -659,10 +722,24 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 server.Database.UpsertEquipmentLimitBreakRecord(character.CharacterId, item.UId, addStatusParam, connectionIn);
             }
         }
+        private bool IsEquipmentStorage(StorageType type)
+            => type is StorageType.CharacterEquipment or StorageType.PawnEquipment or StorageType.ItemBagEquipment;
 
+        private bool IsEquipmentCharacter(StorageType type)
+            => type is StorageType.CharacterEquipment or StorageType.PawnEquipment;
+
+        private (ClientItemInfo, uint) DetermineStackLimit(DdonServer<GameClient> server, Item item, StorageType targetType)
+        {
+            var info = server.AssetRepository.ClientItemInfos[item.ItemId];
+            return info.StorageType == StorageType.ItemBagEquipment
+                   || ItemBagStorageTypes.Contains(targetType)
+                ? (info, info.StackLimit)
+                : (info, STACK_BOX_MAX);
+        }
+        
         public List<CDataItemUpdateResult> MoveItem(DdonServer<GameClient> server, Character character, Storage fromStorage, ushort fromSlotNo, uint num, Storage toStorage, ushort toSlotNo, DbConnection? connectionIn = null)
         {
-            List<CDataItemUpdateResult> results = new List<CDataItemUpdateResult>();
+            List<CDataItemUpdateResult> results = [];
 
             var toItem = toStorage.GetItem(toSlotNo);
             var fromItem = fromStorage.GetItem(fromSlotNo);
@@ -671,185 +748,185 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 throw new ResponseErrorException(ErrorCode.ERROR_CODE_CHARACTER_ITEM_NOT_FOUND);
             }
 
-            if (toStorage.Type == StorageType.CharacterEquipment || toStorage.Type == StorageType.PawnEquipment || toStorage.Type == StorageType.ItemBagEquipment)
+            // Num is either always 1 for single items/equipment or some stack value greater than 1, but it must always be less than the available stack number of the item
+            if (num == 0 || num > fromItem.Item2)
             {
-                if (toItem != null)
-                {
-                    // Delete the item
-                    DeleteItem(server, character, toItem.Item1, toStorage, toSlotNo, connectionIn);
-                }
-                DeleteItem(server, character, fromItem.Item1, fromStorage, fromSlotNo, connectionIn);
+                Logger.Error("Attempting to move invalid number of items.");
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_INVALID_ITEM_NUM);
+            }
 
-                if (toItem != null)
-                {
-                    // Create response which swaps position with the new item being equipped
-                    results.Add(CreateItemUpdateResult(character, toItem.Item1, toStorage, toSlotNo, 0, 0));
-                    results.Add(CreateItemUpdateResult(null, toItem.Item1, fromStorage, fromSlotNo, 1, 1));
-
-                    InsertItem(server, character, toItem.Item1, fromStorage, fromSlotNo, 1, connectionIn);
-                }
-
-                if (toSlotNo == 0)
-                {
-                    // Going to some type of storage (bag or box)
-                    // Find a new slot for the item
-                    toSlotNo = toStorage.AddItem(fromItem.Item1, 0);
-
-                    // Create response which places the item in the new location
-                    if (fromStorage.Type == StorageType.CharacterEquipment || fromStorage.Type == StorageType.PawnEquipment)
-                    {
-                        results.Add(CreateItemUpdateResult(character, fromItem.Item1, fromStorage, fromSlotNo, 0, 0));
-                    }
-                    else
-                    {
-                        results.Add(CreateItemUpdateResult(null, fromItem.Item1, fromStorage, fromSlotNo, 0, 0));
-                    }
-                    results.Add(CreateItemUpdateResult(null, fromItem.Item1, toStorage, toSlotNo, 1, 1));
-                }
-                else
-                {
-                    // This handles:
-                    // - equipment_bag -> equipment
-                    // - equipment     -> equipment_bag
-                    // - equipment     -> storage
-                    // - storage       -> equipment
-
-                    if (fromStorage.Type == StorageType.CharacterEquipment || fromStorage.Type == StorageType.PawnEquipment)
-                    {
-                        results.Add(CreateItemUpdateResult(character, fromItem.Item1, fromStorage, fromSlotNo, 0, 0));
-                    }
-                    else
-                    {
-                        results.Add(CreateItemUpdateResult(null, fromItem.Item1, fromStorage, fromSlotNo, 0, 0));
-                    }
-
-                    if (toStorage.Type == StorageType.CharacterEquipment || toStorage.Type == StorageType.PawnEquipment)
-                    {
-                        results.Add(CreateItemUpdateResult(character, fromItem.Item1, toStorage, toSlotNo, 1, 1));
-                    }
-                    else
-                    {
-                        results.Add(CreateItemUpdateResult(null, fromItem.Item1, toStorage, toSlotNo, 1, 1));
-                    }
-                }
-                InsertItem(server, character, fromItem.Item1, toStorage, toSlotNo, 1, connectionIn);
+            if (IsEquipmentStorage(toStorage.Type))
+            {
+                HandleEquipmentSwap(server, character, fromStorage, fromSlotNo, toStorage, toSlotNo, connectionIn, toItem, fromItem, results);
             }
             else
             {
-                // Moving items to/from or unequipping an item
-                uint newSrcItemNum = fromItem.Item2 - num;
-                if (newSrcItemNum == 0)
-                {
-                    DeleteItem(server, character, fromItem.Item1, fromStorage, fromSlotNo, connectionIn);
-                }
-                else
-                {
-                    UpdateItem(server, character, fromItem.Item1, fromStorage, fromSlotNo, newSrcItemNum, connectionIn);
-                }
-
-                results.Add(CreateItemUpdateResult(null, fromItem.Item1, fromStorage, fromSlotNo, newSrcItemNum, num));
-
-                uint stackLimit = ItemManager.STACK_BOX_MAX;
-                ClientItemInfo clientItemInfo = ClientItemInfo.GetInfoForItemId(server.AssetRepository.ClientItemInfos, fromItem.Item1.ItemId);
-                if (clientItemInfo.StorageType == StorageType.ItemBagEquipment || ItemBagStorageTypes.Contains(toStorage.Type))
-                {
-                    stackLimit = clientItemInfo.StackLimit;
-                }
-
-                uint itemsToMove = num;
-                while (itemsToMove > 0)
-                {
-                    uint oldDstItemNum = 0;
-                    ushort dstSlotNo = toSlotNo;
-
-                    Item item = fromItem.Item1;
-
-                    if (toSlotNo == 0)
-                    {
-                        var itemInDstStorage = toStorage.Items
-                            .Select((item, index) => new { item, index })
-                            .Where(tuple => fromItem.Item1.ItemId == tuple.item?.Item1.ItemId && tuple.item?.Item2 < stackLimit)
-                            .FirstOrDefault();
-
-                        if (itemInDstStorage == null)
-                        {
-                            // Allocate a new slot to stick these items
-                            oldDstItemNum = 0;
-                            dstSlotNo = toStorage.AddItem(fromItem.Item1, 0);
-                        }
-                        else
-                        {
-                            // There is an existing stack, try to merge them
-                            oldDstItemNum = itemInDstStorage.item!.Item2;
-                            dstSlotNo = (ushort)(itemInDstStorage.index + 1);
-                            item = itemInDstStorage.item!.Item1;
-                        }
-                    }
-                    else
-                    {
-                        if (toItem != null)
-                        {
-                            if (toItem.Item1.ItemId != fromItem.Item1.ItemId)
-                            {
-                                // There is another item in the desired slot but they are not the same
-                                // so we need to swap them.
-                                results.AddRange(MoveItem(server, character, toStorage, toSlotNo, toItem.Item2, fromStorage, fromSlotNo, connectionIn));
-                            }
-                            else
-                            {
-                                oldDstItemNum = toItem.Item2;
-                                item = toItem.Item1;
-                            }
-                        }
-                        dstSlotNo = toSlotNo;
-                    }
-
-                    uint newDstItemNum = ((oldDstItemNum + itemsToMove) > stackLimit) ? stackLimit : (oldDstItemNum + itemsToMove);
-                    uint movedItemNum = newDstItemNum - oldDstItemNum;
-                    if (newDstItemNum == stackLimit) toSlotNo = 0; //Stack filled, so roll over into the next found stack/empty slot.
-
-                    if (movedItemNum == 0)
-                    {
-                        // if we move 0 items, this code will get stuck in an infinite loop
-                        // break out and report an error so we can investigate it.
-                        throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_INTERNAL_ERROR);
-                    }
-
-                    if (clientItemInfo.StorageType != StorageType.ItemBagEquipment)
-                    {
-                        // Handles stacks being merged or new ones being created
-                        item = (oldDstItemNum == 0) ? new Item(item) : item;
-                    }
-
-                    toStorage.SetItem(item, newDstItemNum, dstSlotNo);
-                    if (oldDstItemNum == 0)
-                    {
-                        InsertItem(server, character, item, toStorage, dstSlotNo, newDstItemNum, connectionIn);
-                    }
-                    else
-                    {
-                        UpdateItem(server, character, item, toStorage, dstSlotNo, newDstItemNum, connectionIn);
-                    }
-                    results.Add(CreateItemUpdateResult(null, item, toStorage, dstSlotNo, newDstItemNum, movedItemNum));
-
-                    itemsToMove -= movedItemNum;
-                }
+                HandleStackedTransfer(server, character, fromStorage, fromSlotNo, num, toStorage, toSlotNo, connectionIn, toItem, fromItem, results);
             }
 
             return results;
         }
+        
+        private void HandleEquipmentSwap(DdonServer<GameClient> server, Character character, Storage fromStorage, ushort fromSlotNo, Storage toStorage, ushort toSlotNo, DbConnection? connectionIn,
+            Tuple<Item, uint>? toItem, Tuple<Item, uint> fromItem, List<CDataItemUpdateResult> results)
+        {
+            if (toItem != null)
+            {
+                // Delete the item
+                DeleteItem(server, character, toItem.Item1, toStorage, toSlotNo, connectionIn);
+            }
+            DeleteItem(server, character, fromItem.Item1, fromStorage, fromSlotNo, connectionIn);
 
-        public CDataItemUpdateResult CreateItemUpdateResult(CharacterCommon character, Item item, StorageType storageType, ushort slotNo, uint itemNum, uint updateItemNum)
+            if (toItem != null)
+            {
+                // Create response which swaps position with the new item being equipped
+                results.Add(CreateItemUpdateResult(character, toItem.Item1, toStorage, toSlotNo, 0, 0));
+                results.Add(CreateItemUpdateResult(null, toItem.Item1, fromStorage, fromSlotNo, 1, 1));
+
+                InsertItem(server, character, toItem.Item1, fromStorage, fromSlotNo, 1, connectionIn);
+            }
+
+            if (toSlotNo == 0)
+            {
+                // Going to some type of storage (bag or box)
+                // Find a new slot for the item
+                toSlotNo = toStorage.AddItem(fromItem.Item1, 0);
+
+                // Create response which places the item in the new location
+                results.Add(IsEquipmentCharacter(fromStorage.Type)
+                    ? CreateItemUpdateResult(character, fromItem.Item1, fromStorage, fromSlotNo, 0, 0)
+                    : CreateItemUpdateResult(null, fromItem.Item1, fromStorage, fromSlotNo, 0, 0));
+                
+                results.Add(CreateItemUpdateResult(null, fromItem.Item1, toStorage, toSlotNo, 1, 1));
+            }
+            else
+            {
+                // This handles:
+                // - equipment_bag -> equipment
+                // - equipment     -> equipment_bag
+                // - equipment     -> storage
+                // - storage       -> equipment
+
+                results.Add(IsEquipmentCharacter(fromStorage.Type)
+                    ? CreateItemUpdateResult(character, fromItem.Item1, fromStorage, fromSlotNo, 0, 0)
+                    : CreateItemUpdateResult(null, fromItem.Item1, fromStorage, fromSlotNo, 0, 0));
+
+                results.Add(IsEquipmentCharacter(toStorage.Type)
+                    ? CreateItemUpdateResult(character, fromItem.Item1, toStorage, toSlotNo, 1, 1)
+                    : CreateItemUpdateResult(null, fromItem.Item1, toStorage, toSlotNo, 1, 1));
+            }
+            InsertItem(server, character, fromItem.Item1, toStorage, toSlotNo, 1, connectionIn);
+        }
+        
+        private void HandleStackedTransfer(DdonServer<GameClient> server, Character character, Storage fromStorage, ushort fromSlotNo, uint num, Storage toStorage, ushort toSlotNo,
+            DbConnection? connectionIn, Tuple<Item, uint>? toItem, Tuple<Item, uint> fromItem, List<CDataItemUpdateResult> results)
+        {
+            // Moving items to/from or unequipping an item
+            uint newSrcItemNum = fromItem.Item2 - num;
+            if (newSrcItemNum == 0)
+            {
+                DeleteItem(server, character, fromItem.Item1, fromStorage, fromSlotNo, connectionIn);
+            }
+            else
+            {
+                UpdateItem(server, character, fromItem.Item1, fromStorage, fromSlotNo, newSrcItemNum, connectionIn);
+            }
+
+            results.Add(CreateItemUpdateResult(null, fromItem.Item1, fromStorage, fromSlotNo, newSrcItemNum, num));
+
+            (var clientItemInfo, uint stackLimit) = DetermineStackLimit(server, fromItem.Item1, toStorage.Type);
+
+            uint itemsToMove = num;
+            while (itemsToMove > 0)
+            {
+                uint oldDstItemNum = 0;
+                ushort dstSlotNo = toSlotNo;
+
+                Item item = fromItem.Item1;
+
+                if (toSlotNo == 0)
+                {
+                    var itemInDstStorage = toStorage.Items
+                        .Select((item, index) => new { item, index })
+                        .FirstOrDefault(tuple => fromItem.Item1.ItemId == tuple.item?.Item1.ItemId && tuple.item?.Item2 < stackLimit);
+
+                    if (itemInDstStorage == null)
+                    {
+                        // Allocate a new slot to stick these items
+                        oldDstItemNum = 0;
+                        dstSlotNo = toStorage.AddItem(fromItem.Item1, 0);
+                    }
+                    else
+                    {
+                        // There is an existing stack, try to merge them
+                        oldDstItemNum = itemInDstStorage.item!.Item2;
+                        dstSlotNo = (ushort)(itemInDstStorage.index + 1);
+                        item = itemInDstStorage.item!.Item1;
+                    }
+                }
+                else
+                {
+                    if (toItem != null)
+                    {
+                        if (toItem.Item1.ItemId != fromItem.Item1.ItemId)
+                        {
+                            // There is another item in the desired slot but they are not the same
+                            // so we need to swap them.
+                            results.AddRange(MoveItem(server, character, toStorage, toSlotNo, toItem.Item2, fromStorage, fromSlotNo, connectionIn));
+                        }
+                        else
+                        {
+                            oldDstItemNum = toItem.Item2;
+                            item = toItem.Item1;
+                        }
+                    }
+                    dstSlotNo = toSlotNo;
+                }
+
+                uint newDstItemNum = ((oldDstItemNum + itemsToMove) > stackLimit) ? stackLimit : (oldDstItemNum + itemsToMove);
+                uint movedItemNum = newDstItemNum - oldDstItemNum;
+                if (newDstItemNum == stackLimit) toSlotNo = 0; //Stack filled, so roll over into the next found stack/empty slot.
+
+                if (movedItemNum == 0)
+                {
+                    // if we move 0 items, this code will get stuck in an infinite loop
+                    // break out and report an error so we can investigate it.
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_INTERNAL_ERROR);
+                }
+
+                if (clientItemInfo.StorageType != StorageType.ItemBagEquipment)
+                {
+                    // Handles stacks being merged or new ones being created
+                    item = (oldDstItemNum == 0) ? new Item(item) : item;
+                }
+
+                toStorage.SetItem(item, newDstItemNum, dstSlotNo);
+                if (oldDstItemNum == 0)
+                {
+                    InsertItem(server, character, item, toStorage, dstSlotNo, newDstItemNum, connectionIn);
+                }
+                else
+                {
+                    UpdateItem(server, character, item, toStorage, dstSlotNo, newDstItemNum, connectionIn);
+                }
+                results.Add(CreateItemUpdateResult(null, item, toStorage, dstSlotNo, newDstItemNum, movedItemNum));
+
+                itemsToMove -= movedItemNum;
+            }
+        }
+
+
+        public CDataItemUpdateResult CreateItemUpdateResult(CharacterCommon common, Item item, StorageType storageType, ushort slotNo, uint itemNum, uint updateItemNum)
         {
             uint pawnId = 0;
             uint characterId = 0;
-            if (character is Character)
+            if (common is Character character)
             {
-                characterId = ((Character)character).CharacterId;
+                characterId = character.CharacterId;
             }
-            else if (character is Pawn)
+            else if (common is Pawn pawn)
             {
-                pawnId = ((Pawn)character).PawnId;
+                pawnId = pawn.PawnId;
             }
 
             CDataItemUpdateResult updateResult = new CDataItemUpdateResult();
@@ -867,7 +944,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             updateResult.ItemList.EquipPawnID = pawnId;
             updateResult.ItemList.EquipElementParamList = item.EquipElementParamList;
             updateResult.ItemList.AddStatusParamList = item.AddStatusParamList;
-            updateResult.ItemList.Unk2List = item.Unk2List;
+            updateResult.ItemList.EquipStatParamList = item.EquipStatParamList;
             updateResult.UpdateItemNum = (int) updateItemNum;
 
             return updateResult;
@@ -909,7 +986,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             updateResult.ItemList.EquipPawnID = 0;
             updateResult.ItemList.EquipElementParamList = newItem.EquipElementParamList;
             updateResult.ItemList.AddStatusParamList = newItem.AddStatusParamList;
-            updateResult.ItemList.Unk2List = newItem.Unk2List;
+            updateResult.ItemList.EquipStatParamList = newItem.EquipStatParamList;
             updateResult.UpdateItemNum = 1;
 
             Logger.Debug($"Upgraded {newItem.UId} Item in DataBase");
@@ -942,6 +1019,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
             return amountFound >= num;
         }
+
         public ClientItemInfo LookupInfoByUID(DdonGameServer server, string itemUID, DbConnection? connectionIn = null)
         {
             var item = server.Database.SelectStorageItemByUId(itemUID, connectionIn);
@@ -954,16 +1032,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public ClientItemInfo LookupInfoByItem(DdonGameServer server, Item item)
         {
-            return LookupInfoByItemID(server, item.ItemId);
-        }
-
-        public ClientItemInfo LookupInfoByItemID(DdonGameServer server, uint itemID)
-        {
-            if (!server.AssetRepository.ClientItemInfos.ContainsKey(itemID))
-            {
-                throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_INTERNAL_ERROR);
-            }
-            return server.AssetRepository.ClientItemInfos[itemID];
+            return server.AssetRepository.ClientItemInfos[item.ItemId];
         }
 
         public static bool SendToItemBag(uint storageType)
@@ -1018,7 +1087,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
             var ntc = new S2CItemUpdateCharacterItemNtc()
             {
-                UpdateType = ItemNoticeType.Default // TODO: Investigate.
+                UpdateType = ItemNoticeType.ItemSafetySetting
             };
 
             uint updateItemNum = 0;
@@ -1052,7 +1121,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
             PacketQueue queue = new();
             if (client.Character.IsLanternLit)
             {
-                _Server.TimerManager.SetTimer(client.Character.LanternTimer, lanternTimer);
+                _Server.TimerManager.CancelTimer(client.Character.LanternTimer);
+                client.Character.LanternTimer = _Server.TimerManager.CreateTimer(lanternTimer, () =>
+                {
+                    StopLantern(client).Send();
+                });
+                _Server.TimerManager.StartTimer(client.Character.LanternTimer);
             }
             else
             {
@@ -1062,9 +1136,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 });
                 _Server.TimerManager.StartTimer(client.Character.LanternTimer);
                 client.Enqueue(new S2CCharacterStartLanternNtc() { RemainTime = lanternTimer }, queue);
-                //client.Party.EnqueueToAllExcept(new S2CCharacterStartLanternOtherNtc() { CharacterId = client.Character.CharacterId }, queue, client);
             }
-            client.Character.IsLanternLit = true;
 
             return queue;
         }
@@ -1080,10 +1152,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     _Server.TimerManager.CancelTimer(client.Character.LanternTimer);
                 }
                 client.Enqueue(new S2CCharacterFinishLanternNtc(), queue);
-                //client.Party.EnqueueToAllExcept(new S2CCharacterFinishLanternOtherNtc() { CharacterId = client.Character.CharacterId }, queue, client);
             }
 
-            client.Character.IsLanternLit = false;
+            client.Character.LanternTimer = 0;
 
             return queue;
         }

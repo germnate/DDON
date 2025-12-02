@@ -1,5 +1,7 @@
 using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.GameServer.Dump;
+using Arrowgene.Ddon.GameServer.Quests;
+using Arrowgene.Ddon.GameServer.Quests.LightQuests;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
@@ -8,6 +10,7 @@ using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -20,6 +23,12 @@ namespace Arrowgene.Ddon.GameServer.Handler
         public QuestGetPartyQuestProgressInfoHandler(DdonGameServer server) : base(server)
         {
         }
+
+        private readonly HashSet<QuestId> WorldManageQuestToIgnore = new()
+        {
+            QuestId.Q70033001,
+            QuestId.Q70034001,
+        };
 
         public override S2CQuestGetPartyQuestProgressInfoRes Handle(GameClient client, C2SQuestGetPartyQuestProgressInfoReq request)
         {
@@ -43,6 +52,23 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 // TODO: This will probably break everything currently if cleared as all doors in the world will be closed
                 // TODO: Need to go track down all quests
                 // quest.QuestLayoutFlagList = leaderClient.Character.GetWorldManageLayoutUnlocks((QuestId)quest.QuestId);
+
+                // TODO: Don't add these flags since they obfuscate certain cutscenes or other world state
+                // TODO: in some S2 and S3 cutscenes. Add them back properly when the story requires it.
+                // if ((QuestId)quest.QuestId == Server.GameSettings.DebugSettings.QuestId)
+                // {
+                //     quest.QuestLayoutFlagList = Server.GameSettings.DebugSettings.UintList.Select(x => new Shared.Entity.Structure.CDataQuestLayoutFlag() { FlagId = x }).ToList();
+                // }
+                if (WorldManageQuestToIgnore.Contains((QuestId)quest.QuestId))
+                {
+                    quest.QuestLayoutFlagList = new();
+                }
+                else if ((QuestId)quest.QuestId == QuestId.Q70023001)
+                {
+                    quest.QuestLayoutFlagList = quest.QuestLayoutFlagList.Where(x =>
+                        x.FlagId != QuestFlags.HollowOfBeginnings.Mordred.Value &&
+                        x.FlagId != QuestFlags.HollowOfBeginnings.SpiritDragon.Value).ToList();
+                }
             }
 
             // TODO: Do we need to check personal quests here?
@@ -58,7 +84,10 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 }
                 var questStateManager = QuestManager.GetQuestStateManager(client, quest);
                 var questState = questStateManager.GetQuestState(questScheduleId);
-                pcap.QuestOrderList.Add(quest.ToCDataQuestOrderList(questState.Step));
+
+                var questOrder = quest.ToCDataQuestOrderList(questState.Step);
+
+                pcap.QuestOrderList.Add(questOrder);
             }
 
 #if false

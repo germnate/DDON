@@ -1,8 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Logging;
-using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -16,10 +17,36 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         public override S2CSkillGetAcquirableSkillListRes Handle(GameClient client, C2SSkillGetAcquirableSkillListReq request)
         {
-            return new S2CSkillGetAcquirableSkillListRes()
+            // This list can't be filtered based on progress because it's cached between BBM and normal gameplay.
+            //CharacterId = 0 in the request is for the player
+
+            if (request.CharacterId == 0 || Server.GameSettings.GameServerSettings.PawnSkipJobTraining == false)
             {
-                SkillParamList = SkillData.AllSkills.Where(x => x.Job == request.Job).ToList()
-            };
+                return new S2CSkillGetAcquirableSkillListRes()
+                {
+                    SkillParamList = client.Character.AcquirableSkills[request.Job]
+                };
+            }
+            else 
+            {
+                var allDefaultSkills = Server.AssetRepository.SkillData.Skills
+                    .GetValueOrDefault(request.Job, [])
+                    .Where(x => !SkillData.IsUnlockableSkill(request.Job, x.SkillNo, 1));
+                var pawnUnlocks = Server.AssetRepository.SkillData.Skills
+                    .GetValueOrDefault(request.Job, [])
+                    .Where(x => SkillData.IsUnlockableSkill(request.Job, x.SkillNo, 1)
+                    && IsSkillUnlocked(client.Character, request.Job, x.SkillNo)
+                    );
+                return new S2CSkillGetAcquirableSkillListRes()
+                {
+                    SkillParamList = [.. allDefaultSkills, .. pawnUnlocks]
+                };
+            }
+        }
+
+        private bool IsSkillUnlocked(Character character, JobId jobId, uint skillNo)
+        {
+            return character.UnlockedCustomSkills[jobId].Contains(skillNo);
         }
     }
 }

@@ -1,16 +1,18 @@
-using System;
-using System.Collections.Generic;
 using Arrowgene.Ddon.Shared.Entity;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
-using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Ddon.Shared.Network;
 using Arrowgene.Logging;
 using Arrowgene.Networking.Tcp;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Arrowgene.Ddon.Server.Network
 {
     public class Client
     {
+        private static uint IncrementingId = 0;
+
         private readonly ServerLogger Logger;
 
         protected readonly ITcpSocket Socket;
@@ -32,11 +34,24 @@ namespace Arrowgene.Ddon.Server.Network
             _challenge = null;
             Identity = socket.Identity;
             _challengeCompleted = false;
+            Id = IncrementingId++;
         }
 
         public string Identity { get; protected set; }
+        public uint Id { get; protected set; }
 
         public DateTime PingTime { get; set; }
+
+        public PacketId LastPacketSentToServer { get; set; }
+        public PacketId LastPacketSentToClient { get; set; }
+        public bool IsAlive { get { return Socket.IsAlive; } }
+
+        ~Client()
+        {
+            // Something is funny in the event handling for disconnections, so I'm burying this logging here to make sure this absolutely gets called at some point.
+            // This may be divorced in the log from the actual event, but you can reconstruct this based on the IP address and the rough timing.
+            Logger.Debug(this, $"Final Packets: {this?.LastPacketSentToServer.Name ?? "NULL"} / {this?.LastPacketSentToClient.Name ?? "NULL"}");
+        }
 
         public void SetChallengeCompleted(bool challengeCompleted)
         {
@@ -56,10 +71,24 @@ namespace Arrowgene.Ddon.Server.Network
             {
                 packets = _packetFactory.Read(data);
             }
+            catch (ResponseErrorException ex)
+            {
+                // Usually thrown by the Camelia cipher complaining about misshapen packets.
+                // We shouldn't tolerate these connections and just kick them.
+                Logger.Exception(this, ex);
+                packets = [];
+
+                this.Close();
+            }
             catch (Exception ex)
             {
                 Logger.Exception(this, ex);
-                packets = new List<IPacket>();
+                packets = [];
+            }
+
+            if (Socket.IsAlive && packets.Count > 0)
+            {
+                LastPacketSentToServer = packets.Last().Id;
             }
 
             foreach (IPacket packet in packets)
@@ -116,6 +145,11 @@ namespace Arrowgene.Ddon.Server.Network
             {
                 Logger.Exception(this, ex);
                 return;
+            }
+
+            if (Socket.IsAlive && packet is not null)
+            {
+                LastPacketSentToClient = packet.Id;
             }
 
             SendRaw(data);

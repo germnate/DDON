@@ -1,5 +1,6 @@
 using Arrowgene.Ddon.GameServer.Scripting.Interfaces;
-using Microsoft.CodeAnalysis.Scripting;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Arrowgene.Ddon.GameServer.Scripting
 {
@@ -12,16 +13,22 @@ namespace Arrowgene.Ddon.GameServer.Scripting
 
         public QuestModule()
         {
+            IgnoredScripts.Add("EmblemTrial.csx");
         }
 
-        public override bool EvaluateResult(string path, ScriptState<object> result)
+        public override bool EvaluateResult(string path, object result, IDictionary<string, object> variables)
         {
             if (result == null)
             {
                 return false;
             }
 
-            IQuest quest = (IQuest)result.ReturnValue;
+            if (IgnoredScripts.Contains(Path.GetFileName(path)))
+            {
+                return true;
+            }
+
+            IQuest quest = (IQuest)result;
             if (quest == null)
             {
                 return false;

@@ -216,10 +216,17 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdNpcTouchAndOrderUi(this QuestBlock questBlock, StageInfo stageInfo, NpcId npcId, int noOrderGroupSerial, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdNpcTouchAndOrderUi(this QuestBlock questBlock, StageInfo stageInfo, NpcId npcId, uint noOrderGroupSerial, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
             questBlock.CheckCommands[commandListIndex].AddCheckCmdNpcTouchAndOrderUi(stageInfo, npcId, noOrderGroupSerial);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdQuestNpcTouchAndOrderUi(this QuestBlock questBlock, StageInfo stageInfo, uint groupNo, uint setNo, QuestId questId, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdQuestNpcTouchAndOrderUi(stageInfo, groupNo, setNo, questId);
             return questBlock;
         }
 
@@ -643,6 +650,55 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
             questBlock.CheckCommands[commandListIndex].AddCheckCmdPlJobNotEq(jobId);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsOneOffGather(this QuestBlock questBlock, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsOneOffGather();
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCommandIsTutorialQuestOrder(this QuestBlock questBlock, QuestId questId, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCommandIsTutorialQuestOrder(questId);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsEquip(this QuestBlock questBlock, ItemId itemId, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCommandIsEquip(itemId);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsTakePicturesNpc(this QuestBlock questBlock, StageInfo stageInfo, NpcId npcId0, NpcId npcId1 = NpcId.None, NpcId npcId2 = NpcId.None, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCommandIsTakePicturesNpc(stageInfo, npcId0, npcId1, npcId2);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsReleaseWarpPointAnyone(this QuestBlock questBlock, int warpPointId, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsReleaseWarpPointAnyone(warpPointId);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCommandNewTalkNpc(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, QuestId questId = QuestId.None, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdNewTalkNpc(stageInfo, groupNo, setNo, questId);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdNewTalkNpcWithoutMarker(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, QuestId questId = QuestId.None, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdNewTalkNpcWithoutMarker(stageInfo, groupNo, setNo, questId);
             return questBlock;
         }
     }

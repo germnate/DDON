@@ -5,37 +5,28 @@ namespace Arrowgene.Ddon.GameServer.Chat
 {
     public class ChatResponse
     {
+        public ChatResponse() { }
+
+        public ChatResponse(GameClient client, string message, LobbyChatMsgType type)
+        {
+            Message = message;
+            Type = type;
+            Recipients = [ client ];
+        }
+
         public static ChatResponse CommandError(GameClient client, string message)
         {
-            return new ChatResponse()
-            {
-                Deliver = true,
-                Message = message,
-                Type = LobbyChatMsgType.ManagementAlertC,
-                Recipients = { client }
-            };
+            return new ChatResponse(client, message, LobbyChatMsgType.ManagementAlertC);
         }
 
         public static ChatResponse ServerMessage(GameClient client, string message)
         {
-            return new ChatResponse()
-            {
-                Deliver = true,
-                Message = message,
-                Type = LobbyChatMsgType.System,
-                Recipients = { client }
-            };
+            return new ChatResponse(client, message, LobbyChatMsgType.System);
         }
 
         public static ChatResponse ServerChat(GameClient client, string message)
         {
-            return new ChatResponse()
-            {
-                Deliver = true,
-                Message = message,
-                Type = LobbyChatMsgType.ManagementGuideC,
-                Recipients = { client }
-            };
+            return new ChatResponse(client, message, LobbyChatMsgType.ManagementGuideC);
         }
 
         public static ChatResponse FromMessage(GameClient client, ChatMessage message)
@@ -43,7 +34,6 @@ namespace Arrowgene.Ddon.GameServer.Chat
             return new ChatResponse()
             {
                 HandleId = message.HandleId,
-                Deliver = true,
                 Message = message.Message,
                 FirstName = client.Character.FirstName,
                 LastName = client.Character.LastName,
@@ -56,33 +46,17 @@ namespace Arrowgene.Ddon.GameServer.Chat
             };
         }
 
-        public ChatResponse()
-        {
-            HandleId = 0;
-            Recipients = new List<GameClient>();
-            Deliver = true;
-            Type = LobbyChatMsgType.Say;
-            MessageFlavor = 0;
-            PhrasesCategory = 0;
-            PhrasesIndex = 0;
-            CharacterId = 0;
-            Message = "";
-            FirstName = "";
-            LastName = "";
-            ClanName = "";
-        }
-
         public uint HandleId { get; set; }
-        public List<GameClient> Recipients { get; }
-        public bool Deliver { get; set; }
-        public LobbyChatMsgType Type { get; set; }
+        public List<GameClient> Recipients { get; } = [];
+        public bool Deliver { get; set; } = true;
+        public LobbyChatMsgType Type { get; set; } = LobbyChatMsgType.Say;
         public byte MessageFlavor { get; set; }
         public uint PhrasesCategory { get; set; }
         public uint PhrasesIndex { get; set; }
-        public string Message { get; set; }
+        public string Message { get; set; } = string.Empty;
         public uint CharacterId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string ClanName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string ClanName { get; set; } = string.Empty;
     }
 }
