@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Arrowgene.WebServer;
 using Arrowgene.WebServer.Route;
 
@@ -6,7 +6,7 @@ namespace Arrowgene.Ddon.WebServer
 {
     public class IndexRoute : WebRoute
     {
-        public override string Route => "/";
+        public override string Route => "/index";
         
         public override async Task<WebResponse> Get(WebRequest request)
         {
