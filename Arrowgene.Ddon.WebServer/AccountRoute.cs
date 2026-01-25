@@ -1,4 +1,5 @@
 using System;
+using System.Reflection.Metadata;
 using System.Security.AccessControl;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -245,7 +246,8 @@ namespace Arrowgene.Ddon.WebServer
             }
 
             string hash = PasswordHash.CreateHash(password);
-            account = _database.CreateAccount(name, mail, hash);
+            string mailToken = GameToken.GenerateToken();
+            account = _database.CreateAccount(name, mail, hash, mailToken);
             return account;
         }
 

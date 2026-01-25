@@ -25,7 +25,7 @@ public partial class DdonSqlDb : SqlDb
     private static readonly string SqlSelectAccountByEmail = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"mail\"=@mail;";
     private static readonly string SqlUpdateAccount = $"UPDATE \"account\" SET {BuildQueryUpdate(AccountFields)} WHERE \"id\"=@id;";
 
-    public override Account? CreateAccount(string name, string mail, string hash)
+    public override Account? CreateAccount(string name, string mail, string hash, string mailToken)
     {
         Account account = new();
         account.Name = name;
@@ -34,7 +34,7 @@ public partial class DdonSqlDb : SqlDb
         account.Hash = hash;
         account.State = AccountStateType.User;
         account.Created = DateTime.UtcNow;
-        account.MailToken = GameToken.GenerateToken();
+        account.MailToken = mailToken;
         account.PasswordToken = null;
         account.LoginToken = null;
         account.LoginTokenCreated = DateTime.UtcNow;
