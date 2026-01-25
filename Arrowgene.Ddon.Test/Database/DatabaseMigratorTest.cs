@@ -189,7 +189,7 @@ namespace Arrowgene.Ddon.Test.Database
         public void ExecuteQuerySafe(DbConnection? connectionIn, Action<DbConnection> work) {}
         T IDatabase.ExecuteQuerySafe<T>(DbConnection? connectionIn, Func<DbConnection, T> work) { throw new NotImplementedException(); }
 
-        public Account CreateAccount(string name, string mail, string hash) { return new Account(); }
+        public Account CreateAccount(string name, string mail, string hash, string mailToken) { return new Account(); }
         public bool CreateCharacter(Character character) { return true; }
         public bool CreateDatabase() { return true; }
         public bool CreatePawn(Pawn pawn) { return true; }
