@@ -39,7 +39,7 @@ namespace Arrowgene.Ddon.WebServer
             AddMiddleware(staticFile);
 
             AddRoute(new IndexRoute());
-            AddRoute(new AccountRoute(database));
+            AddRoute(new AccountRoute(database, setting.MailSetting));
         }
 
         public void AddMiddleware(IWebMiddleware middleware)

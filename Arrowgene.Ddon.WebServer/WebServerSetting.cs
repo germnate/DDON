@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Net;
 using System.Runtime.Serialization;
 using Arrowgene.Ddon.Shared;
@@ -24,15 +24,33 @@ namespace Arrowgene.Ddon.WebServer
             httpEndpoint.Port = 52099;
             httpEndpoint.IpAddress = IPAddress.Any;
             WebSetting.WebEndpoints.Add(httpEndpoint);
+
+            MailSetting = new MailSetting();
         }
 
         public WebServerSetting(WebServerSetting webServerSetting)
         {
             PublicWebEndPoint = new WebEndPoint(webServerSetting.PublicWebEndPoint);
             WebSetting = new WebSetting(webServerSetting.WebSetting);
+            MailSetting = new MailSetting(webServerSetting.MailSetting);
         }
 
-        [DataMember(Order = 1)] public WebEndPoint PublicWebEndPoint { get; set; }
-        [DataMember(Order = 2)] public WebSetting WebSetting { get; set; }
+        [OnDeserialized]
+        void OnDeserialized(StreamingContext context)
+        {
+            PublicWebEndPoint ??= new WebEndPoint();
+            WebSetting ??= new WebSetting();
+            MailSetting ??= new MailSetting();
+        }
+
+        [DataMember(Order = 1)]
+        public WebEndPoint PublicWebEndPoint { get; set; }
+
+        [DataMember(Order = 2)]
+        public WebSetting WebSetting { get; set; }
+
+        [DataMember(Order = 3)]
+        public MailSetting MailSetting { get; set; }
+
     }
 }

@@ -21,7 +21,7 @@ namespace Arrowgene.Ddon.WebServer
         public override string Route => "/api/account";
 
         private readonly IDatabase _database;
-
+        private readonly MailSend _mail;
         private class AccountRequest
         {
             public string Action { get; set; }
@@ -108,9 +108,10 @@ namespace Arrowgene.Ddon.WebServer
             }
         }
 
-        public AccountRoute(IDatabase database)
+        public AccountRoute(IDatabase database, MailSetting mailSetting)
         {
             _database = database;
+            _mail = new MailSend(mailSetting);
         }
 
         public override async Task<WebResponse> Post(WebRequest request)
@@ -186,6 +187,7 @@ namespace Arrowgene.Ddon.WebServer
                     }
 
                     res.Message = "Password token generated";
+                    await _mail.SendAsync("password_reset", account);
                     res.Token = account.PasswordToken; //for tests
                     break;
 
@@ -221,6 +223,7 @@ namespace Arrowgene.Ddon.WebServer
                     }
 
                     res.Message = "Verification token resent";
+                    await _mail.SendAsync("mail_verify", account);
 
                     break;
 
