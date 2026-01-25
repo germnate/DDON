@@ -21,6 +21,6 @@
         <ProjectReference Include="..\Arrowgene.Ddon.WebServer\Arrowgene.Ddon.WebServer.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Arrowgene.WebServer" Version="1.1.4" />
+        <PackageReference Include="Arrowgene.WebServer" Version="1.1.8" />
     </ItemGroup>
 </Project>
