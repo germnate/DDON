@@ -68,7 +68,7 @@ namespace Arrowgene.Ddon.LoginServer.Handler
                         account = Database.SelectAccountByName(oneTimeToken);
                         if (account == null)
                         {
-                            account = Database.CreateAccount(oneTimeToken, oneTimeToken, oneTimeToken)
+                            account = Database.CreateAccount(oneTimeToken, oneTimeToken, oneTimeToken, oneTimeToken)
                                 ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_AUTH_ACCOUNT_GENERATION_FAIL, "Could not create account from OneTimeToken, choose another token");
 
                             Logger.Info(client, "Created new account from OneTimeToken");
