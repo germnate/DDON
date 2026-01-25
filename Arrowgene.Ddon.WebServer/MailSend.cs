@@ -1,47 +1,51 @@
-using Arrowgene.Ddon.Database.Model;
-using MailKit.Net.Smtp;
-using MailKit.Security;
-using MimeKit;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Arrowgene.Ddon.Database.Model;
+using Arrowgene.Logging;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
 
 namespace Arrowgene.Ddon.WebServer
 {
     public class MailSend
     {
-
+        private static readonly ILogger Logger = LogProvider.Logger<Logger>(typeof(DdonWebServer));
         private readonly MailSetting _mailSetting;
 
         public MailSend(MailSetting mailSetting)
         {
-            _mailSetting = mailSetting
-                ?? throw new ArgumentNullException(nameof(mailSetting));
+            _mailSetting = mailSetting ?? throw new ArgumentNullException(nameof(mailSetting));
         }
         public async Task SendAsync(string mailModel, Account account, CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> placeholders = new();
 
             if (string.IsNullOrWhiteSpace(mailModel))
-                throw new ArgumentException("mailModel is required");
+            {
+                Logger.Error($"MailSend - Mail model not provided");
+                return;
+            }
 
             if (account == null)
-                throw new ArgumentNullException(nameof(account));
+            {
+                Logger.Error($"MailSend - Invalid account provided");
+                return;
+            }
 
             var templateFile = Path.Combine(_mailSetting.TemplatePath, $"{mailModel}.html");
 
             if (!File.Exists(templateFile))
             {
-                throw new FileNotFoundException($"Template not found: {templateFile}");
+                Logger.Error($"MailSend - Template not found: {templateFile}");
+                return;
             }
 
-            var body = await File.ReadAllTextAsync(
-                templateFile,
-                cancellationToken
-            );
+            var body = await File.ReadAllTextAsync(templateFile, cancellationToken);
 
             var baseUrl = _mailSetting.DomainUrl?.TrimEnd('/') ?? throw new InvalidOperationException("ServerUrl is not configured");
 
@@ -49,14 +53,15 @@ namespace Arrowgene.Ddon.WebServer
             {
                 if (string.IsNullOrWhiteSpace(account.MailToken))
                 {
-                    throw new InvalidOperationException("Account MailToken is required for this mail model");
+                    Logger.Error("MailSend - A mail_token is required for this mail model");
+                    return;
                 }
 
                 placeholders = new Dictionary<string, string>
                 {
                     ["{{UserName}}"] = WebUtility.HtmlEncode(account.Name),
-                    ["{{ServerUrl}}"] = baseUrl,
-                    ["{{VerificationLink}}"] = $"{baseUrl}:52099/web/verify.html?token={Uri.EscapeDataString(account.MailToken)}",
+                    ["{{DomainUrl}}"] = baseUrl,
+                    ["{{VerificationLink}}"] = $"http://{baseUrl}:52099/web/verify.html?token={Uri.EscapeDataString(account.MailToken)}",
                     ["{{Year}}"] = DateTime.UtcNow.Year.ToString()
                 };
             }
@@ -64,19 +69,21 @@ namespace Arrowgene.Ddon.WebServer
             {
                 if (string.IsNullOrWhiteSpace(account.PasswordToken))
                 {
-                    throw new InvalidOperationException("Account PasswordToken is required for this mail model");
+                    Logger.Error("MailSend - A password_token is required for this mail model");
+                    return;
                 }
                 placeholders = new Dictionary<string, string>
                 {
                     ["{{UserName}}"] = WebUtility.HtmlEncode(account.Name),
-                    ["{{ServerUrl}}"] = baseUrl,
-                    ["{{PasswordResetLink}}"] = $"{baseUrl}:52099/web/reset_password.html?token={Uri.EscapeDataString(account.PasswordToken)}",
+                    ["{{DomainUrl}}"] = baseUrl,
+                    ["{{PasswordResetLink}}"] = $"http://{baseUrl}:52099/web/reset_password.html?token={Uri.EscapeDataString(account.PasswordToken)}",
                     ["{{Year}}"] = DateTime.UtcNow.Year.ToString()
                 };
             }
             else
             {
-                throw new InvalidOperationException($"Unsupported mail model: {mailModel}");
+                Logger.Error($"MailSend - Unsupported mail model: {mailModel}");
+                return;
             }
 
             foreach (var item in placeholders)
