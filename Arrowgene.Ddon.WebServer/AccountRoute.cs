@@ -123,7 +123,6 @@ namespace Arrowgene.Ddon.WebServer
             }
 
             AccountResponse res = new AccountResponse();
-            AccountVerification accountCheck = new(req.Account, req.Password, req.Email);
 
             switch (req.Action)
             {
@@ -147,6 +146,7 @@ namespace Arrowgene.Ddon.WebServer
                     break;
 
                 case "create":
+                    AccountVerification accountCheck = new(req.Account, req.Password, req.Email);
 
                     if (accountCheck.Error)
                     {
@@ -173,11 +173,6 @@ namespace Arrowgene.Ddon.WebServer
                         res.Error = "Account not found";
                         break;
                     }
-                    else if (!string.IsNullOrEmpty(req.PasswordToken))
-                    {
-                        res.Message = "A valid token exists";
-                        break;
-                    }
 
                     if (!account.MailVerified)
                     {
@@ -190,7 +185,7 @@ namespace Arrowgene.Ddon.WebServer
                     break;
 
                 case "reset":
-                    account = ResetPassword(req.Account, req.Password, req.PasswordToken);
+                    account = ResetPassword(req.Password, req.PasswordToken);
 
                     if (account == null)
                     {
@@ -202,7 +197,7 @@ namespace Arrowgene.Ddon.WebServer
                     break;
 
                 case "verify":
-                    bool verification = VerifyEmail(req.Email, req.EmailToken);
+                    bool verification = VerifyEmail(req.EmailToken);
                     if (!verification)
                     {
                         res.Error = "Email not found";
@@ -281,18 +276,18 @@ namespace Arrowgene.Ddon.WebServer
             return account.LoginToken;
         }
 
-        private Account ResetPassword(string name, string newPassword, string passwordToken)
+        private Account ResetPassword(string newPassword, string passwordToken)
         {
-            Account account = _database.SelectAccountByName(name);
+            Account account = _database.SelectAccountByPasswordToken(passwordToken);
             if (account == null)
             {
-                Logger.Error($"{name} - ResetPassword: account does not exist");
+                Logger.Error("ResetPassword: account does not exist");
                 return null;
             }
 
             if (account.PasswordToken != passwordToken)
             {
-                Logger.Error($"{name} - ResetPassword: invalid token");
+                Logger.Error($"ResetPassword: invalid token");
                 account.PasswordToken = null;
                 _database.UpdateAccount(account);
                 return null;
@@ -300,7 +295,7 @@ namespace Arrowgene.Ddon.WebServer
 
             if (string.IsNullOrWhiteSpace(newPassword))
             {
-                Logger.Error($"{name} - ResetPassword: invalid password");
+                Logger.Error($"ResetPassword: invalid password");
                 account.PasswordToken = null;
                 _database.UpdateAccount(account);
                 return null;
@@ -326,19 +321,19 @@ namespace Arrowgene.Ddon.WebServer
             return account;
         }
 
-        private bool VerifyEmail(string mail, string emailToken)
+        private bool VerifyEmail(string emailToken)
         {
             
-            Account account = _database.SelectAccountByEmail(mail);
+            Account account = _database.SelectAccountByMailToken(emailToken);
             if (account == null)
             {
-                Logger.Error($"{mail} - VerifyEmail: account does not exist");
+                Logger.Error("VerifyEmail: account does not exist");
                 return false;
             }
 
             if (account.MailToken != emailToken)
             {
-                Logger.Error($"{mail} - VerifyEmail: invalid email token");
+                Logger.Error($"{account.NormalName} - VerifyEmail: invalid email token");
                 return false;
             }
 
@@ -354,7 +349,7 @@ namespace Arrowgene.Ddon.WebServer
             Account account = _database.SelectAccountByEmail(mail);
             if (account == null)
             {
-                Logger.Error($"{mail} - ResendEmailVerification: account does not exist");
+                Logger.Error("ResendEmailVerification: account does not exist");
                 return null;
             }
 

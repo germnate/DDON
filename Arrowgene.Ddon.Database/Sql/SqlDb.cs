@@ -304,6 +304,8 @@ public abstract class SqlDb : IDatabase
     public abstract Account? SelectAccountByName(string accountName);
     public abstract Account? SelectAccountByEmail(string email);
     public abstract Account? SelectAccountByLoginToken(string loginToken);
+    public abstract Account? SelectAccountByPasswordToken(string passwordToken);
+    public abstract Account? SelectAccountByMailToken(string mailToken);
     public abstract bool UpdateAccount(Account account);
     public abstract bool DeleteAccount(int accountId);
     public abstract Storages SelectAllStoragesByCharacterId(uint characterId);

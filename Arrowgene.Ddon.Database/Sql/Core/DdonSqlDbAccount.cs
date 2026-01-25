@@ -20,6 +20,8 @@ public partial class DdonSqlDb : SqlDb
     private static readonly string SqlSelectAccountById = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"id\"=@id;";
     private static readonly string SqlSelectAccountByName = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"normal_name\"=@normal_name;";
     private static readonly string SqlSelectAccountByLoginToken = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"login_token\"=@login_token;";
+    private static readonly string SqlSelectAccountByPasswordToken = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"password_token\"=@password_token;";
+    private static readonly string SqlSelectAccountByMailToken = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"mail_token\"=@mail_token;";
     private static readonly string SqlSelectAccountByEmail = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"mail\"=@mail;";
     private static readonly string SqlUpdateAccount = $"UPDATE \"account\" SET {BuildQueryUpdate(AccountFields)} WHERE \"id\"=@id;";
 
@@ -107,6 +109,29 @@ public partial class DdonSqlDb : SqlDb
         Account account = null;
         ExecuteReader(SqlSelectAccountByLoginToken,
             command => { AddParameter(command, "@login_token", loginToken); }, reader =>
+            {
+                if (reader.Read()) account = ReadAccount(reader);
+            });
+
+        return account;
+    }
+
+    public override Account? SelectAccountByPasswordToken(string passwordToken)
+    {
+        Account account = null;
+        ExecuteReader(SqlSelectAccountByPasswordToken,
+            command => { AddParameter(command, "@password_token", passwordToken); }, reader =>
+            {
+                if (reader.Read()) account = ReadAccount(reader);
+            });
+
+        return account;
+    }
+    public override Account? SelectAccountByMailToken(string mailToken)
+    {
+        Account account = null;
+        ExecuteReader(SqlSelectAccountByMailToken,
+            command => { AddParameter(command, "@mail_token", mailToken); }, reader =>
             {
                 if (reader.Read()) account = ReadAccount(reader);
             });

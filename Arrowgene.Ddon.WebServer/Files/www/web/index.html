@@ -25,15 +25,15 @@
     <div>
         <div>
             <label><b>Username</b></label>
-            <input id="input_account" type="text" placeholder="Enter Username">
+            <input id="input_account" type="text">
         </div>
         <div>
             <label><b>Password</b></label>
-            <input id="input_password" type="password" placeholder="Enter Password">
+            <input id="input_password" type="password">
         </div>
         <div>
             <label><b>Email</b></label>
-            <input id="input_email" type="email" placeholder="Enter Email">
+            <input id="input_email" type="email">
         </div>
         <div>
             <button id="button_login" type="button">Login</button>
@@ -41,86 +41,67 @@
         </div>
     </div>
 
-    <div id="response_area"></div>
+    <div id="response_area">
+        <div><span class="label">Error:</span> <span id="resp_error"></span></div>
+        <div><span class="label">Message:</span> <span id="resp_message"></span></div>
+        <div><span class="label">Token:</span> <span id="resp_token"></span></div>
+    </div>
 
     <script>
         (function () {
             window.DDON = {
-                API_URL: "",
-                API_ACCOUNT: "",
-                setup: function (apiUrl) {
-                    DDON.API_URL = apiUrl;
-                    DDON.API_ACCOUNT = DDON.API_URL + "account";
+                API_ACCOUNT: "/api/account",
+
+                setup: function () {
                     DDON.addClick("button_login", DDON.login);
                     DDON.addClick("button_create_account", DDON.createAccount);
                 },
+
                 login: function () {
-                    const data = {
+                    DDON.post({
                         Action: "login",
                         Account: DDON.getText("input_account"),
                         Password: DDON.getText("input_password")
-                    };
-                    DDON.post(DDON.API_ACCOUNT, data, DDON.onLoginResponse);
+                    });
                 },
-                onLoginResponse: function (data) {
-                    DDON.showResponse(data);
-                    window.postMessage(data, "*");
-                },
+
                 createAccount: function () {
-                    const data = {
+                    DDON.post({
                         Action: "create",
                         Account: DDON.getText("input_account"),
                         Password: DDON.getText("input_password"),
                         Email: DDON.getText("input_email")
-                    };
-                    DDON.post(DDON.API_ACCOUNT, data, DDON.onCreateAccountResponse);
+                    });
                 },
-                onCreateAccountResponse: function (data) {
-                    DDON.showResponse(data);
-                    window.postMessage(data, "*");
-                },
-                showResponse: function (data) {
-                    const errorText = (typeof data.Error !== "undefined") ? data.Error : "N/A";
-                    const messageText = (typeof data.Message !== "undefined") ? data.Message : "N/A";
-                    const tokenText = (typeof data.Token !== "undefined") ? data.Token : "N/A";
 
-                    const html = `
-                        <div><span class="label">Error:</span> ${errorText}</div>
-                        <div><span class="label">Message:</span> ${messageText}</div>
-                        <div><span class="label">Token:</span> ${tokenText}</div>
-                    `;
-
-                    document.getElementById("response_area").innerHTML = html;
-                },
-                post: function (url, data, cb) {
-                    fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                post: function (data) {
+                    fetch(DDON.API_ACCOUNT, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(data)
                     })
-                        .then(response => response.json())
-                        .then(json => cb(json))
-                        .catch(error => {
-                            cb({
-                                Error: true,
-                                Message: "Request failed: " + error.message,
-                                Token: null
-                            });
-                        });
+                        .then(r => r.json())
+                        .then(DDON.showResponse);
                 },
-                addClick: function (elementId, cb) {
-                    const el = document.getElementById(elementId);
-                    if (el) el.onclick = cb;
+
+                showResponse: function (data) {
+                    document.getElementById("resp_error").textContent = data.Error;
+                    document.getElementById("resp_message").textContent = data.Message;
+                    document.getElementById("resp_token").textContent = data.Token;
+
+                    window.postMessage(data, "*");
                 },
-                getText: function (elementId) {
-                    const el = document.getElementById(elementId);
-                    return el ? el.value : "";
+
+                addClick: function (id, cb) {
+                    document.getElementById(id).onclick = cb;
                 },
+
+                getText: function (id) {
+                    return document.getElementById(id).value;
+                }
             };
 
-            DDON.setup("/api/");
+            DDON.setup();
         })();
     </script>
 

@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Verify</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #response_area {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="response_area">
+        <div><span class="label">Mensagem:</span> <span id="resp_message"></span></div>
+        <div><span class="label">Erro:</span> <span id="resp_erro"></span></div>
+        <div><span class="label">Token:</span> <span id="resp_token"></span></div>
+    </div>
+
+    <script>
+        (function () {
+            window.DDON = {
+                API_ACCOUNT: "/api/account",
+
+                setup: function () {
+                    DDON.post(DDON.API_ACCOUNT, {
+                        Action: "verify",
+                        MailToken: DDON.getTokenFromUrl()
+                    }, DDON.showResponse);
+                },
+
+                getTokenFromUrl: function () {
+                    return new URLSearchParams(window.location.search).get("token");
+                },
+
+                showResponse: function (data) {
+                    document.getElementById("resp_message").textContent = data.Message;
+                    document.getElementById("resp_erro").textContent = data.Erro;
+                    document.getElementById("resp_token").textContent = data.Token;
+                },
+
+                post: function (url, data, cb) {
+                    fetch(url, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(data)
+                    })
+                        .then(r => r.json())
+                        .then(cb);
+                }
+            };
+
+            DDON.setup();
+        })();
+    </script>
+
+</body>
+</html>
