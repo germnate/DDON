@@ -163,7 +163,6 @@ namespace Arrowgene.Ddon.WebServer
 
                     res.Message = "Account created";
                     await _mail.SendAsync("new_account", account);
-                    res.Token = account.MailToken; //for tests
                     break;
 
                 case "recover":
@@ -188,7 +187,6 @@ namespace Arrowgene.Ddon.WebServer
 
                     res.Message = "Password token generated";
                     await _mail.SendAsync("password_reset", account);
-                    res.Token = account.PasswordToken; //for tests
                     break;
 
                 case "reset":
