@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "[Door of Gemstones] Away, Foul Things!",
+  "comment": "Door of Gemstones: Away, Foul Things!",
   "quest_id": 21000041,
   "base_level": 63,
   "minimum_item_rank": 0,

@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "[Door of Jewelry] Invasive Agent Elimination",
+  "comment": "Door of Jewelry: Invasive Agent Elimination",
   "quest_id": 21000078,
   "base_level": 65,
   "minimum_item_rank": 0,
@@ -50,6 +50,7 @@
         "group_id": 8
       },
       "starting_index": 1,
+      "comment": "Up to two Unappraised Star Trinket (General) and two (Soldier)",
       "enemies": [
         {
           "comment": "Jewelry-Bearing Manticore",
@@ -80,7 +81,7 @@
               "drop_chance": 0.6
             },
             {
-              "item_id": 13479,
+              "item_id": 13480,
               "item_min": 1,
               "item_max": 1,
               "quality": 0,
@@ -118,11 +119,11 @@
               "drop_chance": 0.6
             },
             {
-              "item_id": 13479,
+              "item_id": 13480,
               "item_min": 1,
               "item_max": 1,
               "quality": 0,
-              "drop_chance": 1.0
+              "drop_chance": 0.1
             }
           ],
           "is_boss": true

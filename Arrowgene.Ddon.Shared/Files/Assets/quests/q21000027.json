@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "[Door of Dragonforce] Call of Vengeful Spirits",
+  "comment": "Door of Dragonforce: Call of Vengeful Spirits",
   "quest_id": 21000027,
   "base_level": 60,
   "minimum_item_rank": 0,
