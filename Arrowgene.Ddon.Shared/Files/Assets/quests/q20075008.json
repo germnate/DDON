@@ -195,7 +195,7 @@
     },
     {
       "type": "SeekOutEnemiesAtMarkedLocation",
-      "announce_type": "Accept",
+      "announce_type": "Update",
       "result_commands": [
         {
           "comment": "New idle dialogue - Rocher",
