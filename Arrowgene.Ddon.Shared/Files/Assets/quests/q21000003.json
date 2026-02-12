@@ -1,0 +1,151 @@
+{
+  "state_machine": "GenericStateMachine",
+  "type": "World",
+  "comment": "A Monstrous Rampage",
+  "quest_id": 21000003,
+  "base_level": 63,
+  "minimum_item_rank": 0,
+  "discoverable": false,
+  "area_id": "BreyaCoast",
+  "rewards": [
+    {
+      "type": "exp",
+      "amount": 6976
+    },
+    {
+      "type": "wallet",
+      "wallet_type": "Gold",
+      "amount": 2078
+    },
+    {
+      "type": "wallet",
+      "wallet_type": "RiftPoints",
+      "amount": 265
+    },
+    {
+      "type": "select",
+      "loot_pool": [
+        {
+          "comment": "Corroded Giant Eyeball",
+          "item_id": 11774,
+          "num": 1
+        },
+        {
+          "comment": "Quality Gala Mushroom",
+          "item_id": 7994,
+          "num": 7
+        },
+        {
+          "comment": "Superior Healing Remedy",
+          "item_id": 7555,
+          "num": 3
+        }
+      ]
+    }
+  ],
+  "enemy_groups": [
+    {
+      "stage_id": {
+        "id": 333,
+        "group_id": 4
+      },
+      "placement_type": "manual",
+      "enemies": [
+        {
+          "comment": "Infected Gorecyclops (Slight)",
+          "enemy_id": "0x015012",
+          "level": 60,
+          "exp": 3783,
+          "is_boss": true,
+          "infection_type": 1,
+          "index": 5
+        },
+        {
+          "comment": "Infected Direwolf",
+          "enemy_id": "0x010209",
+          "level": 60,
+          "exp": 756,
+          "index": 7
+        },
+        {
+          "comment": "Infected Direwolf",
+          "enemy_id": "0x010209",
+          "level": 60,
+          "exp": 756,
+          "index": 8
+        },
+        {
+          "comment": "Infected Direwolf",
+          "enemy_id": "0x010209",
+          "level": 60,
+          "exp": 756,
+          "index": 9
+        }
+      ]
+    },
+    {
+      "stage_id": {
+        "id": 333,
+        "group_id": 9
+      },
+      "enemies": [
+        {
+          "comment": "Lux Skeleton",
+          "enemy_id": "0x010317",
+          "start_think_tbl_no": 2,
+          "level": 60,
+          "exp": 756
+        },
+        {
+          "comment": "Lux Skeleton",
+          "enemy_id": "0x010317",
+          "start_think_tbl_no": 2,
+          "level": 60,
+          "exp": 756
+        },
+        {
+          "comment": "Lux Skeleton",
+          "enemy_id": "0x010317",
+          "start_think_tbl_no": 2,
+          "level": 60,
+          "exp": 756
+        },
+        {
+          "comment": "Lux Skeleton",
+          "enemy_id": "0x010317",
+          "start_think_tbl_no": 2,
+          "level": 60,
+          "exp": 756
+        },
+        {
+          "comment": "Lux Skeleton",
+          "enemy_id": "0x010317",
+          "start_think_tbl_no": 2,
+          "level": 60,
+          "exp": 756
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "DiscoverEnemy",
+      "groups": [0]
+    },
+    {
+      "type": "Raw",
+      "announce_type": "Accept",
+      "check_commands": [ { "type": "EmHpLess", "Param1": 824, "Param2": 4, "Param3": 5, "Param4": 35 } ] 
+    },
+    {
+      "type": "KillGroup",
+      "announce_type": "Update",
+      "groups": [1]
+    },
+    {
+      "type": "KillGroup",
+      "reset_group": false,
+      "groups": [0]
+    }
+  ]
+}

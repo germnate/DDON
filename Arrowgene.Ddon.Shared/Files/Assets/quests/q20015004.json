@@ -52,28 +52,32 @@
       },
       "enemies": [
         {
-          "comment": "Blue Newt",
+          "comment": "Vigilant Blue Newt",
           "enemy_id": "0x010460",
+          "named_enemy_params_id": 53,
           "level": 34,
-          "exp": 463
+          "exp": 167
         },
         {
-          "comment": "Blue Newt",
+          "comment": "Vigilant Blue Newt",
           "enemy_id": "0x010460",
+          "named_enemy_params_id": 53,
           "level": 34,
-          "exp": 463
+          "exp": 167
         },
         {
-          "comment": "Blue Newt",
+          "comment": "Vigilant Blue Newt",
           "enemy_id": "0x010460",
+          "named_enemy_params_id": 53,
           "level": 34,
-          "exp": 463
+          "exp": 167
         },
         {
-          "comment": "Blue Newt",
+          "comment": "Vigilant Blue Newt",
           "enemy_id": "0x010460",
+          "named_enemy_params_id": 53,
           "level": 34,
-          "exp": 463
+          "exp": 167
         }
       ]
     }
