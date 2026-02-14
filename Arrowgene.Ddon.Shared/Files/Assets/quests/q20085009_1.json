@@ -1,44 +1,45 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "An Ancient Perseverance",
+    "comment": "An Ancient Perseverance (II)",
     "quest_id": 20085009,
-    "base_level": 47,
+    "base_level": 49,
     "minimum_item_rank": 0,
     "discoverable": false,
     "area_id": "EasternZandora",
+    "variant_index": 1,
     "rewards": [
         {
             "type": "wallet",
             "wallet_type": "Gold",
-            "amount": 1290
+            "amount": 1340
         },
         {
             "type": "wallet",
             "wallet_type": "RiftPoints",
-            "amount": 200
+            "amount": 210
         },
         {
             "type": "exp",
-            "amount": 1290
+            "amount": 1610
         },
         {
             "type": "select",
             "loot_pool": [
                 {
-                    "comment": "Crest of Sheer Protection",
-                    "item_id": 9289,
+                    "comment": "Cursed Skull",
+                    "item_id": 7772,
                     "num": 1
                 },
                 {
-                    "comment": "Crest of Sheer Intelligence",
-                    "item_id": 9293,
-                    "num": 1
+                    "comment": "Bone Meal",
+                    "item_id": 7850,
+                    "num": 3
                 },
                 {
-                    "comment": "Panacea",
-                    "item_id": 41,
-                    "num": 1
+                    "comment": "Strong Gala Extract",
+                    "item_id": 9363,
+                    "num": 3
                 }
             ]
         }
@@ -54,43 +55,43 @@
                     "comment": "Brutal Skeleton Warrior",
                     "enemy_id": "0x010302",
                     "named_enemy_params_id": 54,
-                    "level": 47,
-                    "exp": 224
+                    "level": 49,
+                    "exp": 232
                 },
                 {
                     "comment": "Brutal Skeleton Warrior",
                     "enemy_id": "0x010302",
                     "named_enemy_params_id": 54,
-                    "level": 47,
-                    "exp": 224
+                    "level": 49,
+                    "exp": 232
                 },
                 {
-                    "comment": "Brutal Ghost Mail",
-                    "enemy_id": "0x010311",
+                    "comment": "Brutal Skull Lord",
+                    "enemy_id": "0x010313",
                     "named_enemy_params_id": 54,
-                    "level": 47,
-                    "exp": 576
-                },
-                {
-                    "comment": "Brutal Skeleton Warrior",
-                    "enemy_id": "0x010302",
-                    "named_enemy_params_id": 54,
-                    "level": 47,
-                    "exp": 224
-                },
-                {
-                    "comment": "Brutal Ghost Mail",
-                    "enemy_id": "0x010311",
-                    "named_enemy_params_id": 54,
-                    "level": 47,
-                    "exp": 576
+                    "level": 49,
+                    "exp": 1148
                 },
                 {
                     "comment": "Brutal Skeleton Warrior",
                     "enemy_id": "0x010302",
                     "named_enemy_params_id": 54,
-                    "level": 47,
-                    "exp": 224
+                    "level": 49,
+                    "exp": 232
+                },
+                {
+                    "comment": "Brutal Skull Lord",
+                    "enemy_id": "0x010313",
+                    "named_enemy_params_id": 54,
+                    "level": 49,
+                    "exp": 1148
+                },
+                {
+                    "comment": "Brutal Skeleton Warrior",
+                    "enemy_id": "0x010302",
+                    "named_enemy_params_id": 54,
+                    "level": 49,
+                    "exp": 232
                 }
             ]
         }

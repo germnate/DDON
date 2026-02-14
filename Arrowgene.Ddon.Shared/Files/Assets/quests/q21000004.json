@@ -55,7 +55,7 @@
     {
       "type": "DeliverItems",
       "stage_id": {
-        "id": 1
+        "id": 16
       },
       "npc_id": "Emerada0",
       "announce_type": "Accept",

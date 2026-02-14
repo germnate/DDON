@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "NorthernBetlandPlains",
+  "news_image": 151,
   "rewards": [
     {
       "type": "exp",
@@ -54,14 +55,14 @@
         {
           "comment": "Great Horned War Demon (General Orc)",
           "enemy_id": "0x015830",
-          "named_enemy_params_id": 642,
+          "named_enemy_params_id": 644,
           "level": 58,
           "exp": 1568
         },
         {
           "comment": "Great Horned War Demon (General Orc)",
           "enemy_id": "0x015830",
-          "named_enemy_params_id": 642,
+          "named_enemy_params_id": 644,
           "level": 58,
           "exp": 1568
         },
