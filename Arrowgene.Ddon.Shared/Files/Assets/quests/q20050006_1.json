@@ -1,27 +1,28 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Witch of the Forest",
+  "comment": "The Witch of the Forest (II)",
   "quest_id": 20050006,
-  "base_level": 13,
+  "base_level": 15,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "MysreeForest",
   "news_image": 114,
+  "variant_index": 1,
   "rewards": [
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 850
+      "amount": 120
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 70
+      "amount": 80
     },
     {
       "type": "exp",
-      "amount": 280
+      "amount": 330
     },
     {
       "type": "select",
@@ -32,14 +33,25 @@
           "num": 2
         },
         {
-          "comment": "Oil Flask",
-          "item_id": 9394,
-          "num": 3
+          "comment": "Superior Healing Potion",
+          "item_id": 35,
+          "num": 2
         },
         {
-          "comment": "Mushroom Sauté",
-          "item_id": 1351,
+          "comment": "Meatloaf",
+          "item_id": 9408,
           "num": 1
+        }
+      ]
+    },
+    {
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Rough Thread",
+          "item_id": 7952,
+          "num": 1,
+          "chance": 1.0
         }
       ]
     }
@@ -51,7 +63,7 @@
         "id": 16
       },
       "npc_id": "Emerada0",
-      "message_id": 11429
+      "message_id": 13111
     },
     {
       "type": "DeliverItems",
@@ -71,12 +83,12 @@
       ],
       "items": [
         {
-          "comment": "Lestania Herb",
-          "id": 7976,
+          "comment": "White Seashell",
+          "id": 8016,
           "amount": 5
         }
       ],
-      "message_id": 13113
+      "message_id": 13114
     }
   ]
 }
