@@ -1,17 +1,18 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "An Ancient Perseverance",
-    "quest_id": 20085009,
+    "comment": "Eliminate the Orc Expedition! (II)",
+    "quest_id": 20085003,
     "base_level": 47,
     "minimum_item_rank": 0,
     "discoverable": false,
     "area_id": "EasternZandora",
+    "variant_index": 1,
     "rewards": [
         {
             "type": "wallet",
             "wallet_type": "Gold",
-            "amount": 1290
+            "amount": 1030
         },
         {
             "type": "wallet",
@@ -26,14 +27,14 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "comment": "Crest of Sheer Protection",
-                    "item_id": 9289,
+                    "comment": "Pigeon Blood",
+                    "item_id": 7910,
                     "num": 1
                 },
                 {
-                    "comment": "Crest of Sheer Intelligence",
-                    "item_id": 9293,
-                    "num": 1
+                    "comment": "Orc Decoration",
+                    "item_id": 8020,
+                    "num": 2
                 },
                 {
                     "comment": "Panacea",
@@ -46,51 +47,54 @@
     "enemy_groups" : [
         {
             "stage_id": {
-                "id": 65,
-                "group_id": 0
+                "id": 1,
+                "group_id": 468
             },
+            "starting_index": 8,
             "enemies": [
                 {
-                    "comment": "Brutal Skeleton Warrior",
-                    "enemy_id": "0x010302",
+                    "comment": "Brutal Orc Blitzer",
+                    "enemy_id": "0x015811",
                     "named_enemy_params_id": 54,
                     "level": 47,
-                    "exp": 224
+                    "exp": 273
                 },
                 {
-                    "comment": "Brutal Skeleton Warrior",
-                    "enemy_id": "0x010302",
+                    "comment": "Brutal Orc Blitzer",
+                    "enemy_id": "0x015811",
                     "named_enemy_params_id": 54,
                     "level": 47,
-                    "exp": 224
+                    "exp": 273
                 },
                 {
-                    "comment": "Brutal Ghost Mail",
-                    "enemy_id": "0x010311",
+                    "comment": "Brutal Orc Blitzer",
+                    "enemy_id": "0x015811",
                     "named_enemy_params_id": 54,
                     "level": 47,
-                    "exp": 576
+                    "exp": 273
                 },
                 {
-                    "comment": "Brutal Skeleton Warrior",
-                    "enemy_id": "0x010302",
+                    "comment": "Brutal Orc Blitzer",
+                    "enemy_id": "0x015811",
                     "named_enemy_params_id": 54,
                     "level": 47,
-                    "exp": 224
+                    "exp": 273
                 },
                 {
-                    "comment": "Brutal Ghost Mail",
-                    "enemy_id": "0x010311",
+                    "comment": "Brutal Orc Blitzer",
+                    "enemy_id": "0x015811",
                     "named_enemy_params_id": 54,
                     "level": 47,
-                    "exp": 576
+                    "exp": 273
                 },
                 {
-                    "comment": "Brutal Skeleton Warrior",
-                    "enemy_id": "0x010302",
+                    "comment": "Brutal Orc Captain",
+                    "enemy_id": "0x015820",
                     "named_enemy_params_id": 54,
                     "level": 47,
-                    "exp": 224
+                    "exp": 573,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 }
             ]
         }

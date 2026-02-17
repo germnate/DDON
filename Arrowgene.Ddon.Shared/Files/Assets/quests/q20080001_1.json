@@ -1,26 +1,27 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "The Bound Spirit",
+    "comment": "The Bound Spirit (II)",
     "quest_id": 20080001,
-    "base_level": 48,
+    "base_level": 50,
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "EasternZandora",
+    "variant_index": 1,
     "rewards": [
         {
             "type": "exp",
-            "amount": 1740
+            "amount": 1980
         },
         {
             "type": "wallet",
             "wallet_type": "Gold",
-            "amount": 1320
+            "amount": 1370
         },
         {
             "type": "wallet",
             "wallet_type": "RiftPoints",
-            "amount": 290
+            "amount": 330
         },
         {
             "type": "select",
@@ -31,14 +32,14 @@
                     "num": 1
                 },
                 {
-                    "comment": "Enhanced Lumber Knife",
-                    "item_id": 9402,
+                    "comment": "Enhanced Lockpick",
+                    "item_id": 9403,
                     "num": 3
                 },
                 {
-                    "comment": "Strong Gala Extract",
-                    "item_id": 9363,
-                    "num": 3
+                    "comment": "Panacea",
+                    "item_id": 41,
+                    "num": 1
                 }
             ]
         }
@@ -52,42 +53,35 @@
             "placement_type": "manual",
             "enemies": [
                 {
-                    "comment": "Skeleton Warrior",
-                    "enemy_id": "0x010302",
-                    "start_think_tbl_no": 8,
-                    "level": 47,
-                    "exp": 225,
-                    "is_required": false,
-                    "is_manual_set": true,
+                    "comment": "Brutal Ghost Mail",
+                    "enemy_id": "0x010311",
+                    "named_enemy_params_id": 54,
+                    "level": 50,
+                    "exp": 600,
                     "index": 8
                 },
                 {
-                    "comment": "Skeleton Warrior",
-                    "enemy_id": "0x010302",
-                    "start_think_tbl_no": 8,
-                    "level": 47,
-                    "exp": 225,
-                    "is_required": false,
-                    "is_manual_set": true,
+                    "comment": "Brutal Ghost Mail",
+                    "enemy_id": "0x010311",
+                    "named_enemy_params_id": 54,
+                    "level": 50,
+                    "exp": 600,
                     "index": 9
                 },
                 {
-                    "comment": "Skeleton Warrior",
-                    "enemy_id": "0x010302",
-                    "start_think_tbl_no": 8,
-                    "level": 47,
-                    "exp": 225,
-                    "is_required": false,
-                    "is_manual_set": true,
+                    "comment": "Brutal Ghost Mail",
+                    "enemy_id": "0x010311",
+                    "named_enemy_params_id": 54,
+                    "level": 50,
+                    "exp": 600,
                     "index": 10
                 },
                 {
-                    "comment": "Brutal Empress Ghost",
+                    "comment": "Dangerous Empress Ghost",
                     "enemy_id": "0x015605",
-                    "named_enemy_params_id": 54,
-                    "start_think_tbl_no": 2,
-                    "level": 48,
-                    "exp": 3738,
+                    "named_enemy_params_id": 56,
+                    "level": 50,
+                    "exp": 3840,
                     "is_boss": true,
                     "index": 2
                 }

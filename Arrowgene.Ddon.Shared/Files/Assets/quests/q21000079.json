@@ -117,11 +117,11 @@
       },
       "npc_id": "Ariadne",
       "announce_type": "Accept",
-      "result_commands": [ 
-        { 
+      "result_commands": [
+        {
           "comment": "Idle dialogue",
-          "type": "QstTalkChg", 
-          "Param1": 2303, 
+          "type": "QstTalkChg",
+          "Param1": 2303,
           "Param2": 17402
         }
       ],
@@ -136,11 +136,11 @@
     },
     {
       "type": "SeekOutEnemiesAtMarkedLocation",
-      "announce_type": "Accept",
-      "result_commands": [ 
-        { 
-          "type": "QstTalkChg", 
-          "Param1": 2303, 
+      "announce_type": "Update",
+      "result_commands": [
+        {
+          "type": "QstTalkChg",
+          "Param1": 2303,
           "Param2": 17404,
           "comment": "Idle dialogue"
         }

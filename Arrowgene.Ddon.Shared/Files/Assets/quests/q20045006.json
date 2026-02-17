@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "VoldenMines",
+  "news_image": 546,
   "rewards": [
     {
       "type": "exp",
@@ -82,7 +83,7 @@
         "id": 1,
         "group_id": 239
       },
-      "starting_index": 4,
+      "placement_type": "manual",
       "enemies": [
         {
           "comment": "Calamity Caller (Nightmare)",
@@ -90,28 +91,32 @@
           "named_enemy_params_id": 640,
           "level": 58,
           "exp": 8831,
-          "is_boss": true
+          "is_boss": true,
+          "index": 3
         },
         {
           "comment": "Death Courting Demon Princess (Empress Ghost)",
           "enemy_id": "0x015605",
           "named_enemy_params_id": 641,
           "level": 58,
-          "exp": 4249
+          "exp": 4249,
+          "index": 4
         },
         {
           "comment": "Death Courting Demon Princess (Empress Ghost)",
           "enemy_id": "0x015605",
           "named_enemy_params_id": 641,
           "level": 58,
-          "exp": 4249
+          "exp": 4249,
+          "index": 5
         },
         {
           "comment": "Death Courting Demon Princess (Empress Ghost)",
           "enemy_id": "0x015605",
           "named_enemy_params_id": 641,
           "level": 58,
-          "exp": 4249
+          "exp": 4249,
+          "index": 7
         }
       ]
     }
@@ -159,7 +164,7 @@
     },
     {
       "type": "SeekOutEnemiesAtMarkedLocation",
-      "announce_type": "Accept",
+      "announce_type": "Update",
       "result_commands": [
         {
           "comment": "Idle dialogue",

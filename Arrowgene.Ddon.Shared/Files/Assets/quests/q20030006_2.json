@@ -1,45 +1,46 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Incapable Courier",
+  "comment": "The Incapable Courier (III)",
   "quest_id": 20030006,
-  "base_level": 28,
+  "base_level": 45,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "DoweValley",
   "news_image": 62,
+  "variant_index": 2,
   "rewards": [
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 700
+      "amount": 1200
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 120
+      "amount": 180
     },
     {
       "type": "exp",
-      "amount": 920
+      "amount": 1000
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Wiseman Cloak",
-          "item_id": 1012,
-          "num": 1
+          "comment": "Eye Gem",
+          "item_id": 7730,
+          "num": 3
         },
         {
-          "comment": "Sprite's Amulet",
-          "item_id": 9384,
-          "num": 2
+          "comment": "Refreshing Remedy",
+          "item_id": 9375,
+          "num": 3
         },
         {
-          "comment": "Three-Herb-Salad",
-          "item_id": 9410,
-          "num": 2
+          "comment": "Healing Remedy",
+          "item_id": 7554,
+          "num": 3
         }
       ]
     }
@@ -82,9 +83,9 @@
       ],
       "items": [
         {
-          "comment": "Combat Fabric",
-          "id": 7938,
-          "amount": 3
+          "comment": "Healing Drop",
+          "id": 7829,
+          "amount": 8
         }
       ],
       "message_id": 11995

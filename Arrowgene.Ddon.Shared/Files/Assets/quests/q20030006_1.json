@@ -1,13 +1,14 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Incapable Courier",
+  "comment": "The Incapable Courier (II)",
   "quest_id": 20030006,
-  "base_level": 28,
+  "base_level": 30,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "DoweValley",
   "news_image": 62,
+  "variant_index": 1,
   "rewards": [
     {
       "type": "wallet",
@@ -17,29 +18,29 @@
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 120
+      "amount": 130
     },
     {
       "type": "exp",
-      "amount": 920
+      "amount": 990
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Wiseman Cloak",
-          "item_id": 1012,
+          "comment": "Red Chromium",
+          "item_id": 7879,
+          "num": 3
+        },
+        {
+          "comment": "Throwing Skull",
+          "item_id": 9397,
+          "num": 3
+        },
+        {
+          "comment": "Wine-Boiled Mushroom",
+          "item_id": 9411,
           "num": 1
-        },
-        {
-          "comment": "Sprite's Amulet",
-          "item_id": 9384,
-          "num": 2
-        },
-        {
-          "comment": "Three-Herb-Salad",
-          "item_id": 9410,
-          "num": 2
         }
       ]
     }
@@ -82,9 +83,9 @@
       ],
       "items": [
         {
-          "comment": "Combat Fabric",
-          "id": 7938,
-          "amount": 3
+          "comment": "Hard Leather Cloth",
+          "id": 7937,
+          "amount": 2
         }
       ],
       "message_id": 11995

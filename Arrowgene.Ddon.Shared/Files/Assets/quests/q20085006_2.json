@@ -1,45 +1,46 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "The Evil That Draws Near",
-    "quest_id": 20080007,
-    "base_level": 47,
+    "comment": "The Attacking Bite (Rare Species)",
+    "quest_id": 20085006,
+    "base_level": 60,
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "EasternZandora",
+    "news_image": 544,
+    "variant_index": 2,
     "rewards": [
         {
             "type": "wallet",
             "wallet_type": "Gold",
-            "amount": 1550
+            "amount": 1980
         },
         {
             "type": "wallet",
             "wallet_type": "RiftPoints",
-            "amount": 280
+            "amount": 490
         },
         {
             "type": "exp",
-            "amount": 2530
+            "amount": 3460
         },
         {
             "type": "select",
             "loot_pool": [
                 {
-                    "comment": "Shadowy Claw",
-                    "item_id": 7800,
+                    "comment": "Superior Healing Remedy",
+                    "item_id": 7555,
+                    "num": 2
+                },
+                {
+                    "comment": "Superior Strong Gala Extract",
+                    "item_id": 9364,
+                    "num": 2
+                },
+                {
+                    "comment": "Panacea",
+                    "item_id": 41,
                     "num": 1
-                },
-                {
-                    "comment": "Enhanced Pickaxe",
-                    "item_id": 9401,
-                    "num": 3
-                },
-                {
-                    "comment": "Healing Elixir",
-                    "item_id": 7554,
-                    "num": 3
-
                 }
             ]
         }
@@ -48,36 +49,33 @@
         {
             "stage_id": {
                 "id": 1,
-                "group_id": 440
+                "group_id": 446
             },
             "placement_type": "manual",
             "enemies": [
                 {
-                    "comment": "Brutal Shadow Chimera",
-                    "enemy_id": "0x015203",
-                    "named_enemy_params_id": 54,
+                    "comment": "Hellfire Drake (Drake)",
+                    "enemy_id": "0x015700",
+                    "named_enemy_params_id": 615,
                     "start_think_tbl_no": 1,
-                    "level": 47,
-                    "exp": 4912,
+                    "level": 60,
+                    "exp": 9860,
                     "is_boss": true,
-                    "index": 3
+                    "index": 1
                 }
             ]
         }
     ],
     "blocks": [
         {
-            "type": "NewNpcTalkAndOrder",
-            "flags": [
-                {"type": "QstLayout", "action": "Set", "value": 1074, "comment": "Spawns Man511 NPC"}
-            ],
+            "type": "NpcTalkAndOrder",
             "stage_id": {
-                "id": 1,
+                "id": 57,
                 "group_id": 1,
                 "layer_no": 1
             },
-            "npc_id": "Man511",
-            "message_id": 11452
+            "npc_id": "Oswald",
+            "message_id": 16049
         },
         {
             "type": "SeekOutEnemiesAtMarkedLocation",
@@ -86,8 +84,8 @@
                 {
                     "comment": "Idle dialogue",
                     "type": "QstTalkChg",
-                    "Param1": 511,
-                    "Param2": 13273
+                    "Param1": 1800,
+                    "Param2": 16050
                 }
             ],
             "groups": [0]
@@ -99,15 +97,15 @@
             "groups": [0]
         },
         {
-            "type": "NewTalkToNpc",
+            "type": "TalkToNpc",
             "stage_id": {
-                "id": 1,
+                "id": 57,
                 "group_id": 1,
                 "layer_no": 1
             },
             "announce_type": "Update",
-            "npc_id": "Man511",
-            "message_id": 13270
+            "npc_id": "Oswald",
+            "message_id": 16051
         }
     ]
 }

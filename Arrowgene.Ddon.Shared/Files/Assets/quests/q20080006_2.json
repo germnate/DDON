@@ -1,26 +1,27 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "The Uninvited Ones",
+    "comment": "The Uninvited Ones (III)",
     "quest_id": 20080006,
-    "base_level": 46,
+    "base_level": 48,
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "EasternZandora",
+    "variant_index": 2,
     "rewards": [
         {
             "type": "wallet",
             "wallet_type": "Gold",
-            "amount": 1160
+            "amount": 1210
         },
         {
             "type": "wallet",
             "wallet_type": "RiftPoints",
-            "amount": 200
+            "amount": 210
         },
         {
             "type": "exp",
-            "amount": 1260
+            "amount": 1320
         },
         {
             "type": "select",
@@ -36,20 +37,9 @@
                     "num": 1
                 },
                 {
-                    "comment": "Panacea",
-                    "item_id": 41,
-                    "num": 1
-                }
-            ]
-        },
-        {
-            "type": "random",
-            "loot_pool": [
-                {
-                    "comment": "Healing Potion",
-                    "item_id": 34,
-                    "num": 9,
-                    "chance": 1.0
+                    "comment": "Healing Remedy",
+                    "item_id": 7554,
+                    "num": 3
                 }
             ]
         }
@@ -63,50 +53,45 @@
             "placement_type": "manual",
             "enemies": [
                 {
-                    "comment": "Vigilant Banded Hunter",
-                    "enemy_id": "0x011012",
+                    "comment": "Vigilant Shadow Goblin Fighter",
+                    "enemy_id": "0x011131",
                     "named_enemy_params_id": 53,
-                    "hm_present_no": 54,
-                    "level": 46,
-                    "exp": 231,
+                    "level": 48,
+                    "exp": 195,
                     "index": 5
                 },
                 {
-                    "comment": "Vigilant Banded Hunter",
-                    "enemy_id": "0x011012",
+                    "comment": "Vigilant Shadow Goblin Fighter",
+                    "enemy_id": "0x011131",
                     "named_enemy_params_id": 53,
-                    "hm_present_no": 54,
-                    "level": 46,
-                    "exp": 231,
+                    "level": 48,
+                    "exp": 195,
                     "index": 6
                 },
                 {
-                    "comment": "Vigilant Banded Hunter",
-                    "enemy_id": "0x011012",
+                    "comment": "Vigilant Shadow Goblin Fighter",
+                    "enemy_id": "0x011131",
                     "named_enemy_params_id": 53,
-                    "hm_present_no": 54,
-                    "level": 46,
-                    "exp": 231,
+                    "level": 48,
+                    "exp": 195,
                     "index": 7
                 },
                 {
-                    "comment": "Vigilant Banded Hunter",
-                    "enemy_id": "0x011012",
+                    "comment": "Vigilant Shadow Goblin Fighter",
+                    "enemy_id": "0x011131",
                     "named_enemy_params_id": 53,
-                    "hm_present_no": 54,
-                    "level": 46,
-                    "exp": 231,
+                    "level": 48,
+                    "exp": 195,
                     "index": 8
                 },
                 {
-                    "comment": "Vigilant Banded Fighter",
-                    "enemy_id": "0x011010",
+                    "comment": "Vigilant Shadow Goblin",
+                    "enemy_id": "0x011130",
                     "named_enemy_params_id": 53,
-                    "hm_present_no": 52,
-                    "level": 46,
-                    "exp": 231,
+                    "level": 48,
+                    "exp": 183,
                     "repop_count": 2,
-                    "repop_wait_second": 10,
+                    "repop_wait_second": 5,
                     "index": 11
                 }
             ]

@@ -1,45 +1,46 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Thugs of the Forest",
+  "comment": "The Thugs of the Forest (II)",
   "quest_id": 20060003,
-  "base_level": 34,
+  "base_level": 41,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "MysreeGrove",
   "news_image": 126,
+  "variant_index": 1,
   "rewards": [
     {
       "type": "exp",
-      "amount": 1120
+      "amount": 1350
     },
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 930
+      "amount": 1120
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 140
+      "amount": 180
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Custodian Arms",
-          "item_id": 923,
+          "comment": "Northern Oregano",
+          "item_id": 9064,
+          "num": 3
+        },
+        {
+          "comment": "Sprite's Talisman",
+          "item_id": 9390,
           "num": 1
         },
         {
-          "comment": "Old Forest Dwellers' Key",
-          "item_id": 9066,
+          "comment": "Blue Whiskey",
+          "item_id": 9417,
           "num": 2
-        },
-        {
-          "comment": "Enhanced Lockpick",
-          "item_id": 9403,
-          "num": 3
         }
       ]
     }
@@ -53,39 +54,43 @@
       "placement_type": "manual",
       "enemies": [
         {
-          "comment": "Vigilant Redcap Fighter",
+          "comment": "Brutal Redcap Fighter",
           "enemy_id": "0x011111",
-          "named_enemy_params_id": 53,
-          "level": 34,
-          "exp": 141,
+          "named_enemy_params_id": 54,
+          "level": 41,
+          "exp": 166,
           "repop_count": 1,
           "repop_wait_time": 10,
           "index": 3
         },
         {
-          "comment": "Vigilant Sling Redcap",
+          "comment": "Brutal Sling Redcap",
           "enemy_id": "0x011112",
-          "named_enemy_params_id": 53,
-          "level": 34,
-          "exp": 141,
+          "named_enemy_params_id": 54,
+          "level": 41,
+          "exp": 166,
           "repop_count": 1,
           "repop_wait_time": 10,
           "index": 4
         },
         {
-          "comment": "Vigilant Sling Redcap",
+          "comment": "Brutal Sling Redcap",
           "enemy_id": "0x011112",
-          "named_enemy_params_id": 53,
-          "level": 34,
-          "exp": 141,
+          "named_enemy_params_id": 54,
+          "level": 41,
+          "exp": 166,
+          "repop_count": 1,
+          "repop_wait_time": 10,
           "index": 5
         },
         {
-          "comment": "Vigilant Redcap Fighter",
+          "comment": "Brutal Redcap Fighter",
           "enemy_id": "0x011111",
-          "named_enemy_params_id": 53,
-          "level": 34,
-          "exp": 141,
+          "named_enemy_params_id": 54,
+          "level": 41,
+          "exp": 166,
+          "repop_count": 1,
+          "repop_wait_time": 10,
           "index": 9
         }
       ]

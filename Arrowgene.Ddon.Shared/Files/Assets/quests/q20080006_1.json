@@ -1,17 +1,18 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "The Uninvited Ones",
+    "comment": "The Uninvited Ones (II)",
     "quest_id": 20080006,
-    "base_level": 46,
+    "base_level": 47,
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "EasternZandora",
+    "variant_index": 1,
     "rewards": [
         {
             "type": "wallet",
             "wallet_type": "Gold",
-            "amount": 1160
+            "amount": 1180
         },
         {
             "type": "wallet",
@@ -20,7 +21,7 @@
         },
         {
             "type": "exp",
-            "amount": 1260
+            "amount": 1290
         },
         {
             "type": "select",
@@ -31,25 +32,14 @@
                     "num": 1
                 },
                 {
-                    "comment": "Crest of Dwindled Magick",
-                    "item_id": 9282,
-                    "num": 1
+                    "comment": "Enhanced Lockpick",
+                    "item_id": 9403,
+                    "num": 3
                 },
                 {
-                    "comment": "Panacea",
-                    "item_id": 41,
-                    "num": 1
-                }
-            ]
-        },
-        {
-            "type": "random",
-            "loot_pool": [
-                {
-                    "comment": "Healing Potion",
-                    "item_id": 34,
-                    "num": 9,
-                    "chance": 1.0
+                    "comment": "Enhanced Lumber Knife",
+                    "item_id": 9402,
+                    "num": 3
                 }
             ]
         }
@@ -63,51 +53,51 @@
             "placement_type": "manual",
             "enemies": [
                 {
-                    "comment": "Vigilant Banded Hunter",
-                    "enemy_id": "0x011012",
-                    "named_enemy_params_id": 53,
-                    "hm_present_no": 54,
-                    "level": 46,
-                    "exp": 231,
+                    "comment": "Brutal Banded Mage",
+                    "enemy_id": "0x011015",
+                    "named_enemy_params_id": 54,
+                    "hm_present_no": 57,
+                    "level": 47,
+                    "exp": 234,
                     "index": 5
                 },
                 {
-                    "comment": "Vigilant Banded Hunter",
-                    "enemy_id": "0x011012",
-                    "named_enemy_params_id": 53,
-                    "hm_present_no": 54,
-                    "level": 46,
-                    "exp": 231,
+                    "comment": "Brutal Banded Mage",
+                    "enemy_id": "0x011015",
+                    "named_enemy_params_id": 54,
+                    "hm_present_no": 57,
+                    "level": 47,
+                    "exp": 234,
                     "index": 6
                 },
                 {
-                    "comment": "Vigilant Banded Hunter",
-                    "enemy_id": "0x011012",
-                    "named_enemy_params_id": 53,
-                    "hm_present_no": 54,
-                    "level": 46,
-                    "exp": 231,
+                    "comment": "Brutal Banded Mage",
+                    "enemy_id": "0x011015",
+                    "named_enemy_params_id": 54,
+                    "hm_present_no": 57,
+                    "level": 47,
+                    "exp": 234,
                     "index": 7
                 },
                 {
-                    "comment": "Vigilant Banded Hunter",
-                    "enemy_id": "0x011012",
-                    "named_enemy_params_id": 53,
-                    "hm_present_no": 54,
-                    "level": 46,
-                    "exp": 231,
+                    "comment": "Brutal Banded Mage",
+                    "enemy_id": "0x011015",
+                    "named_enemy_params_id": 54,
+                    "hm_present_no": 57,
+                    "level": 47,
+                    "exp": 234,
                     "index": 8
                 },
                 {
-                    "comment": "Vigilant Banded Fighter",
-                    "enemy_id": "0x011010",
-                    "named_enemy_params_id": 53,
-                    "hm_present_no": 52,
-                    "level": 46,
-                    "exp": 231,
+                    "comment": "Brutal Banded Hunter",
+                    "enemy_id": "0x011012",
+                    "named_enemy_params_id": 54,
+                    "hm_present_no": 54,
+                    "level": 47,
+                    "exp": 234,
+                    "index": 11,
                     "repop_count": 2,
-                    "repop_wait_second": 10,
-                    "index": 11
+                    "repop_wait_second": 10
                 }
             ]
         }
