@@ -1,63 +1,64 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "After That Dragon! (II)",
-  "quest_id": 20035009,
-  "base_level": 40,
+  "comment": "The Echoing Roars in the Tunnel (II)",
+  "quest_id": 20035008,
+  "base_level": 35,
   "minimum_item_rank": 0,
   "discoverable": false,
   "area_id": "DoweValley",
-  "news_image": 64,
+  "news_image": 535,
   "variant_index": 1,
   "rewards": [
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1320
+      "amount": 1150
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 260
+      "amount": 160
     },
     {
       "type": "exp",
-      "amount": 1840
+      "amount": 1480
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Water Dragon Fang",
-          "item_id": 7765,
+          "comment": "Crest of Holy Drain Warding",
+          "item_id": 9323,
           "num": 1
         },
         {
-          "comment": "Dragonleather",
-          "item_id": 7941,
+          "comment": "Grilled Mushroom",
+          "item_id": 9415,
           "num": 1
         },
         {
-          "comment": "Demon's Talisman",
-          "item_id": 9389,
-          "num": 1
+          "comment": "Throwing Skull",
+          "item_id": 9397,
+          "num": 3
         }
       ]
-  }
+    }
   ],
   "enemy_groups": [
     {
       "stage_id": {
-        "id": 1,
-        "group_id": 228
+        "id": 100,
+        "group_id": 4
       },
+      "starting_index": 11,
       "enemies": [
         {
-          "comment": "Dangerous Lindwurm",
-          "enemy_id": "0x015707",
-          "named_enemy_params_id": 56,
-          "level": 40,
-          "exp": 6890,
+          "comment": "Brutal Ogre",
+          "enemy_id": "0x015500",
+          "named_enemy_params_id": 54,
+          "level": 35,
+          "exp": 2600,
           "is_boss": true
         }
       ]
@@ -66,7 +67,6 @@
   "blocks": [
     {
       "type": "DiscoverEnemy",
-      "show_marker": false,
       "groups": [ 0 ]
     },
     {

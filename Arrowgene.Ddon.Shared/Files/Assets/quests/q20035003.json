@@ -1,63 +1,62 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "After That Dragon! (II)",
-  "quest_id": 20035009,
-  "base_level": 40,
+  "comment": "The Glittering Horn",
+  "quest_id": 20035003,
+  "base_level": 35,
   "minimum_item_rank": 0,
   "discoverable": false,
   "area_id": "DoweValley",
-  "news_image": 64,
-  "variant_index": 1,
   "rewards": [
+    {
+      "type": "exp",
+      "amount": 3230
+    },
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1320
+      "amount": 2310
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 260
-    },
-    {
-      "type": "exp",
-      "amount": 1840
+      "amount": 180
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Water Dragon Fang",
-          "item_id": 7765,
-          "num": 1
+		  "comment": "Superior Quality Gala Extract",
+          "item_id": 9362,
+          "num": 3
         },
         {
-          "comment": "Dragonleather",
-          "item_id": 7941,
-          "num": 1
+		  "comment": "Superior Healing Elixir",
+          "item_id": 7553,
+          "num": 2
         },
         {
-          "comment": "Demon's Talisman",
-          "item_id": 9389,
-          "num": 1
+		  "comment": "Conqueror's Amulet",
+          "item_id": 9381,
+          "num": 2
         }
       ]
-  }
+    }
   ],
   "enemy_groups": [
     {
       "stage_id": {
         "id": 1,
-        "group_id": 228
+        "group_id": 487
       },
+      "starting_index": 2,
       "enemies": [
         {
-          "comment": "Dangerous Lindwurm",
-          "enemy_id": "0x015707",
-          "named_enemy_params_id": 56,
-          "level": 40,
-          "exp": 6890,
+		  "comment": "Bounty Chimera",
+          "enemy_id": "0x015200",
+          "named_enemy_params_id": 458,
+          "level": 35,
+          "exp": 3300,
           "is_boss": true
         }
       ]
@@ -66,7 +65,6 @@
   "blocks": [
     {
       "type": "DiscoverEnemy",
-      "show_marker": false,
       "groups": [ 0 ]
     },
     {

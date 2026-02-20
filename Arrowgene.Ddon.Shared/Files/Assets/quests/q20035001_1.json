@@ -1,63 +1,64 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "After That Dragon! (II)",
-  "quest_id": 20035009,
-  "base_level": 40,
+  "comment": "The Sleeping Giant (II)",
+  "quest_id": 20035001,
+  "base_level": 56,
   "minimum_item_rank": 0,
   "discoverable": false,
   "area_id": "DoweValley",
-  "news_image": 64,
+  "news_image": 72,
   "variant_index": 1,
   "rewards": [
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1320
+      "amount": 1840
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 260
+      "amount": 290
     },
     {
       "type": "exp",
-      "amount": 1840
+      "amount": 2430
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Water Dragon Fang",
-          "item_id": 7765,
+          "comment": "Giant Single Pelt",
+          "item_id": 9438,
           "num": 1
         },
         {
-          "comment": "Dragonleather",
-          "item_id": 7941,
+          "comment": "Giant Eyeball",
+          "item_id": 7740,
           "num": 1
         },
         {
-          "comment": "Demon's Talisman",
-          "item_id": 9389,
-          "num": 1
+          "comment": "Rugged Leather",
+          "item_id": 7924,
+          "num": 3
         }
       ]
-  }
+    }
   ],
   "enemy_groups": [
     {
       "stage_id": {
-        "id": 1,
-        "group_id": 228
+        "id": 69,
+        "group_id": 6
       },
+      "starting_index": 1,
       "enemies": [
         {
-          "comment": "Dangerous Lindwurm",
-          "enemy_id": "0x015707",
-          "named_enemy_params_id": 56,
-          "level": 40,
-          "exp": 6890,
+          "comment": "Keywarden Cyclops (Club)",
+          "enemy_id": "0x015001",
+          "named_enemy_params_id": 387,
+          "level": 56,
+          "exp": 3888,
           "is_boss": true
         }
       ]
@@ -66,7 +67,6 @@
   "blocks": [
     {
       "type": "DiscoverEnemy",
-      "show_marker": false,
       "groups": [ 0 ]
     },
     {

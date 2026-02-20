@@ -1,46 +1,46 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Timeless Castle (IV)",
-  "quest_id": 20030003,
-  "base_level": 58,
+  "comment": "The Spectator (II)",
+  "quest_id": 20030007,
+  "base_level": 36,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "DoweValley",
-  "news_image": 71,
-  "variant_index": 3,
+  "news_image": 505,
+  "variant_index": 1,
   "rewards": [
     {
       "type": "exp",
-      "amount": 3340
+      "amount": 1660
     },
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1910
+      "amount": 1180
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 380
+      "amount": 190
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Dragon Fang",
-          "item_id": 7763,
+          "comment": "Silver Chainmail",
+          "item_id": 985,
           "num": 1
         },
         {
-          "comment": "Thick Dragonscale",
-          "item_id": 7929,
+          "comment": "Goat Horn",
+          "item_id": 7785,
           "num": 1
         },
         {
-          "comment": "Behemoth Fang",
-          "item_id": 7799,
-          "num": 1
+          "comment": "Wine-Boiled Mushroom",
+          "item_id": 9412,
+          "num": 2
         }
       ]
     }
@@ -48,20 +48,18 @@
   "enemy_groups": [
     {
       "stage_id": {
-        "id": 69,
-        "group_id": 19
+        "id": 166,
+        "group_id": 4
       },
-      "placement_type": "manual",
+      "starting_index": 7,
       "enemies": [
         {
-          "comment": "Legendary Behemoth",
-          "enemy_id": "0x015709",
-          "named_enemy_params_id": 57,
-          "start_think_tbl_no": 1,
-          "level": 58,
-          "exp": 9296,
-          "is_boss": true,
-          "index": 4
+          "comment": "Brutal Chimera",
+          "enemy_id": "0x015200",
+          "named_enemy_params_id": 54,
+          "level": 36,
+          "exp": 3360,
+          "is_boss": true
         }
       ]
     }
@@ -70,12 +68,12 @@
     {
       "type": "NpcTalkAndOrder",
       "stage_id": {
-        "id": 42,
+        "id": 51,
         "group_id": 1,
         "layer_no": 1
       },
-      "npc_id": "Urda",
-      "message_id": 11197
+      "npc_id": "Chester0",
+      "message_id": 12213
     },
     {
       "type": "SeekOutEnemiesAtMarkedLocation",
@@ -84,8 +82,8 @@
         {
           "comment": "Idle dialogue",
           "type": "QstTalkChg",
-          "Param1": 1502,
-          "Param2": 11202
+          "Param1": 539,
+          "Param2": 12212
         }
       ],
       "groups": [ 0 ]
@@ -99,13 +97,13 @@
     {
       "type": "TalkToNpc",
       "stage_id": {
-        "id": 42,
+        "id": 51,
         "group_id": 1,
         "layer_no": 1
       },
       "announce_type": "Update",
-      "npc_id": "Urda",
-      "message_id": 11200
+      "npc_id": "Chester0",
+      "message_id": 12210
     }
   ]
 }

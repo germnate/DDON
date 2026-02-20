@@ -61,7 +61,7 @@
         "layer_no": 1
       },
       "npc_id": "August",
-      "message_id": 11168
+      "message_id": 11167
     },
     {
       "type": "DeliverItems",
@@ -86,7 +86,7 @@
           "amount": 10
         }
       ],
-      "message_id": 11171
+      "message_id": 11170
     }
   ]
 }

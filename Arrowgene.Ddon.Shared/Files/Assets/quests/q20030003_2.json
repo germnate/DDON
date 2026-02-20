@@ -57,12 +57,12 @@
         {
           "comment": "Dangerous Angules",
           "enemy_id": "0x015708",
-          "start_think_tbl_no": 1,
           "named_enemy_params_id": 56,
+          "start_think_tbl_no": 1,
           "level": 58,
           "exp": 9462,
           "is_boss": true,
-          "index": 2
+          "index": 4
         }
       ]
     }
@@ -76,7 +76,7 @@
         "layer_no": 1
       },
       "npc_id": "Urda",
-      "message_id": 11198
+      "message_id": 11197
     },
     {
       "type": "SeekOutEnemiesAtMarkedLocation",
@@ -106,7 +106,7 @@
       },
       "announce_type": "Update",
       "npc_id": "Urda",
-      "message_id": 11201
+      "message_id": 11200
     }
   ]
 }

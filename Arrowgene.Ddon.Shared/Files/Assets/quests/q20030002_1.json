@@ -1,39 +1,40 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "Historical Mementos",
+  "comment": "Historical Mementos (II)",
   "quest_id": 20030002,
-  "base_level": 35,
+  "base_level": 40,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "DoweValley",
   "news_image": 70,
+  "variant_index": 1,
   "rewards": [
     {
       "type": "exp",
-      "amount": 960
+      "amount": 1100
     },
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1150
+      "amount": 1320
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 120
+      "amount": 170
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Crest of Freeze Warding",
-          "item_id": 9317,
-          "num": 1
+          "comment": "Strong Thread",
+          "item_id": 7956,
+          "num": 3
         },
         {
-          "comment": "Forest Dwellers Old Key",
-          "item_id": 9066,
+          "comment": "Grilled Mushroom",
+          "item_id": 9415,
           "num": 2
         },
         {

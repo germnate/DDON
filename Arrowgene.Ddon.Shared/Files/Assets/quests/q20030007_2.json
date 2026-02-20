@@ -1,45 +1,46 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Spectator",
+  "comment": "The Spectator (Twelve Calamities)",
   "quest_id": 20030007,
-  "base_level": 31,
+  "base_level": 55,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "DoweValley",
   "news_image": 505,
+  "variant_index": 2,
   "rewards": [
     {
       "type": "exp",
-      "amount": 1430
+      "amount": 5080
     },
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1020
+      "amount": 3900
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 160
+      "amount": 360
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Faerie Band",
-          "item_id": 9564,
-          "num": 1
+          "comment": "Troll's Poisonous Moss",
+          "item_id": 8000,
+          "num": 3
         },
         {
-          "comment": "Conqueror Amulet",
-          "item_id": 9381,
-          "num": 2
+          "comment": "Thick Bone",
+          "item_id": 7770,
+          "num": 3
         },
         {
-          "comment": "Wine-Boiled Mushroom",
-          "item_id": 9411,
-          "num": 2
+          "comment": "Gold Thread",
+          "item_id": 7743,
+          "num": 3
         }
       ]
     }
@@ -53,11 +54,27 @@
       "starting_index": 7,
       "enemies": [
         {
-          "comment": "Vigilant Chimera",
-          "enemy_id": "0x015200",
-          "named_enemy_params_id": 53,
-          "level": 31,
-          "exp": 3060,
+          "comment": "Lord of Rock (Mole Troll)",
+          "enemy_id": "0x015041",
+          "named_enemy_params_id": 528,
+          "level": 55,
+          "exp": 4800,
+          "is_boss": true
+        },
+        {
+          "comment": "Lord of Rock (Mole Troll)",
+          "enemy_id": "0x015041",
+          "named_enemy_params_id": 528,
+          "level": 55,
+          "exp": 4800,
+          "is_boss": true
+        },
+        {
+          "comment": "Lord of Rock (Mole Troll)",
+          "enemy_id": "0x015041",
+          "named_enemy_params_id": 528,
+          "level": 55,
+          "exp": 4800,
           "is_boss": true
         }
       ]

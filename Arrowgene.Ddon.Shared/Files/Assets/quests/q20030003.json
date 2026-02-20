@@ -72,12 +72,12 @@
         {
           "comment": "Brutal Behemoth",
           "enemy_id": "0x015709",
-          "start_think_tbl_no": 1,
           "named_enemy_params_id": 54,
+          "start_think_tbl_no": 1,
           "level": 40,
           "exp": 7280,
           "is_boss": true,
-          "index": 2
+          "index": 4
         }
       ]
     }
@@ -91,7 +91,7 @@
         "layer_no": 1
       },
       "npc_id": "Urda",
-      "message_id": 11196
+      "message_id": 11197
     },
     {
       "type": "SeekOutEnemiesAtMarkedLocation",
@@ -121,7 +121,7 @@
       },
       "announce_type": "Update",
       "npc_id": "Urda",
-      "message_id": 11199
+      "message_id": 11200
     }
   ]
 }

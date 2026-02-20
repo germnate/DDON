@@ -1,45 +1,46 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Footsteps in the Halls",
+  "comment": "The Footsteps in the Halls (II)",
   "quest_id": 20035002,
-  "base_level": 33,
+  "base_level": 36,
   "minimum_item_rank": 0,
   "discoverable": false,
   "area_id": "DoweValley",
   "news_image": 75,
+  "variant_index": 1,
   "rewards": [
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1080
+      "amount": 1180
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 140
+      "amount": 170
     },
     {
       "type": "exp",
-      "amount": 1080
+      "amount": 1300
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Loneliness Gloves",
-          "item_id": 9659,
+          "comment": "Braided Hose",
+          "item_id": 1002,
           "num": 1
         },
         {
-          "comment": "Throwing Skull",
-          "item_id": 9397,
+          "comment": "Enhanced Pickaxe",
+          "item_id": 9401,
           "num": 3
         },
         {
-          "comment": "Refreshing Remedy",
-          "item_id": 9375,
-          "num": 3
+          "comment": "Mellow Ale",
+          "item_id": 9413,
+          "num": 2
         }
       ]
     }
@@ -53,36 +54,36 @@
       "starting_index": 9,
       "enemies": [
         {
-          "comment": "Vigilant Undead Swordsman",
-          "enemy_id": "0x010503",
+          "comment": "Vigilant Skeleton Mage",
+          "enemy_id": "0x010308",
           "named_enemy_params_id": 53,
-          "level": 33,
-          "exp": 129,
+          "level": 34,
+          "exp": 134,
           "repop_count": 1,
           "repop_wait_second": 10
         },
         {
-          "comment": "Vigilant Undead Swordsman",
-          "enemy_id": "0x010503",
+          "comment": "Vigilant Skeleton Mage",
+          "enemy_id": "0x010308",
           "named_enemy_params_id": 53,
-          "level": 33,
-          "exp": 129,
+          "level": 34,
+          "exp": 134,
           "repop_count": 1,
           "repop_wait_second": 10
         },
         {
-          "comment": "Vigilant Skeleton Sorcerer",
+          "comment": "Brutal Skeleton Sorcerer",
           "enemy_id": "0x010309",
-          "named_enemy_params_id": 53,
-          "level": 33,
-          "exp": 151
+          "named_enemy_params_id": 54,
+          "level": 36,
+          "exp": 161
         },
         {
-          "comment": "Vigilant Skeleton Sorcerer",
+          "comment": "Brutal Skeleton Sorcerer",
           "enemy_id": "0x010309",
-          "named_enemy_params_id": 53,
-          "level": 33,
-          "exp": 151
+          "named_enemy_params_id": 54,
+          "level": 36,
+          "exp": 161
         }
       ]
     }
