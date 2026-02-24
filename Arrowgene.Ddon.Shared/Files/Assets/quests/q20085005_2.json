@@ -74,7 +74,7 @@
                 "layer_no": 1
             },
             "npc_id": "Sonya",
-            "message_id": 11372
+            "message_id": 16046
         },
         {
             "type": "SeekOutEnemiesAtMarkedLocation",
@@ -104,7 +104,7 @@
             },
             "announce_type": "Update",
             "npc_id": "Sonya",
-            "message_id": 11835
+            "message_id": 16048
         }
     ]
 }

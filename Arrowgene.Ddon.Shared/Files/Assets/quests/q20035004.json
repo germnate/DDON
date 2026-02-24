@@ -26,17 +26,17 @@
       "type": "select",
       "loot_pool": [
         {
-		  "comment": "Sentry Tights",
+          "comment": "Sentry Tights",
           "item_id": 8733,
           "num": 1
         },
         {
-		  "comment": "Special Bracers",
+          "comment": "Special Bracers",
           "item_id": 983,
           "num": 1
         },
         {
-		  "comment": "Old Forest Dwellers' Key",
+          "comment": "Old Forest Dwellers' Key",
           "item_id": 9066,
           "num": 2
         }
@@ -53,21 +53,21 @@
       "starting_index": 4,
       "enemies": [
         {
-		  "comment": "Vigilant Skeleton Knight",
+          "comment": "Vigilant Skeleton Knight",
           "enemy_id": "0x010301",
           "named_enemy_params_id": 53,
           "level": 38,
           "exp": 155
         },
         {
-		  "comment": "Vigilant Skeleton Knight",
+          "comment": "Vigilant Skeleton Knight",
           "enemy_id": "0x010301",
           "named_enemy_params_id": 53,
           "level": 38,
           "exp": 155
         },
         {
-		  "comment": "Vigilant Skeleton Knight",
+          "comment": "Vigilant Skeleton Knight",
           "enemy_id": "0x010301",
           "named_enemy_params_id": 53,
           "level": 38,
@@ -80,25 +80,25 @@
         "id": 90,
         "group_id": 3
       },
-      "starting_index": 3,
       "comment": "Group 2 - Skeleton Sorcerers",
+      "starting_index": 3,
       "enemies": [
         {
-		  "comment": "Vigilant Skeleton Sorcerer",
+          "comment": "Vigilant Skeleton Sorcerer",
           "enemy_id": "0x010309",
           "named_enemy_params_id": 53,
           "level": 38,
           "exp": 169
         },
         {
-		  "comment": "Vigilant Skeleton Sorcerer",
+          "comment": "Vigilant Skeleton Sorcerer",
           "enemy_id": "0x010309",
           "named_enemy_params_id": 53,
           "level": 38,
           "exp": 169
         },
         {
-		  "comment": "Vigilant Skeleton Sorcerer",
+          "comment": "Vigilant Skeleton Sorcerer",
           "enemy_id": "0x010309",
           "named_enemy_params_id": 53,
           "level": 38,

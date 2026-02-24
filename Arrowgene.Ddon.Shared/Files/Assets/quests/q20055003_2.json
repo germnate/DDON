@@ -1,44 +1,46 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Glittering Horn",
-  "quest_id": 20035003,
-  "base_level": 35,
+  "comment": "Shadows in the Demon’s Den (Bounty)",
+  "quest_id": 20055003,
+  "base_level": 25,
   "minimum_item_rank": 0,
   "discoverable": false,
-  "area_id": "DoweValley",
+  "area_id": "MysreeForest",
+  "news_image": 113,
+  "variant_index": 2,
   "rewards": [
-    {
-      "type": "exp",
-      "amount": 3230
-    },
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 2310
+      "amount": 1480
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 180
+      "amount": 130
+    },
+    {
+      "type": "exp",
+      "amount": 2070
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Superior Quality Gala Extract",
-          "item_id": 9362,
+          "comment": "Combat Fabric",
+          "item_id": 7938,
+          "num": 2
+        },
+        {
+          "comment": "Fortifier",
+          "item_id": 9377,
           "num": 3
         },
         {
-          "comment": "Superior Healing Elixir",
-          "item_id": 7553,
-          "num": 2
-        },
-        {
-          "comment": "Conqueror's Amulet",
-          "item_id": 9381,
-          "num": 2
+          "comment": "Throwing Rock",
+          "item_id": 9396,
+          "num": 3
         }
       ]
     }
@@ -46,17 +48,16 @@
   "enemy_groups": [
     {
       "stage_id": {
-        "id": 1,
-        "group_id": 487
+        "id": 160,
+        "group_id": 0
       },
-      "starting_index": 2,
       "enemies": [
         {
-          "comment": "Bounty Chimera",
-          "enemy_id": "0x015200",
+          "comment": "Bounty Sphinx",
+          "enemy_id": "0x015302",
           "named_enemy_params_id": 458,
-          "level": 35,
-          "exp": 3300,
+          "level": 25,
+          "exp": 2875,
           "is_boss": true
         }
       ]

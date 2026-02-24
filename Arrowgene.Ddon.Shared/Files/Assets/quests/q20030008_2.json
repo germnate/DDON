@@ -62,6 +62,7 @@
         "id": 136,
         "group_id": 2
       },
+      "starting_index": 1,
       "enemies": [
         {
           "comment": "Bounty Troll",
