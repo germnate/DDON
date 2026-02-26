@@ -136,7 +136,7 @@
         {
           "comment": "Group 0 boss HP check",
           "type": "Raw",
-          "check_commands": [ { "type": "EmHpLess", "Param1": 843, "Param2": 2, "Param3": 9, "Param4": 35 } ]
+          "check_commands": [ { "type": "EmHpLess", "Param1": 843, "Param2": 2, "Param3": 9, "Param4": 40 } ]
         },
         {
           "type": "SpawnGroup",

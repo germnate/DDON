@@ -1,13 +1,13 @@
-{
+	{
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "A Monstrous Rampage",
-  "quest_id": 21000003,
-  "base_level": 63,
+  "comment": "The Cursed Sanctuary",
+  "quest_id": 21000040,
+  "base_level": 60,
   "minimum_item_rank": 0,
   "discoverable": false,
-  "area_id": "BreyaCoast",
-  "order_conditions": [ { "type": "AreaRank", "Param1": 2, "Param2": 13 } ],
+  "area_id": "MysreeGrove",
+  "order_conditions": [ { "type": "AreaRank", "Param1": 6, "Param2": 13 } ],
   "rewards": [
     {
       "type": "exp",
@@ -27,14 +27,14 @@
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Corroded Giant Eyeball",
-          "item_id": 11774,
+          "comment": "Discolored Spore-Covered Feather",
+          "item_id": 13223,
           "num": 1
         },
         {
-          "comment": "Quality Gala Mushroom",
-          "item_id": 7994,
-          "num": 7
+          "comment": "Blue Alluvial Gold",
+          "item_id": 7848,
+          "num": 3
         },
         {
           "comment": "Superior Healing Remedy",
@@ -47,81 +47,90 @@
   "enemy_groups": [
     {
       "stage_id": {
-        "id": 333,
-        "group_id": 4
+        "id": 427,
+        "group_id": 10
       },
-      "placement_type": "manual",
+      "starting_index": 7,
       "enemies": [
         {
-          "comment": "Infected Gorecyclops (Slight)",
-          "enemy_id": "0x015012",
+          "comment": "Infected Griffin (Severe)",
+          "enemy_id": "0x015306",
+          "infection_type": 2,
           "level": 60,
           "exp": 3783,
-          "is_boss": true,
-          "infection_type": 1,
-          "index": 5
+          "is_boss": true
         },
         {
-          "comment": "Infected Direwolf",
-          "enemy_id": "0x010209",
+          "comment": "Snow Harpy",
+          "enemy_id": "0x010601",
           "level": 60,
-          "exp": 756,
-          "index": 7
+          "exp": 756
         },
         {
-          "comment": "Infected Direwolf",
-          "enemy_id": "0x010209",
+          "comment": "Snow Harpy",
+          "enemy_id": "0x010601",
           "level": 60,
-          "exp": 756,
-          "index": 8
+          "exp": 756
         },
         {
-          "comment": "Infected Direwolf",
-          "enemy_id": "0x010209",
+          "comment": "Snow Harpy",
+          "enemy_id": "0x010601",
           "level": 60,
-          "exp": 756,
-          "index": 9
+          "exp": 756
         }
       ]
     },
     {
       "stage_id": {
-        "id": 333,
-        "group_id": 9
+        "id": 427,
+        "group_id": 17
       },
       "enemies": [
         {
-          "comment": "Lux Skeleton",
-          "enemy_id": "0x010317",
-          "start_think_tbl_no": 2,
+          "comment": "Infected Snow Harpy (Severe)",
+          "enemy_id": "0x010612",
+          "infection_type": 2,
+          "start_think_tbl_no": 3,
           "level": 60,
           "exp": 756
         },
         {
-          "comment": "Lux Skeleton",
-          "enemy_id": "0x010317",
-          "start_think_tbl_no": 2,
+          "comment": "Infected Snow Harpy (Severe)",
+          "enemy_id": "0x010612",
+          "infection_type": 2,
+          "start_think_tbl_no": 3,
           "level": 60,
           "exp": 756
         },
         {
-          "comment": "Lux Skeleton",
-          "enemy_id": "0x010317",
-          "start_think_tbl_no": 2,
+          "comment": "Infected Snow Harpy (Severe)",
+          "enemy_id": "0x010612",
+          "infection_type": 2,
+          "start_think_tbl_no": 3,
           "level": 60,
           "exp": 756
         },
         {
-          "comment": "Lux Skeleton",
-          "enemy_id": "0x010317",
-          "start_think_tbl_no": 2,
+          "comment": "Infected Snow Harpy (Severe)",
+          "enemy_id": "0x010612",
+          "infection_type": 2,
+          "start_think_tbl_no": 3,
           "level": 60,
           "exp": 756
         },
         {
-          "comment": "Lux Skeleton",
-          "enemy_id": "0x010317",
-          "start_think_tbl_no": 2,
+          "comment": "Infected Snow Harpy (Severe)",
+          "enemy_id": "0x010612",
+          "infection_type": 2,
+          "start_think_tbl_no": 3,
+          "level": 60,
+          "exp": 756
+        },
+        {
+          "comment": "Infected Snow Harpy (Severe)",
+          "enemy_id": "0x010612",
+          "infection_type": 2,
+          "start_think_tbl_no": 3,
           "level": 60,
           "exp": 756
         }
@@ -133,8 +142,7 @@
       "blocks": [
         {
           "type": "DiscoverEnemy",
-          "groups": [0],
-          "result_commands": [ { "type": "QstLayoutFlagOn", "Param1": 3007 } ]
+          "groups": [0]
         },
         {
           "type": "KillGroup",
@@ -159,7 +167,7 @@
         {
           "comment": "Group 0 boss HP check",
           "type": "Raw",
-          "check_commands": [ { "type": "EmHpLess", "Param1": 824, "Param2": 4, "Param3": 5, "Param4": 40 } ]
+          "check_commands": [ { "type": "EmHpLess", "Param1": 850, "Param2": 10, "Param3": 7, "Param4": 40 } ]
         },
         {
           "type": "SpawnGroup",
@@ -187,10 +195,10 @@
           "comment": "Is group 0 dead",
           "type": "Raw",
           "check_commands": [
-              { "type": "DieEnemy", "Param1": 824, "Param2": 4, "Param3": 5 } ,
-              { "type": "DieEnemy", "Param1": 824, "Param2": 4, "Param3": 7 } ,
-              { "type": "DieEnemy", "Param1": 824, "Param2": 4, "Param3": 8 } ,
-              { "type": "DieEnemy", "Param1": 824, "Param2": 4, "Param3": 9 }
+              { "type": "DieEnemy", "Param1": 850, "Param2": 10, "Param3": 7 } ,
+              { "type": "DieEnemy", "Param1": 850, "Param2": 10, "Param3": 8 } ,
+              { "type": "DieEnemy", "Param1": 850, "Param2": 10, "Param3": 9 } ,
+              { "type": "DieEnemy", "Param1": 850, "Param2": 10, "Param3": 10 }
           ]
         },
         {
@@ -209,11 +217,12 @@
           "comment": "Is group 1 dead",
           "type": "Raw",
           "check_commands": [
-              { "type": "DieEnemy", "Param1": 824, "Param2": 9, "Param3": 0 } ,
-              { "type": "DieEnemy", "Param1": 824, "Param2": 9, "Param3": 1 } ,
-              { "type": "DieEnemy", "Param1": 824, "Param2": 9, "Param3": 2 } ,
-              { "type": "DieEnemy", "Param1": 824, "Param2": 9, "Param3": 3 } ,
-              { "type": "DieEnemy", "Param1": 824, "Param2": 9, "Param3": 4 }
+              { "type": "DieEnemy", "Param1": 850, "Param2": 17, "Param3": 0 } ,
+              { "type": "DieEnemy", "Param1": 850, "Param2": 17, "Param3": 1 } ,
+              { "type": "DieEnemy", "Param1": 850, "Param2": 17, "Param3": 2 } ,
+              { "type": "DieEnemy", "Param1": 850, "Param2": 17, "Param3": 3 } ,
+              { "type": "DieEnemy", "Param1": 850, "Param2": 17, "Param3": 4 } ,
+              { "type": "DieEnemy", "Param1": 850, "Param2": 17, "Param3": 5 }
           ]
         },
         {
