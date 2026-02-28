@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": false,
   "area_id": "BreyaCoast",
+  "order_conditions": [ { "type": "AreaRank", "Param1": 2, "Param2": 13 } ],
   "rewards": [
     {
       "type": "exp",
@@ -127,25 +128,99 @@
       ]
     }
   ],
-  "blocks": [
+  "processes": [
     {
-      "type": "DiscoverEnemy",
-      "groups": [0]
+      "blocks": [
+        {
+          "type": "DiscoverEnemy",
+          "groups": [0],
+          "result_commands": [ { "type": "QstLayoutFlagOn", "Param1": 3007 } ]
+        },
+        {
+          "type": "KillGroup",
+          "reset_group": false,
+          "announce_type": "Accept",
+          "groups": [0],
+          "result_commands": [ { "type": "MyQstFlagOn",  "Param1": 2 } ]
+        },
+        {
+          "type": "KillGroup",
+          "reset_group": false,
+          "groups": [1]
+        }
+      ]
     },
     {
-      "type": "Raw",
-      "announce_type": "Accept",
-      "check_commands": [ { "type": "EmHpLess", "Param1": 824, "Param2": 4, "Param3": 5, "Param4": 35 } ] 
+      "blocks": [
+        {
+          "type": "Raw",
+          "check_commands": [ { "type": "MyQstFlagOn", "Param1": 2 } ]
+        },
+        {
+          "comment": "Group 0 boss HP check",
+          "type": "Raw",
+          "check_commands": [ { "type": "EmHpLess", "Param1": 824, "Param2": 4, "Param3": 5, "Param4": 40 } ]
+        },
+        {
+          "type": "SpawnGroup",
+          "announce_type": "Update",
+          "groups": [1],
+          "check_commands": [
+            { "type": "MyQstFlagOff", "Param1": 0 },
+            { "type": "MyQstFlagOn",  "Param1": 1 }
+          ]
+        },
+        {
+          "comment": "Group 1 is dead and group 0 is still alive, update announcement",
+          "type": "Raw",
+          "result_commands": [ { "type": "UpdateAnnounce", "Param1": 3 } ]
+        }
+      ]
     },
     {
-      "type": "KillGroup",
-      "announce_type": "Update",
-      "groups": [1]
+      "blocks": [
+        {
+          "type": "Raw",
+          "check_commands": [ { "type": "MyQstFlagOn", "Param1": 2 } ]
+        },
+        {
+          "comment": "Is group 0 dead",
+          "type": "Raw",
+          "check_commands": [
+              { "type": "DieEnemy", "Param1": 824, "Param2": 4, "Param3": 5 } ,
+              { "type": "DieEnemy", "Param1": 824, "Param2": 4, "Param3": 7 } ,
+              { "type": "DieEnemy", "Param1": 824, "Param2": 4, "Param3": 8 } ,
+              { "type": "DieEnemy", "Param1": 824, "Param2": 4, "Param3": 9 }
+          ]
+        },
+        {
+          "type": "MyQstFlags",
+          "set_flags": [0]
+        }
+      ]
     },
     {
-      "type": "KillGroup",
-      "reset_group": false,
-      "groups": [0]
+      "blocks": [
+        {
+          "type": "Raw",
+          "check_commands": [ { "type": "MyQstFlagOn", "Param1": 2 } ]
+        },
+        {
+          "comment": "Is group 1 dead",
+          "type": "Raw",
+          "check_commands": [
+              { "type": "DieEnemy", "Param1": 824, "Param2": 9, "Param3": 0 } ,
+              { "type": "DieEnemy", "Param1": 824, "Param2": 9, "Param3": 1 } ,
+              { "type": "DieEnemy", "Param1": 824, "Param2": 9, "Param3": 2 } ,
+              { "type": "DieEnemy", "Param1": 824, "Param2": 9, "Param3": 3 } ,
+              { "type": "DieEnemy", "Param1": 824, "Param2": 9, "Param3": 4 }
+          ]
+        },
+        {
+          "type": "MyQstFlags",
+          "set_flags": [1]
+        }
+      ]
     }
   ]
 }

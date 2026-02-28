@@ -27,14 +27,17 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Strong Hatchet",
           "item_id": 67,
           "num": 1
         },
         {
+          "comment": "Interventive",
           "item_id": 9374,
           "num": 2
         },
         {
+          "comment": "Restorative",
           "item_id": 9369,
           "num": 3
         }
@@ -49,38 +52,43 @@
       },
       "enemies": [
         {
-          "comment": "Troll",
+          "comment": "Vigilant Troll",
           "enemy_id": "0x015040",
+          "named_enemy_params_id": 53,
           "level": 18,
-          "exp": 2950,
+          "exp": 1872,
           "is_boss": true
         },
         {
-          "comment": "Mudman",
+          "comment": "Vigilant Mudman",
           "enemy_id": "0x010509",
+          "named_enemy_params_id": 53,
           "level": 16,
-          "exp": 150,
+          "exp": 89,
           "is_boss": false
         },
         {
-          "comment": "Mudman",
+          "comment": "Vigilant Mudman",
           "enemy_id": "0x010509",
+          "named_enemy_params_id": 53,
           "level": 16,
-          "exp": 150,
+          "exp": 89,
           "is_boss": false
         },
         {
-          "comment": "Mudman",
+          "comment": "Vigilant Mudman",
           "enemy_id": "0x010509",
+          "named_enemy_params_id": 53,
           "level": 16,
-          "exp": 150,
+          "exp": 89,
           "is_boss": false
         },
         {
-          "comment": "Mudman",
+          "comment": "Vigilant Mudman",
           "enemy_id": "0x010509",
+          "named_enemy_params_id": 53,
           "level": 16,
-          "exp": 150,
+          "exp": 89,
           "is_boss": false
         }
       ]

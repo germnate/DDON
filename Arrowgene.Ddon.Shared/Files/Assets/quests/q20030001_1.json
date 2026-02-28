@@ -46,7 +46,7 @@
   ],
   "blocks": [
     {
-      "type": "NpcTalkAndOrder",
+      "type": "NewNpcTalkAndOrder",
       "flags": [
         {
           "type": "QstLayout",
@@ -56,18 +56,19 @@
         }
       ],
       "stage_id": {
-        "id": 306,
+        "id": 14,
         "group_id": 1,
         "layer_no": 1
       },
       "npc_id": "August",
-      "message_id": 11168
+      "message_id": 11167
     },
     {
-      "type": "DeliverItems",
+      "type": "NewDeliverItems",
       "stage_id": {
-        "id": 306,
-        "group_id": 1
+        "id": 14,
+        "group_id": 1,
+        "layer_no": 1
       },
       "npc_id": "August",
       "announce_type": "Accept",
@@ -82,11 +83,11 @@
       "items": [
         {
           "comment": "Coconut-Scented Milkcap",
-          "id": 8036,
+          "id": 9063,
           "amount": 10
         }
       ],
-      "message_id": 11171
+      "message_id": 11170
     }
   ]
 }
