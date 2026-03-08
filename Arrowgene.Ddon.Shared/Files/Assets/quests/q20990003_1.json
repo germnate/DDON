@@ -54,11 +54,11 @@
                 {
                     "comment": "Dangerous Mergan Seeker",
                     "enemy_id": "0x011021",
-                    "named_enemy_params_id": 60,
+                    "named_enemy_params_id": 56,
                     "level": 50,
                     "exp": 262,
                     "is_boss": false,
-                    "hm_present_no": 63
+                    "hm_present_no": 60
                 },
                 {
                     "comment": "Dangerous Mergan Element Archer",
@@ -81,38 +81,38 @@
                 {
                     "comment": "Dangerous Mergan Seeker",
                     "enemy_id": "0x011021",
-                    "named_enemy_params_id": 60,
+                    "named_enemy_params_id": 56,
                     "level": 50,
                     "exp": 262,
                     "is_boss": false,
-                    "hm_present_no": 63
+                    "hm_present_no": 60
                 },
                 {
                     "comment": "Dangerous Mergan Seeker",
                     "enemy_id": "0x011021",
-                    "named_enemy_params_id": 60,
+                    "named_enemy_params_id": 56,
                     "level": 50,
                     "exp": 262,
                     "is_boss": false,
-                    "hm_present_no": 63
+                    "hm_present_no": 60
                 },
                 {
                     "comment": "Dangerous Mergan Seeker",
                     "enemy_id": "0x011021",
-                    "named_enemy_params_id": 60,
+                    "named_enemy_params_id": 56,
                     "level": 50,
                     "exp": 262,
                     "is_boss": false,
-                    "hm_present_no": 63
+                    "hm_present_no": 60
                 },
                 {
                     "comment": "Dangerous Mergan Seeker",
                     "enemy_id": "0x011021",
-                    "named_enemy_params_id": 60,
+                    "named_enemy_params_id": 56,
                     "level": 50,
                     "exp": 262,
                     "is_boss": false,
-                    "hm_present_no": 63
+                    "hm_present_no": 60
                 }
             ]
         }

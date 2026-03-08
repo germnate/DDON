@@ -1,22 +1,23 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "The Bridges of Our Livelihood",
+    "comment": "The Bridges of Our Livelihood (II)",
     "quest_id": 20050009,
-    "base_level": 14,
+    "base_level": 18,
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "MysreeForest",
     "news_image": 103,
+    "variant_index": 1,
     "rewards": [
         {
             "type": "exp",
-            "amount": 460
+            "amount": 590
         },
         {
             "type": "wallet",
             "wallet_type": "Gold",
-            "amount": 460
+            "amount": 590
         },
         {
             "type": "wallet",
@@ -27,13 +28,13 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "comment": "Leather Armor",
-                    "item_id": 444,
+                    "comment": "Soldier's Ring",
+                    "item_id": 8947,
                     "num": 1
                 },
                 {
-                    "comment": "Superior Gala Extract",
-                    "item_id": 61,
+                    "comment": "Superior Healing Potion",
+                    "item_id": 35,
                     "num": 3
                 }
             ]
@@ -50,22 +51,24 @@
                     "comment": "Vigilant Redcap",
                     "enemy_id": "0x011110",
                     "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71
+                    "level": 18,
+                    "exp": 85,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 },
                 {
                     "comment": "Vigilant Redcap",
                     "enemy_id": "0x011110",
                     "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71
+                    "level": 18,
+                    "exp": 85
                 },
                 {
                     "comment": "Vigilant Redcap",
                     "enemy_id": "0x011110",
                     "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71
+                    "level": 18,
+                    "exp": 85
                 }
             ]
         },
@@ -80,22 +83,24 @@
                     "comment": "Vigilant Redcap",
                     "enemy_id": "0x011110",
                     "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71
+                    "level": 18,
+                    "exp": 85,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 },
                 {
                     "comment": "Vigilant Redcap",
                     "enemy_id": "0x011110",
                     "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71
+                    "level": 18,
+                    "exp": 85
                 },
                 {
                     "comment": "Vigilant Redcap",
                     "enemy_id": "0x011110",
                     "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71
+                    "level": 18,
+                    "exp": 85
                 }
             ]
         },
@@ -110,8 +115,8 @@
                     "comment": "Vigilant Redcap",
                     "enemy_id": "0x011110",
                     "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71,
+                    "level": 18,
+                    "exp": 85,
                     "repop_count": 1,
                     "repop_wait_second": 10
                 },
@@ -119,8 +124,10 @@
                     "comment": "Vigilant Redcap",
                     "enemy_id": "0x011110",
                     "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71
+                    "level": 18,
+                    "exp": 85,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 }
             ]
         }

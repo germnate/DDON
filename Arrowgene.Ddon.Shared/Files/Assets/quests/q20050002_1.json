@@ -1,56 +1,46 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "Crisis within a Cave",
+  "comment": "Crisis within a Cave (II)",
   "quest_id": 20050002,
-  "base_level": 32,
+  "base_level": 45,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "MysreeForest",
   "news_image": 533,
+  "variant_index": 1,
   "rewards": [
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 880
+      "amount": 990
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 140
+      "amount": 190
     },
     {
       "type": "exp",
-      "amount": 1050
+      "amount": 1230
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Hard Leather Cloth",
-          "item_id": 7937,
+          "comment": "Protective Cloth",
+          "item_id": 7940,
+          "num": 2
+        },
+        {
+          "comment": "Strong Gala Extract",
+          "item_id": 9363,
           "num": 3
         },
         {
-          "comment": "Refreshing Remedy",
-          "item_id": 9375,
-          "num": 3
-        },
-        {
-          "comment": "Healing Elixir",
-          "item_id": 7552,
-          "num": 3
-        }
-      ]
-    },
-    {
-      "type": "random",
-      "loot_pool": [
-        {
-          "comment": "Superior Healing Potion",
-          "item_id": 35,
-          "num": 9,
-          "chance": 1.0
+          "comment": "Panacea",
+          "item_id": 41,
+          "num": 1
         }
       ]
     }
@@ -63,52 +53,54 @@
       },
       "enemies": [
         {
-          "comment": "Vigilant Mist Fighter",
-          "enemy_id": "0x011030",
+          "comment": "Vigilant Shadow Harpy",
+          "enemy_id": "0x010607",
           "named_enemy_params_id": 53,
-          "hm_present_no": 68,
-          "level": 32,
-          "exp": 162
+          "level": 45,
+          "exp": 210,
+          "repop_count": 1,
+          "repop_wait_second": 10
         },
         {
-          "comment": "Vigilant Mist Fighter",
-          "enemy_id": "0x011030",
+          "comment": "Vigilant Shadow Harpy",
+          "enemy_id": "0x010607",
           "named_enemy_params_id": 53,
-          "hm_present_no": 68,
-          "level": 32,
-          "exp": 162
+          "level": 45,
+          "exp": 210,
+          "repop_count": 1,
+          "repop_wait_second": 10
         },
         {
-          "comment": "Vigilant Mist Fighter",
-          "enemy_id": "0x011030",
+          "comment": "Vigilant Shadow Harpy",
+          "enemy_id": "0x010607",
           "named_enemy_params_id": 53,
-          "hm_present_no": 68,
-          "level": 32,
-          "exp": 162
+          "level": 45,
+          "exp": 210
         },
         {
-          "comment": "Vigilant Mist Hunter",
-          "enemy_id": "0x011031",
+          "comment": "Vigilant Shadow Wolf",
+          "enemy_id": "0x010206",
           "named_enemy_params_id": 53,
-          "hm_present_no": 69,
-          "level": 32,
-          "exp": 162
+          "level": 45,
+          "exp": 236,
+          "repop_count": 1,
+          "repop_wait_second": 10
         },
         {
-          "comment": "Vigilant Mist Hunter",
-          "enemy_id": "0x011031",
+          "comment": "Vigilant Shadow Wolf",
+          "enemy_id": "0x010206",
           "named_enemy_params_id": 53,
-          "hm_present_no": 69,
-          "level": 32,
-          "exp": 162
+          "level": 45,
+          "exp": 236,
+          "repop_count": 1,
+          "repop_wait_second": 10
         },
         {
-          "comment": "Vigilant Mist Hunter",
-          "enemy_id": "0x011031",
+          "comment": "Vigilant Shadow Wolf",
+          "enemy_id": "0x010206",
           "named_enemy_params_id": 53,
-          "hm_present_no": 69,
-          "level": 32,
-          "exp": 162
+          "level": 45,
+          "exp": 236
         }
       ]
     }

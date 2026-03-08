@@ -1,55 +1,46 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "Echoing Footsteps in the Cave",
+  "comment": "Echoing Footsteps in the Cave (III)",
   "quest_id": 20050005,
-  "base_level": 19,
+  "base_level": 58,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "MysreeForest",
   "news_image": 111,
+  "variant_index": 2,
   "rewards": [
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 620
+      "amount": 1910
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 100
+      "amount": 330
     },
     {
       "type": "exp",
-      "amount": 870
+      "amount": 2900
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Iron Legs",
-          "item_id": 8403,
+          "comment": "Dragon Horn",
+          "item_id": 7754,
           "num": 1
         },
         {
-          "comment": "Angel's Periapt",
-          "item_id": 43,
-          "num": 2
+          "comment": "Smooth Dragonleather",
+          "item_id": 7927,
+          "num": 1
         },
         {
-          "comment": "Demon's Periapt",
-          "item_id": 44,
-          "num": 2
-        }
-      ]
-    },
-    {
-      "type": "random",
-      "loot_pool": [
-        {
-          "item_id": 34,
-          "num": 9,
-          "chance": 1.0
+          "comment": "Angules Horn",
+          "item_id": 7756,
+          "num": 1
         }
       ]
     }
@@ -60,36 +51,15 @@
         "id": 67,
         "group_id": 2
       },
-      "placement_type": "manual",
+      "starting_index": 14,
       "enemies": [
         {
-          "comment": "Vigilant Brute Ape",
-          "enemy_id": "0x015504",
-          "named_enemy_params_id": 53,
-          "level": 12,
-          "exp": 116,
-          "repop_count": 2,
-          "repop_wait_second": 10,
-          "index": 4
-        },
-        {
-          "comment": "Vigilant Dread Ape",
-          "enemy_id": "0x015502",
-          "named_enemy_params_id": 53,
-          "level": 19,
-          "exp": 1414,
-          "is_boss": true,
-          "index": 5
-        },
-        {
-          "comment": "Vigilant Brute Ape",
-          "enemy_id": "0x015504",
-          "named_enemy_params_id": 53,
-          "level": 12,
-          "exp": 116,
-          "repop_count": 2,
-          "repop_wait_second": 10,
-          "index": 14
+          "comment": "Legendary Angules",
+          "enemy_id": "0x015708",
+          "named_enemy_params_id": 57,
+          "level": 58,
+          "exp": 9462,
+          "is_boss": true
         }
       ]
     }

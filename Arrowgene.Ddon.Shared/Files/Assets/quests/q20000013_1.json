@@ -1,12 +1,13 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "Beloved Forest",
+    "comment": "Beloved Forest (II)",
     "quest_id": 20000013,
-    "base_level": 12,
+    "base_level": 15,
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "HidellPlains",
+    "variant_index": 1,
     "rewards": [
         {
             "type": "exp",
@@ -26,14 +27,14 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "comment" : "Mace",
-                    "item_id": 64,
+                    "comment" : "Thousand Troops",
+                    "item_id": 66,
                     "num": 1
                 },
                 {
-                    "comment" : "Conqueror's Periapt",
-                    "item_id": 42,
-                    "num": 2
+                    "comment" : "Muscular Wall",
+                    "item_id": 71,
+                    "num": 1
                 }
             ]
         }
@@ -50,8 +51,8 @@
                     "comment" : "Vigilant Dread Ape",
                     "enemy_id": "0x015502",
                     "named_enemy_params_id": 53,
-                    "level": 12,
-                    "exp": 1014,
+                    "level": 15,
+                    "exp": 1184,
                     "is_boss": true
                 }
             ]

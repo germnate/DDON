@@ -1,40 +1,46 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "The Bridges of Our Livelihood",
+    "comment": "The Bridges of Our Livelihood (III)",
     "quest_id": 20050009,
-    "base_level": 14,
+    "base_level": 55,
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "MysreeForest",
     "news_image": 103,
+    "variant_index": 2,
     "rewards": [
         {
             "type": "exp",
-            "amount": 460
+            "amount": 1510
         },
         {
             "type": "wallet",
             "wallet_type": "Gold",
-            "amount": 460
+            "amount": 1510
         },
         {
             "type": "wallet",
             "wallet_type": "RiftPoints",
-            "amount": 60
+            "amount": 180
         },
         {
             "type": "select",
             "loot_pool": [
                 {
-                    "comment": "Leather Armor",
-                    "item_id": 444,
+                    "comment": "Sand of Reminiscence",
+                    "item_id": 9441,
                     "num": 1
                 },
                 {
-                    "comment": "Superior Gala Extract",
-                    "item_id": 61,
-                    "num": 3
+                    "comment": "Demonic Gem",
+                    "item_id": 7911,
+                    "num": 1
+                },
+                {
+                    "comment": "Cracked Black Horn",
+                    "item_id": 7753,
+                    "num": 2
                 }
             ]
         }
@@ -47,25 +53,31 @@
             },
             "enemies": [
                 {
-                    "comment": "Vigilant Redcap",
-                    "enemy_id": "0x011110",
+                    "comment": "Vigilant Shadow Goblin",
+                    "enemy_id": "0x011130",
                     "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71
+                    "level": 55,
+                    "exp": 223,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 },
                 {
-                    "comment": "Vigilant Redcap",
-                    "enemy_id": "0x011110",
+                    "comment": "Vigilant Shadow Goblin",
+                    "enemy_id": "0x011130",
                     "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71
+                    "level": 55,
+                    "exp": 223,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 },
                 {
-                    "comment": "Vigilant Redcap",
-                    "enemy_id": "0x011110",
+                    "comment": "Vigilant Shadow Goblin",
+                    "enemy_id": "0x011130",
                     "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71
+                    "level": 55,
+                    "exp": 223,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 }
             ]
         },
@@ -77,25 +89,31 @@
             "starting_index": 4,
             "enemies": [
                 {
-                    "comment": "Vigilant Redcap",
-                    "enemy_id": "0x011110",
+                    "comment": "Vigilant Shadow Goblin Fighter",
+                    "enemy_id": "0x011131",
                     "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71
+                    "level": 55,
+                    "exp": 223,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 },
                 {
-                    "comment": "Vigilant Redcap",
-                    "enemy_id": "0x011110",
+                    "comment": "Vigilant Shadow Goblin Fighter",
+                    "enemy_id": "0x011131",
                     "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71
+                    "level": 55,
+                    "exp": 223,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 },
                 {
-                    "comment": "Vigilant Redcap",
-                    "enemy_id": "0x011110",
+                    "comment": "Vigilant Shadow Goblin Fighter",
+                    "enemy_id": "0x011131",
                     "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71
+                    "level": 55,
+                    "exp": 223,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 }
             ]
         },
@@ -107,20 +125,22 @@
             "starting_index": 2,
             "enemies": [
                 {
-                    "comment": "Vigilant Redcap",
-                    "enemy_id": "0x011110",
-                    "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71,
+                    "comment": "Dangerous Shadow Goblin Leader",
+                    "enemy_id": "0x011160",
+                    "named_enemy_params_id": 56,
+                    "level": 55,
+                    "exp": 270,
                     "repop_count": 1,
                     "repop_wait_second": 10
                 },
                 {
-                    "comment": "Vigilant Redcap",
-                    "enemy_id": "0x011110",
-                    "named_enemy_params_id": 53,
-                    "level": 14,
-                    "exp": 71
+                    "comment": "Dangerous Shadow Goblin Leader",
+                    "enemy_id": "0x011160",
+                    "named_enemy_params_id": 56,
+                    "level": 55,
+                    "exp": 270,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 }
             ]
         }
