@@ -50,6 +50,7 @@
         "id": 98,
         "group_id": 7
       },
+      "starting_index": 2,
       "enemies": [
         {
           "comment": "Vigilant Blue Newt",

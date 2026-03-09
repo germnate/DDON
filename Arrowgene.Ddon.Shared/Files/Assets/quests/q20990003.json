@@ -62,20 +62,20 @@
                 {
                     "comment": "Dangerous Mergan Warrior",
                     "enemy_id": "0x011020",
-                    "named_enemy_params_id": 59,
+                    "named_enemy_params_id": 56,
                     "level": 50,
                     "exp": 262,
                     "is_boss": false,
-                    "hm_present_no": 65
+                    "hm_present_no": 59
                 },
                 {
                     "comment": "Dangerous Mergan Warrior",
                     "enemy_id": "0x011020",
-                    "named_enemy_params_id": 59,
+                    "named_enemy_params_id": 56,
                     "level": 50,
                     "exp": 262,
                     "is_boss": false,
-                    "hm_present_no": 65
+                    "hm_present_no": 59
                 },
                 {
                     "comment": "Dangerous Mergan Defender",

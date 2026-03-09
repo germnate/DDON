@@ -1,45 +1,46 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "A Gourmand’s Forest Protection",
+  "comment": "A Gourmand’s Forest Protection (II)",
   "quest_id": 20050008,
-  "base_level": 18,
+  "base_level": 20,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "MysreeForest",
   "news_image": 104,
+  "variant_index": 1,
   "rewards": [
     {
       "type": "exp",
-      "amount": 830
+      "amount": 920
     },
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 590
+      "amount": 660
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 90
+      "amount": 100
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Legacy Band",
-          "item_id": 9549,
+          "comment": "Assassin's Mask",
+          "item_id": 625,
           "num": 1
         },
         {
-          "comment": "Lestanian Vest",
-          "item_id": 9624,
+          "comment": "Quest Helm",
+          "item_id": 839,
           "num": 1
         },
         {
-          "comment": "Conqueror's Periapt",
-          "item_id": 42,
-          "num": 2
+          "comment": "Hot Gel",
+          "item_id": 9371,
+          "num": 3
         }
       ]
     }
@@ -55,8 +56,8 @@
           "comment": "Vigilant Ent",
           "enemy_id": "0x015031",
           "named_enemy_params_id": 53,
-          "level": 18,
-          "exp": 2236,
+          "level": 20,
+          "exp": 2340,
           "is_boss": true,
           "is_required": false
         }

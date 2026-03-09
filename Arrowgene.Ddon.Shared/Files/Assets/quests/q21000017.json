@@ -113,7 +113,8 @@
       "blocks": [
         {
           "type": "DiscoverEnemy",
-          "groups": [0]
+          "groups": [0],
+          "result_commands": [ { "type": "QstLayoutFlagOn", "Param1": 3039 } ]
         },
         {
           "type": "KillGroup",

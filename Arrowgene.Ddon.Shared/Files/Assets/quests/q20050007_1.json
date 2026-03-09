@@ -1,56 +1,46 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "An Ancient Gathering",
+  "comment": "An Ancient Gathering (II)",
   "quest_id": 20050007,
-  "base_level": 21,
+  "base_level": 25,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "MysreeForest",
   "news_image": 110,
+  "variant_index": 1,
   "rewards": [
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 570
+      "amount": 680
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 90
+      "amount": 110
     },
     {
       "type": "exp",
-      "amount": 690
+      "amount": 820
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Hunter Jacket",
-          "item_id": 651,
+          "comment": "Bloodstained Red Cloth",
+          "item_id": 7946,
           "num": 1
         },
         {
-          "comment": "Conqueror's Periapt",
-          "item_id": 42,
+          "comment": "Angel's Amulet",
+          "item_id": 9382,
           "num": 1
         },
         {
-          "comment": "Throwing Skull",
-          "item_id": 9397,
-          "num": 2
-        }
-      ]
-    },
-    {
-      "type": "random",
-      "loot_pool": [
-        {
-          "comment": "Healing Potion",
-          "item_id": 34,
-          "num": 9,
-          "chance": 1.0
+          "comment": "Fortifier",
+          "item_id": 9377,
+          "num": 3
         }
       ]
     }
@@ -67,43 +57,47 @@
           "comment": "Vigilant Redcap",
           "enemy_id": "0x011110",
           "named_enemy_params_id": 53,
-          "level": 21,
-          "exp": 95
+          "level": 25,
+          "exp": 106,
+          "repop_count": 1,
+          "repop_wait_second": 10
         },
         {
           "comment": "Vigilant Redcap",
           "enemy_id": "0x011110",
           "named_enemy_params_id": 53,
-          "level": 21,
-          "exp": 95
+          "level": 25,
+          "exp": 106
         },
         {
           "comment": "Vigilant Redcap",
           "enemy_id": "0x011110",
           "named_enemy_params_id": 53,
-          "level": 21,
-          "exp": 95
+          "level": 25,
+          "exp": 106
         },
         {
           "comment": "Vigilant Redcap Slinger",
           "enemy_id": "0x011112",
           "named_enemy_params_id": 53,
-          "level": 21,
-          "exp": 95
+          "level": 25,
+          "exp": 106,
+          "repop_count": 1,
+          "repop_wait_second": 10
         },
         {
           "comment": "Vigilant Redcap Slinger",
           "enemy_id": "0x011112",
           "named_enemy_params_id": 53,
-          "level": 21,
-          "exp": 95
+          "level": 25,
+          "exp": 106
         },
         {
           "comment": "Vigilant Redcap Slinger",
           "enemy_id": "0x011112",
           "named_enemy_params_id": 53,
-          "level": 21,
-          "exp": 95
+          "level": 25,
+          "exp": 106
         }
       ]
     }

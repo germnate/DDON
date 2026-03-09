@@ -1,39 +1,45 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "Beloved Forest",
+    "comment": "Beloved Forest (III)",
     "quest_id": 20000013,
-    "base_level": 12,
+    "base_level": 30,
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "HidellPlains",
+    "variant_index": 2,
     "rewards": [
         {
             "type": "exp",
-            "amount": 750
+            "amount": 1500
         },
         {
             "type": "wallet",
             "wallet_type": "Gold",
-            "amount": 490
+            "amount": 990
         },
         {
             "type": "wallet",
             "wallet_type": "RiftPoints",
-            "amount": 80
+            "amount": 170
         },
         {
             "type": "select",
             "loot_pool": [
                 {
-                    "comment" : "Mace",
-                    "item_id": 64,
+                    "comment" : "Wiseman Cloak",
+                    "item_id": 1012,
                     "num": 1
                 },
                 {
-                    "comment" : "Conqueror's Periapt",
-                    "item_id": 42,
-                    "num": 2
+                    "comment" : "Quality Gala Extract",
+                    "item_id": 9361,
+                    "num": 3
+                },
+                {
+                    "comment" : "Throwing Skull",
+                    "item_id": 9397,
+                    "num": 3
                 }
             ]
         }
@@ -42,16 +48,15 @@
         {
             "stage_id": {
                 "id": 1,
-                "group_id": 72
+                "group_id": 128
             },
-            "starting_index": 1,
             "enemies": [
                 {
-                    "comment" : "Vigilant Dread Ape",
-                    "enemy_id": "0x015502",
+                    "comment" : "Vigilant Troll",
+                    "enemy_id": "0x015040",
                     "named_enemy_params_id": 53,
-                    "level": 12,
-                    "exp": 1014,
+                    "level": 30,
+                    "exp": 2520,
                     "is_boss": true
                 }
             ]
