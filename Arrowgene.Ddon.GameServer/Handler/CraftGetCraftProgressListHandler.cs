@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Arrowgene.Ddon.GameServer.Party;
@@ -52,6 +53,18 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         supportPawns.Add(GetPawnCraftInfo(craftProgress.CraftSupportPawnId3));
                     }
 
+                    // --- START: New Crafting Timer Code ---
+                    long currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                    long finishAt = craftProgress.RemainTime;
+                    long diff = finishAt - currentTime;
+                    // --- END: New Crafting Timer Code ---
+
+                    uint displayTime = 0;
+                    if (diff > 0)
+                    {
+                        displayTime = (uint)diff;
+                    }
+
                     CDataCraftProgress CDataCraftProgress = new CDataCraftProgress()
                     {
                         CraftMainPawnInfo = leadPawn,
@@ -63,22 +76,22 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         ItemId = craftProgress.ItemId,
                         ToppingId = 0,
                         AdditionalStatusId = craftProgress.AdditionalStatusId,
-                        RemainTime = craftProgress.RemainTime,
+                        //RemainTime = craftProgress.RemainTime,
+                        RemainTime = displayTime, // NEW
                         ExpBonus = craftProgress.ExpBonus,
-                        CreateCount = craftProgress.CreateCount
+                        CreateCount = craftProgress.CreateCount,
                     };
                     // Number of elements determines number icon pop up on Production Status 
                     res.CraftProgressList.Add(CDataCraftProgress);
-                    if (craftProgress.RemainTime == 0)
+
+                    // --- START: New Code ---
+                    if (displayTime == 0)
                     {
                         createdRecipes.Add(CDataCraftProgress.RecipeId);
-                    }
-                    else
-                    {
-                        // TODO: this needs to be sent by some background thread which periodically deducts time => triggers mypawn/progress req/res, can infinitely loop if sent at the wrong time
-                        craftProgress.RemainTime = 0;
-                        Server.Database.UpdatePawnCraftProgress(craftProgress);
-                        client.Send(new S2CCraftFinishCraftNtc { PawnId = leadPawn.PawnId });
+                        // Optional: We could clean up the status in the DB here,
+                        // but for now it is more than enough if the UI sees 0.
+                        // Therefor, we keep the Item in the DB,
+                        // until the User retrieves it (RequestCraftProduct).
                     }
                 }
                 else

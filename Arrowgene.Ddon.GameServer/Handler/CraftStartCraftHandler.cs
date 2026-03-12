@@ -134,6 +134,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     actionType = NpcActionType.NpcActionDesk;
                 }
 
+                // Implementation of a working crafting timer.
+                // We calculate the duration and add it to the current Unix-Timestamp.
+                uint duration = Server.CraftManager.CalculateRecipeProductionSpeed(recipe.Time, itemInfo, craftPawns);
+                long finishAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + duration;
+
                 CraftProgress craftProgress = new CraftProgress
                     {
                         CraftCharacterId = client.Character.CharacterId,
@@ -145,13 +150,18 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         NpcActionId = actionType,
                         ItemId = recipe.ItemID,
                         AdditionalStatusId = request.AdditionalStatusId,
-                        // TODO: implement mechanism to deduct time periodically
-                        RemainTime = Server.CraftManager.CalculateRecipeProductionSpeed(recipe.Time, itemInfo, craftPawns),
+                        // RemainTime = Server.CraftManager.CalculateRecipeProductionSpeed(recipe.Time, itemInfo, craftPawns), 
+                        // We cast it to uint, because we use the 'remain_time'-column
+                        RemainTime = (uint)finishAt,
+
                         CreateCount = recipe.Num * request.CreateCount,
                         PlusValue = plusValue,
                         GreatSuccess = isGreatSuccessEquipmentQuality || isGreatSuccessConsumableQuantity,
                         AdditionalQuantity = consumableAdditionalQuantity
                     };
+
+                // A quick Debug-Log to print `finishAt` the Server Console to compare the Timer with the Client UI.
+                // Logger.Info($"[CRAFTING] {client.Character.FirstName} {client.Character.LastName} started recipe {recipe.RecipeID}. Duration: {duration}s. Will finish at: {DateTimeOffset.FromUnixTimeSeconds(finishAt).ToLocalTime()}");
 
                 // TODO: check if course bonus provides exp bonus for crafting & calculate bonus EXP
                 // TODO: Decide whether bonus exp should be calculated when craft is started vs. received
