@@ -53,11 +53,9 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         supportPawns.Add(GetPawnCraftInfo(craftProgress.CraftSupportPawnId3));
                     }
 
-                    // --- START: New Crafting Timer Code ---
                     long currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                     long finishAt = craftProgress.RemainTime;
                     long diff = finishAt - currentTime;
-                    // --- END: New Crafting Timer Code ---
 
                     uint displayTime = 0;
                     if (diff > 0)
@@ -76,7 +74,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         ItemId = craftProgress.ItemId,
                         ToppingId = 0,
                         AdditionalStatusId = craftProgress.AdditionalStatusId,
-                        //RemainTime = craftProgress.RemainTime,
                         RemainTime = displayTime, // NEW
                         ExpBonus = craftProgress.ExpBonus,
                         CreateCount = craftProgress.CreateCount,
@@ -88,7 +85,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     if (displayTime == 0)
                     {
                         createdRecipes.Add(CDataCraftProgress.RecipeId);
-                        // Optional: We could clean up the status in the DB here,
+                        // We could clean up the status in the DB here,
                         // but for now it is more than enough if the UI sees 0.
                         // Therefor, we keep the Item in the DB,
                         // until the User retrieves it (RequestCraftProduct).
