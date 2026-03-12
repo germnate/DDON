@@ -150,7 +150,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         NpcActionId = actionType,
                         ItemId = recipe.ItemID,
                         AdditionalStatusId = request.AdditionalStatusId,
-                        // RemainTime = Server.CraftManager.CalculateRecipeProductionSpeed(recipe.Time, itemInfo, craftPawns), 
                         // We cast it to uint, because we use the 'remain_time'-column
                         RemainTime = (uint)finishAt,
 
