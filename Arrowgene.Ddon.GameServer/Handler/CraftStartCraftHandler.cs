@@ -133,9 +133,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     actionType = NpcActionType.NpcActionDesk;
                 }
-
-                // Implementation of a working crafting timer.
-                // We calculate the duration and add it to the current Unix-Timestamp.
+                
                 uint duration = Server.CraftManager.CalculateRecipeProductionSpeed(recipe.Time, itemInfo, craftPawns);
                 long finishAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + duration;
 
@@ -150,7 +148,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         NpcActionId = actionType,
                         ItemId = recipe.ItemID,
                         AdditionalStatusId = request.AdditionalStatusId,
-                        // We cast it to uint, because we use the 'remain_time'-column
                         RemainTime = (uint)finishAt,
 
                         CreateCount = recipe.Num * request.CreateCount,
@@ -158,9 +155,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         GreatSuccess = isGreatSuccessEquipmentQuality || isGreatSuccessConsumableQuantity,
                         AdditionalQuantity = consumableAdditionalQuantity
                     };
-
-                // A quick Debug-Log to print `finishAt` the Server Console to compare the Timer with the Client UI.
-                // Logger.Info($"[CRAFTING] {client.Character.FirstName} {client.Character.LastName} started recipe {recipe.RecipeID}. Duration: {duration}s. Will finish at: {DateTimeOffset.FromUnixTimeSeconds(finishAt).ToLocalTime()}");
 
                 // TODO: check if course bonus provides exp bonus for crafting & calculate bonus EXP
                 // TODO: Decide whether bonus exp should be calculated when craft is started vs. received
