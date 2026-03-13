@@ -54,8 +54,6 @@ namespace Arrowgene.Ddon.GameServer
     {
         private static readonly ServerLogger Logger = LogProvider.Logger<ServerLogger>(typeof(DdonGameServer));
 
-        private System.Timers.Timer _craftingTimer;
-
         public DdonGameServer(GameServerSetting setting, GameSettings gameSettings, IDatabase database, AssetRepository assetRepository)
             : base(ServerType.Game, setting.ServerSetting, database, assetRepository)
         {
@@ -169,12 +167,7 @@ namespace Arrowgene.Ddon.GameServer
 
             LoadChatHandler();
             LoadPacketHandler();
-
-            _craftingTimer = new System.Timers.Timer(10000);
-            _craftingTimer.Elapsed += (s, e) => CraftManager.UpdateOnlineCraftingProgress();
-            _craftingTimer.AutoReset = true;
-            _craftingTimer.Start();
-            Logger.Info("Crafting Notification System active (10s interval).");
+            CraftManager.StartTimer();
 
             base.Start();
         }

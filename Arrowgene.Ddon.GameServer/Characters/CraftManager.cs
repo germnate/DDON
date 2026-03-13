@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Timers;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
@@ -21,6 +22,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
     public class CraftManager
     {
         private static readonly ServerLogger Logger = LogProvider.Logger<ServerLogger>(typeof(CraftManager));
+
+        private System.Timers.Timer? _craftingTimer;
+
         // TODO: introduce new assets instead
         private static readonly List<uint> craftRankExpLimit = new()
         {
@@ -113,6 +117,14 @@ namespace Arrowgene.Ddon.GameServer.Characters
         public CraftManager(DdonGameServer server)
         {
             _server = server;
+        }
+
+        public void StartTimer()
+        {
+            _craftingTimer = new System.Timers.Timer(10000);
+            _craftingTimer.Elapsed += (s, e) => UpdateOnlineCraftingProgress();
+            _craftingTimer.AutoReset = true;
+            _craftingTimer.Start();
         }
 
         /// <summary>
@@ -519,26 +531,20 @@ namespace Arrowgene.Ddon.GameServer.Characters
         public void UpdateOnlineCraftingProgress()
         {
             long currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            // We grab every logged in Client.
-            var onlineClients = _server.ClientLookup.GetAll().Where(c => c?.Character != null).ToList();
 
-            foreach (var client in onlineClients)
+            foreach (var client in _server.ClientLookup.GetAll())
             {
-                // We check for every Pawn who might be in a Crafting-State
+                if (client?.Character == null)
+                    continue;
+
                 foreach (var pawn in client.Character.Pawns.Where(p => p.PawnState == PawnState.Craft))
                 {
                     var progress = _server.Database.SelectPawnCraftProgress(client.Character.CharacterId, pawn.PawnId);
 
-                    // Logic: If a Timestamp exists, is in the past UND is not equal to 0
                     if (progress != null && progress.RemainTime > 0 && currentTime >= progress.RemainTime)
                     {
-                        Logger.Info($"[CRAFTING] Success! {client.Character.FirstName} {client.Character.LastName}'s Pawn {pawn.Name} finished Recipe {progress.RecipeId}");
-
-                        // We set RemainTime to 0, so that we won't notify at each new Tick
                         progress.RemainTime = 0;
                         _server.Database.UpdatePawnCraftProgress(progress);
-
-                        // We send the Notification to the UI!
                         client.Send(new S2CCraftFinishCraftNtc { PawnId = pawn.PawnId});
                     }
                 }

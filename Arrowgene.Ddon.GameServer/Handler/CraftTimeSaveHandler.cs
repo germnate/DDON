@@ -10,7 +10,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
 {
     public class CraftTimeSaveHandler : GameRequestPacketQueueHandler<C2SCraftTimeSaveReq, S2CCraftTimeSaveRes>
     {
-        private static readonly ServerLogger Logger = LogProvider.Logger<ServerLogger>(typeof(CraftCancelCraftHandler));
+        private static readonly ServerLogger Logger = LogProvider.Logger<ServerLogger>(typeof(CraftTimeSaveHandler));
 
         public CraftTimeSaveHandler(DdonGameServer server) : base(server)
         {
