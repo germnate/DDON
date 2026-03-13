@@ -74,18 +74,17 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         ItemId = craftProgress.ItemId,
                         ToppingId = 0,
                         AdditionalStatusId = craftProgress.AdditionalStatusId,
-                        RemainTime = displayTime, // NEW
+                        RemainTime = displayTime,
                         ExpBonus = craftProgress.ExpBonus,
                         CreateCount = craftProgress.CreateCount,
                     };
                     // Number of elements determines number icon pop up on Production Status 
                     res.CraftProgressList.Add(CDataCraftProgress);
 
-                    // --- START: New Code ---
                     if (displayTime == 0)
                     {
                         createdRecipes.Add(CDataCraftProgress.RecipeId);
-                        // We could clean up the status in the DB here,
+                        // TODO: We could clean up the status in the DB here,
                         // but for now it is more than enough if the UI sees 0.
                         // Therefor, we keep the Item in the DB,
                         // until the User retrieves it (RequestCraftProduct).
