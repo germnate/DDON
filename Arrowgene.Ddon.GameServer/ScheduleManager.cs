@@ -34,6 +34,7 @@ namespace Arrowgene.Ddon.GameServer
                 new AreaPointResetTask(DayOfWeek.Monday, 5, 0),
                 new RankingBoardResetTask(DayOfWeek.Monday, 5, 0),
                 new BBMResetTicketTask(DayOfWeek.Monday, 5, 0),
+                new CraftingSchedulerTask(),
                 new PawnLikabilityIncreaseResetTask(5, 0),
                 new EquipmentRecycleResetTask(5, 0),
                 new BoardQuestRotationTask(5, 0),
@@ -64,8 +65,10 @@ namespace Arrowgene.Ddon.GameServer
             {
                 if (!entries.ContainsKey(task.Type))
                 {
-                    Logger.Error($"Task '{task.Type}' has no record in the database. Skipping.");
-                    continue;
+                    Logger.Info($"Task '{task.Type}' not found in database. Performing auto-initialization...");
+                    long initialTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                    Server.Database.UpdateScheduleInfo(task.Type, initialTimestamp);
+                    entries[task.Type] = new SchedulerTaskEntry { Type = task.Type, Timestamp = initialTimestamp };
                 }
 
                 if (!task.IsEnabled(Server))

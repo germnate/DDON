@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Timers;
-using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
@@ -21,9 +19,6 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
     public class CraftManager
     {
-        private static readonly ServerLogger Logger = LogProvider.Logger<ServerLogger>(typeof(CraftManager));
-
-        private System.Timers.Timer? _craftingTimer;
 
         // TODO: introduce new assets instead
         private static readonly List<uint> craftRankExpLimit = new()
@@ -121,10 +116,6 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public void StartTimer()
         {
-            _craftingTimer = new System.Timers.Timer(10000);
-            _craftingTimer.Elapsed += (s, e) => UpdateOnlineCraftingProgress();
-            _craftingTimer.AutoReset = true;
-            _craftingTimer.Start();
         }
 
         /// <summary>
@@ -527,7 +518,6 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 .FirstOrDefault(itemId);
         }
 
-        // Background-Thread for Crafting System Timer!
         public void UpdateOnlineCraftingProgress()
         {
             long currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -542,7 +532,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     var progress = _server.Database.SelectPawnCraftProgress(client.Character.CharacterId, pawn.PawnId);
 
                     if (progress != null && progress.RemainTime > 0 && currentTime >= progress.RemainTime)
-                    {
+                    {                        
                         progress.RemainTime = 0;
                         _server.Database.UpdatePawnCraftProgress(progress);
                         client.Send(new S2CCraftFinishCraftNtc { PawnId = pawn.PawnId});
