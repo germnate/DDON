@@ -33,7 +33,7 @@ public partial class DdonSqlDb : SqlDb
 
     private readonly string SqlUpsertPawnCraftProgress =
         $"""
-         INSERT INTO "ddon_equipment_limit_break" ({BuildQueryField(PawnCraftProgressFields)}) 
+         INSERT INTO "ddon_pawn_craft_progress" ({BuildQueryField(PawnCraftProgressFields)}) 
                         VALUES ({BuildQueryInsert(PawnCraftProgressFields)}) 
                         ON CONFLICT ("craft_character_id", "craft_lead_pawn_id") 
                         DO UPDATE SET {BuildQueryUpdateWithPrefix("EXCLUDED.", PawnCraftProgressNonKeyFields)};

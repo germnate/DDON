@@ -6,7 +6,7 @@ namespace Arrowgene.Ddon.GameServer.Tasks.Implementations
 {
     public class CraftingSchedulerTask : SecondlyTask
     {
-        public CraftingSchedulerTask() : base(TaskType.Crafting, 10)
+        public CraftingSchedulerTask() : base(TaskType.Crafting, 1)
         {
         }
 

@@ -1,1 +1,1 @@
-INSERT OR REPLACE INTO "ddon_schedule_next" ("type", "timestamp") VALUES (25, 0);
+INSERT INTO "ddon_schedule_next" ("type", "timestamp") VALUES (25, 0);

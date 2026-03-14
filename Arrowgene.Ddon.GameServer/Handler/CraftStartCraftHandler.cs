@@ -134,8 +134,9 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     actionType = NpcActionType.NpcActionDesk;
                 }
                 
-                uint duration = Server.CraftManager.CalculateRecipeProductionSpeed(recipe.Time, itemInfo, craftPawns);
+                uint duration = Server.CraftManager.CalculateRecipeProductionSpeed(recipe.Time, itemInfo, craftPawns) * request.CreateCount;
                 long finishAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + duration;
+                leadPawn.CraftingFinishAt = finishAt;
 
                 CraftProgress craftProgress = new CraftProgress
                     {

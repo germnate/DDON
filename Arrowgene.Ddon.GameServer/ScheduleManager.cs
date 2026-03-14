@@ -68,10 +68,8 @@ namespace Arrowgene.Ddon.GameServer
             {
                 if (!entries.ContainsKey(task.Type))
                 {
-                    Logger.Error($"Task '{task.Type}' not found in database. Performing auto-initialization...");
-                    long initialTimestamp = 0;
-                    Server.Database.UpdateScheduleInfo(task.Type, initialTimestamp);
-                    entries[task.Type] = new SchedulerTaskEntry { Type = task.Type, Timestamp = initialTimestamp };
+                    Logger.Error($"Task '{task.Type}' has no record in the database. Skipping.");
+                    continue;
                 }
 
                 if (!task.IsEnabled(Server))

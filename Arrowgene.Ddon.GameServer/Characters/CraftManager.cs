@@ -518,26 +518,29 @@ namespace Arrowgene.Ddon.GameServer.Characters
             long currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             var onlineClients = _server.ClientLookup.GetAll();
 
-            _server.Database.ExecuteInTransaction(connection =>
+            foreach (var client in onlineClients)
             {
-                foreach (var client in onlineClients)
+                if (client?.Character == null) continue;
+
+                foreach (var pawn in client.Character.Pawns.Where(p => p.PawnState == PawnState.Craft))
                 {
-                    if (client?.Character == null)
-                    continue;
-                    
-                    foreach (var pawn in client.Character.Pawns.Where(p => p.PawnState == PawnState.Craft))
+                    if (pawn.CraftingFinishAt > 0 && currentTime >= pawn.CraftingFinishAt)
                     {
-                        var progress = _server.Database.SelectPawnCraftProgress(client.Character.CharacterId, pawn.PawnId, connection);
-                        
-                        if (progress != null && progress.RemainTime > 0 && currentTime >= progress.RemainTime)
-                        {                        
-                            progress.RemainTime = 0;
-                            _server.Database.UpdatePawnCraftProgress(progress, connection);
-                            client.Send(new S2CCraftFinishCraftNtc { PawnId = pawn.PawnId });
-                        }
+                        _server.Database.ExecuteInTransaction(connection =>
+                        {
+                            var progress = _server.Database.SelectPawnCraftProgress(client.Character.CharacterId, pawn.PawnId, connection);
+                            if (progress != null)
+                            {
+                                progress.RemainTime = 0;
+                                _server.Database.UpdatePawnCraftProgress(progress, connection);
+                            }
+                        });
+
+                        pawn.CraftingFinishAt = 0;
+                        client.Send(new S2CCraftFinishCraftNtc { PawnId = pawn.PawnId });
                     }
                 }
-            });
+            }
         }
     }
 }
