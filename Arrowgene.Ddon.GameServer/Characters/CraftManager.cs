@@ -19,7 +19,6 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
     public class CraftManager
     {
-
         // TODO: introduce new assets instead
         private static readonly List<uint> craftRankExpLimit = new()
         {
@@ -112,10 +111,6 @@ namespace Arrowgene.Ddon.GameServer.Characters
         public CraftManager(DdonGameServer server)
         {
             _server = server;
-        }
-
-        public void StartTimer()
-        {
         }
 
         /// <summary>
@@ -521,24 +516,28 @@ namespace Arrowgene.Ddon.GameServer.Characters
         public void UpdateOnlineCraftingProgress()
         {
             long currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            var onlineClients = _server.ClientLookup.GetAll();
 
-            foreach (var client in _server.ClientLookup.GetAll())
+            _server.Database.ExecuteInTransaction(connection =>
             {
-                if (client?.Character == null)
-                    continue;
-
-                foreach (var pawn in client.Character.Pawns.Where(p => p.PawnState == PawnState.Craft))
+                foreach (var client in onlineClients)
                 {
-                    var progress = _server.Database.SelectPawnCraftProgress(client.Character.CharacterId, pawn.PawnId);
-
-                    if (progress != null && progress.RemainTime > 0 && currentTime >= progress.RemainTime)
-                    {                        
-                        progress.RemainTime = 0;
-                        _server.Database.UpdatePawnCraftProgress(progress);
-                        client.Send(new S2CCraftFinishCraftNtc { PawnId = pawn.PawnId});
+                    if (client?.Character == null)
+                    continue;
+                    
+                    foreach (var pawn in client.Character.Pawns.Where(p => p.PawnState == PawnState.Craft))
+                    {
+                        var progress = _server.Database.SelectPawnCraftProgress(client.Character.CharacterId, pawn.PawnId, connection);
+                        
+                        if (progress != null && progress.RemainTime > 0 && currentTime >= progress.RemainTime)
+                        {                        
+                            progress.RemainTime = 0;
+                            _server.Database.UpdatePawnCraftProgress(progress, connection);
+                            client.Send(new S2CCraftFinishCraftNtc { PawnId = pawn.PawnId });
+                        }
                     }
                 }
-            }
+            });
         }
     }
 }

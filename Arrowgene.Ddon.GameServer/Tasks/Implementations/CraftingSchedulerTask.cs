@@ -15,8 +15,6 @@ namespace Arrowgene.Ddon.GameServer.Tasks.Implementations
             server.CraftManager.UpdateOnlineCraftingProgress();
         }
 
-        public override bool IsEnabled(DdonGameServer server) => true;
-
         public override string TaskTypeName() => "Crafting";
     }
 }

@@ -1096,3 +1096,6 @@ CREATE TABLE IF NOT EXISTS "ddon_bbm_reset_gg"
 
 INSERT INTO "ddon_schedule_next"(type, timestamp)
 VALUES (20, 0);
+
+INSERT INTO "ddon_schedule_next"(type, timestamp)
+VALUES (25, 0);

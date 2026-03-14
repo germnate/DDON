@@ -7,11 +7,19 @@ namespace Arrowgene.Ddon.GameServer.Tasks
     {
         public uint Seconds { get; }
 
-        public SecondlyTask(TaskType type, uint seconds) : base(ScheduleInterval.Secondly, type)
+        /// <summary>
+        /// Calculates the next timestamp for this task in unix seconds
+        /// </summary>
+        /// <returns>Returns the next timestamp in unix seconds</returns>
+        public SecondlyTask(TaskType taskType, uint seconds) : base(ScheduleInterval.Secondly, taskType)
         {
             Seconds = seconds;
         }
 
+        /// <summary>
+        /// Calculates the next timestamp for this task in unix seconds
+        /// </summary>
+        /// <returns>Returns the next timestamp in unix seconds</returns>
         public override long NextTimestamp()
         {
             return DateTimeOffset.UtcNow.ToUnixTimeSeconds() + Seconds;

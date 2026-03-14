@@ -1,0 +1,1 @@
+INSERT OR REPLACE INTO "ddon_schedule_next" ("type", "timestamp") VALUES (25, 0);

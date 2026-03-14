@@ -167,7 +167,6 @@ namespace Arrowgene.Ddon.GameServer
 
             LoadChatHandler();
             LoadPacketHandler();
-            CraftManager.StartTimer();
 
             base.Start();
         }
