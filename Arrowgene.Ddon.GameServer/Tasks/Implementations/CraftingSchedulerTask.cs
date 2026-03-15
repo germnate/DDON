@@ -1,6 +1,7 @@
 using System;
 using Arrowgene.Ddon.Shared.Model.Scheduler;
 using Arrowgene.Ddon.Server;
+using Arrowgene.Ddon.Shared.Model.Rpc;
 
 namespace Arrowgene.Ddon.GameServer.Tasks.Implementations
 {
@@ -12,7 +13,7 @@ namespace Arrowgene.Ddon.GameServer.Tasks.Implementations
 
         public override void RunTask(DdonGameServer server)
         {
-            server.CraftManager.UpdateOnlineCraftingProgress();
+            server.RpcManager.AnnounceAll("internal/command", RpcInternalCommand.UpdateCrafting, null);
         }
 
         public override string TaskTypeName() => "Crafting";

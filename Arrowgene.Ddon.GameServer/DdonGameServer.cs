@@ -31,7 +31,6 @@ using Arrowgene.Ddon.GameServer.Handler;
 using Arrowgene.Ddon.GameServer.Party;
 using Arrowgene.Ddon.GameServer.Quests.LightQuests;
 using Arrowgene.Ddon.GameServer.Scripting;
-using Arrowgene.Ddon.GameServer.Scripting.Interfaces;
 using Arrowgene.Ddon.GameServer.Shop;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Handler;
@@ -40,7 +39,6 @@ using Arrowgene.Ddon.Shared;
 using Arrowgene.Ddon.Shared.Entity;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
-using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Network;
 using Arrowgene.Logging;
 using Arrowgene.Networking.Tcp;
@@ -167,7 +165,6 @@ namespace Arrowgene.Ddon.GameServer
 
             LoadChatHandler();
             LoadPacketHandler();
-
             base.Start();
         }
 

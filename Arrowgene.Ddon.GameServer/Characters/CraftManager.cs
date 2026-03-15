@@ -528,12 +528,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     {
                         _server.Database.ExecuteInTransaction(connection =>
                         {
-                            var progress = _server.Database.SelectPawnCraftProgress(client.Character.CharacterId, pawn.PawnId, connection);
-                            if (progress != null)
-                            {
-                                progress.RemainTime = 0;
-                                _server.Database.UpdatePawnCraftProgress(progress, connection);
-                            }
+                            _server.Database.UpdatePawnCraftFinishTime(client.Character.CharacterId, pawn.PawnId, 0, connection);
                         });
 
                         pawn.CraftingFinishAt = 0;

@@ -661,7 +661,7 @@ CREATE TABLE IF NOT EXISTS "ddon_pawn_craft_progress"
     "npc_action_id"          INTEGER NOT NULL,
     "item_id"                INTEGER NOT NULL,
     "unk0"                   INTEGER NOT NULL,
-    "remain_time"            INTEGER NOT NULL,
+    "finish_at"              INTEGER NOT NULL,
     "exp_bonus"              BOOLEAN NOT NULL,
     "create_count"           INTEGER NOT NULL,
 

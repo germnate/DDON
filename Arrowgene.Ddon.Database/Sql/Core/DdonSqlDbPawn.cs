@@ -452,7 +452,7 @@ public partial class DdonSqlDb : SqlDb
             {
                 if (reader.Read())
                 {
-                    pawn.CraftingFinishAt = GetUInt32(reader, "remain_time");
+                    pawn.CraftingFinishAt = GetUInt32(reader, "finish_at");
                 }
             }
         );
