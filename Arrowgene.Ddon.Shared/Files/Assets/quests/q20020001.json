@@ -27,14 +27,17 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Loneliness Gloves",
           "item_id": 9659,
           "num": 1
         },
         {
+          "comment": "Blue Whiskey",
           "item_id": 9417,
           "num": 1
         },
         {
+          "comment": "Superior Quality Gala Extract",
           "item_id": 9362,
           "num": 2
         }
@@ -47,27 +50,43 @@
         "id": 1,
         "group_id": 264
       },
+      "placement_type": "manual",
       "enemies": [
         {
+          "comment": "Brutal Rogue Seeker",
           "enemy_id": "0x011001",
+          "named_enemy_params_id": 54,
+          "hm_present_no": 46,
           "level": 31,
-          "exp": 400,
-          "is_boss": false,
-          "hm_present_no": 46
+          "exp": 138,
+          "index": 0
         },
         {
+          "comment": "Brutal Rogue Seeker",
           "enemy_id": "0x011001",
+          "named_enemy_params_id": 54,
+          "hm_present_no": 46,
           "level": 31,
-          "exp": 400,
-          "is_boss": false,
-          "hm_present_no": 46
+          "exp": 138,
+          "index": 8
         },
         {
+          "comment": "Brutal Rogue Hunter",
           "enemy_id": "0x011002",
+          "named_enemy_params_id": 54,
+          "hm_present_no": 47,
           "level": 31,
-          "exp": 400,
-          "is_boss": false,
-          "hm_present_no": 47
+          "exp": 138,
+          "index": 14
+        },
+        {
+          "comment": "Brutal Rogue Seeker",
+          "enemy_id": "0x011001",
+          "named_enemy_params_id": 54,
+          "hm_present_no": 46,
+          "level": 31,
+          "exp": 138,
+          "index": 15
         }
       ]
     }
@@ -89,12 +108,26 @@
         "layer_no": 1
       },
       "npc_id": "ArisenCorpsRegimentalSoldier10",
-      "message_id": 11372
+      "message_id": 8636
     },
     {
       "type": "SeekOutEnemiesAtMarkedLocation",
       "announce_type": "Accept",
-      "groups": [ 0 ]
+      "groups": [ 0 ],
+      "result_commands": [
+        {
+          "comment": "Idle dialogue - Soldier10",
+          "type": "QstTalkChg",
+          "Param1": 533,
+          "Param2": 8646
+        },
+        {
+          "comment": "Idle dialogue - Soldier7",
+          "type": "QstTalkChg",
+          "Param1": 530,
+          "Param2": 14839
+        }
+      ]
     },
     {
       "type": "KillGroup",
@@ -119,7 +152,7 @@
       },
       "announce_type": "Update",
       "npc_id": "ArisenCorpsRegimentalSoldier7",
-      "message_id": 11372
+      "message_id": 8639
     },
     {
       "type": "NewTalkToNpc",
@@ -130,7 +163,7 @@
       },
       "announce_type": "Update",
       "npc_id": "ArisenCorpsRegimentalSoldier10",
-      "message_id": 11842
+      "message_id": 8640
     },
     {
       "type": "TalkToNpc",
@@ -141,7 +174,7 @@
       },
       "announce_type": "Update",
       "npc_id": "Vanessa0",
-      "message_id": 11842
+      "message_id": 8641
     }
   ]
 }

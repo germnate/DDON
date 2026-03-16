@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "A Huge Armored Creature Appears!",
+  "comment": "A Huge Armored Creature Appears! (II)",
   "quest_id": 20025005,
   "base_level": 41,
   "minimum_item_rank": 0,
@@ -13,29 +13,32 @@
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1120
+      "amount": 1350
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 200
+      "amount": 270
     },
     {
       "type": "exp",
-      "amount": 1430
+      "amount": 1890
     },
     {
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Crest of Greater Protection",
           "item_id": 9288,
           "num": 1
         },
         {
+          "comment": "Demon's Talisman",
           "item_id": 9389,
           "num": 1
         },
         {
+          "comment": "Exquisite Fried Meat",
           "item_id": 9416,
           "num": 2
         }
@@ -58,43 +61,36 @@
         "id": 120,
         "group_id": 3
       },
-      "placement_type": "manual",
+      "starting_index": 7,
       "enemies": [
         {
+          "comment": "Dangerous Armored Cyclops",
           "enemy_id": "0x015002",
-          "start_think_tbl_no": 1,
-		      "named_enemy_params_id": 56,
+          "named_enemy_params_id": 56,
           "level": 41,
-          "exp": 6590,
-          "is_boss": true,
-          "index": 10
+          "exp": 3498,
+          "is_boss": true
         },
         {
+          "comment": "Brutal Skeleton Sorcerer",
           "enemy_id": "0x010309",
-          "start_think_tbl_no": 1,
-		      "named_enemy_params_id": 54,
+          "named_enemy_params_id": 54,
           "level": 41,
-          "exp": 4200,
-          "is_boss": false,
-          "index": 8
+          "exp": 181
         },
         {
+          "comment": "Brutal Skeleton Sorcerer",
           "enemy_id": "0x010309",
-          "start_think_tbl_no": 1,
-		      "named_enemy_params_id": 54,
+          "named_enemy_params_id": 54,
           "level": 41,
-          "exp": 4200,
-          "is_boss": false,
-          "index": 9
+          "exp": 181
         },
         {
+          "comment": "Brutal Skeleton Sorcerer",
           "enemy_id": "0x010309",
-          "start_think_tbl_no": 1,
-		      "named_enemy_params_id": 54,
+          "named_enemy_params_id": 54,
           "level": 41,
-          "exp": 4200,
-          "is_boss": false,
-          "index": 7
+          "exp": 181
         }
       ]
     }

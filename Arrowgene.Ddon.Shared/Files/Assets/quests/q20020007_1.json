@@ -1,22 +1,23 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "A Situation on the Mountain Road",
+  "comment": "A Situation on the Mountain Road (II)",
   "quest_id": 20020007,
-  "base_level": 36,
+  "base_level": 56,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "BetlandPlains",
   "news_image": 43,
+  "variant_index": 1,
   "rewards": [
     {
       "type": "exp",
-      "amount": 1660
+      "amount": 2580
     },
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1180
+      "amount": 1840
     },
     {
       "type": "wallet",
@@ -27,18 +28,18 @@
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Shiny Hands",
-          "item_id": 9664,
+          "comment": "Cockatrice Gastrolith",
+          "item_id": 9440,
           "num": 1
         },
         {
-          "comment": "Demon's Talisman",
-          "item_id": 9389,
+          "comment": "Cockatrice Poison Gland",
+          "item_id": 7745,
           "num": 1
         },
         {
-          "comment": "Throwing Knife",
-          "item_id": 9398,
+          "comment": "Cockatrice Liquor",
+          "item_id": 7842,
           "num": 1
         }
       ]
@@ -53,11 +54,11 @@
       "starting_index": 5,
       "enemies": [
         {
-          "comment": "Brutal Griffin",
-          "enemy_id": "0x015300",
-          "named_enemy_params_id": 54,
-          "level": 36,
-          "exp": 4200,
+          "comment": "Dangerous Cockatrice",
+          "enemy_id": "0x015301",
+          "named_enemy_params_id": 56,
+          "level": 56,
+          "exp": 5974,
           "is_boss": true
         }
       ]
