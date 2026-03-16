@@ -1,44 +1,45 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Residents of Darkness",
+  "comment": "The Residents of Darkness (II)",
   "quest_id": 20020009,
-  "base_level": 40,
+  "base_level": 41,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "BetlandPlains",
   "news_image": 546,
+  "variant_index": 1,
   "rewards": [
     {
       "type": "exp",
-      "amount": 1320
+      "amount": 1350
     },
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1100
+      "amount": 1120
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 170
+      "amount": 180
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Strong Thread",
-          "item_id": 7956,
-          "num": 3
+          "comment": "Protective Cloth",
+          "item_id": 7940,
+          "num": 2
         },
         {
-          "comment": "Sprite's Talisman",
-          "item_id": 9390,
+          "comment": "Angel's Talisman",
+          "item_id": 9388,
           "num": 1
         },
         {
-          "comment": "Five-Herb Salad",
-          "item_id": 9414,
+          "comment": "Grilled Mushroom",
+          "item_id": 9415,
           "num": 2
         }
       ]
@@ -50,35 +51,60 @@
         "id": 91,
         "group_id": 3
       },
-      "starting_index": 7,
+      "placement_type": "manual",
       "enemies": [
         {
-          "comment": "Vigilant Skeleton Mage",
-          "enemy_id": "0x010308",
-          "named_enemy_params_id": 53,
-          "level": 40,
-          "exp": 154
-        },
-        {
-          "comment": "Vigilant Skeleton Mage",
-          "enemy_id": "0x010308",
-          "named_enemy_params_id": 53,
-          "level": 40,
-          "exp": 154
-        },
-        {
-          "comment": "Vigilant Skeleton Sorcerer",
+          "comment": "Skeleton Sorcerer",
           "enemy_id": "0x010309",
-          "named_enemy_params_id": 53,
-          "level": 40,
-          "exp": 177
+          "level": 41,
+          "exp": 181,
+          "start_think_tbl_no": 8,
+          "repop_count": 1,
+          "is_manual_set": true,
+          "is_required": false,
+          "index": 6
         },
         {
-          "comment": "Vigilant Skeleton Sorcerer",
+          "comment": "Brutal Witch",
+          "enemy_id": "0x015604",
+          "named_enemy_params_id": 54,
+          "level": 41,
+          "exp": 2772,
+          "is_boss": true,
+          "index": 8
+        },
+        {
+          "comment": "Skeleton Sorcerer",
           "enemy_id": "0x010309",
-          "named_enemy_params_id": 53,
-          "level": 40,
-          "exp": 177
+          "level": 41,
+          "exp": 181,
+          "start_think_tbl_no": 8,
+          "repop_count": 1,
+          "is_manual_set": true,
+          "is_required": false,
+          "index": 9
+        },
+        {
+          "comment": "Skeleton Sorcerer",
+          "enemy_id": "0x010309",
+          "level": 41,
+          "exp": 181,
+          "start_think_tbl_no": 8,
+          "repop_count": 1,
+          "is_manual_set": true,
+          "is_required": false,
+          "index": 10
+        },
+        {
+          "comment": "Skeleton Sorcerer",
+          "enemy_id": "0x010309",
+          "level": 41,
+          "exp": 181,
+          "start_think_tbl_no": 8,
+          "repop_count": 1,
+          "is_manual_set": true,
+          "is_required": false,
+          "index": 11
         }
       ]
     }

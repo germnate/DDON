@@ -27,16 +27,19 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Crest of Permafrost",
           "item_id": 9260,
           "num": 1
         },
         {
+          "comment": "Rare Meat Paté",
           "item_id": 9420,
           "num": 1
         },
         {
+          "comment": "Blue Whiskey",
           "item_id": 9417,
-          "num": 1
+          "num": 2
         }
       ]
     }
@@ -47,11 +50,14 @@
         "id": 74,
         "group_id": 2
       },
+      "starting_index": 2,
       "enemies": [
         {
-          "enemy_id": "0x015002",
+          "comment": "Brutal Armored Cyclops (Club)",
+          "enemy_id": "0x015003",
+          "named_enemy_params_id": 54,
           "level": 38,
-          "exp": 6500,
+          "exp": 3339,
           "is_boss": true
         }
       ]
