@@ -149,7 +149,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         NpcActionId = actionType,
                         ItemId = recipe.ItemID,
                         AdditionalStatusId = request.AdditionalStatusId,
-                        RemainTime = (uint)finishAt,
+                        FinishAt = (uint)finishAt,
 
                         CreateCount = recipe.Num * request.CreateCount,
                         PlusValue = plusValue,

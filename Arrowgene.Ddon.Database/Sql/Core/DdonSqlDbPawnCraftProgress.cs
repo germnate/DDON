@@ -109,7 +109,7 @@ public partial class DdonSqlDb : SqlDb
             NpcActionId = (NpcActionType)GetInt32(reader, "npc_action_id"),
             ItemId = GetUInt32(reader, "item_id"),
             AdditionalStatusId = GetUInt16(reader, "unk0"),
-            RemainTime = GetUInt32(reader, "finish_at"),
+            FinishAt = GetUInt32(reader, "finish_at"),
             ExpBonus = GetBoolean(reader, "exp_bonus"),
             CreateCount = GetUInt32(reader, "create_count"),
 

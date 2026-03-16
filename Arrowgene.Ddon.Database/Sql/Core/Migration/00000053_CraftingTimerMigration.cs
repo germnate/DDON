@@ -20,7 +20,7 @@ namespace Arrowgene.Ddon.Database.Sql.Core.Migration
 
         public bool Migrate(IDatabase db, DbConnection conn)
         {
-            string scriptPath = Path.Combine(DatabaseSetting.DatabaseFolder, "Script/migration_crafting_timer_sqlite.sql");
+            string scriptPath = Path.Combine(DatabaseSetting.DatabaseFolder, "Script/migration_rename_craft_remain_time_sqlite.sql");
             string script = File.ReadAllText(scriptPath, Encoding.UTF8);
             string adaptedScript = DdonDatabaseBuilder.AdaptSQLiteSchemaTo(DatabaseSetting.Type, script);
             db.Execute(conn, adaptedScript);
