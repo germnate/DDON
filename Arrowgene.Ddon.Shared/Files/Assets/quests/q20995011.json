@@ -59,7 +59,7 @@
                     "is_boss": true
                 },
                 {
-                    "comment": "Critical Alchemized Harpy",
+                    "comment": "Dangerous Alchemized Harpy",
                     "enemy_id": "0x010606",
                     "named_enemy_params_id": 56,
                     "level": 56,
@@ -69,7 +69,7 @@
                     "repop_wait_second": 10
                 },
                 {
-                    "comment": "Critical Alchemized Harpy",
+                    "comment": "Dangerous Alchemized Harpy",
                     "enemy_id": "0x010606",
                     "named_enemy_params_id": 56,
                     "level": 56,

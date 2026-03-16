@@ -7,6 +7,7 @@
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "MergodaRuins",
+    "order_conditions": [ { "type": "AreaRank", "Param1": 12, "Param2": 11 } ],
     "rewards": [
         {
             "type": "exp",
@@ -81,14 +82,14 @@
                     "enemy_id": "0x010312",
                     "level": 68,
                     "exp": 788,
-                    "index": 15
+                    "index": 16
                 },
                 {
                     "comment": "Alchemized Skeleton",
                     "enemy_id": "0x010312",
                     "level": 68,
                     "exp": 788,
-                    "index": 16
+                    "index": 17
                 },
                 {
                     "comment": "Alchemized Skeleton",

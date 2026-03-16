@@ -25,6 +25,10 @@
           "group_id": 1
         }
       ],
+    "order_conditions": [
+      {"type": "MinimumLevel", "Param1": 55},
+      {"type": "MainQuestCompleted", "Param1": 30}
+    ],
     "rewards": [
         {
             "type": "exp",
