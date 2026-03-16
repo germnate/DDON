@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "MergodaRuins",
   "news_image": 562,
+  "order_conditions": [ { "type": "AreaRank", "Param1": 12, "Param2": 13 } ],
   "rewards": [
     {
       "type": "wallet",
@@ -50,7 +51,7 @@
         "id": 424,
         "group_id": 4
       },
-      "starting_index": 1,
+      "starting_index": 5,
       "enemies": [
         {
           "comment": "Alchemized Skeleton",

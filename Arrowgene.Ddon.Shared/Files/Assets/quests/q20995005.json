@@ -47,10 +47,7 @@
         {
             "stage_id": {
                 "id": 76,
-                "group_id": 4,
-                "sub_group_id": 0,
-                "layer_no": 0
-                
+                "group_id": 4
             },
             "placement_type": "manual",
             "enemies": [

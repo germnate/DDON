@@ -50,40 +50,8 @@
                 "id": 84,
                 "group_id": 5
             },
-            "starting_index": 6,
+            "starting_index": 7,
             "enemies": [
-                {
-                    "comment": "Vigilant Alchemized Harpy",
-                    "enemy_id": "0x010606",
-                    "named_enemy_params_id": 53,
-                    "level": 52,
-                    "exp": 252,
-                    "is_boss": false
-                },
-                {
-                    "comment": "Vigilant Alchemized Harpy",
-                    "enemy_id": "0x010606",
-                    "named_enemy_params_id": 53,
-                    "level": 52,
-                    "exp": 252,
-                    "is_boss": false
-                },
-                {
-                    "comment": "Vigilant Alchemized Harpy",
-                    "enemy_id": "0x010606",
-                    "named_enemy_params_id": 53,
-                    "level": 52,
-                    "exp": 252,
-                    "is_boss": false
-                },
-                {
-                    "comment": "Vigilant Alchemized Harpy",
-                    "enemy_id": "0x010606",
-                    "named_enemy_params_id": 53,
-                    "level": 52,
-                    "exp": 252,
-                    "is_boss": false
-                },
                 {
                     "comment": "Brutal Silver Roar",
                     "enemy_id": "0x015505",
@@ -91,6 +59,38 @@
                     "level": 52,
                     "exp": 3914,
                     "is_boss": true
+                },
+                {
+                    "comment": "Vigilant Alchemized Harpy",
+                    "enemy_id": "0x010606",
+                    "named_enemy_params_id": 53,
+                    "level": 52,
+                    "exp": 252,
+                    "is_boss": false
+                },
+                {
+                    "comment": "Vigilant Alchemized Harpy",
+                    "enemy_id": "0x010606",
+                    "named_enemy_params_id": 53,
+                    "level": 52,
+                    "exp": 252,
+                    "is_boss": false
+                },
+                {
+                    "comment": "Vigilant Alchemized Harpy",
+                    "enemy_id": "0x010606",
+                    "named_enemy_params_id": 53,
+                    "level": 52,
+                    "exp": 252,
+                    "is_boss": false
+                },
+                {
+                    "comment": "Vigilant Alchemized Harpy",
+                    "enemy_id": "0x010606",
+                    "named_enemy_params_id": 53,
+                    "level": 52,
+                    "exp": 252,
+                    "is_boss": false
                 }
             ]
         }
