@@ -32,7 +32,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             }
 
             Server.Database.UpdatePawnCraftProgress(craftProgress);
-            client.Enqueue(new S2CCraftTimeSaveRes { PawnID = request.PawnID, RemainTime = 0 }, packetQueue);
+            client.Enqueue(new S2CCraftTimeSaveRes { PawnID = request.PawnID, FinishAt = 0 }, packetQueue);
             client.Enqueue(new S2CCraftFinishCraftNtc { PawnId = request.PawnID }, packetQueue);
             return packetQueue;
         }

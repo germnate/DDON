@@ -9,7 +9,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
         public override PacketId Id => PacketId.S2C_CRAFT_CRAFT_TIME_SAVE_RES;
 
         public uint PawnID { get; set; }
-        public uint RemainTime { get; set; }
+        public uint FinishAt { get; set; }
 
         public class Serializer : PacketEntitySerializer<S2CCraftTimeSaveRes>
         {
@@ -18,7 +18,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
                 WriteServerResponse(buffer, obj);
 
                 WriteUInt32(buffer, obj.PawnID);
-                WriteUInt32(buffer, obj.RemainTime);
+                WriteUInt32(buffer, obj.FinishAt);
             }
 
             public override S2CCraftTimeSaveRes Read(IBuffer buffer)
@@ -28,7 +28,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
                 ReadServerResponse(buffer, obj);
 
                 obj.PawnID = ReadUInt32(buffer);
-                obj.RemainTime = ReadUInt32(buffer);
+                obj.FinishAt = ReadUInt32(buffer);
 
                 return obj;
             }

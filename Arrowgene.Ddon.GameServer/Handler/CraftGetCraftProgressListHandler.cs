@@ -54,8 +54,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     }
 
                     long currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                    long FinishAt = craftProgress.FinishAt;
-                    long diff = FinishAt - currentTime;
+                    long finishAt = craftProgress.FinishAt;
+                    long diff = finishAt - currentTime;
 
                     uint displayTime = 0;
                     if (diff > 0)
@@ -74,7 +74,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         ItemId = craftProgress.ItemId,
                         ToppingId = 0,
                         AdditionalStatusId = craftProgress.AdditionalStatusId,
-                        RemainTime = displayTime,
+                        FinishAt = displayTime,
                         ExpBonus = craftProgress.ExpBonus,
                         CreateCount = craftProgress.CreateCount,
                     };

@@ -153,7 +153,7 @@ public partial class DdonSqlDb : SqlDb
         AddParameter(command, "@npc_action_id", (int)craftProgress.NpcActionId);
         AddParameter(command, "@item_id", craftProgress.ItemId);
         AddParameter(command, "@unk0", craftProgress.AdditionalStatusId);
-        AddParameter(command, "@finish_at", craftProgress.RemainTime);
+        AddParameter(command, "@finish_at", craftProgress.FinishAt);
         AddParameter(command, "@exp_bonus", craftProgress.ExpBonus);
         AddParameter(command, "@create_count", craftProgress.CreateCount);
 
