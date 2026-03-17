@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Wicked Pursuer (Calamity)",
+  "comment": "The Wicked Pursuer (Twelve Calamities)",
   "quest_id": 20100003,
   "base_level": 55,
   "minimum_item_rank": 0,
@@ -43,6 +43,28 @@
           "num": 1
         }
       ]
+    },
+    {
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Crest of Sheer Intelligence",
+          "item_id": 9293,
+          "num": 1,
+          "chance": 0.15
+        }
+      ]
+    },
+    {
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Crest of Greater Intelligence",
+          "item_id": 9292,
+          "num": 1,
+          "chance": 0.15
+        }
+      ]
     }
   ],
   "enemy_groups": [
@@ -51,7 +73,7 @@
         "id": 114,
         "group_id": 0
       },
-      "starting_index": 6,
+      "placement_type": "manual",
       "enemies": [
         {
           "comment": "Fierce Winged Lion (Griffin)",
@@ -59,7 +81,8 @@
           "named_enemy_params_id": 517,
           "level": 55,
           "exp": 5625,
-          "is_boss": true
+          "is_boss": true,
+          "index": 6
         },
         {
           "comment": "Fierce Silver Lion (White Chimera)",
@@ -67,7 +90,8 @@
           "named_enemy_params_id": 518,
           "level": 55,
           "exp": 5787,
-          "is_boss": true
+          "is_boss": true,
+          "index": 8
         }
       ]
     }

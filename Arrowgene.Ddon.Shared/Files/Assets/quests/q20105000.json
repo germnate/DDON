@@ -53,42 +53,6 @@
       "starting_index": 4,
       "enemies": [
         {
-          "comment": "Vigilant Harpy",
-          "enemy_id": "0x010600",
-          "start_think_tbl_no": 2,
-          "named_enemy_params_id": 53,
-          "level": 41,
-          "exp": 117,
-          "is_boss": false
-        },
-        {
-          "comment": "Vigilant Harpy",
-          "enemy_id": "0x010600",
-          "start_think_tbl_no": 1,
-          "named_enemy_params_id": 53,
-          "level": 41,
-          "exp": 117,
-          "is_boss": false
-        },
-        {
-          "comment": "Vigilant Harpy",
-          "enemy_id": "0x010600",
-          "start_think_tbl_no": 2,
-          "named_enemy_params_id": 53,
-          "level": 41,
-          "exp": 117,
-          "is_boss": false
-        },
-        {
-          "comment": "Vigilant Harpy",
-          "enemy_id": "0x010600",
-          "start_think_tbl_no": 1,
-          "named_enemy_params_id": 53,
-          "level": 41,
-          "exp": 117,
-          "is_boss": false
-        },
-        {
           "comment": "Brutal White Chimera",
           "enemy_id": "0x015202",
           "start_think_tbl_no": 1,
@@ -96,6 +60,42 @@
           "level": 43,
           "exp": 4887,
           "is_boss": true
+        },
+        {
+          "comment": "Vigilant Harpy",
+          "enemy_id": "0x010600",
+          "start_think_tbl_no": 2,
+          "named_enemy_params_id": 53,
+          "level": 41,
+          "exp": 117,
+          "is_boss": false
+        },
+        {
+          "comment": "Vigilant Harpy",
+          "enemy_id": "0x010600",
+          "start_think_tbl_no": 1,
+          "named_enemy_params_id": 53,
+          "level": 41,
+          "exp": 117,
+          "is_boss": false
+        },
+        {
+          "comment": "Vigilant Harpy",
+          "enemy_id": "0x010600",
+          "start_think_tbl_no": 2,
+          "named_enemy_params_id": 53,
+          "level": 41,
+          "exp": 117,
+          "is_boss": false
+        },
+        {
+          "comment": "Vigilant Harpy",
+          "enemy_id": "0x010600",
+          "start_think_tbl_no": 1,
+          "named_enemy_params_id": 53,
+          "level": 41,
+          "exp": 117,
+          "is_boss": false
         }
       ]
     }
