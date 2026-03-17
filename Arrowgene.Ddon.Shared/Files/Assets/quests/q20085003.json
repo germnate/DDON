@@ -49,8 +49,15 @@
                 "id": 1,
                 "group_id": 468
             },
-            "starting_index": 8,
+            "starting_index": 5,
             "enemies": [
+                {
+                    "comment": "Brutal Orc Captain",
+                    "enemy_id": "0x015820",
+                    "named_enemy_params_id": 54,
+                    "level": 46,
+                    "exp": 564
+                },
                 {
                     "comment": "Brutal Grimwarg",
                     "enemy_id": "0x010205",
@@ -87,13 +94,6 @@
                     "named_enemy_params_id": 54,
                     "level": 46,
                     "exp": 234
-                },
-                {
-                    "comment": "Brutal Orc Captain",
-                    "enemy_id": "0x015820",
-                    "named_enemy_params_id": 54,
-                    "level": 46,
-                    "exp": 564
                 }
             ]
         }

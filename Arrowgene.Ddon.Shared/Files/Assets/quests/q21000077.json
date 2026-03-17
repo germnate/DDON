@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": false,
   "area_id": "EasternZandora",
+  "order_conditions": [ { "type": "AreaRank", "Param1": 11, "Param2": 13 } ],
   "rewards": [
     {
       "type": "exp",
@@ -49,7 +50,6 @@
         "id": 432,
         "group_id": 10
       },
-      "starting_index": 1,
       "comment": "Up to 66000G",
       "enemies": [
         {
@@ -141,6 +141,12 @@
             }
           ],
           "is_boss": true
+        },
+        {
+          "comment": "Shadow Harpy",
+          "enemy_id": "0x010607",
+          "level": 65,
+          "exp": 788
         },
         {
           "comment": "Shadow Harpy",

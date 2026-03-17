@@ -50,44 +50,8 @@
                 "id": 169,
                 "group_id": 1
             },
-            "placement_type": "manual",
+            "starting_index": 6,
             "enemies": [
-                {
-                    "comment": "Brutal Banded Mage",
-                    "enemy_id": "0x011015",
-                    "named_enemy_params_id": 54,
-                    "hm_present_no": 57,
-                    "level": 47,
-                    "exp": 234,
-                    "index": 5
-                },
-                {
-                    "comment": "Brutal Banded Mage",
-                    "enemy_id": "0x011015",
-                    "named_enemy_params_id": 54,
-                    "hm_present_no": 57,
-                    "level": 47,
-                    "exp": 234,
-                    "index": 6
-                },
-                {
-                    "comment": "Brutal Banded Mage",
-                    "enemy_id": "0x011015",
-                    "named_enemy_params_id": 54,
-                    "hm_present_no": 57,
-                    "level": 47,
-                    "exp": 234,
-                    "index": 7
-                },
-                {
-                    "comment": "Brutal Banded Mage",
-                    "enemy_id": "0x011015",
-                    "named_enemy_params_id": 54,
-                    "hm_present_no": 57,
-                    "level": 47,
-                    "exp": 234,
-                    "index": 8
-                },
                 {
                     "comment": "Brutal Banded Hunter",
                     "enemy_id": "0x011012",
@@ -95,9 +59,50 @@
                     "hm_present_no": 54,
                     "level": 47,
                     "exp": 234,
-                    "index": 11,
-                    "repop_count": 2,
+                    "repop_count": 1,
                     "repop_wait_second": 10
+                },
+                {
+                    "comment": "Brutal Banded Mage",
+                    "enemy_id": "0x011015",
+                    "named_enemy_params_id": 54,
+                    "hm_present_no": 57,
+                    "level": 47,
+                    "exp": 234,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
+                },
+                {
+                    "comment": "Brutal Banded Mage",
+                    "enemy_id": "0x011015",
+                    "named_enemy_params_id": 54,
+                    "hm_present_no": 57,
+                    "level": 47,
+                    "exp": 234
+                },
+                {
+                    "comment": "Brutal Banded Mage",
+                    "enemy_id": "0x011015",
+                    "named_enemy_params_id": 54,
+                    "hm_present_no": 57,
+                    "level": 47,
+                    "exp": 234
+                },
+                {
+                    "comment": "Brutal Banded Hunter",
+                    "enemy_id": "0x011012",
+                    "named_enemy_params_id": 54,
+                    "hm_present_no": 54,
+                    "level": 47,
+                    "exp": 234
+                },
+                {
+                    "comment": "Brutal Banded Mage",
+                    "enemy_id": "0x011015",
+                    "named_enemy_params_id": 54,
+                    "hm_present_no": 57,
+                    "level": 47,
+                    "exp": 234
                 }
             ]
         }
