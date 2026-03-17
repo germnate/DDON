@@ -8,6 +8,10 @@
   "discoverable": true,
   "area_id": "VoldenMines",
   "news_image": 546,
+  "order_conditions": [
+    {"type": "MinimumLevel", "Param1": 55},
+    {"type": "MainQuestCompleted", "Param1": 30}
+  ],
   "rewards": [
     {
       "type": "exp",
@@ -61,19 +65,19 @@
           "exp": 1660
         },
         {
-          "comment": "Death Calling Dark Knight (Death Knight)",
-          "enemy_id": "0x010310",
-          "named_enemy_params_id": 639,
-          "level": 58,
-          "exp": 1660
-        },
-        {
           "comment": "Demolition Fang (Behemoth)",
           "enemy_id": "0x015709",
           "named_enemy_params_id": 638,
           "level": 58,
           "exp": 9296,
           "is_boss": true
+        },
+        {
+          "comment": "Death Calling Dark Knight (Death Knight)",
+          "enemy_id": "0x010310",
+          "named_enemy_params_id": 639,
+          "level": 58,
+          "exp": 1660
         }
       ]
     },
@@ -86,20 +90,20 @@
       "placement_type": "manual",
       "enemies": [
         {
+          "comment": "Death Courting Demon Princess (Empress Ghost)",
+          "enemy_id": "0x015605",
+          "named_enemy_params_id": 641,
+          "level": 58,
+          "exp": 4249,
+          "index": 3
+        },
+        {
           "comment": "Calamity Caller (Nightmare)",
           "enemy_id": "0x015305",
           "named_enemy_params_id": 640,
           "level": 58,
           "exp": 8831,
           "is_boss": true,
-          "index": 3
-        },
-        {
-          "comment": "Death Courting Demon Princess (Empress Ghost)",
-          "enemy_id": "0x015605",
-          "named_enemy_params_id": 641,
-          "level": 58,
-          "exp": 4249,
           "index": 4
         },
         {

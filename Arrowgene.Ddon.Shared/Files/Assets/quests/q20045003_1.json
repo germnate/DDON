@@ -51,6 +51,7 @@
         "id": 101,
         "group_id": 5
       },
+      "starting_index": 9,
       "enemies": [
         {
           "comment": "Brutal Ogre",

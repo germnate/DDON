@@ -50,67 +50,67 @@
         "id": 102,
         "group_id": 3
       },
-      "starting_index": 6,
+      "placement_type": "manual",
       "enemies": [
         {
-          "comment": "Vigilant Rogue Seeker",
-          "enemy_id": "0x011001",
+          "comment": "Vigilant Rogue Defender",
+          "enemy_id": "0x011004",
+          "hm_present_no": 49,
           "named_enemy_params_id": 53,
           "start_think_table_no": 1,
           "level": 34,
           "exp": 148,
-          "is_boss": false,
-          "hm_present_no": 46
-        },
-        {
-          "comment": "Vigilant Rogue Seeker",
-          "enemy_id": "0x011001",
-          "named_enemy_params_id": 53,
-          "start_think_table_no": 1,
-          "level": 34,
-          "exp": 148,
-          "is_boss": false,
-          "hm_present_no": 46
+          "index": 5
         },
         {
           "comment": "Vigilant Rogue Defender",
           "enemy_id": "0x011004",
+          "hm_present_no": 49,
           "named_enemy_params_id": 53,
           "start_think_table_no": 1,
           "level": 34,
           "exp": 148,
-          "is_boss": false,
-          "hm_present_no": 49
+          "index": 6
         },
         {
           "comment": "Vigilant Rogue Seeker",
           "enemy_id": "0x011001",
+          "hm_present_no": 46,
           "named_enemy_params_id": 53,
           "start_think_table_no": 1,
           "level": 34,
           "exp": 148,
-          "is_boss": false,
-          "hm_present_no": 46
+          "index": 8
         },
         {
           "comment": "Vigilant Rogue Seeker",
           "enemy_id": "0x011001",
+          "hm_present_no": 46,
           "named_enemy_params_id": 53,
           "start_think_table_no": 1,
           "level": 34,
           "exp": 148,
-          "is_boss": false,
-          "hm_present_no": 46
+          "index": 9
         },
         {
-          "comment": "Vigilant Rogue Defender",
-          "enemy_id": "0x011004",
+          "comment": "Vigilant Rogue Seeker",
+          "enemy_id": "0x011001",
+          "hm_present_no": 46,
           "named_enemy_params_id": 53,
           "start_think_table_no": 1,
           "level": 34,
           "exp": 148,
-          "is_boss": false,
-          "hm_present_no": 49
+          "index": 10
+        },
+        {
+          "comment": "Vigilant Rogue Seeker",
+          "enemy_id": "0x011001",
+          "hm_present_no": 46,
+          "named_enemy_params_id": 53,
+          "start_think_table_no": 1,
+          "level": 34,
+          "exp": 148,
+          "index": 11
         }
       ]
     }

@@ -51,6 +51,7 @@
         "id": 1,
         "group_id": 192
       },
+      "starting_index": 3,
       "enemies": [
         {
           "comment": "Brutal Colossus",
