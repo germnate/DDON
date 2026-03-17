@@ -53,18 +53,18 @@
       },
       "enemies": [
         {
+          "comment": "Shadow Wolf",
+          "enemy_id": "0x010206",
+          "level": 56,
+          "exp": 279
+        },
+        {
           "comment": "Shadow Harpy",
           "enemy_id": "0x010607",
           "level": 56,
           "exp": 243,
           "repop_count": 1,
           "repop_wait_second": 10
-        },
-        {
-          "comment": "Shadow Wolf",
-          "enemy_id": "0x010206",
-          "level": 56,
-          "exp": 279
         },
         {
           "comment": "Shadow Wolf",

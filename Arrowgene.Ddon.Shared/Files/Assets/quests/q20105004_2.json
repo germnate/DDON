@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Keeper of the Woods (Calamity)",
+  "comment": "The Keeper of the Woods (Twelve Calamities)",
   "quest_id": 20105004,
   "base_level": 45,
   "minimum_item_rank": 0,
@@ -41,6 +41,28 @@
           "comment": "Sprite's Talisman",
           "item_id": 9390,
           "num": 1
+        }
+      ]
+    },
+    {
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Crest of Sheer Magick",
+          "item_id": 9201,
+          "num": 1,
+          "chance": 0.15
+        }
+      ]
+    },
+    {
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Crest of Greater Magick",
+          "item_id": 9200,
+          "num": 1,
+          "chance": 0.15
         }
       ]
     }

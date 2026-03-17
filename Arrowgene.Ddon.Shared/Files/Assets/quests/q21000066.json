@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "DeenanWoods",
+  "order_conditions": [ { "type": "AreaRank", "Param1": 7, "Param2": 13 } ],
   "rewards": [
     {
       "type": "wallet",
@@ -57,7 +58,7 @@
           "level": 68,
           "exp": 5925,
           "is_boss": true,
-          "index": 0
+          "index": 5
         },
         {
           "comment": "Bolt Grimwarg",

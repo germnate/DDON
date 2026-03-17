@@ -50,40 +50,8 @@
         "id": 113,
         "group_id": 6
       },
-      "starting_index": 3,
+      "starting_index": 2,
       "enemies": [
-        {
-          "comment": "Vigilant Direwolf",
-          "enemy_id": "0x010201",
-          "named_enemy_params_id": 53,
-          "level": 40,
-          "exp": 148,
-          "is_boss": false
-        },
-        {
-          "comment": "Vigilant Direwolf",
-          "enemy_id": "0x010201",
-          "named_enemy_params_id": 53,
-          "level": 40,
-          "exp": 148,
-          "is_boss": false
-        },
-        {
-          "comment": "Vigilant Direwolf",
-          "enemy_id": "0x010201",
-          "named_enemy_params_id": 53,
-          "level": 40,
-          "exp": 148,
-          "is_boss": false
-        },
-        {
-          "comment": "Vigilant Direwolf",
-          "enemy_id": "0x010201",
-          "named_enemy_params_id": 53,
-          "level": 40,
-          "exp": 148,
-          "is_boss": false
-        },
         {
           "comment": "Brutal Silver Roar",
           "enemy_id": "0x015505",
@@ -91,6 +59,38 @@
           "level": 41,
           "exp": 3287,
           "is_boss": true
+        },
+        {
+          "comment": "Vigilant Direwolf",
+          "enemy_id": "0x010201",
+          "named_enemy_params_id": 53,
+          "level": 40,
+          "exp": 148,
+          "is_boss": false
+        },
+        {
+          "comment": "Vigilant Direwolf",
+          "enemy_id": "0x010201",
+          "named_enemy_params_id": 53,
+          "level": 40,
+          "exp": 148,
+          "is_boss": false
+        },
+        {
+          "comment": "Vigilant Direwolf",
+          "enemy_id": "0x010201",
+          "named_enemy_params_id": 53,
+          "level": 40,
+          "exp": 148,
+          "is_boss": false
+        },
+        {
+          "comment": "Vigilant Direwolf",
+          "enemy_id": "0x010201",
+          "named_enemy_params_id": 53,
+          "level": 40,
+          "exp": 148,
+          "is_boss": false
         }
       ]
     }

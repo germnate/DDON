@@ -51,7 +51,7 @@
         "id": 114,
         "group_id": 0
       },
-      "starting_index": 7,
+      "placement_type": "manual",
       "enemies": [
         {
           "comment": "Sharp Fang Mist Dragon (Mist Drake)",
@@ -59,7 +59,8 @@
           "named_enemy_params_id": 624,
           "level": 60,
           "exp": 9860,
-          "is_boss": true
+          "is_boss": true,
+          "index": 6
         },
         {
           "comment": "Wicked Clawed White Lion (White Chimera)",
@@ -67,7 +68,8 @@
           "named_enemy_params_id": 625,
           "level": 60,
           "exp": 6162,
-          "is_boss": true
+          "is_boss": true,
+          "index": 8
         }
       ]
     }

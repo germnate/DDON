@@ -51,7 +51,7 @@
         "id": 113,
         "group_id": 6
       },
-      "starting_index": 6,
+      "placement_type": "manual",
       "enemies": [
         {
           "comment": "Brutal Silver Roar",
@@ -59,7 +59,8 @@
           "named_enemy_params_id": 54,
           "level": 41,
           "exp": 3287,
-          "is_boss": true
+          "is_boss": true,
+          "index": 4
         },
         {
           "comment": "Brutal Silver Roar",
@@ -67,7 +68,8 @@
           "named_enemy_params_id": 54,
           "level": 41,
           "exp": 3287,
-          "is_boss": true
+          "is_boss": true,
+          "index": 6
         }
       ]
     }
