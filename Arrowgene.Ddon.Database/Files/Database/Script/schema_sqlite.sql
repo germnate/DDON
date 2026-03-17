@@ -661,7 +661,7 @@ CREATE TABLE IF NOT EXISTS "ddon_pawn_craft_progress"
     "npc_action_id"          INTEGER NOT NULL,
     "item_id"                INTEGER NOT NULL,
     "unk0"                   INTEGER NOT NULL,
-    "remain_time"            INTEGER NOT NULL,
+    "finish_at"              INTEGER NOT NULL,
     "exp_bonus"              BOOLEAN NOT NULL,
     "create_count"           INTEGER NOT NULL,
 
@@ -1096,3 +1096,6 @@ CREATE TABLE IF NOT EXISTS "ddon_bbm_reset_gg"
 
 INSERT INTO "ddon_schedule_next"(type, timestamp)
 VALUES (20, 0);
+
+INSERT INTO "ddon_schedule_next"(type, timestamp)
+VALUES (25, 0);
