@@ -157,7 +157,40 @@
             },
             "placement_type": "manual",
             "enemies": [
-               {
+                {
+                    "comment": "Brutal Shadow Wolf",
+                    "enemy_id": "0x010206",
+                    "start_think_tbl_no": 1,
+                    "named_enemy_params_id": 54,
+                    "level": 56,
+                    "exp": 279,
+                    "repop_count": 1,
+                    "repop_wait_second": 10,
+                    "index": 6
+                },
+                {
+                    "comment": "Brutal Shadow Wolf",
+                    "enemy_id": "0x010206",
+                    "start_think_tbl_no": 1,
+                    "named_enemy_params_id": 54,
+                    "level": 56,
+                    "exp": 279,
+                    "repop_count": 1,
+                    "repop_wait_second": 10,
+                    "index": 7
+                },
+                {
+                    "comment": "Brutal Shadow Wolf",
+                    "enemy_id": "0x010206",
+                    "start_think_tbl_no": 1,
+                    "named_enemy_params_id": 54,
+                    "level": 56,
+                    "exp": 279,
+                    "repop_count": 1,
+                    "repop_wait_second": 10,
+                    "index": 8
+                },
+                {
                     "comment": "Dangerous White Chimera",
                     "enemy_id": "0x015202",
                     "start_think_tbl_no": 1,
@@ -165,39 +198,6 @@
                     "level": 57,
                     "is_boss": true,
                     "exp": 5937,
-                    "index": 0
-                },
-                {
-                    "comment": "Brutal Shadow Wolf",
-                    "enemy_id": "0x010206",
-                    "start_think_tbl_no": 1,
-                    "named_enemy_params_id": 54,
-                    "level": 56,
-                    "exp": 279,
-                    "repop_count": 1,
-                    "repop_wait_second": 10,
-                    "index": 1
-                },
-                {
-                    "comment": "Brutal Shadow Wolf",
-                    "enemy_id": "0x010206",
-                    "start_think_tbl_no": 1,
-                    "named_enemy_params_id": 54,
-                    "level": 56,
-                    "exp": 279,
-                    "repop_count": 1,
-                    "repop_wait_second": 10,
-                    "index": 9
-                },
-                {
-                    "comment": "Brutal Shadow Wolf",
-                    "enemy_id": "0x010206",
-                    "start_think_tbl_no": 1,
-                    "named_enemy_params_id": 54,
-                    "level": 56,
-                    "exp": 279,
-                    "repop_count": 1,
-                    "repop_wait_second": 10,
                     "index": 10
                 }
             ]

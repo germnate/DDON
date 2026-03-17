@@ -50,49 +50,53 @@
                 "id": 169,
                 "group_id": 1
             },
-            "placement_type": "manual",
+            "starting_index": 6,
             "enemies": [
-                {
-                    "comment": "Vigilant Shadow Goblin Fighter",
-                    "enemy_id": "0x011131",
-                    "named_enemy_params_id": 53,
-                    "level": 48,
-                    "exp": 195,
-                    "index": 5
-                },
-                {
-                    "comment": "Vigilant Shadow Goblin Fighter",
-                    "enemy_id": "0x011131",
-                    "named_enemy_params_id": 53,
-                    "level": 48,
-                    "exp": 195,
-                    "index": 6
-                },
-                {
-                    "comment": "Vigilant Shadow Goblin Fighter",
-                    "enemy_id": "0x011131",
-                    "named_enemy_params_id": 53,
-                    "level": 48,
-                    "exp": 195,
-                    "index": 7
-                },
-                {
-                    "comment": "Vigilant Shadow Goblin Fighter",
-                    "enemy_id": "0x011131",
-                    "named_enemy_params_id": 53,
-                    "level": 48,
-                    "exp": 195,
-                    "index": 8
-                },
                 {
                     "comment": "Vigilant Shadow Goblin",
                     "enemy_id": "0x011130",
                     "named_enemy_params_id": 53,
                     "level": 48,
                     "exp": 183,
-                    "repop_count": 2,
-                    "repop_wait_second": 5,
-                    "index": 11
+                    "repop_count": 1,
+                    "repop_wait_second": 10
+                },
+                {
+                    "comment": "Vigilant Shadow Goblin Fighter",
+                    "enemy_id": "0x011131",
+                    "named_enemy_params_id": 53,
+                    "level": 48,
+                    "exp": 195,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
+                },
+                {
+                    "comment": "Vigilant Shadow Goblin Fighter",
+                    "enemy_id": "0x011131",
+                    "named_enemy_params_id": 53,
+                    "level": 48,
+                    "exp": 195
+                },
+                {
+                    "comment": "Vigilant Shadow Goblin Fighter",
+                    "enemy_id": "0x011131",
+                    "named_enemy_params_id": 53,
+                    "level": 48,
+                    "exp": 195
+                },
+                {
+                    "comment": "Vigilant Shadow Goblin",
+                    "enemy_id": "0x011130",
+                    "named_enemy_params_id": 53,
+                    "level": 48,
+                    "exp": 183
+                },
+                {
+                    "comment": "Vigilant Shadow Goblin Fighter",
+                    "enemy_id": "0x011131",
+                    "named_enemy_params_id": 53,
+                    "level": 48,
+                    "exp": 195
                 }
             ]
         }

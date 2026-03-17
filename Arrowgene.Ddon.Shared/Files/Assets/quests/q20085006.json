@@ -59,9 +59,8 @@
         {
             "stage_id": {
                 "id": 1,
-                "group_id": 446
+                "group_id": 460
             },
-            "placement_type": "manual",
             "enemies": [
                 {
                     "comment": "Brutal Behemoth",
@@ -70,8 +69,7 @@
                     "start_think_tbl_no": 1,
                     "level": 55,
                     "exp": 8960,
-                    "is_boss": true,
-                    "index": 1
+                    "is_boss": true
                 }
             ]
         }

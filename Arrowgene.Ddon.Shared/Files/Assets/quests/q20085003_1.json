@@ -50,43 +50,8 @@
                 "id": 1,
                 "group_id": 468
             },
-            "starting_index": 8,
+            "starting_index": 5,
             "enemies": [
-                {
-                    "comment": "Brutal Orc Blitzer",
-                    "enemy_id": "0x015811",
-                    "named_enemy_params_id": 54,
-                    "level": 47,
-                    "exp": 273
-                },
-                {
-                    "comment": "Brutal Orc Blitzer",
-                    "enemy_id": "0x015811",
-                    "named_enemy_params_id": 54,
-                    "level": 47,
-                    "exp": 273
-                },
-                {
-                    "comment": "Brutal Orc Blitzer",
-                    "enemy_id": "0x015811",
-                    "named_enemy_params_id": 54,
-                    "level": 47,
-                    "exp": 273
-                },
-                {
-                    "comment": "Brutal Orc Blitzer",
-                    "enemy_id": "0x015811",
-                    "named_enemy_params_id": 54,
-                    "level": 47,
-                    "exp": 273
-                },
-                {
-                    "comment": "Brutal Orc Blitzer",
-                    "enemy_id": "0x015811",
-                    "named_enemy_params_id": 54,
-                    "level": 47,
-                    "exp": 273
-                },
                 {
                     "comment": "Brutal Orc Captain",
                     "enemy_id": "0x015820",
@@ -95,6 +60,41 @@
                     "exp": 573,
                     "repop_count": 1,
                     "repop_wait_second": 10
+                },
+                {
+                    "comment": "Brutal Orc Blitzer",
+                    "enemy_id": "0x015811",
+                    "named_enemy_params_id": 54,
+                    "level": 47,
+                    "exp": 273
+                },
+                {
+                    "comment": "Brutal Orc Blitzer",
+                    "enemy_id": "0x015811",
+                    "named_enemy_params_id": 54,
+                    "level": 47,
+                    "exp": 273
+                },
+                {
+                    "comment": "Brutal Orc Blitzer",
+                    "enemy_id": "0x015811",
+                    "named_enemy_params_id": 54,
+                    "level": 47,
+                    "exp": 273
+                },
+                {
+                    "comment": "Brutal Orc Blitzer",
+                    "enemy_id": "0x015811",
+                    "named_enemy_params_id": 54,
+                    "level": 47,
+                    "exp": 273
+                },
+                {
+                    "comment": "Brutal Orc Blitzer",
+                    "enemy_id": "0x015811",
+                    "named_enemy_params_id": 54,
+                    "level": 47,
+                    "exp": 273
                 }
             ]
         }

@@ -50,9 +50,18 @@
                 "id": 1,
                 "group_id": 468
             },
-            "starting_index": 8,
+            "starting_index": 5,
             "enemies": [
                 {
+                    "comment": "Dangerous Orc General",
+                    "enemy_id": "0x015830",
+                    "named_enemy_params_id": 56,
+                    "level": 55,
+                    "exp": 1505,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
+                },
+                {
                     "comment": "Dangerous Orc Battler",
                     "enemy_id": "0x015810",
                     "named_enemy_params_id": 56,
@@ -85,18 +94,11 @@
                     "exp": 352
                 },
                 {
-                    "comment": "Dangerous Orc General",
-                    "enemy_id": "0x015830",
+                    "comment": "Dangerous Orc Battler",
+                    "enemy_id": "0x015810",
                     "named_enemy_params_id": 56,
                     "level": 55,
-                    "exp": 1505
-                },
-                {
-                    "comment": "Dangerous Orc General",
-                    "enemy_id": "0x015830",
-                    "named_enemy_params_id": 56,
-                    "level": 55,
-                    "exp": 1505
+                    "exp": 352
                 }
             ]
         }

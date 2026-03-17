@@ -60,9 +60,8 @@
         {
             "stage_id": {
                 "id": 1,
-                "group_id": 446
+                "group_id": 460
             },
-            "placement_type": "manual",
             "enemies": [
                 {
                     "comment": "Dangerous Drake",
@@ -71,8 +70,7 @@
                     "start_think_tbl_no": 1,
                     "level": 60,
                     "exp": 9860,
-                    "is_boss": true,
-                    "index": 1
+                    "is_boss": true
                 }
             ]
         }

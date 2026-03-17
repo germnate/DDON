@@ -53,6 +53,15 @@
             "placement_type": "manual",
             "enemies": [
                 {
+                    "comment": "Dangerous Empress Ghost",
+                    "enemy_id": "0x015605",
+                    "named_enemy_params_id": 56,
+                    "level": 50,
+                    "exp": 3840,
+                    "is_boss": true,
+                    "index": 2
+                },
+                {
                     "comment": "Brutal Ghost Mail",
                     "enemy_id": "0x010311",
                     "named_enemy_params_id": 54,
@@ -75,15 +84,6 @@
                     "level": 50,
                     "exp": 600,
                     "index": 10
-                },
-                {
-                    "comment": "Dangerous Empress Ghost",
-                    "enemy_id": "0x015605",
-                    "named_enemy_params_id": 56,
-                    "level": 50,
-                    "exp": 3840,
-                    "is_boss": true,
-                    "index": 2
                 }
             ]
         }

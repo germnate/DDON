@@ -50,7 +50,6 @@
                 "id": 1,
                 "group_id": 459
             },
-            "placement_type": "manual",
             "enemies": [
                 {
                     "comment": "Glossy Black Griffin (Black Griffin)",
@@ -59,8 +58,7 @@
                     "start_think_tbl_no": 1,
                     "level": 57,
                     "exp": 5959,
-                    "is_boss": true,
-                    "index": 6
+                    "is_boss": true
                 }
             ]
         }
@@ -79,6 +77,8 @@
         {
             "type": "SeekOutEnemiesAtMarkedLocation",
             "announce_type": "Accept",
+            "spawn_time_start": "18 * 3600000 + 0 * 60000",
+            "spawn_time_end": "6 * 3600000 + 59 * 60000",
             "result_commands": [
                 {
                     "comment": "Idle dialogue",
