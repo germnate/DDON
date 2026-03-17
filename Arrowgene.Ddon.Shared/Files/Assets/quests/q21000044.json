@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "VoldenMines",
+  "order_conditions": [ { "type": "AreaRank", "Param1": 4, "Param2": 13 } ],
   "rewards": [
     {
       "type": "exp",
@@ -28,7 +29,7 @@
         {
           "comment": "Volden Quality Coal",
           "item_id": 11770,
-          "num": 1
+          "num": 3
         },
         {
           "comment": "Iron Ore Fragment",
@@ -79,13 +80,6 @@
           "enemy_id": "0x010309",
           "level": 63,
           "exp": 756,
-          "index": 8
-        },
-        {
-          "comment": "Skeleton Sorcerer",
-          "enemy_id": "0x010309",
-          "level": 63,
-          "exp": 756,
           "index": 9
         },
         {
@@ -115,6 +109,13 @@
           "level": 63,
           "exp": 756,
           "index": 13
+        },
+        {
+          "comment": "Skeleton Sorcerer",
+          "enemy_id": "0x010309",
+          "level": 63,
+          "exp": 756,
+          "index": 14
         }
       ]
     }

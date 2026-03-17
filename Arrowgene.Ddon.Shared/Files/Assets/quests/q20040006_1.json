@@ -53,6 +53,28 @@
       },
       "enemies": [
         {
+          "comment": "Vigilant Rogue Hunter",
+          "enemy_id": "0x011002",
+          "named_enemy_params_id": 53,
+          "level": 30,
+          "exp": 134,
+          "is_boss": false,
+          "hm_present_no": 47,
+          "repop_count": 2,
+          "repop_wait_second": 5
+        },
+        {
+          "comment": "Vigilant Rogue Hunter",
+          "enemy_id": "0x011002",
+          "named_enemy_params_id": 53,
+          "level": 30,
+          "exp": 134,
+          "is_boss": false,
+          "hm_present_no": 47,
+          "repop_count": 2,
+          "repop_wait_second": 5
+        },
+        {
           "comment": "Vigilant Rogue Defender",
           "enemy_id": "0x011004",
           "named_enemy_params_id": 53,
@@ -79,28 +101,6 @@
           "is_boss": false,
           "hm_present_no": 49,
           "repop_count": 1,
-          "repop_wait_second": 5
-        },
-        {
-          "comment": "Vigilant Rogue Hunter",
-          "enemy_id": "0x011002",
-          "named_enemy_params_id": 53,
-          "level": 30,
-          "exp": 134,
-          "is_boss": false,
-          "hm_present_no": 47,
-          "repop_count": 2,
-          "repop_wait_second": 5
-        },
-        {
-          "comment": "Vigilant Rogue Hunter",
-          "enemy_id": "0x011002",
-          "named_enemy_params_id": 53,
-          "level": 30,
-          "exp": 134,
-          "is_boss": false,
-          "hm_present_no": 47,
-          "repop_count": 2,
           "repop_wait_second": 5
         }
       ]
