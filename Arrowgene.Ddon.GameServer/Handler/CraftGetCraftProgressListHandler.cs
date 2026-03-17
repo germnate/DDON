@@ -74,7 +74,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         ItemId = craftProgress.ItemId,
                         ToppingId = 0,
                         AdditionalStatusId = craftProgress.AdditionalStatusId,
-                        FinishAt = displayTime,
+                        RemainTime = displayTime,
                         ExpBonus = craftProgress.ExpBonus,
                         CreateCount = craftProgress.CreateCount,
                     };

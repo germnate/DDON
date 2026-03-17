@@ -34,7 +34,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
         public ushort AdditionalStatusId { get; set; }
 
         /// Remaining time in seconds
-        public uint FinishAt { get; set; }
+        public uint RemainTime { get; set; }
 
         /// Determines whether GG-based bonus is active
         public bool ExpBonus { get; set; }
@@ -53,7 +53,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
                 WriteUInt32(buffer, obj.ItemId);
                 WriteUInt32(buffer, obj.ToppingId);
                 WriteUInt16(buffer, obj.AdditionalStatusId);
-                WriteUInt32(buffer, obj.FinishAt);
+                WriteUInt32(buffer, obj.RemainTime);
                 WriteBool(buffer, obj.ExpBonus);
                 WriteUInt32(buffer, obj.CreateCount);
             }
@@ -70,7 +70,7 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
                 obj.ItemId = ReadUInt32(buffer);
                 obj.ToppingId = ReadUInt32(buffer);
                 obj.AdditionalStatusId = ReadUInt16(buffer);
-                obj.FinishAt = ReadUInt32(buffer);
+                obj.RemainTime = ReadUInt32(buffer);
                 obj.ExpBonus = ReadBool(buffer);
                 obj.CreateCount = ReadUInt32(buffer);
                 return obj;
