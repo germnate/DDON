@@ -58,19 +58,17 @@
           "enemy_id": "0x011160",
           "named_enemy_params_id": 54,
           "level": 46,
-          "exp": 472,
+          "exp": 236,
           "repop_count": 1,
           "repop_wait_time": 10,
           "index": 3
         },
         {
-          "comment": "Brutal Shadow Sling Goblin",
-          "enemy_id": "0x011132",
+          "comment": "Brutal Shadow Goblin Leader",
+          "enemy_id": "0x011160",
           "named_enemy_params_id": 54,
           "level": 46,
-          "exp": 390,
-          "repop_count": 2,
-          "repop_wait_time": 10,
+          "exp": 236,
           "index": 4
         },
         {
@@ -78,17 +76,19 @@
           "enemy_id": "0x011132",
           "named_enemy_params_id": 54,
           "level": 46,
-          "exp": 390,
-          "repop_count": 3,
+          "exp": 195,
+          "repop_count": 1,
           "repop_wait_time": 10,
           "index": 5
         },
         {
-          "comment": "Brutal Shadow Goblin Leader",
-          "enemy_id": "0x011160",
+          "comment": "Brutal Shadow Sling Goblin",
+          "enemy_id": "0x011132",
           "named_enemy_params_id": 54,
           "level": 46,
-          "exp": 472,
+          "exp": 195,
+          "repop_count": 2,
+          "repop_wait_time": 10,
           "index": 9
         }
       ]
@@ -112,7 +112,7 @@
         {
           "comment": "Idle dialogue",
           "type": "QstTalkChg",
-          "Param1": 522,
+          "Param1": 4503,
           "Param2": 13303
         }
       ],

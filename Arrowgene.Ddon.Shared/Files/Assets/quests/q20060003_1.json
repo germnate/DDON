@@ -64,8 +64,8 @@
           "index": 3
         },
         {
-          "comment": "Brutal Sling Redcap",
-          "enemy_id": "0x011112",
+          "comment": "Brutal Redcap Fighter",
+          "enemy_id": "0x011111",
           "named_enemy_params_id": 54,
           "level": 41,
           "exp": 166,
@@ -84,8 +84,8 @@
           "index": 5
         },
         {
-          "comment": "Brutal Redcap Fighter",
-          "enemy_id": "0x011111",
+          "comment": "Brutal Sling Redcap",
+          "enemy_id": "0x011112",
           "named_enemy_params_id": 54,
           "level": 41,
           "exp": 166,
@@ -114,7 +114,7 @@
         {
           "comment": "Idle dialogue",
           "type": "QstTalkChg",
-          "Param1": 522,
+          "Param1": 4503,
           "Param2": 13303
         }
       ],

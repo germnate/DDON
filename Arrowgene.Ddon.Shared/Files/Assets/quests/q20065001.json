@@ -27,14 +27,17 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Ruby",
           "item_id": 7900,
           "num": 2
         },
         {
+          "comment": "Sprite's Talisman",
           "item_id": 9390,
           "num": 1
         },
         {
+          "comment": "Three-Herb Salad",
           "item_id": 9410,
           "num": 2
         }
@@ -45,13 +48,16 @@
     {
       "stage_id": {
         "id": 112,
-        "group_id": 4
+        "group_id": 1
       },
+      "starting_index": 2,
       "enemies": [
         {
+          "comment": "Brutal Ent",
           "enemy_id": "0x015031",
+          "named_enemy_params_id": 54,
           "level": 40,
-          "exp": 12000,
+          "exp": 3380,
           "is_boss": true
         }
       ]

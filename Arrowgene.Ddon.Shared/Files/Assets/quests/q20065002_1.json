@@ -1,44 +1,45 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Unbidden Guest",
+  "comment": "The Unbidden Guest (II)",
   "quest_id": 20065002,
-  "base_level": 35,
+  "base_level": 55,
   "minimum_item_rank": 0,
   "discoverable": false,
   "area_id": "MysreeGrove",
   "news_image": 564,
+  "variant_index": 1,
   "rewards": [
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 960
+      "amount": 1510
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 150
+      "amount": 240
     },
     {
       "type": "exp",
-      "amount": 1150
+      "amount": 1510
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Soldier Arms",
-          "item_id": 711,
+          "comment": "Sand of Reminiscence",
+          "item_id": 9441,
           "num": 1
         },
         {
-          "comment": "Refreshing Remedy",
-          "item_id": 9375,
-          "num": 3
+          "comment": "Demonic Gem",
+          "item_id": 7911,
+          "num": 1
         },
         {
-          "comment": "Three-Herb Salad",
-          "item_id": 9410,
+          "comment": "Cracked Black Horn",
+          "item_id": 7753,
           "num": 2
         }
       ]
@@ -53,36 +54,36 @@
       "starting_index": 5,
       "enemies": [
         {
-          "comment": "Vigilant Giant Sulfur Saurian",
-          "enemy_id": "0x010411",
-          "named_enemy_params_id": 53,
-          "level": 35,
-          "exp": 201,
+          "comment": "Shadow Goblin",
+          "enemy_id": "0x011130",
+          "level": 55,
+          "exp": 223,
           "repop_count": 1,
           "repop_wait_second": 10
         },
         {
-          "comment": "Vigilant Giant Sulfur Saurian",
-          "enemy_id": "0x010411",
-          "named_enemy_params_id": 53,
-          "level": 35,
-          "exp": 201,
+          "comment": "Shadow Goblin",
+          "enemy_id": "0x011130",
+          "level": 55,
+          "exp": 223,
           "repop_count": 1,
           "repop_wait_second": 10
         },
         {
-          "comment": "Vigilant Giant Sulfur Saurian",
-          "enemy_id": "0x010411",
-          "named_enemy_params_id": 53,
-          "level": 35,
-          "exp": 201
+          "comment": "Shadow Goblin",
+          "enemy_id": "0x011130",
+          "level": 55,
+          "exp": 223,
+          "repop_count": 1,
+          "repop_wait_second": 10
         },
         {
-          "comment": "Vigilant Giant Sulfur Saurian",
-          "enemy_id": "0x010411",
-          "named_enemy_params_id": 53,
-          "level": 35,
-          "exp": 201
+          "comment": "Shadow Goblin",
+          "enemy_id": "0x011130",
+          "level": 55,
+          "exp": 223,
+          "repop_count": 1,
+          "repop_wait_second": 10
         }
       ]
     }
