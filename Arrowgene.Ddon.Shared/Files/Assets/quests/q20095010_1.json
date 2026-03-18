@@ -1,44 +1,45 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "A Clash With the Orc Elite Corps",
+    "comment": "A Clash With the Orc Elite Corps (II)",
     "quest_id": 20095010,
-    "base_level": 48,
+    "base_level": 50,
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "ZandoraWastelands",
+    "variant_index": 1,
     "rewards": [
         {
             "type": "wallet",
             "wallet_type": "Gold",
-            "amount": 1320
+            "amount": 1370
         },
         {
             "type": "wallet",
             "wallet_type": "RiftPoints",
-            "amount": 210
+            "amount": 220
         },
         {
             "type": "exp",
-            "amount": 1320
+            "amount": 1370
         },
         {
             "type": "select",
             "loot_pool": [
                 {
-                    "comment": "Crest of Holy Drain Prevention",
-                    "item_id": 9324,
-                    "num": 1
+                    "comment": "Mithril Ore",
+                    "item_id": 7862,
+                    "num": 3
                 },
                 {
-                    "comment": "Crest of Blind Prevention",
-                    "item_id": 9327,
-                    "num": 1
+                    "comment": "Orc's War Tusk",
+                    "item_id": 7761,
+                    "num": 3
                 },
                 {
-                    "comment": "Panacea",
-                    "item_id": 41,
-                    "num": 1
+                    "comment": "Orc Decoration",
+                    "item_id": 8020,
+                    "num": 2
                 }
             ]
         },
@@ -62,46 +63,52 @@
             },
             "enemies": [
                 {
-                    "comment": "Brutal Orc General",
+                    "comment": "Dangerous Orc General",
                     "enemy_id": "0x015830",
-                    "named_enemy_params_id": 54,
-                    "level": 48,
-                    "exp": 1358
+                    "named_enemy_params_id": 56,
+                    "level": 50,
+                    "exp": 1400,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 },
                 {
-                    "comment": "Brutal Orc Battler",
-                    "enemy_id": "0x015810",
+                    "comment": "Brutal Orc Blitzer",
+                    "enemy_id": "0x015811",
                     "named_enemy_params_id": 54,
-                    "level": 48,
-                    "exp": 251
+                    "level": 50,
+                    "exp": 292,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 },
                 {
-                    "comment": "Brutal Orc Battler",
-                    "enemy_id": "0x015810",
+                    "comment": "Brutal Orc Blitzer",
+                    "enemy_id": "0x015811",
                     "named_enemy_params_id": 54,
-                    "level": 48,
-                    "exp": 251
+                    "level": 50,
+                    "exp": 292,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 },
                 {
-                    "comment": "Brutal Orc Battler",
-                    "enemy_id": "0x015810",
+                    "comment": "Brutal Orc Blitzer",
+                    "enemy_id": "0x015811",
                     "named_enemy_params_id": 54,
-                    "level": 48,
-                    "exp": 251
+                    "level": 50,
+                    "exp": 292
                 },
                 {
-                    "comment": "Brutal Orc Battler",
-                    "enemy_id": "0x015810",
+                    "comment": "Brutal Orc Blitzer",
+                    "enemy_id": "0x015811",
                     "named_enemy_params_id": 54,
-                    "level": 48,
-                    "exp": 251
+                    "level": 50,
+                    "exp": 292
                 },
                 {
-                    "comment": "Brutal Orc Battler",
-                    "enemy_id": "0x015810",
+                    "comment": "Brutal Orc Blitzer",
+                    "enemy_id": "0x015811",
                     "named_enemy_params_id": 54,
-                    "level": 48,
-                    "exp": 251
+                    "level": 50,
+                    "exp": 292
                 }
             ]
         }

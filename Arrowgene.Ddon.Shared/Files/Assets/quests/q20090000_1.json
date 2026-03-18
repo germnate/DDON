@@ -1,26 +1,27 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "The Dead City's Chronicles",
+    "comment": "The Dead City's Chronicles (II)",
     "quest_id": 20090000,
-    "base_level": 49,
+    "base_level": 50,
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "ZandoraWastelands",
+    "variant_index": 1,
     "rewards": [
         {
             "type": "exp",
-            "amount": 1880
+            "amount": 2500
         },
         {
             "type": "wallet",
             "wallet_type": "Gold",
-            "amount": 1340
+            "amount": 1650
         },
         {
             "type": "wallet",
             "wallet_type": "RiftPoints",
-            "amount": 210
+            "amount": 280
         },
         {
             "type": "select",
@@ -49,7 +50,7 @@
                 "id": 77,
                 "group_id": 23
             },
-            "starting_index": 8,
+            "placement_type": "manual",
             "enemies": [
                 {
                     "comment": "Vigilant Shadow Harpy",
@@ -59,17 +60,8 @@
                     "level": 49,
                     "exp": 222,
                     "repop_count": 2,
-                    "repop_wait_second": 10
-                },
-                {
-                    "comment": "Vigilant Shadow Goblin",
-                    "enemy_id": "0x011130",
-                    "named_enemy_params_id": 53,
-                    "start_think_tbl_no": 1,
-                    "level": 49,
-                    "exp": 204,
-                    "repop_count": 1,
-                    "repop_wait_second": 10
+                    "repop_wait_second": 10,
+                    "index": 8
                 },
                 {
                     "comment": "Vigilant Shadow Harpy",
@@ -79,17 +71,17 @@
                     "level": 49,
                     "exp": 222,
                     "repop_count": 2,
-                    "repop_wait_second": 10
+                    "repop_wait_second": 10,
+                    "index": 10
                 },
                 {
-                    "comment": "Vigilant Shadow Goblin",
-                    "enemy_id": "0x011130",
-                    "named_enemy_params_id": 53,
-                    "start_think_tbl_no": 1,
-                    "level": 49,
-                    "exp": 204,
-                    "repop_count": 1,
-                    "repop_wait_second": 10
+                    "comment": "Brutal Shadow Chimera",
+                    "enemy_id": "0x015203",
+                    "named_enemy_params_id": 54,
+                    "level": 50,
+                    "exp": 5110,
+                    "is_boss": true,
+                    "index": 11
                 }
             ]
         }
@@ -110,7 +102,7 @@
                     "comment": "Idle dialogue - Plum",
                     "type": "QstTalkChg",
                     "Param1": 500,
-                    "Param2": 8729
+                    "Param2": 8730
                }
            ],
             "stage_id": {

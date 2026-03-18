@@ -50,6 +50,7 @@
         "id": 1,
         "group_id": 423
       },
+      "starting_index": 1,
       "enemies": [
         {
           "comment": "Bounty Geo Golem",

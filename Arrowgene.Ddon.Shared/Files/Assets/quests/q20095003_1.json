@@ -1,17 +1,18 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "The Sinister Beasts",
+    "comment": "The Sinister Beasts (II)",
     "quest_id": 20095003,
-    "base_level": 48,
+    "base_level": 49,
     "minimum_item_rank": 0,
     "discoverable": false,
     "area_id": "ZandoraWastelands",
+    "variant_index": 1,
     "rewards": [
         {
             "type": "wallet",
             "wallet_type": "Gold",
-            "amount": 1050
+            "amount": 1070
         },
         {
             "type": "wallet",
@@ -20,7 +21,7 @@
         },
         {
             "type": "exp",
-            "amount": 1320
+            "amount": 1340
         },
         {
             "type": "select",
@@ -31,14 +32,14 @@
                     "num": 2
                 },
                 {
-                    "comment": "Strong Gala Extract",
-                    "item_id": 9363,
+                    "comment": "Enhanced Lockpick",
+                    "item_id": 9403,
                     "num": 3
                 },
                 {
-                    "comment": "Panacea",
-                    "item_id": 41,
-                    "num": 1
+                    "comment": "Enhanced Lumber Knife",
+                    "item_id": 9402,
+                    "num": 3
                 }
             ]
         }
@@ -55,8 +56,8 @@
                     "comment": "Brutal Shadow Wolf",
                     "enemy_id": "0x010206",
                     "named_enemy_params_id": 54,
-                    "level": 48,
-                    "exp": 248,
+                    "level": 49,
+                    "exp": 252,
                     "repop_count": 1,
                     "repop_wait_second": 10
                 },
@@ -64,35 +65,35 @@
                     "comment": "Brutal Shadow Wolf",
                     "enemy_id": "0x010206",
                     "named_enemy_params_id": 54,
-                    "level": 48,
-                    "exp": 248,
+                    "level": 49,
+                    "exp": 252,
                     "repop_count": 1,
                     "repop_wait_second": 10
                 },
                 {
-                    "comment": "Brutal Shadow Goblin",
-                    "enemy_id": "0x011130",
+                    "comment": "Brutal Shadow Goblin Fighter",
+                    "enemy_id": "0x011131",
                     "named_enemy_params_id": 54,
-                    "level": 48,
-                    "exp": 201,
+                    "level": 49,
+                    "exp": 204,
                     "repop_count": 1,
                     "repop_wait_second": 10
                 },
                 {
-                    "comment": "Brutal Shadow Goblin",
-                    "enemy_id": "0x011130",
+                    "comment": "Brutal Shadow Goblin Fighter",
+                    "enemy_id": "0x011131",
                     "named_enemy_params_id": 54,
-                    "level": 48,
-                    "exp": 201,
+                    "level": 49,
+                    "exp": 204,
                     "repop_count": 1,
                     "repop_wait_second": 10
                 },
                 {
-                    "comment": "Brutal Shadow Goblin",
-                    "enemy_id": "0x011130",
+                    "comment": "Brutal Shadow Goblin Fighter",
+                    "enemy_id": "0x011131",
                     "named_enemy_params_id": 54,
-                    "level": 48,
-                    "exp": 201,
+                    "level": 49,
+                    "exp": 204,
                     "repop_count": 1,
                     "repop_wait_second": 10
                 }
