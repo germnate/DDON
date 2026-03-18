@@ -1,45 +1,46 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Inias Monster",
+  "comment": "The Inias Monster (II)",
   "quest_id": 20060001,
-  "base_level": 36,
+  "base_level": 43,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "MysreeGrove",
   "news_image": 124,
+  "variant_index": 1,
   "rewards": [
     {
       "type": "exp",
-      "amount": 1660
+      "amount": 1980
     },
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1180
+      "amount": 1410
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 230
+      "amount": 280
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Crest of Electrocution",
+          "comment": "Bluish Gray Dragonscale",
+          "item_id": 7932,
+          "num": 1
+        },
+        {
+          "comment": "Crest of Electroction",
           "item_id": 9262,
           "num": 1
         },
         {
-          "comment": "Superior Quality Gala Extract",
-          "item_id": 9362,
-          "num": 3
-        },
-        {
-          "comment": "Special Mushroom Dip",
-          "item_id": 9419,
-          "num": 2
+          "comment": "Demon's Talisman",
+          "item_id": 9389,
+          "num": 1
         }
       ]
     }
@@ -55,8 +56,8 @@
           "comment": "Brutal Lindwurm",
           "enemy_id": "0x015707",
           "named_enemy_params_id": 54,
-          "level": 36,
-          "exp": 6466,
+          "level": 43,
+          "exp": 7208,
           "is_boss": true
         }
       ]

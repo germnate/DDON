@@ -1,45 +1,46 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Inias Monster",
+  "comment": "The Inias Monster (Bounty)",
   "quest_id": 20060001,
-  "base_level": 36,
+  "base_level": 43,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "MysreeGrove",
   "news_image": 124,
+  "variant_index": 2,
   "rewards": [
     {
       "type": "exp",
-      "amount": 1660
+      "amount": 3970
     },
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1180
+      "amount": 2830
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 230
+      "amount": 280
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Crest of Electrocution",
-          "item_id": 9262,
-          "num": 1
-        },
-        {
-          "comment": "Superior Quality Gala Extract",
-          "item_id": 9362,
+          "comment": "Superior Healing Elixir",
+          "item_id": 7553,
           "num": 3
         },
         {
-          "comment": "Special Mushroom Dip",
-          "item_id": 9419,
-          "num": 2
+          "comment": "Enhanced Lockpick",
+          "item_id": 9403,
+          "num": 3
+        },
+        {
+          "comment": "Conqueror's Talisman",
+          "item_id": 9387,
+          "num": 1
         }
       ]
     }
@@ -52,11 +53,11 @@
       },
       "enemies": [
         {
-          "comment": "Brutal Lindwurm",
+          "comment": "Bounty Lindwurm",
           "enemy_id": "0x015707",
-          "named_enemy_params_id": 54,
-          "level": 36,
-          "exp": 6466,
+          "named_enemy_params_id": 512,
+          "level": 43,
+          "exp": 7208,
           "is_boss": true
         }
       ]
