@@ -1,12 +1,13 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "The Fiery Titan",
+    "comment": "The Fiery Titan (II)",
     "quest_id": 20095000,
     "base_level": 49,
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "ZandoraWastelands",
+    "variant_index": 1,
     "rewards": [
         {
             "type": "wallet",
@@ -26,30 +27,19 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "comment": "Crest of Burn Prevention",
-                    "item_id": 9315,
+                    "comment": "Black Iron Ingot",
+                    "item_id": 7878,
                     "num": 1
                 },
                 {
-                    "comment": "Crest of Freeze Prevention",
-                    "item_id": 9318,
-                    "num": 1
+                    "comment": "Chipped Gold Lump",
+                    "item_id": 8025,
+                    "num": 2
                 },
                 {
-                    "comment": "Crest of Shock Prevention",
-                    "item_id": 9321,
-                    "num": 1
-                }
-            ]
-        },
-        {
-            "type": "random",
-            "loot_pool": [
-                {
-                    "comment": "Healing Potion",
-                    "item_id": 34,
-                    "num": 9,
-                    "chance": 1.0
+                    "comment": "Enhanced Lockpick",
+                    "item_id": 9403,
+                    "num": 3
                 }
             ]
         }
@@ -62,11 +52,11 @@
             },
             "enemies": [
                 {
-                    "comment": "Brutal Geo Golem",
-                    "enemy_id": "0x015104",
+                    "comment": "Brutal Damned Golem",
+                    "enemy_id": "0x015103",
                     "named_enemy_params_id": 54,
                     "level": 49,
-                    "exp": 4736,
+                    "exp": 4617,
                     "is_boss": true
                 }
             ]

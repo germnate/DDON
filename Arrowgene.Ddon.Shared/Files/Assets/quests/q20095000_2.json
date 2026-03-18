@@ -1,55 +1,45 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "The Fiery Titan",
+    "comment": "The Fiery Titan (III)",
     "quest_id": 20095000,
-    "base_level": 49,
+    "base_level": 56,
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "ZandoraWastelands",
+    "variant_index": 2,
     "rewards": [
         {
             "type": "wallet",
             "wallet_type": "Gold",
-            "amount": 1610
+            "amount": 1840
         },
         {
             "type": "wallet",
             "wallet_type": "RiftPoints",
-            "amount": 250
+            "amount": 290
         },
         {
             "type": "exp",
-            "amount": 2260
+            "amount": 2580
         },
         {
             "type": "select",
             "loot_pool": [
                 {
-                    "comment": "Crest of Burn Prevention",
-                    "item_id": 9315,
+                    "comment": "Alchemite",
+                    "item_id": 7871,
                     "num": 1
                 },
                 {
-                    "comment": "Crest of Freeze Prevention",
-                    "item_id": 9318,
+                    "comment": "Dirty Sheet Metal",
+                    "item_id": 8029,
                     "num": 1
                 },
                 {
-                    "comment": "Crest of Shock Prevention",
-                    "item_id": 9321,
-                    "num": 1
-                }
-            ]
-        },
-        {
-            "type": "random",
-            "loot_pool": [
-                {
-                    "comment": "Healing Potion",
-                    "item_id": 34,
-                    "num": 9,
-                    "chance": 1.0
+                    "comment": "Chipped Gold Lump",
+                    "item_id": 8025,
+                    "num": 3
                 }
             ]
         }
@@ -62,11 +52,11 @@
             },
             "enemies": [
                 {
-                    "comment": "Brutal Geo Golem",
-                    "enemy_id": "0x015104",
-                    "named_enemy_params_id": 54,
-                    "level": 49,
-                    "exp": 4736,
+                    "comment": "Dangerous Damned Golem",
+                    "enemy_id": "0x015103",
+                    "named_enemy_params_id": 56,
+                    "level": 56,
+                    "exp": 5054,
                     "is_boss": true
                 }
             ]

@@ -1,14 +1,14 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "The Accursed Wanderer",
+    "comment": "The Accursed Wanderer (Twelve Calamities II)",
     "quest_id": 20095007,
     "base_level": 60,
     "minimum_item_rank": 0,
     "discoverable": true,
-    "area_id": "ZandoraWastelands",	
+    "area_id": "ZandoraWastelands",
     "news_image": 183,
-	"variant_index": 2,
+    "variant_index": 2,
     "rewards": [
         {
             "type": "exp",
@@ -28,118 +28,202 @@
             "type": "select",
             "loot_pool": [
                 {
+                    "comment": "Crest of Crystallization",
                     "item_id": 9254,
                     "num": 1
                 },
                 {
+                    "comment": "Cockatrice Gastrolith",
                     "item_id": 9440,
                     "num": 1
                 },
                 {
+                    "comment": "Giant Single Pelt",
                     "item_id": 9438,
-                    "num": 1					
-                },
-                {
-                    "item_id": 11740,
                     "num": 1
-                },
-                {
-                    "item_id": 11741,
-                    "num": 1					
-                },
-                {
-                    "item_id": 13812,
-                    "num": 1					
                 }
             ]
-          },
+        },
+        {
+            "type": "random",
+            "loot_pool": [
                 {
-                    "type": "random",
-                    "loot_pool": [
-                      {
-                        "item_id": 7554,
-                        "num": 1,
-                        "chance": 0.6
-                      },
-                      {
-                        "item_id": 41,
-                        "num": 1,
-                        "chance": 0.6
-                      }
-                    ]
-                  }
-                ],
+                    "comment": "Healing Remedy",
+                    "item_id": 7554,
+                    "num": 1,
+                    "chance": 0.6
+                },
+                {
+                    "comment": "Panacea",
+                    "item_id": 41,
+                    "num": 1,
+                    "chance": 0.6
+                }
+            ]
+        }
+    ],
     "enemy_groups" : [
         {
             "stage_id": {
                 "id": 1,
                 "group_id": 391
             },
-            "placement_type": "manual",
+            "starting_index": 6,
             "enemies": [
-                
-        {
+                {
+                    "comment": "One-Eyed Tyrant (Cyclops)",
                     "enemy_id": "0x015000",
                     "start_think_tbl_no": 1,
                     "named_enemy_params_id": 623,
                     "level": 60,
-                    "exp": 34700,
-                    "is_boss": true,
-                    "index": 0
+                    "exp": 4080,
+                    "is_boss": true
+                }
+            ]
         },
         {
-                    "enemy_id": "0x015000",
-                    "start_think_tbl_no": 1,
-                    "named_enemy_params_id": 623,
-                    "level": 60,
-                    "exp": 34700,
-                    "is_boss": true,
-                    "index": 1					
-                },
+            "stage_id": {
+                "id": 1,
+                "group_id": 393
+            },
+            "starting_index": 3,
+            "enemies": [
                 {
+                    "comment": "Petrifying Demon Cockerel (Cockatrice)",
                     "enemy_id": "0x015301",
                     "start_think_tbl_no": 1,
-                    "named_enemy_params_id": 622,
+                    "named_enemy_params_id": 522,
                     "level": 60,
-                    "exp": 34700,
-                    "is_boss": true,
-                    "index": 2
-        }
+                    "exp": 6310,
+                    "is_boss": true
+                }
+            ]
+        },
+        {
+            "stage_id": {
+                "id": 1,
+                "group_id": 374
+            },
+            "starting_index": 1,
+            "enemies": [
+                {
+                    "comment": "One-Eyed Tyrant (Cyclops)",
+                    "enemy_id": "0x015000",
+                    "start_think_tbl_no": 1,
+                    "named_enemy_params_id": 623,
+                    "level": 60,
+                    "exp": 4080,
+                    "is_boss": true
+                }
             ]
         }
-    ],	
-    "blocks": [
+    ],
+    "processes": [
         {
-            "type": "NpcTalkAndOrder",
-            "stage_id": {
-                "id": 55,
-                "group_id": 1,
-                "layer_no": 1
-            },
-            "npc_id": "Bayard",
-            "message_id": 11372
+            "blocks": [
+                {
+                    "type": "NpcTalkAndOrder",
+                    "stage_id": {
+                        "id": 55
+                    },
+                    "npc_id": "Bayard",
+                    "message_id": 16105
+                },
+                {
+                    "type": "MyQstFlags",
+                    "announce_type": "Accept",
+                    "result_commands": [
+                        {
+                            "comment": "Idle dialogue",
+                            "type": "QstTalkChg",
+                            "Param1": 4504,
+                            "Param2": 16106
+                        }
+                    ],
+                    "set_flags": [0],
+                    "check_flags": [1]
+                },
+                {
+                    "type": "MyQstFlags",
+                    "announce_type": "Update",
+                    "check_flags": [2, 3, 4]
+                },
+                {
+                    "type": "TalkToNpc",
+                    "stage_id": {
+                        "id": 55
+                    },
+                    "announce_type": "Update",
+                    "npc_id": "Bayard",
+                    "message_id": 16107
+                }
+            ]
         },
         {
-            "type": "SeekOutEnemiesAtMarkedLocation",
-            "announce_type": "Accept",
-            "groups": [0]
+            "blocks": [
+                {
+                    "type": "MyQstFlags",
+                    "check_flags": [ 0 ]
+                },
+                {
+                    "type": "SeekOutEnemiesAtMarkedLocation",
+                    "groups": [0]
+                },
+                {
+                    "type": "KillGroup",
+                    "result_commands": [{ "type": "MyQstFlagOn", "Param1": 1 }],
+                    "reset_group": false,
+                    "groups": [0]
+                },
+                {
+                    "type": "MyQstFlags",
+                    "set_flags": [ 2 ]
+                }
+            ]
         },
         {
-            "type": "KillGroup",
-            "announce_type": "Update",
-            "reset_group": false,
-            "groups": [0]
+            "blocks": [
+                {
+                    "type": "MyQstFlags",
+                    "check_flags": [ 0 ]
+                },
+                {
+                    "type": "SeekOutEnemiesAtMarkedLocation",
+                    "groups": [1]
+                },
+                {
+                    "type": "KillGroup",
+                    "result_commands": [{ "type": "MyQstFlagOn", "Param1": 1 }],
+                    "reset_group": false,
+                    "groups": [1]
+                },
+                {
+                    "type": "MyQstFlags",
+                    "set_flags": [ 3 ]
+                }
+            ]
         },
-        {		
-            "type": "TalkToNpc",
-            "stage_id": {
-                "id": 55,
-                "group_id": 1,
-                "layer_no": 1
-            },
-            "announce_type": "Update",
-            "npc_id": "Bayard",
-            "message_id": 11842
+        {
+            "blocks": [
+                {
+                    "type": "MyQstFlags",
+                    "check_flags": [ 0 ]
+                },
+                {
+                    "type": "SeekOutEnemiesAtMarkedLocation",
+                    "groups": [2]
+                },
+                {
+                    "type": "KillGroup",
+                    "result_commands": [{ "type": "MyQstFlagOn", "Param1": 1 }],
+                    "reset_group": false,
+                    "groups": [2]
+                },
+                {
+                    "type": "MyQstFlags",
+                    "set_flags": [ 4 ]
+                }
+            ]
         }
     ]
 }
