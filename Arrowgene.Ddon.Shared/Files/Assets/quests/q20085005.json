@@ -76,6 +76,8 @@
         {
             "type": "SeekOutEnemiesAtMarkedLocation",
             "announce_type": "Accept",
+            "spawn_time_start": "18 * 3600000 + 0 * 60000",
+            "spawn_time_end": "6 * 3600000 + 59 * 60000",
             "result_commands": [
                 {
                     "comment": "Idle dialogue",

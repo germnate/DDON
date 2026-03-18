@@ -124,7 +124,7 @@
                     "comment": "Brutal Cyclops",
                     "enemy_id": "0x015000",
                     "start_think_tbl_no": 1,
-                    "named_enemy_params_id": 53,
+                    "named_enemy_params_id": 54,
                     "level": 56,
                     "exp": 6476,
                     "is_boss": true
