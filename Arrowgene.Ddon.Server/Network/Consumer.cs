@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using Arrowgene.Ddon.Metrics;
 using Arrowgene.Ddon.Shared.Network;
 using Arrowgene.Logging;
+using Arrowgene.Networking.Metrics;
 using Arrowgene.Networking.SAEAServer;
 using Arrowgene.Networking.SAEAServer.Consumer.BlockingQueueConsumption;
 
 namespace Arrowgene.Ddon.Server.Network
 {
-    public class Consumer<TClient> : ThreadedBlockingQueueConsumer, IDisposable where TClient : Client
+    public class Consumer<TClient> : ThreadedBlockingQueue, IDisposable, IMetricsCapture<DdonConsumerMetricsSnapshot> where TClient : Client
     {
         private readonly ServerLogger Logger;
         private readonly Dictionary<PacketId, IPacketHandler<TClient>> _packetHandlerLookup;
         private readonly Dictionary<long, TClient> _clients;
+        private readonly DdonConsumerMetricsState _ddonConsumerMetricsState;
         private readonly object _lock;
         private readonly IClientFactory<TClient> _clientFactory;
 
@@ -34,6 +38,7 @@ namespace Arrowgene.Ddon.Server.Network
             _lock = new object();
             _clients = new Dictionary<long, TClient>();
             _packetHandlerLookup = new Dictionary<PacketId, IPacketHandler<TClient>>();
+            _ddonConsumerMetricsState = new DdonConsumerMetricsState();
         }
 
         public void Clear()
@@ -60,6 +65,8 @@ namespace Arrowgene.Ddon.Server.Network
 
         protected override void HandleReceived(ClientHandle clientHandle, byte[] data)
         {
+            long receivedTimestamp = Stopwatch.GetTimestamp();
+
             if (!clientHandle.IsAlive)
             {
                 return;
@@ -78,23 +85,30 @@ namespace Arrowgene.Ddon.Server.Network
             List<IPacket> packets = client.Receive(data);
             foreach (IPacket packet in packets)
             {
-                HandlePacket(client, packet);
+                HandlePacket(client, packet, receivedTimestamp);
             }
         }
 
-        private void HandlePacket(TClient client, IPacket packet)
+        private void HandlePacket(TClient client, IPacket packet, long receivedTimestamp)
         {
             if (!_packetHandlerLookup.TryGetValue(packet.Id, out IPacketHandler<TClient> packetHandler))
             {
                 Logger.LogUnhandledPacket(client, packet);
                 if (_fallbackPacketHandler != null)
                 {
-                    _fallbackPacketHandler.Handle(client, packet);
+                    ExecutePacketHandler(client, packet, _fallbackPacketHandler, receivedTimestamp);
                 }
 
                 return;
             }
 
+            ExecutePacketHandler(client, packet, packetHandler, receivedTimestamp);
+        }
+
+        private void ExecutePacketHandler(TClient client, IPacket packet, IPacketHandler<TClient> packetHandler, long receivedTimestamp)
+        {
+            _ddonConsumerMetricsState.RecordParseDuration(receivedTimestamp);
+            long startTimestamp = Stopwatch.GetTimestamp();
             try
             {
                 packetHandler.Handle(client, packet);
@@ -103,6 +117,16 @@ namespace Arrowgene.Ddon.Server.Network
             {
                 Logger.Exception(client, ex);
                 Logger.LogPacketError(client, packet);
+                _ddonConsumerMetricsState.IncrementHandlerErrors(
+                    packetHandler.Id.ToString(),
+                    packetHandler.Id.Name);
+            }
+            finally
+            {
+                _ddonConsumerMetricsState.RecordHandlerExecution(
+                    packetHandler.Id.ToString(),
+                    packetHandler.Id.Name,
+                    startTimestamp);
             }
         }
 
@@ -164,6 +188,45 @@ namespace Arrowgene.Ddon.Server.Network
             Logger.Exception(clientSnapshot, exception);
         }
 
+        public DdonConsumerMetricsSnapshot CreateSnapshot(double elapsedSeconds)
+        {
+            long currentExecuted = _ddonConsumerMetricsState.GetHandlersExecuted();
+            long currentErrors = _ddonConsumerMetricsState.GetHandlerErrors();
+
+            long[] durationBuckets = new long[_ddonConsumerMetricsState.HandlerDurationBucketsCount];
+            _ddonConsumerMetricsState.CopyHandlerDurationBuckets(durationBuckets);
+
+            long[] parseBuckets = new long[_ddonConsumerMetricsState.HandlerDurationBucketsCount];
+            _ddonConsumerMetricsState.CopyParseDurationBuckets(parseBuckets);
+
+            var handlerEntries = _ddonConsumerMetricsState.GetHandlerEntries();
+            var handlerMetrics = new Dictionary<string, DdonConsumerMetricsSnapshot.HandlerMetrics>(handlerEntries.Count);
+            foreach (var kvp in handlerEntries)
+            {
+                var entry = kvp.Value;
+                handlerMetrics[kvp.Key] = new DdonConsumerMetricsSnapshot.HandlerMetrics(
+                    entry.HandlerName,
+                    entry.GetExecutionCount(),
+                    entry.GetErrorCount(),
+                    entry.GetTotalDurationTicks(),
+                    entry.GetMinDurationTicks(),
+                    entry.GetMaxDurationTicks());
+            }
+
+            return new DdonConsumerMetricsSnapshot(
+                currentExecuted, currentErrors, durationBuckets, parseBuckets, handlerMetrics);
+        }
+
+        void IMetricsCapture.EnableCapture()
+        {
+            _ddonConsumerMetricsState.EnableCapture();
+        }
+
+        void IMetricsCapture.DisableCapture()
+        {
+            _ddonConsumerMetricsState.DisableCapture();
+        }
+
         public void Dispose()
         {
             foreach (var handler in _packetHandlerLookup.Values)
@@ -173,5 +236,6 @@ namespace Arrowgene.Ddon.Server.Network
 
             _fallbackPacketHandler?.Dispose();
         }
+
     }
 }

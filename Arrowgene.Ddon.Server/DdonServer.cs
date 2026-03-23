@@ -21,17 +21,19 @@
  */
 
 using System;
-using System.Collections.Generic;
 using Arrowgene.Ddon.Database;
+using Arrowgene.Ddon.Metrics;
 using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared;
 using Arrowgene.Ddon.Shared.Network;
 using Arrowgene.Logging;
+using Arrowgene.Networking.Metrics;
 using Arrowgene.Networking.SAEAServer;
+using Arrowgene.Networking.SAEAServer.Metric;
 
 namespace Arrowgene.Ddon.Server
 {
-    public abstract class DdonServer<TClient> : IClientFactory<TClient>
+    public abstract class DdonServer<TClient> : IClientFactory<TClient>, IMetricsCapture<DdonServerMetricsSnapshot>
         where TClient : Client
     {
         private readonly ServerLogger Logger;
@@ -39,6 +41,7 @@ namespace Arrowgene.Ddon.Server
         private readonly Consumer<TClient> _consumer;
         private readonly TcpServer _server;
         private readonly ServerSetting _setting;
+        private readonly DdonServerMetricsState _ddonMetricsState;
 
         public readonly ServerType Type;
 
@@ -69,11 +72,11 @@ namespace Arrowgene.Ddon.Server
                 _consumer,
                 _setting.TcpServerSettings
             );
+
+            _ddonMetricsState = new DdonServerMetricsState();
         }
 
         public int Id => _setting.Id;
-        public string Name => _setting.Name;
-
         public AssetRepository AssetRepository { get; }
         public IDatabase Database { get; }
 
@@ -105,10 +108,46 @@ namespace Arrowgene.Ddon.Server
         protected abstract void ClientConnected(TClient client);
         protected abstract void ClientDisconnected(TClient client);
         public abstract TClient NewClient(ClientHandle clientHandle);
-
-        [Obsolete("deprecated, use `ClientLookup.GetAll()` instead")]
-        public List<TClient> Clients => ClientLookup.GetAll();
-
         public abstract ClientLookup<TClient> ClientLookup { get; }
+
+        public DdonServerMetricsSnapshot CreateSnapshot(double elapsedSeconds)
+        {
+            TcpServerMetricsSnapshot tcpSnapshot =
+                ((IMetricsCapture<TcpServerMetricsSnapshot>)_server).CreateSnapshot(elapsedSeconds);
+
+            DdonConsumerMetricsSnapshot consumerSnapshot =
+                ((IMetricsCapture<DdonConsumerMetricsSnapshot>)_consumer).CreateSnapshot(elapsedSeconds);
+
+            long seq = _ddonMetricsState.IncrementSequenceNumber();
+            var (executedPerSec, errorsPerSec) =
+                _ddonMetricsState.CalculateRates(
+                    consumerSnapshot.HandlersExecuted,
+                    consumerSnapshot.HandlerErrors,
+                    elapsedSeconds
+                );
+
+            return new DdonServerMetricsSnapshot(
+                DateTime.UtcNow,
+                tcpSnapshot.ServerStartedAtUtc,
+                seq,
+                executedPerSec,
+                errorsPerSec,
+                consumerSnapshot,
+                tcpSnapshot);
+        }
+
+        public void EnableCapture()
+        {
+            _ddonMetricsState.EnableCapture();
+            ((IMetricsCapture)_consumer).EnableCapture();
+            ((IMetricsCapture)_server).EnableCapture();
+        }
+
+        public void DisableCapture()
+        {
+            _ddonMetricsState.DisableCapture();
+            ((IMetricsCapture)_consumer).DisableCapture();
+            ((IMetricsCapture)_server).DisableCapture();
+        }
     }
 }
