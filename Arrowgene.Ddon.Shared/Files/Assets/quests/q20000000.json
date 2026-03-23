@@ -50,7 +50,7 @@
         "id": 85,
         "group_id": 7
       },
-      "starting_index": 7,
+      "starting_index": 6,
       "enemies": [
         {
           "comment": "Brutal Skeleton Sorcerer",
@@ -76,7 +76,7 @@
           "level": 18,
           "exp": 85,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
           "comment": "Vigilant Skeleton Knight",
@@ -94,7 +94,7 @@
           "level": 18,
           "exp": 85,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         }
       ]
     }

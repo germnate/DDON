@@ -1,51 +1,46 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "Knight And Arisen",
+  "comment": "Knight And Arisen (III)",
   "quest_id": 20000015,
-  "base_level": 10,
+  "base_level": 16,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "HidellPlains",
   "news_image": 541,
+  "variant_index": 2,
   "rewards": [
+    {
+      "type": "exp",
+      "amount": 730
+    },
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 330
+      "amount": 520
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 30
-    },
-    {
-      "type": "exp",
-      "amount": 460
+      "amount": 60
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Wolf Head",
-          "item_id": 423,
+          "comment": "Noble Greaves",
+          "item_id": 480,
           "num": 1
         },
         {
-          "comment": "Eyedrops",
-          "item_id": 39,
+          "comment": "Demon's Periapt",
+          "item_id": 44,
           "num": 2
-        }
-      ]
-    },
-    {
-      "type": "random",
-      "loot_pool": [
+        },
         {
-          "comment": "Traveler's Tights",
-          "item_id": 8658,
-          "num": 1,
-          "chance": 1.0
+          "comment": "Purifying Decoction",
+          "item_id": 9372,
+          "num": 2
         }
       ]
     }
@@ -62,8 +57,8 @@
           "comment": "Vigilant Orc Tosser",
           "enemy_id": "0x015801",
           "named_enemy_params_id": 53,
-          "level": 10,
-          "exp": 76,
+          "level": 16,
+          "exp": 103,
           "repop_count": 1,
           "repop_wait_second": 10,
           "index": 0
@@ -72,8 +67,8 @@
           "comment": "Vigilant Orc Tosser",
           "enemy_id": "0x015801",
           "named_enemy_params_id": 53,
-          "level": 10,
-          "exp": 76,
+          "level": 16,
+          "exp": 103,
           "repop_count": 1,
           "repop_wait_second": 10,
           "index": 5
@@ -82,16 +77,20 @@
           "comment": "Vigilant Orc Tosser",
           "enemy_id": "0x015801",
           "named_enemy_params_id": 53,
-          "level": 10,
-          "exp": 76,
+          "level": 16,
+          "exp": 103,
+          "repop_count": 1,
+          "repop_wait_second": 10,
           "index": 7
         },
         {
           "comment": "Vigilant Orc Tosser",
           "enemy_id": "0x015801",
           "named_enemy_params_id": 53,
-          "level": 10,
-          "exp": 76,
+          "level": 16,
+          "exp": 103,
+          "repop_count": 1,
+          "repop_wait_second": 10,
           "index": 8
         }
       ]

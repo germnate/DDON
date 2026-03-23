@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Price of Honor",
+  "comment": "The Price of Honor (II)",
   "quest_id": 20000016,
   "base_level": 33,
   "minimum_item_rank": 0,
@@ -28,32 +28,33 @@
       "type": "select",
       "loot_pool": [
         {
-          "comment": "anti freeze crest",
+          "comment": "Crest of Freeze Warding",
           "item_id": 9317,
           "num": 1
         },
         {
-          "comment": "stam pot",
+          "comment": "Superior Quality Gala Extract",
           "item_id": 9362,
           "num": 2
         },
         {
-          "comment": "angel amu",
+          "comment": "Angel's Amulet",
           "item_id": 9382,
           "num": 2
         }
       ]
-  },
-  {
+    },
+    {
       "type": "random",
       "loot_pool": [
           {
+              "comment": "Conqueror's Talisman",
               "item_id": 9387,
               "num": 2,
               "chance": 1.0
           }
       ]
-  }
+    }
   ],
   "enemy_groups": [
     {
@@ -61,55 +62,43 @@
         "id": 1,
         "group_id": 259
       },
-      "starting_index": 2,
+      "starting_index": 5,
       "enemies": [
         {
-          "comment": "Orc aim",
+          "comment": "Brutal Orc Tosser",
           "enemy_id": "0x015801",
-          "start_think_tbl_no": 1,
           "named_enemy_params_id": 54,
           "level": 33,
-          "exp":1194
+          "exp": 182,
+          "repop_count": 1,
+          "repop_wait_second": 10
         },
         {
-          "comment": "Orc aim",
+          "comment": "Brutal Orc Vanguard",
+          "enemy_id": "0x015802",
+          "named_enemy_params_id": 54,
+          "level": 33,
+          "exp": 182,
+          "repop_count": 1,
+          "repop_wait_second": 10
+        },
+        {
+          "comment": "Brutal Orc Vanguard",
+          "enemy_id": "0x015802",
+          "named_enemy_params_id": 54,
+          "level": 33,
+          "exp": 182,
+          "repop_count": 1,
+          "repop_wait_second": 10
+        },
+        {
+          "comment": "Brutal Orc Tosser",
           "enemy_id": "0x015801",
-          "start_think_tbl_no": 1,
           "named_enemy_params_id": 54,
           "level": 33,
-          "exp":1194
-        },
-        {
-          "comment": "Orc banger",
-          "enemy_id": "0x015802",
-          "start_think_tbl_no": 1,
-          "named_enemy_params_id": 54,
-          "level": 33,
-          "exp":1194
-        },
-        {
-          "comment": "Orc banger",
-          "enemy_id": "0x015802",
-          "start_think_tbl_no": 1,
-          "named_enemy_params_id": 54,
-          "level": 33,
-          "exp":1194
-        },
-        {
-          "comment": "Orc aim",
-          "enemy_id": "0x015801",
-          "start_think_tbl_no": 1,
-          "named_enemy_params_id": 54,
-          "level": 33,
-          "exp":1194
-        },
-        {
-          "comment": "Orc banger",
-          "enemy_id": "0x015802",
-          "start_think_tbl_no": 1,
-          "named_enemy_params_id": 54,
-          "level": 33,
-          "exp":1194
+          "exp": 182,
+          "repop_count": 1,
+          "repop_wait_second": 10
         }
       ]
     }
@@ -134,7 +123,15 @@
     {
       "type": "DiscoverEnemy",
       "announce_type": "Accept",
-      "groups": [ 0 ]
+      "groups": [ 0 ],
+      "result_commands": [
+        {
+          "comment": "Idle dialogue",
+          "type": "QstTalkChg",
+          "Param1": 8,
+          "Param2": 11845
+        }
+      ]
     },
     {
       "type": "KillGroup",

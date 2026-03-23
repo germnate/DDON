@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Evil Lurking in the Tombs (Twelve Calamities)",
+  "comment": "The Evil Lurking in the Tombs (The Twelve Calamities Descend!)",
   "quest_id": 20000006,
   "base_level": 55,
   "minimum_item_rank": 0,
@@ -31,7 +31,19 @@
           "comment": "Crest of Dismantling II",
           "item_id": 9230,
           "num": 1,
-          "chance": 0.15
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Dismantling",
+          "item_id": 9229,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Exorcism",
+          "item_id": 9227,
+          "num": 1,
+          "chance": 0.1
         }
       ]
     },
@@ -39,10 +51,22 @@
       "type": "random",
       "loot_pool": [
         {
+          "comment": "Crest of Dismantling II",
+          "item_id": 9230,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Dismantling",
+          "item_id": 9229,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
           "comment": "Crest of Exorcism",
           "item_id": 9227,
           "num": 1,
-          "chance": 0.15
+          "chance": 0.1
         }
       ]
     }

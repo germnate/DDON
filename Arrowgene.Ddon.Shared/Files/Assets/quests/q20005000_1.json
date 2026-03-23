@@ -51,12 +51,12 @@
         "id": 1,
         "group_id": 30
       },
+      "starting_index": 1,
       "enemies": [
         {
           "comment": "Vigilant Sphinx",
           "enemy_id": "0x015302",
           "named_enemy_params_id": 53,
-          "start_think_tbl_no": 1,
           "level": 16,
           "exp": 2254,
           "is_boss": true

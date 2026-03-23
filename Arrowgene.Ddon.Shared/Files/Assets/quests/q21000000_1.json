@@ -1,17 +1,18 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "High Difficulty: Lurking in the Shadows (Dual Crests ★ Debut)",
+  "comment": "High Difficulty: Lurking in the Shadows (Crests x Quests 2017)",
   "quest_id": 21000000,
   "base_level": 65,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "HidellPlains",
   "order_conditions": [ { "type": "AreaRank", "Param1": 1, "Param2": 13 } ],
+  "variant_index": 1,
   "rewards": [
     {
       "type": "exp",
-      "amount": 9379
+      "amount": 9457
     },
     {
       "type": "wallet",
@@ -27,19 +28,192 @@
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Crest of Herculean Power (Lowered Defense)",
-          "item_id": 16050,
-          "num": 2
+          "comment": "Crest of Firm Protection (Health)",
+          "item_id": 16070,
+          "num": 1
         },
         {
-          "comment": "Crest of Herculean Power",
-          "item_id": 9198,
-          "num": 2
+          "comment": "Crest of Wisdom (Health)",
+          "item_id": 16074,
+          "num": 1
+        }
+      ]
+    },
+    {
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Crest of Firm Protection (Health)",
+          "item_id": 16070,
+          "num": 1,
+          "chance": 0.1
         },
         {
-          "comment": "Crest of Dwindled Defense",
-          "item_id": 9280,
-          "num": 2
+          "comment": "Crest of Firm Protection (Endurance)",
+          "item_id": 16071,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Firm Protection (Vitality)",
+          "item_id": 16072,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Firm Protection (Lightness)",
+          "item_id": 16073,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Wisdom (Health)",
+          "item_id": 16074,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Wisdom (Endurance)",
+          "item_id": 16075,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Wisdom (Vitality)",
+          "item_id": 16076,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Wisdom (Lightness)",
+          "item_id": 16077,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Double Resist (Poison/Torpor)",
+          "item_id": 16085,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Double Resist (Sleep/Stun)",
+          "item_id": 16086,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Double Resist (Petrify/Gild)",
+          "item_id": 16087,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Double Resist (Curse/Stifle)",
+          "item_id": 16088,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Double Resist (Lowered Strength/Defense)",
+          "item_id": 16089,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Double Resist (Lowered Magick/Magick Defense)",
+          "item_id": 16090,
+          "num": 1,
+          "chance": 0.1
+        }
+      ]
+    },
+    {
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Crest of Firm Protection (Health)",
+          "item_id": 16070,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Firm Protection (Endurance)",
+          "item_id": 16071,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Firm Protection (Vitality)",
+          "item_id": 16072,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Firm Protection (Lightness)",
+          "item_id": 16073,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Wisdom (Health)",
+          "item_id": 16074,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Wisdom (Endurance)",
+          "item_id": 16075,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Wisdom (Vitality)",
+          "item_id": 16076,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Wisdom (Lightness)",
+          "item_id": 16077,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Double Resist (Poison/Torpor)",
+          "item_id": 16085,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Double Resist (Sleep/Stun)",
+          "item_id": 16086,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Double Resist (Petrify/Gild)",
+          "item_id": 16087,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Double Resist (Curse/Stifle)",
+          "item_id": 16088,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Double Resist (Lowered Strength/Defense)",
+          "item_id": 16089,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Double Resist (Lowered Magick/Magick Defense)",
+          "item_id": 16090,
+          "num": 1,
+          "chance": 0.1
         }
       ]
     }

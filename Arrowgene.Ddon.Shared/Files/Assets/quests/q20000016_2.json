@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Price of Honor",
+  "comment": "The Price of Honor (III)",
   "quest_id": 20000016,
   "base_level": 55,
   "minimum_item_rank": 0,
@@ -28,32 +28,33 @@
       "type": "select",
       "loot_pool": [
         {
-          "comment": "demon prized",
+          "comment": "Demon's Prized Liquor",
           "item_id": 9443,
           "num": 1
         },
         {
-          "comment": "pigeon blood",
+          "comment": "Pigeon Blood",
           "item_id": 7910,
           "num": 1
         },
         {
-          "comment": "orc deco",
+          "comment": "Orc Decoration",
           "item_id": 8020,
           "num": 1
         }
       ]
-  },
-  {
+    },
+    {
       "type": "random",
       "loot_pool": [
           {
+              "comment": "White Dragon Miracle Cure",
               "item_id": 54,
               "num": 1,
               "chance": 1.0
           }
       ]
-  }
+    }
   ],
   "enemy_groups": [
     {
@@ -61,64 +62,48 @@
         "id": 1,
         "group_id": 259
       },
-      "starting_index": 2,
+      "starting_index": 4,
       "enemies": [
         {
-          "comment": "Orc cap",
+          "comment": "Brutal Orc Battler",
+          "enemy_id": "0x015810",
+          "named_enemy_params_id": 54,
+          "level": 55,
+          "exp": 352,
+          "repop_count": 1,
+          "repop_wait_second": 10
+        },
+        {
+          "comment": "Brutal Orc Captain",
           "enemy_id": "0x015820",
-          "start_think_tbl_no": 1,
-          "named_enemy_params_id": 56,
-          "is_boss": true,
-          "level": 55,
-          "exp":19700
-        },
-        {
-          "comment": "Orc battler",
-          "enemy_id": "0x015810",
-          "start_think_tbl_no": 1,
           "named_enemy_params_id": 54,
           "level": 55,
-          "exp":6476
+          "exp": 645
         },
         {
-          "comment": "Orc banger",
+          "comment": "Brutal Orc Captain",
           "enemy_id": "0x015820",
-          "start_think_tbl_no": 1,
-          "named_enemy_params_id": 56,
-          "level": 55,
-          "exp":6476
-        },
-        {
-          "comment": "Orc banger",
-          "enemy_id": "0x015810",
-          "start_think_tbl_no": 1,
           "named_enemy_params_id": 54,
           "level": 55,
-          "exp":6476
+          "exp": 645
         },
         {
-          "comment": "Orc aim",
+          "comment": "Brutal Orc Battler",
           "enemy_id": "0x015810",
-          "start_think_tbl_no": 1,
           "named_enemy_params_id": 54,
           "level": 55,
-          "exp":6476
+          "exp": 352,
+          "repop_count": 1,
+          "repop_wait_second": 10
         },
         {
-          "comment": "Orc aim",
+          "comment": "Brutal Orc Battler",
           "enemy_id": "0x015810",
-          "start_think_tbl_no": 1,
           "named_enemy_params_id": 54,
           "level": 55,
-          "exp":6476
-        },
-        {
-          "comment": "Orc banger",
-          "enemy_id": "0x015810",
-          "start_think_tbl_no": 1,
-          "named_enemy_params_id": 54,
-          "level": 55,
-          "exp":6476
+          "exp": 352,
+          "repop_count": 1,
+          "repop_wait_second": 10
         }
       ]
     }
@@ -143,7 +128,15 @@
     {
       "type": "DiscoverEnemy",
       "announce_type": "Accept",
-      "groups": [ 0 ]
+      "groups": [ 0 ],
+      "result_commands": [
+        {
+          "comment": "Idle dialogue",
+          "type": "QstTalkChg",
+          "Param1": 8,
+          "Param2": 11845
+        }
+      ]
     },
     {
       "type": "KillGroup",

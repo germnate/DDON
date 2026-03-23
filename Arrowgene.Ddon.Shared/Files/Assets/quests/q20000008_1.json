@@ -54,29 +54,13 @@
       "starting_index": 7,
       "enemies": [
         {
-          "comment": "Vigilant Orc Vanguard",
-          "enemy_id": "0x015802",
-          "named_enemy_params_id": 53,
-          "level": 16,
-          "exp": 103,
-          "repop_count": 1,
-          "repop_wait_second": 5
-        },
-        {
-          "comment": "Vigilant Orc Vanguard",
-          "enemy_id": "0x015802",
-          "named_enemy_params_id": 53,
-          "level": 16,
-          "exp": 103
-        },
-        {
           "comment": "Vigilant Orc Soldier",
           "enemy_id": "0x015800",
           "named_enemy_params_id": 53,
           "level": 16,
           "exp": 103,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
           "comment": "Vigilant Orc Soldier",
@@ -88,6 +72,22 @@
         {
           "comment": "Vigilant Orc Soldier",
           "enemy_id": "0x015800",
+          "named_enemy_params_id": 53,
+          "level": 16,
+          "exp": 103
+        },
+        {
+          "comment": "Vigilant Orc Vanguard",
+          "enemy_id": "0x015802",
+          "named_enemy_params_id": 53,
+          "level": 16,
+          "exp": 103,
+          "repop_count": 1,
+          "repop_wait_second": 10
+        },
+        {
+          "comment": "Vigilant Orc Vanguard",
+          "enemy_id": "0x015802",
           "named_enemy_params_id": 53,
           "level": 16,
           "exp": 103
@@ -99,23 +99,17 @@
         "id": 1,
         "group_id": 36
       },
-      "starting_index": 6,
+      "placement_type": "manual",
       "enemies": [
         {
-          "comment": "Vigilant Orc Vanguard",
-          "enemy_id": "0x015802",
+          "comment": "Vigilant Orc Soldier",
+          "enemy_id": "0x015800",
           "named_enemy_params_id": 53,
           "level": 16,
           "exp": 103,
           "repop_count": 1,
-          "repop_wait_second": 5
-        },
-        {
-          "comment": "Vigilant Orc Vanguard",
-          "enemy_id": "0x015802",
-          "named_enemy_params_id": 53,
-          "level": 16,
-          "exp": 103
+          "repop_wait_second": 10,
+          "index": 6
         },
         {
           "comment": "Vigilant Orc Soldier",
@@ -123,22 +117,33 @@
           "named_enemy_params_id": 53,
           "level": 16,
           "exp": 103,
+          "index": 7
+        },
+        {
+          "comment": "Vigilant Orc Soldier",
+          "enemy_id": "0x015800",
+          "named_enemy_params_id": 53,
+          "level": 16,
+          "exp": 103,
+          "index": 9
+        },
+        {
+          "comment": "Vigilant Orc Vanguard",
+          "enemy_id": "0x015802",
+          "named_enemy_params_id": 53,
+          "level": 16,
+          "exp": 103,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10,
+          "index": 11
         },
         {
-          "comment": "Vigilant Orc Soldier",
-          "enemy_id": "0x015800",
+          "comment": "Vigilant Orc Vanguard",
+          "enemy_id": "0x015802",
           "named_enemy_params_id": 53,
           "level": 16,
-          "exp": 103
-        },
-        {
-          "comment": "Vigilant Orc Soldier",
-          "enemy_id": "0x015800",
-          "named_enemy_params_id": 53,
-          "level": 16,
-          "exp": 103
+          "exp": 103,
+          "index": 12
         }
       ]
     }

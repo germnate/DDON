@@ -50,25 +50,35 @@
         "id": 238,
         "group_id": 9
       },
-      "starting_index": 5,
+      "placement_type": "manual",
       "enemies": [
         {
+          "comment": "Stout Undead",
+          "enemy_id": "0x010502",
+          "start_think_tbl_no": 8,
+          "level": 28,
+          "exp": 134,
+          "is_required": false,
+          "is_manual_set": true,
+          "index": 5
+        },
+        {
           "comment": "Brutal Wight",
           "enemy_id": "0x015600",
           "named_enemy_params_id": 54,
-          "start_think_tbl_no": 2,
           "level": 30,
           "exp": 1664,
-          "is_boss": true
+          "is_boss": true,
+          "index": 7
         },
         {
           "comment": "Brutal Wight",
           "enemy_id": "0x015600",
           "named_enemy_params_id": 54,
-          "start_think_tbl_no": 2,
           "level": 30,
           "exp": 1664,
-          "is_boss": true
+          "is_boss": true,
+          "index": 8
         },
         {
           "comment": "Stout Undead",
@@ -77,7 +87,8 @@
           "level": 28,
           "exp": 134,
           "is_required": false,
-          "is_manual_set": true
+          "is_manual_set": true,
+          "index": 9
         },
         {
           "comment": "Stout Undead",
@@ -86,7 +97,8 @@
           "level": 28,
           "exp": 134,
           "is_required": false,
-          "is_manual_set": true
+          "is_manual_set": true,
+          "index": 10
         },
         {
           "comment": "Stout Undead",
@@ -95,16 +107,8 @@
           "level": 28,
           "exp": 134,
           "is_required": false,
-          "is_manual_set": true
-        },
-        {
-          "comment": "Stout Undead",
-          "enemy_id": "0x010502",
-          "start_think_tbl_no": 8,
-          "level": 28,
-          "exp": 134,
-          "is_required": false,
-          "is_manual_set": true
+          "is_manual_set": true,
+          "index": 11
         }
       ]
     }

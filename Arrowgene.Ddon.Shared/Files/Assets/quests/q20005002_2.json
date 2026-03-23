@@ -59,14 +59,9 @@
           "enemy_id": "0x015800",
           "named_enemy_params_id": 458,
           "level": 12,
-          "exp": 85
-        },
-        {
-          "comment": "Bounty Orc Soldier",
-          "enemy_id": "0x015800",
-          "named_enemy_params_id": 458,
-          "level": 12,
-          "exp": 85
+          "exp": 85,
+          "repop_count": 1,
+          "repop_wait_second": 10
         },
         {
           "comment": "Bounty Orc Soldier",
