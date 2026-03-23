@@ -63,20 +63,6 @@
           "repop_wait_second": 10
         },
         {
-          "comment": "Vigilant Redcap",
-          "enemy_id": "0x011110",
-          "named_enemy_params_id": 53,
-          "level": 25,
-          "exp": 106
-        },
-        {
-          "comment": "Vigilant Redcap",
-          "enemy_id": "0x011110",
-          "named_enemy_params_id": 53,
-          "level": 25,
-          "exp": 106
-        },
-        {
           "comment": "Vigilant Redcap Slinger",
           "enemy_id": "0x011112",
           "named_enemy_params_id": 53,
@@ -86,6 +72,13 @@
           "repop_wait_second": 10
         },
         {
+          "comment": "Vigilant Redcap",
+          "enemy_id": "0x011110",
+          "named_enemy_params_id": 53,
+          "level": 25,
+          "exp": 106
+        },
+        {
           "comment": "Vigilant Redcap Slinger",
           "enemy_id": "0x011112",
           "named_enemy_params_id": 53,
@@ -95,6 +88,13 @@
         {
           "comment": "Vigilant Redcap Slinger",
           "enemy_id": "0x011112",
+          "named_enemy_params_id": 53,
+          "level": 25,
+          "exp": 106
+        },
+        {
+          "comment": "Vigilant Redcap",
+          "enemy_id": "0x011110",
           "named_enemy_params_id": 53,
           "level": 25,
           "exp": 106

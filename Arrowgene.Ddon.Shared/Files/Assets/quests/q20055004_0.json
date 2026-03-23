@@ -50,39 +50,39 @@
                 "id": 67,
                 "group_id": 4
             },
-            "starting_index": 8,
+            "starting_index": 6,
             "enemies": [
                 {
-                    "comment": "Vigilant Redcap Fighter",
-                    "enemy_id": "0x011111",
+                    "comment": "Vigilant Redcap",
+                    "enemy_id": "0x011110",
                     "named_enemy_params_id": 53,
                     "level": 19,
-                    "exp": 87,
+                    "exp": 88,
                     "repop_count": 1,
-                    "repop_wait_second": 5
-                },
-                {
-                    "comment": "Vigilant Redcap Fighter",
-                    "enemy_id": "0x011111",
-                    "named_enemy_params_id": 53,
-                    "level": 19,
-                    "exp": 87
+                    "repop_wait_second": 10
                 },
                 {
                     "comment": "Vigilant Redcap",
                     "enemy_id": "0x011110",
                     "named_enemy_params_id": 53,
                     "level": 19,
-                    "exp": 87,
-                    "repop_count": 1,
-                    "repop_wait_second": 5
+                    "exp": 88
                 },
                 {
-                    "comment": "Vigilant Redcap",
-                    "enemy_id": "0x011110",
+                    "comment": "Vigilant Redcap Fighter",
+                    "enemy_id": "0x011111",
                     "named_enemy_params_id": 53,
                     "level": 19,
-                    "exp": 87
+                    "exp": 88,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
+                },
+                {
+                    "comment": "Vigilant Redcap Fighter",
+                    "enemy_id": "0x011111",
+                    "named_enemy_params_id": 53,
+                    "level": 19,
+                    "exp": 88
                 }
             ]
         }
