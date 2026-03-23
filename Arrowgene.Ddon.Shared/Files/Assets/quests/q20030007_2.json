@@ -1,9 +1,9 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Spectator (Twelve Calamities)",
+  "comment": "The Spectator (Crests x Quests)",
   "quest_id": 20030007,
-  "base_level": 55,
+  "base_level": 45,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "DoweValley",
@@ -12,35 +12,160 @@
   "rewards": [
     {
       "type": "exp",
-      "amount": 5080
+      "amount": 4150
     },
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 3900
+      "amount": 2970
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 360
+      "amount": 290
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Troll's Poisonous Moss",
-          "item_id": 8000,
-          "num": 3
+          "comment": "Crest of Sheer Protection",
+          "item_id": 9289,
+          "num": 1
         },
         {
-          "comment": "Thick Bone",
-          "item_id": 7770,
-          "num": 3
+          "comment": "Crest of Sheer Intelligence",
+          "item_id": 9293,
+          "num": 1
+        }
+      ]
+    },
+    {
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Crest of Sheer Protection",
+          "item_id": 9289,
+          "num": 1,
+          "chance": 0.1
         },
         {
-          "comment": "Gold Thread",
-          "item_id": 7743,
-          "num": 3
+          "comment": "Crest of Sheer Intelligence",
+          "item_id": 9293,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Burn Prevention",
+          "item_id": 9315,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Freeze Prevention",
+          "item_id": 9318,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Shock Prevention",
+          "item_id": 9321,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Holy Drain Prevention",
+          "item_id": 9324,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Blind Prevention",
+          "item_id": 9327,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Stifle Warding",
+          "item_id": 9341,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Petrification Warding",
+          "item_id": 9347,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Curse Warding",
+          "item_id": 9343,
+          "num": 1,
+          "chance": 0.1
+        }
+      ]
+    },
+    {
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Crest of Sheer Protection",
+          "item_id": 9289,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Sheer Intelligence",
+          "item_id": 9293,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Burn Prevention",
+          "item_id": 9315,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Freeze Prevention",
+          "item_id": 9318,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Shock Prevention",
+          "item_id": 9321,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Holy Drain Prevention",
+          "item_id": 9324,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Blind Prevention",
+          "item_id": 9327,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Stifle Warding",
+          "item_id": 9341,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Petrification Warding",
+          "item_id": 9347,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Curse Warding",
+          "item_id": 9343,
+          "num": 1,
+          "chance": 0.1
         }
       ]
     }
@@ -51,30 +176,30 @@
         "id": 166,
         "group_id": 4
       },
-      "starting_index": 7,
+      "starting_index": 8,
       "enemies": [
         {
           "comment": "Lord of Rock (Mole Troll)",
           "enemy_id": "0x015041",
-          "named_enemy_params_id": 528,
-          "level": 55,
-          "exp": 4800,
+          "named_enemy_params_id": 508,
+          "level": 45,
+          "exp": 4200,
           "is_boss": true
         },
         {
           "comment": "Lord of Rock (Mole Troll)",
           "enemy_id": "0x015041",
-          "named_enemy_params_id": 528,
-          "level": 55,
-          "exp": 4800,
+          "named_enemy_params_id": 508,
+          "level": 45,
+          "exp": 4200,
           "is_boss": true
         },
         {
           "comment": "Lord of Rock (Mole Troll)",
           "enemy_id": "0x015041",
-          "named_enemy_params_id": 528,
-          "level": 55,
-          "exp": 4800,
+          "named_enemy_params_id": 508,
+          "level": 45,
+          "exp": 4200,
           "is_boss": true
         }
       ]
