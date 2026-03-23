@@ -89,35 +89,35 @@
             "starting_index": 8,
             "enemies": [
                 {
-                    "comment": "Vigilant Saurian",
-                    "enemy_id": "0x010400",
-                    "named_enemy_params_id": 53,
-                    "level": 9,
-                    "exp": 45,
-                    "is_boss": false
-                },
-                {
-                    "comment": "Vigilant Saurian",
-                    "enemy_id": "0x010400",
-                    "named_enemy_params_id": 53,
-                    "level": 9,
-                    "exp": 45,
-                    "is_boss": false
-                },
-                {
-                    "comment": "Vigilant Saurian",
-                    "enemy_id": "0x010400",
-                    "named_enemy_params_id": 53,
-                    "level": 9,
-                    "exp": 45,
-                    "is_boss": false
-                },
-                {
                     "comment": "Vigilant Giant Saurian",
                     "enemy_id": "0x010401",
                     "named_enemy_params_id": 53,
                     "level": 9,
                     "exp": 84,
+                    "is_boss": false
+                },
+                {
+                    "comment": "Vigilant Saurian",
+                    "enemy_id": "0x010400",
+                    "named_enemy_params_id": 53,
+                    "level": 9,
+                    "exp": 45,
+                    "is_boss": false
+                },
+                {
+                    "comment": "Vigilant Saurian",
+                    "enemy_id": "0x010400",
+                    "named_enemy_params_id": 53,
+                    "level": 9,
+                    "exp": 45,
+                    "is_boss": false
+                },
+                {
+                    "comment": "Vigilant Saurian",
+                    "enemy_id": "0x010400",
+                    "named_enemy_params_id": 53,
+                    "level": 9,
+                    "exp": 45,
                     "is_boss": false
                 }
             ]

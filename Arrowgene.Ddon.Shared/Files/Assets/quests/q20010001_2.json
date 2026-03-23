@@ -90,35 +90,35 @@
             "starting_index": 8,
             "enemies": [
                 {
-                    "comment": "Vigilant Sulfur Saurian",
-                    "enemy_id": "0x010410",
-                    "named_enemy_params_id": 53,
-                    "level": 26,
-                    "exp": 132,
-                    "is_boss": false
-                },
-                {
-                    "comment": "Vigilant Sulfur Saurian",
-                    "enemy_id": "0x010410",
-                    "named_enemy_params_id": 53,
-                    "level": 26,
-                    "exp": 132,
-                    "is_boss": false
-                },
-                {
-                    "comment": "Vigilant Sulfur Saurian",
-                    "enemy_id": "0x010410",
-                    "named_enemy_params_id": 53,
-                    "level": 26,
-                    "exp": 132,
-                    "is_boss": false
-                },
-                {
                     "comment": "Vigilant Giant Sulfur Saurian",
                     "enemy_id": "0x010411",
                     "named_enemy_params_id": 53,
                     "level": 26,
                     "exp": 165,
+                    "is_boss": false
+                },
+                {
+                    "comment": "Vigilant Sulfur Saurian",
+                    "enemy_id": "0x010410",
+                    "named_enemy_params_id": 53,
+                    "level": 26,
+                    "exp": 132,
+                    "is_boss": false
+                },
+                {
+                    "comment": "Vigilant Sulfur Saurian",
+                    "enemy_id": "0x010410",
+                    "named_enemy_params_id": 53,
+                    "level": 26,
+                    "exp": 132,
+                    "is_boss": false
+                },
+                {
+                    "comment": "Vigilant Sulfur Saurian",
+                    "enemy_id": "0x010410",
+                    "named_enemy_params_id": 53,
+                    "level": 26,
+                    "exp": 132,
                     "is_boss": false
                 }
             ]

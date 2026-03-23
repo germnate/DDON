@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": false,
   "area_id": "BreyaCoast",
+  "order_conditions": [ { "type": "AreaRank", "Param1": 2, "Param2": 13 } ],
   "rewards": [
     {
       "type": "wallet",
@@ -52,54 +53,6 @@
       "comment": "Needs correct XP values",
       "enemies": [
         {
-          "comment": "Dragonforce-Bearing Bolt Grimwarg",
-          "enemy_id": "0x010211",
-          "named_enemy_params_id": 1120,
-          "level": 60,
-          "exp": 756,
-          "blood_orbs": 149
-        },
-        {
-          "comment": "Dragonforce-Bearing Bolt Grimwarg",
-          "enemy_id": "0x010211",
-          "named_enemy_params_id": 1120,
-          "level": 60,
-          "exp": 756,
-          "blood_orbs": 149
-        },
-        {
-          "comment": "Dragonforce-Bearing Bolt Grimwarg",
-          "enemy_id": "0x010211",
-          "named_enemy_params_id": 1120,
-          "level": 60,
-          "exp": 756,
-          "blood_orbs": 149
-        },
-        {
-          "comment": "Ghost",
-          "enemy_id": "0x015620",
-          "level": 60,
-          "exp": 756
-        },
-        {
-          "comment": "Ghost",
-          "enemy_id": "0x015620",
-          "level": 60,
-          "exp": 756
-        },
-        {
-          "comment": "Ghost",
-          "enemy_id": "0x015620",
-          "level": 60,
-          "exp": 756
-        },
-        {
-          "comment": "Ghost",
-          "enemy_id": "0x015620",
-          "level": 60,
-          "exp": 756
-        },
-        {
           "comment": "Dragonforce-Bearing Ghost Mail",
           "enemy_id": "0x010311",
           "named_enemy_params_id": 1120,
@@ -116,6 +69,54 @@
           "exp": 1125,
           "blood_orbs": 149,
           "is_boss": true
+        },
+        {
+          "comment": "Dragonforce-Bearing Bolt Grimwarg",
+          "enemy_id": "0x010211",
+          "named_enemy_params_id": 1120,
+          "level": 60,
+          "exp": 756,
+          "blood_orbs": 149
+        },
+        {
+          "comment": "Dragonforce-Bearing Bolt Grimwarg",
+          "enemy_id": "0x010211",
+          "named_enemy_params_id": 1120,
+          "level": 60,
+          "exp": 756,
+          "blood_orbs": 149
+        },
+        {
+          "comment": "Dragonforce-Bearing Bolt Grimwarg",
+          "enemy_id": "0x010211",
+          "named_enemy_params_id": 1120,
+          "level": 60,
+          "exp": 756,
+          "blood_orbs": 149
+        },
+        {
+          "comment": "Ghost",
+          "enemy_id": "0x015620",
+          "level": 60,
+          "exp": 756
+        },
+        {
+          "comment": "Ghost",
+          "enemy_id": "0x015620",
+          "level": 60,
+          "exp": 756
+        },
+        {
+          "comment": "Ghost",
+          "enemy_id": "0x015620",
+          "level": 60,
+          "exp": 756
+        },
+        {
+          "comment": "Ghost",
+          "enemy_id": "0x015620",
+          "level": 60,
+          "exp": 756
         }
       ]
     }

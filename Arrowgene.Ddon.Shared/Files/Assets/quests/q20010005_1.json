@@ -51,7 +51,6 @@
         "id": 34,
         "group_id": 0
       },
-      "starting_index": 5,
       "enemies": [
         {
           "comment": "Vigilant Mist Hunter",
@@ -77,7 +76,7 @@
           "exp": 114,
           "hm_present_no": 68,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
           "comment": "Vigilant Mist Fighter",
@@ -87,7 +86,7 @@
           "exp": 114,
           "hm_present_no": 68,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         }
       ]
     }

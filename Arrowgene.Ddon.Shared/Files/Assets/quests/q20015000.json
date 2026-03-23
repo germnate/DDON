@@ -45,6 +45,7 @@
         "id": 1,
         "group_id": 95
       },
+      "starting_index": 6,
       "enemies": [
         {
           "comment": "Vigilant Giant Saurian",
