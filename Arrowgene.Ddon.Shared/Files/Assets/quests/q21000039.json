@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": false,
   "area_id": "BetlandPlains",
+  "order_conditions": [ { "type": "AreaRank", "Param1": 8, "Param2": 13 } ],
   "rewards": [
     {
       "type": "exp",
@@ -156,7 +157,7 @@
               "item_min": 1,
               "item_max": 1,
               "quality": 0,
-              "drop_chance": 0.1
+              "drop_chance": 0.15
             }
           ]
         },
@@ -193,7 +194,7 @@
               "item_min": 1,
               "item_max": 1,
               "quality": 0,
-              "drop_chance": 0.1
+              "drop_chance": 0.15
             }
           ]
         },
@@ -230,8 +231,8 @@
               "item_min": 1,
               "item_max": 1,
               "quality": 0,
-              "drop_chance": 0.1
-            }
+              "drop_chance": 0.15
+			}
           ]
         }
       ]

@@ -52,6 +52,16 @@
             "placement_type": "manual",
             "enemies": [
                 {
+                    "comment": "Brutal Empress Ghost",
+                    "enemy_id": "0x015605",
+                    "named_enemy_params_id": 54,
+                    "start_think_tbl_no": 2,
+                    "level": 48,
+                    "exp": 3738,
+                    "is_boss": true,
+                    "index": 2
+                },
+                {
                     "comment": "Skeleton Warrior",
                     "enemy_id": "0x010302",
                     "start_think_tbl_no": 8,
@@ -80,16 +90,6 @@
                     "is_required": false,
                     "is_manual_set": true,
                     "index": 10
-                },
-                {
-                    "comment": "Brutal Empress Ghost",
-                    "enemy_id": "0x015605",
-                    "named_enemy_params_id": 54,
-                    "start_think_tbl_no": 2,
-                    "level": 48,
-                    "exp": 3738,
-                    "is_boss": true,
-                    "index": 2
                 }
             ]
         }

@@ -48,8 +48,9 @@
         {
             "stage_id": {
                 "id": 1,
-                "group_id": 340
+                "group_id": 322
             },
+            "starting_index": 4,
             "enemies": [
                 {
                     "comment": "Brutal Ent",

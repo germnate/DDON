@@ -60,44 +60,8 @@
                 "id": 169,
                 "group_id": 1
             },
-            "placement_type": "manual",
+            "starting_index": 6,
             "enemies": [
-                {
-                    "comment": "Vigilant Banded Hunter",
-                    "enemy_id": "0x011012",
-                    "named_enemy_params_id": 53,
-                    "hm_present_no": 54,
-                    "level": 46,
-                    "exp": 231,
-                    "index": 5
-                },
-                {
-                    "comment": "Vigilant Banded Hunter",
-                    "enemy_id": "0x011012",
-                    "named_enemy_params_id": 53,
-                    "hm_present_no": 54,
-                    "level": 46,
-                    "exp": 231,
-                    "index": 6
-                },
-                {
-                    "comment": "Vigilant Banded Hunter",
-                    "enemy_id": "0x011012",
-                    "named_enemy_params_id": 53,
-                    "hm_present_no": 54,
-                    "level": 46,
-                    "exp": 231,
-                    "index": 7
-                },
-                {
-                    "comment": "Vigilant Banded Hunter",
-                    "enemy_id": "0x011012",
-                    "named_enemy_params_id": 53,
-                    "hm_present_no": 54,
-                    "level": 46,
-                    "exp": 231,
-                    "index": 8
-                },
                 {
                     "comment": "Vigilant Banded Fighter",
                     "enemy_id": "0x011010",
@@ -105,9 +69,50 @@
                     "hm_present_no": 52,
                     "level": 46,
                     "exp": 231,
-                    "repop_count": 2,
-                    "repop_wait_second": 10,
-                    "index": 11
+                    "repop_count": 1,
+                    "repop_wait_second": 10
+                },
+                {
+                    "comment": "Vigilant Banded Hunter",
+                    "enemy_id": "0x011012",
+                    "named_enemy_params_id": 53,
+                    "hm_present_no": 54,
+                    "level": 46,
+                    "exp": 231,
+                    "repop_count": 1,
+                    "repop_wait_second": 10
+                },
+                {
+                    "comment": "Vigilant Banded Hunter",
+                    "enemy_id": "0x011012",
+                    "named_enemy_params_id": 53,
+                    "hm_present_no": 54,
+                    "level": 46,
+                    "exp": 231
+                },
+                {
+                    "comment": "Vigilant Banded Hunter",
+                    "enemy_id": "0x011012",
+                    "named_enemy_params_id": 53,
+                    "hm_present_no": 54,
+                    "level": 46,
+                    "exp": 231
+                },
+                {
+                    "comment": "Vigilant Banded Fighter",
+                    "enemy_id": "0x011010",
+                    "named_enemy_params_id": 53,
+                    "hm_present_no": 52,
+                    "level": 46,
+                    "exp": 231
+                },
+                {
+                    "comment": "Vigilant Banded Hunter",
+                    "enemy_id": "0x011012",
+                    "named_enemy_params_id": 53,
+                    "hm_present_no": 54,
+                    "level": 46,
+                    "exp": 231
                 }
             ]
         }

@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "VoldenMines",
+  "order_conditions": [ { "type": "AreaRank", "Param1": 4, "Param2": 11 } ],
   "rewards": [
     {
       "type": "exp",
@@ -26,18 +27,18 @@
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Cursed Cloth",
-          "item_id": 7948,
+          "comment": "Blow-Resistant Cloth",
+          "item_id": 7942,
           "num": 2
         },
         {
-          "comment": "Large Scallop Shell",
-          "item_id": 8018,
-          "num": 5
+          "comment": "Quality Gala Mushroom",
+          "item_id": 7995,
+          "num": 7
         },
         {
-          "comment": "Superior Strong Gala Extract",
-          "item_id": 9364,
+          "comment": "Superior Healing Remedy",
+          "item_id": 7555,
           "num": 3
         }
       ]

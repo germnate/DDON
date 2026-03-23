@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": false,
   "area_id": "DeenanWoods",
+  "order_conditions": [ { "type": "AreaRank", "Param1": 7, "Param2": 13 } ],
   "rewards": [
     {
       "type": "exp",
@@ -170,30 +171,6 @@
           "is_boss": true
         },
         {
-          "comment": "Saurian Sage",
-          "enemy_id": "0x010430",
-          "level": 68,
-          "exp": 1185
-        },
-        {
-          "comment": "Saurian Sage",
-          "enemy_id": "0x010430",
-          "level": 68,
-          "exp": 1185
-        },
-        {
-          "comment": "Saurian Sage",
-          "enemy_id": "0x010430",
-          "level": 68,
-          "exp": 1185
-        },
-        {
-          "comment": "Saurian Sage",
-          "enemy_id": "0x010430",
-          "level": 68,
-          "exp": 1185
-        },
-        {
           "comment": "Jewelry-Bearing Lux Corpse Punisher",
           "enemy_id": "0x010515",
           "named_enemy_params_id": 1121,
@@ -282,6 +259,30 @@
               "drop_chance": 0.1
             }
           ]
+        },
+        {
+          "comment": "Saurian Sage",
+          "enemy_id": "0x010430",
+          "level": 68,
+          "exp": 1185
+        },
+        {
+          "comment": "Saurian Sage",
+          "enemy_id": "0x010430",
+          "level": 68,
+          "exp": 1185
+        },
+        {
+          "comment": "Saurian Sage",
+          "enemy_id": "0x010430",
+          "level": 68,
+          "exp": 1185
+        },
+        {
+          "comment": "Saurian Sage",
+          "enemy_id": "0x010430",
+          "level": 68,
+          "exp": 1185
         }
       ]
     }

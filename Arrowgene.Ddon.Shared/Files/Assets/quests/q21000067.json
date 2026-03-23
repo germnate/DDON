@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "DeenanWoods",
+  "order_conditions": [ { "type": "AreaRank", "Param1": 7, "Param2": 13 } ],
   "rewards": [
     {
       "type": "wallet",
@@ -60,29 +61,29 @@
           "index": 0
         },
         {
-          "comment": "Aqua Jelly",
-          "enemy_id": "0x010904",
+          "comment": "Direwolf",
+          "enemy_id": "0x010201",
           "level": 68,
           "exp": 1185,
           "index": 1
         },
         {
-          "comment": "Aqua Jelly",
-          "enemy_id": "0x010904",
+          "comment": "Direwolf",
+          "enemy_id": "0x010201",
           "level": 68,
           "exp": 1185,
           "index": 2
         },
         {
-          "comment": "Direwolf",
-          "enemy_id": "0x010201",
+          "comment": "Aqua Jelly",
+          "enemy_id": "0x010904",
           "level": 68,
           "exp": 1185,
           "index": 6
         },
         {
-          "comment": "Direwolf",
-          "enemy_id": "0x010201",
+          "comment": "Aqua Jelly",
+          "enemy_id": "0x010904",
           "level": 68,
           "exp": 1185,
           "index": 7

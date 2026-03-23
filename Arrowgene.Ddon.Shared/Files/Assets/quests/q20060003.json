@@ -63,13 +63,11 @@
           "index": 3
         },
         {
-          "comment": "Vigilant Sling Redcap",
-          "enemy_id": "0x011112",
+          "comment": "Vigilant Redcap Fighter",
+          "enemy_id": "0x011111",
           "named_enemy_params_id": 53,
           "level": 34,
           "exp": 141,
-          "repop_count": 1,
-          "repop_wait_time": 10,
           "index": 4
         },
         {
@@ -78,11 +76,13 @@
           "named_enemy_params_id": 53,
           "level": 34,
           "exp": 141,
+          "repop_count": 1,
+          "repop_wait_time": 10,
           "index": 5
         },
         {
-          "comment": "Vigilant Redcap Fighter",
-          "enemy_id": "0x011111",
+          "comment": "Vigilant Sling Redcap",
+          "enemy_id": "0x011112",
           "named_enemy_params_id": 53,
           "level": 34,
           "exp": 141,
@@ -109,7 +109,7 @@
         {
           "comment": "Idle dialogue",
           "type": "QstTalkChg",
-          "Param1": 522,
+          "Param1": 4503,
           "Param2": 13303
         }
       ],

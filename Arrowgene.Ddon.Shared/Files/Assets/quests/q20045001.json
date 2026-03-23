@@ -95,7 +95,7 @@
           "level": 27,
           "exp": 128,
           "is_boss": false,
-          "index": 11
+          "index": 12
         },
         {
           "comment": "Vigilant Skeleton Sorcerer",
@@ -104,7 +104,7 @@
           "level": 27,
           "exp": 128,
           "is_boss": false,
-          "index": 11
+          "index": 13
         }
       ]
     }

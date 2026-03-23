@@ -50,48 +50,55 @@
                 "id": 65,
                 "group_id": 0
             },
+            "placement_type": "manual",
             "enemies": [
                 {
                     "comment": "Brutal Skeleton Warrior",
                     "enemy_id": "0x010302",
                     "named_enemy_params_id": 54,
                     "level": 49,
-                    "exp": 232
+                    "exp": 232,
+                    "index": 0
                 },
                 {
                     "comment": "Brutal Skeleton Warrior",
                     "enemy_id": "0x010302",
                     "named_enemy_params_id": 54,
                     "level": 49,
-                    "exp": 232
+                    "exp": 232,
+                    "index": 3
                 },
                 {
                     "comment": "Brutal Skull Lord",
                     "enemy_id": "0x010313",
                     "named_enemy_params_id": 54,
                     "level": 49,
-                    "exp": 1148
+                    "exp": 1148,
+                    "index": 6
                 },
                 {
                     "comment": "Brutal Skeleton Warrior",
                     "enemy_id": "0x010302",
                     "named_enemy_params_id": 54,
                     "level": 49,
-                    "exp": 232
+                    "exp": 232,
+                    "index": 7
+                },
+                {
+                    "comment": "Brutal Skeleton Warrior",
+                    "enemy_id": "0x010302",
+                    "named_enemy_params_id": 54,
+                    "level": 49,
+                    "exp": 232,
+                    "index": 8
                 },
                 {
                     "comment": "Brutal Skull Lord",
                     "enemy_id": "0x010313",
                     "named_enemy_params_id": 54,
                     "level": 49,
-                    "exp": 1148
-                },
-                {
-                    "comment": "Brutal Skeleton Warrior",
-                    "enemy_id": "0x010302",
-                    "named_enemy_params_id": 54,
-                    "level": 49,
-                    "exp": 232
+                    "exp": 1148,
+                    "index": 9
                 }
             ]
         }

@@ -50,6 +50,7 @@
                 "id": 1,
                 "group_id": 449
             },
+            "placement_type": "manual",
             "enemies": [
                 {
                     "comment": "Brutal Ghost Mail",
@@ -58,16 +59,8 @@
                     "start_think_tbl_no": 1,
                     "level": 47,
                     "exp": 576,
-                    "is_boss": false
-                },
-                {
-                    "comment": "Brutal Ghost Mail",
-                    "enemy_id": "0x010311",
-                    "named_enemy_params_id": 54,
-                    "start_think_tbl_no": 1,
-                    "level": 47,
-                    "exp": 576,
-                    "is_boss": false
+                    "is_boss": false,
+                    "index": 0
                 },
                 {
                     "comment": "Vigilant Skeleton Warrior",
@@ -78,7 +71,18 @@
                     "exp": 224,
                     "is_boss": false,
                     "repop_count": 1,
-                    "repop_wait_second": 10
+                    "repop_wait_second": 10,
+                    "index": 1
+                },
+                {
+                    "comment": "Brutal Ghost Mail",
+                    "enemy_id": "0x010311",
+                    "named_enemy_params_id": 54,
+                    "start_think_tbl_no": 1,
+                    "level": 47,
+                    "exp": 576,
+                    "is_boss": false,
+                    "index": 8
                 }
             ]
         }
@@ -101,7 +105,7 @@
                 {
                     "comment": "Idle dialogue",
                     "type": "QstTalkChg",
-                    "Param1": 541,
+                    "Param1": 1814,
                     "Param2": 16041
                 }
             ],

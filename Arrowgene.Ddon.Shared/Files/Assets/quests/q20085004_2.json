@@ -61,6 +61,7 @@
                 "id": 1,
                 "group_id": 447
             },
+            "starting_index": 1,
             "enemies": [
                 {
                     "comment": "Dangerous Geo Golem",

@@ -61,8 +61,35 @@
                 "id": 149,
                 "group_id": 2
             },
-            "starting_index": 7,
+            "starting_index": 8,
             "enemies": [
+                {
+                    "comment": "Dangerous Living Armor",
+                    "enemy_id": "0x010306",
+                    "named_enemy_params_id": 56,
+                    "start_think_tbl_no": 0,
+                    "level": 55,
+                    "exp": 1120,
+                    "is_boss": false
+                },
+                {
+                    "comment": "Dangerous Living Armor",
+                    "enemy_id": "0x010306",
+                    "named_enemy_params_id": 56,
+                    "start_think_tbl_no": 0,
+                    "level": 55,
+                    "exp": 1120,
+                    "is_boss": false
+                },
+                {
+                    "comment": "Dangerous Living Armor",
+                    "enemy_id": "0x010306",
+                    "named_enemy_params_id": 56,
+                    "start_think_tbl_no": 0,
+                    "level": 55,
+                    "exp": 1120,
+                    "is_boss": false
+                },
                 {
                     "comment": "Legendary Empress Ghost",
                     "enemy_id": "0x015605",
@@ -71,33 +98,6 @@
                     "level": 55,
                     "exp": 4095,
                     "is_boss": true
-                },
-                {
-                    "comment": "Dangerous Living Armor",
-                    "enemy_id": "0x010306",
-                    "named_enemy_params_id": 56,
-                    "start_think_tbl_no": 0,
-                    "level": 55,
-                    "exp": 1120,
-                    "is_boss": false
-                },
-                {
-                    "comment": "Dangerous Living Armor",
-                    "enemy_id": "0x010306",
-                    "named_enemy_params_id": 56,
-                    "start_think_tbl_no": 0,
-                    "level": 55,
-                    "exp": 1120,
-                    "is_boss": false
-                },
-                {
-                    "comment": "Dangerous Living Armor",
-                    "enemy_id": "0x010306",
-                    "named_enemy_params_id": 56,
-                    "start_think_tbl_no": 0,
-                    "level": 55,
-                    "exp": 1120,
-                    "is_boss": false
                 }
             ]
         }

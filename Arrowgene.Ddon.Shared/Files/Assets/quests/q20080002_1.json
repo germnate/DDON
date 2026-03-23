@@ -60,20 +60,11 @@
                     "exp": 1500
                 },
                 {
-                    "comment": "Brutal Living Armor",
-                    "enemy_id": "0x010306",
-                    "named_enemy_params_id": 54,
-                    "level": 50,
-                    "exp": 1500
-                },
-                {
                     "comment": "Vigilant Frost Corpse Torturer",
                     "enemy_id": "0x010512",
                     "named_enemy_params_id": 53,
                     "level": 50,
-                    "exp": 254,
-                    "repop_count": 1,
-                    "repop_wait_second": 10
+                    "exp": 254
                 },
                 {
                     "comment": "Vigilant Frost Corpse Torturer",
@@ -81,6 +72,20 @@
                     "named_enemy_params_id": 53,
                     "level": 50,
                     "exp": 254
+                },
+                {
+                    "comment": "Vigilant Frost Corpse Torturer",
+                    "enemy_id": "0x010512",
+                    "named_enemy_params_id": 53,
+                    "level": 50,
+                    "exp": 254
+                },
+                {
+                    "comment": "Brutal Living Armor",
+                    "enemy_id": "0x010306",
+                    "named_enemy_params_id": 54,
+                    "level": 50,
+                    "exp": 1500
                 }
             ]
         }

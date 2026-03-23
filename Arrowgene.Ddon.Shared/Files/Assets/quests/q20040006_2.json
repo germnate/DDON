@@ -51,6 +51,7 @@
         "id": 138,
         "group_id": 1
       },
+      "placement_type": "manual",
       "enemies": [
         {
           "comment": "Dangerous Chimera",
@@ -58,35 +59,40 @@
           "named_enemy_params_id": 56,
           "level": 57,
           "exp": 4620,
-          "is_boss": true
+          "is_boss": true,
+          "index": 0
         },
         {
           "comment": "Brutal Lapis Eye",
           "enemy_id": "0x015412",
           "named_enemy_params_id": 54,
           "level": 56,
-          "exp": 388
+          "exp": 388,
+          "index": 3
         },
         {
           "comment": "Brutal Lapis Eye",
           "enemy_id": "0x015412",
           "named_enemy_params_id": 54,
           "level": 56,
-          "exp": 388
+          "exp": 388,
+          "index": 4
         },
         {
           "comment": "Brutal Lapis Eye",
           "enemy_id": "0x015412",
           "named_enemy_params_id": 54,
           "level": 56,
-          "exp": 388
+          "exp": 388,
+          "index": 5
         },
         {
           "comment": "Brutal Lapis Eye",
           "enemy_id": "0x015412",
           "named_enemy_params_id": 54,
           "level": 56,
-          "exp": 388
+          "exp": 388,
+          "index": 6
         }
       ]
     }

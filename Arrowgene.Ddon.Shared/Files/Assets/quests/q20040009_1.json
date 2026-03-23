@@ -51,67 +51,67 @@
         "id": 102,
         "group_id": 3
       },
-      "starting_index": 6,
+      "placement_type": "manual",
       "enemies": [
         {
           "comment": "Dangerous Rogue Healer",
           "enemy_id": "0x011003",
+          "hm_present_no": 48,
           "named_enemy_params_id": 56,
           "start_think_table_no": 1,
           "level": 46,
           "exp": 194,
-          "is_boss": false,
-          "hm_present_no": 48
-        },
-        {
-          "comment": "Dangerous Rogue Warrior",
-          "enemy_id": "0x011000",
-          "named_enemy_params_id": 56,
-          "start_think_table_no": 1,
-          "level": 46,
-          "exp": 194,
-          "is_boss": false,
-          "hm_present_no": 45
-        },
-        {
-          "comment": "Dangerous Rogue Warrior",
-          "enemy_id": "0x011000",
-          "named_enemy_params_id": 56,
-          "start_think_table_no": 1,
-          "level": 46,
-          "exp": 194,
-          "is_boss": false,
-          "hm_present_no": 45
+          "index": 5
         },
         {
           "comment": "Dangerous Rogue Healer",
           "enemy_id": "0x011003",
+          "hm_present_no": 48,
           "named_enemy_params_id": 56,
           "start_think_table_no": 1,
           "level": 46,
           "exp": 194,
-          "is_boss": false,
-          "hm_present_no": 48
+          "index": 6
         },
         {
           "comment": "Dangerous Rogue Warrior",
           "enemy_id": "0x011000",
+          "hm_present_no": 45,
           "named_enemy_params_id": 56,
           "start_think_table_no": 1,
           "level": 46,
           "exp": 194,
-          "is_boss": false,
-          "hm_present_no": 45
+          "index": 8
         },
         {
           "comment": "Dangerous Rogue Warrior",
           "enemy_id": "0x011000",
+          "hm_present_no": 45,
           "named_enemy_params_id": 56,
           "start_think_table_no": 1,
           "level": 46,
           "exp": 194,
-          "is_boss": false,
-          "hm_present_no": 45
+          "index": 9
+        },
+        {
+          "comment": "Dangerous Rogue Warrior",
+          "enemy_id": "0x011000",
+          "hm_present_no": 45,
+          "named_enemy_params_id": 56,
+          "start_think_table_no": 1,
+          "level": 46,
+          "exp": 194,
+          "index": 10
+        },
+        {
+          "comment": "Dangerous Rogue Warrior",
+          "enemy_id": "0x011000",
+          "hm_present_no": 45,
+          "named_enemy_params_id": 56,
+          "start_think_table_no": 1,
+          "level": 46,
+          "exp": 194,
+          "index": 11
         }
       ]
     }

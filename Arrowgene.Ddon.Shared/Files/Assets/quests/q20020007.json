@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "TA Situation on the Mountain Road",
+  "comment": "A Situation on the Mountain Road",
   "quest_id": 20020007,
   "base_level": 36,
   "minimum_item_rank": 0,
@@ -27,16 +27,19 @@
       "type": "select",
       "loot_pool": [
         {
-          "item_id": 7553,
-          "num": 3
+          "comment": "Shiny Hands",
+          "item_id": 9664,
+          "num": 1
         },
         {
-          "item_id": 9362,
-          "num": 3
+          "comment": "Demon's Talisman",
+          "item_id": 9389,
+          "num": 1
         },
         {
-          "item_id": 9403,
-          "num": 3
+          "comment": "Throwing Knife",
+          "item_id": 9398,
+          "num": 1
         }
       ]
     }
@@ -45,13 +48,16 @@
     {
       "stage_id": {
         "id": 1,
-        "group_id": 221
+        "group_id": 222
       },
+      "starting_index": 5,
       "enemies": [
         {
+          "comment": "Brutal Griffin",
           "enemy_id": "0x015300",
+          "named_enemy_params_id": 54,
           "level": 36,
-          "exp": 7500,
+          "exp": 4200,
           "is_boss": true
         }
       ]
@@ -74,12 +80,20 @@
         "layer_no": 1
       },
       "npc_id": "ArisenCorpsRegimentalSoldier9",
-      "message_id": 11372
+      "message_id": 11388
     },
     {
       "type": "SeekOutEnemiesAtMarkedLocation",
       "announce_type": "Accept",
-      "groups": [ 0 ]
+      "groups": [ 0 ],
+      "result_commands": [
+        {
+          "comment": "Idle dialogue",
+          "type": "QstTalkChg",
+          "Param1": 532,
+          "Param2": 12256
+        }
+      ]
     },
     {
       "type": "KillGroup",
@@ -96,7 +110,7 @@
       },
       "announce_type": "Update",
       "npc_id": "ArisenCorpsRegimentalSoldier9",
-      "message_id": 11842
+      "message_id": 12252
     }
   ]
 }
