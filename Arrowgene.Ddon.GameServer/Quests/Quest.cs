@@ -916,11 +916,12 @@ namespace Arrowgene.Ddon.GameServer.Quests
             }
         }
 
-        public virtual void ResetEnemiesForStage(GameClient client, StageLayoutId stageId)
+        public virtual void ResetEnemiesForStage(GameClient client, StageLayoutId stageId, bool onlyLoaded = false)
         {
             foreach (var (groupId, group) in EnemyGroups)
             {
-                if (group.StageLayoutId.Id == stageId.Id)
+                if (group.StageLayoutId.Id == stageId.Id
+                    && (!onlyLoaded || client.Party.InstanceEnemyManager.HasEnemyGroup(group.StageLayoutId)))
                 {
                     // Cleanup old contexts if we are replacing monsters with new ones
                     foreach (var enemy in group.Enemies)
@@ -929,13 +930,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
                         ContextManager.RemoveContext(client.Party, uid);
                     }
 
-                    S2CInstanceEnemyGroupResetNtc resetNtc = new S2CInstanceEnemyGroupResetNtc()
+                    client.Party.InstanceEnemyManager.ResetEnemyNode(group.StageLayoutId);
+                    client.Party.SendToAll(new S2CInstanceEnemyGroupResetNtc()
                     {
                         LayoutId = group.StageLayoutId.ToCDataStageLayoutId()
-                    };
-
-                    client.Party.InstanceEnemyManager.ResetEnemyNode(group.StageLayoutId);
-                    client.Party.SendToAll(resetNtc);
+                    });
                 }
             }
         }
