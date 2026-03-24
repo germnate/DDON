@@ -71,6 +71,30 @@
           "exp": 162
         },
         {
+          "comment": "Vigilant Mist Hunter",
+          "enemy_id": "0x011031",
+          "named_enemy_params_id": 53,
+          "hm_present_no": 69,
+          "level": 32,
+          "exp": 162
+        },
+        {
+          "comment": "Vigilant Mist Hunter",
+          "enemy_id": "0x011031",
+          "named_enemy_params_id": 53,
+          "hm_present_no": 69,
+          "level": 32,
+          "exp": 162
+        },
+        {
+          "comment": "Vigilant Mist Hunter",
+          "enemy_id": "0x011031",
+          "named_enemy_params_id": 53,
+          "hm_present_no": 69,
+          "level": 32,
+          "exp": 162
+        },
+        {
           "comment": "Vigilant Mist Fighter",
           "enemy_id": "0x011030",
           "named_enemy_params_id": 53,
@@ -83,30 +107,6 @@
           "enemy_id": "0x011030",
           "named_enemy_params_id": 53,
           "hm_present_no": 68,
-          "level": 32,
-          "exp": 162
-        },
-        {
-          "comment": "Vigilant Mist Hunter",
-          "enemy_id": "0x011031",
-          "named_enemy_params_id": 53,
-          "hm_present_no": 69,
-          "level": 32,
-          "exp": 162
-        },
-        {
-          "comment": "Vigilant Mist Hunter",
-          "enemy_id": "0x011031",
-          "named_enemy_params_id": 53,
-          "hm_present_no": 69,
-          "level": 32,
-          "exp": 162
-        },
-        {
-          "comment": "Vigilant Mist Hunter",
-          "enemy_id": "0x011031",
-          "named_enemy_params_id": 53,
-          "hm_present_no": 69,
           "level": 32,
           "exp": 162
         }

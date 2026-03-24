@@ -61,7 +61,7 @@
           "level": 21,
           "exp": 100,
           "repop_count": 1,
-          "repop_wait_second": 5,
+          "repop_wait_second": 10,
           "index": 4
         },
         {
@@ -81,7 +81,7 @@
           "level": 21,
           "exp": 100,
           "repop_count": 1,
-          "repop_wait_second": 5,
+          "repop_wait_second": 10,
           "index": 6
         },
         {
@@ -101,7 +101,7 @@
           "level": 21,
           "exp": 100,
           "repop_count": 1,
-          "repop_wait_second": 5,
+          "repop_wait_second": 10,
           "index": 9
         },
         {
@@ -112,7 +112,7 @@
           "level": 21,
           "exp": 100,
           "repop_count": 1,
-          "repop_wait_second": 5,
+          "repop_wait_second": 10,
           "index": 10
         }               
      ]

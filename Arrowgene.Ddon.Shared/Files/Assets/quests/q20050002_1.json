@@ -62,22 +62,6 @@
           "repop_wait_second": 10
         },
         {
-          "comment": "Vigilant Shadow Harpy",
-          "enemy_id": "0x010607",
-          "named_enemy_params_id": 53,
-          "level": 45,
-          "exp": 210,
-          "repop_count": 1,
-          "repop_wait_second": 10
-        },
-        {
-          "comment": "Vigilant Shadow Harpy",
-          "enemy_id": "0x010607",
-          "named_enemy_params_id": 53,
-          "level": 45,
-          "exp": 210
-        },
-        {
           "comment": "Vigilant Shadow Wolf",
           "enemy_id": "0x010206",
           "named_enemy_params_id": 53,
@@ -101,6 +85,22 @@
           "named_enemy_params_id": 53,
           "level": 45,
           "exp": 236
+        },
+        {
+          "comment": "Vigilant Shadow Harpy",
+          "enemy_id": "0x010607",
+          "named_enemy_params_id": 53,
+          "level": 45,
+          "exp": 210,
+          "repop_count": 1,
+          "repop_wait_second": 10
+        },
+        {
+          "comment": "Vigilant Shadow Harpy",
+          "enemy_id": "0x010607",
+          "named_enemy_params_id": 53,
+          "level": 45,
+          "exp": 210
         }
       ]
     }

@@ -1,7 +1,7 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "The Shadow That Roams the Dead City (Calamity)",
+    "comment": "The Shadow That Roams the Dead City (The Twelve Calamities Descend!)",
     "quest_id": 20995011,
     "base_level": 55,
     "minimum_item_rank": 0,
@@ -40,6 +40,52 @@
                     "comment": "Alchemized Armor Plate",
                     "item_id": 8031,
                     "num": 3
+                }
+            ]
+        },
+        {
+            "type": "random",
+            "loot_pool": [
+                {
+                    "comment": "Crest of Herculean Power",
+                    "item_id": 9198,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Sheer Power",
+                    "item_id": 9197,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Greater Power",
+                    "item_id": 9196,
+                    "num": 1,
+                    "chance": 0.1
+                }
+            ]
+        },
+        {
+            "type": "random",
+            "loot_pool": [
+                {
+                    "comment": "Crest of Herculean Power",
+                    "item_id": 9198,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Sheer Power",
+                    "item_id": 9197,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Greater Power",
+                    "item_id": 9196,
+                    "num": 1,
+                    "chance": 0.1
                 }
             ]
         }

@@ -1,16 +1,17 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "High Difficulty: Lurking in the Shadows",
+  "comment": "High Difficulty: Lurking in the Shadows (Dual Crests ★ Debut)",
   "quest_id": 21000000,
   "base_level": 65,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "HidellPlains",
+  "order_conditions": [ { "type": "AreaRank", "Param1": 1, "Param2": 13 } ],
   "rewards": [
     {
       "type": "exp",
-      "amount": 9457
+      "amount": 9379
     },
     {
       "type": "wallet",
@@ -26,14 +27,19 @@
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Crest of Firm Protection (Health)",
-          "item_id": 16070,
-          "num": 1
+          "comment": "Crest of Herculean Power (Lowered Defense)",
+          "item_id": 16050,
+          "num": 2
         },
         {
-          "comment": "Crest of Wisdom (Health)",
-          "item_id": 16074,
-          "num": 1
+          "comment": "Crest of Herculean Power",
+          "item_id": 9198,
+          "num": 2
+        },
+        {
+          "comment": "Crest of Dwindled Defense",
+          "item_id": 9280,
+          "num": 2
         }
       ]
     }

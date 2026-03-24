@@ -50,9 +50,23 @@
         "id": 69,
         "group_id": 18
       },
-      "starting_index": 9,
+      "starting_index": 7,
       "enemies": [
         {
+          "comment": "Vigilant Skeleton Sorcerer",
+          "enemy_id": "0x010309",
+          "named_enemy_params_id": 53,
+          "level": 33,
+          "exp": 151
+        },
+        {
+          "comment": "Vigilant Skeleton Sorcerer",
+          "enemy_id": "0x010309",
+          "named_enemy_params_id": 53,
+          "level": 33,
+          "exp": 151
+        },
+        {
           "comment": "Vigilant Undead Swordsman",
           "enemy_id": "0x010503",
           "named_enemy_params_id": 53,
@@ -69,20 +83,6 @@
           "exp": 129,
           "repop_count": 1,
           "repop_wait_second": 10
-        },
-        {
-          "comment": "Vigilant Skeleton Sorcerer",
-          "enemy_id": "0x010309",
-          "named_enemy_params_id": 53,
-          "level": 33,
-          "exp": 151
-        },
-        {
-          "comment": "Vigilant Skeleton Sorcerer",
-          "enemy_id": "0x010309",
-          "named_enemy_params_id": 53,
-          "level": 33,
-          "exp": 151
         }
       ]
     }

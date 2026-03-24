@@ -51,9 +51,23 @@
         "id": 69,
         "group_id": 18
       },
-      "starting_index": 9,
+      "starting_index": 7,
       "enemies": [
         {
+          "comment": "Brutal Skeleton Sorcerer",
+          "enemy_id": "0x010309",
+          "named_enemy_params_id": 54,
+          "level": 36,
+          "exp": 161
+        },
+        {
+          "comment": "Brutal Skeleton Sorcerer",
+          "enemy_id": "0x010309",
+          "named_enemy_params_id": 54,
+          "level": 36,
+          "exp": 161
+        },
+        {
           "comment": "Vigilant Skeleton Mage",
           "enemy_id": "0x010308",
           "named_enemy_params_id": 53,
@@ -70,20 +84,6 @@
           "exp": 134,
           "repop_count": 1,
           "repop_wait_second": 10
-        },
-        {
-          "comment": "Brutal Skeleton Sorcerer",
-          "enemy_id": "0x010309",
-          "named_enemy_params_id": 54,
-          "level": 36,
-          "exp": 161
-        },
-        {
-          "comment": "Brutal Skeleton Sorcerer",
-          "enemy_id": "0x010309",
-          "named_enemy_params_id": 54,
-          "level": 36,
-          "exp": 161
         }
       ]
     }

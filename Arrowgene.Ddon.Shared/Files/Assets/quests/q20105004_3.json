@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Keeper of the Woods (Twelve Calamities II)",
+  "comment": "The Keeper of the Woods (The Twelve Calamities Descend!)",
   "quest_id": 20105004,
   "base_level": 55,
   "minimum_item_rank": 0,
@@ -41,6 +41,52 @@
           "comment": "Dragonleather",
           "item_id": 7941,
           "num": 3
+        }
+      ]
+    },
+    {
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Crest of Superior Magick",
+          "item_id": 9202,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Sheer Magick",
+          "item_id": 9201,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Greater Magick",
+          "item_id": 9200,
+          "num": 1,
+          "chance": 0.1
+        }
+      ]
+    },
+    {
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Crest of Superior Magick",
+          "item_id": 9202,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Sheer Magick",
+          "item_id": 9201,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Greater Magick",
+          "item_id": 9200,
+          "num": 1,
+          "chance": 0.1
         }
       ]
     }

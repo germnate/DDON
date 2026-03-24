@@ -45,6 +45,7 @@
                 "id": 1,
                 "group_id": 51
             },
+            "starting_index": 2,
             "enemies": [
                 {
                     "comment": "Vigilant Redcap",

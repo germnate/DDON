@@ -51,6 +51,7 @@
         "id": 146,
         "group_id": 8
       },
+      "starting_index": 6,
       "enemies": [
         {
           "comment": "Brutal Alchemized Skeleton",
@@ -73,7 +74,7 @@
           "level": 23,
           "exp": 107,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
           "comment": "Brutal Alchemized Wolf",
@@ -82,21 +83,16 @@
           "level": 23,
           "exp": 107,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
           "comment": "Brutal Alchemized Wolf",
           "enemy_id": "0x010207",
           "named_enemy_params_id": 54,
           "level": 23,
-          "exp": 107
-        },
-        {
-          "comment": "Brutal Alchemized Wolf",
-          "enemy_id": "0x010207",
-          "named_enemy_params_id": 54,
-          "level": 23,
-          "exp": 107
+          "exp": 107,
+          "repop_count": 1,
+          "repop_wait_second": 10
         }
       ]
     }

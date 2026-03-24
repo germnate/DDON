@@ -12,7 +12,7 @@
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1700
+      "amount": 1410
     },
     {
       "type": "wallet",
@@ -27,14 +27,17 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Crest of Greater Protection",
           "item_id": 9288,
           "num": 1
         },
         {
+          "comment": "Enhanced Lumber Knife",
           "item_id": 9402,
           "num": 3
         },
         {
+          "comment": "Conqueror's Talisman",
           "item_id": 9387,
           "num": 1
         }
@@ -47,30 +50,36 @@
         "id": 1,
         "group_id": 305
       },
+      "starting_index": 10,
       "enemies": [
         {
+          "comment": "Brutal Armored Cyclops",
           "enemy_id": "0x015002",
+          "named_enemy_params_id": 54,
           "level": 43,
-          "exp": 12000,
+          "exp": 3604,
           "is_boss": true
         },
         {
+          "comment": "Brutal Grimwarg",
           "enemy_id": "0x010601",
-          "level": 40,
-          "exp": 350,
-          "is_boss": false
+          "named_enemy_params_id": 54,
+          "level": 42,
+          "exp": 218
         },
         {
+          "comment": "Brutal Grimwarg",
           "enemy_id": "0x010601",
-          "level": 40,
-          "exp": 350,
-          "is_boss": false
+          "named_enemy_params_id": 54,
+          "level": 42,
+          "exp": 218
         },
         {
+          "comment": "Brutal Grimwarg",
           "enemy_id": "0x010601",
-          "level": 40,
-          "exp": 350,
-          "is_boss": false
+          "named_enemy_params_id": 54,
+          "level": 42,
+          "exp": 218
         }
       ]
     }

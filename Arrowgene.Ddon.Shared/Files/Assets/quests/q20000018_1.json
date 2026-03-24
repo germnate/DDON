@@ -46,8 +46,15 @@
         "id": 1,
         "group_id": 21
       },
-      "starting_index": 1,
+      "starting_index": 2,
       "enemies": [
+        {
+          "comment": "Vigilant Brute Ape",
+          "enemy_id": "0x015504",
+          "named_enemy_params_id": 53,
+          "level": 18,
+          "exp": 141
+        },
         {
           "comment": "Vigilant Dread Ape",
           "enemy_id": "0x015502",
@@ -61,16 +68,7 @@
           "enemy_id": "0x015504",
           "named_enemy_params_id": 53,
           "level": 18,
-          "exp": 141,
-          "is_boss": false
-        },
-        {
-          "comment": "Vigilant Brute Ape",
-          "enemy_id": "0x015504",
-          "named_enemy_params_id": 53,
-          "level": 18,
-          "exp": 141,
-          "is_boss": false
+          "exp": 141
         }
       ]
     }
@@ -94,7 +92,7 @@
           "comment": "Idle dialogue",
           "type": "QstTalkChg",
           "Param1": 12,
-          "Param2": 10823
+          "Param2": 11867
         }
       ]
     },

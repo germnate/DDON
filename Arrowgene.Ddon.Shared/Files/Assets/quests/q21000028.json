@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": false,
   "area_id": "MysreeForest",
+  "order_conditions": [ { "type": "AreaRank", "Param1": 3, "Param2": 13 } ],
   "rewards": [
     {
       "type": "exp",
@@ -73,7 +74,7 @@
               "drop_chance": 0.4
             },
             {
-              "item_id": 13479,
+              "item_id": 13480,
               "item_min": 1,
               "item_max": 1,
               "quality": 1,
@@ -86,7 +87,9 @@
           "comment": "Shadow Goblin Leader",
           "enemy_id": "0x011160",
           "level": 70,
-          "exp": 1535
+          "exp": 1535,
+          "repop_count": 1,
+          "repop_wait_second": 10
         },
         {
           "comment": "Shadow Goblin Leader",
@@ -101,12 +104,6 @@
           "exp": 1535
         },
         {
-          "comment": "Shadow Goblin Leader",
-          "enemy_id": "0x011160",
-          "level": 70,
-          "exp": 1535
-        },
-        {
           "comment": "Jewelry-Bearing Shadow Goblin",
           "enemy_id": "0x011130",
           "named_enemy_params_id": 1121,
@@ -258,9 +255,44 @@
               "quality": 0,
               "drop_chance": 0.1
             }
-          ],
-          "repop_count": 1,
-          "repop_wait_second": 10
+          ]
+        },
+        {
+          "comment": "Jewelry-Bearing Shadow Goblin",
+          "enemy_id": "0x011130",
+          "named_enemy_params_id": 1121,
+          "level": 70,
+          "exp": 1535,
+          "drop_items": [
+            {
+              "item_id": 7911,
+              "item_min": 1,
+              "item_max": 1,
+              "quality": 0,
+              "drop_chance": 0.8
+            },
+            {
+              "item_id": 7753,
+              "item_min": 1,
+              "item_max": 2,
+              "quality": 0,
+              "drop_chance": 0.9
+            },
+            {
+              "item_id": 9441,
+              "item_min": 1,
+              "item_max": 2,
+              "quality": 0,
+              "drop_chance": 0.6
+            },
+            {
+              "item_id": 13479,
+              "item_min": 1,
+              "item_max": 1,
+              "quality": 0,
+              "drop_chance": 0.1
+            }
+          ]
         }
       ]
     }

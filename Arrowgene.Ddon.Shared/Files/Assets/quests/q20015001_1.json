@@ -49,8 +49,9 @@
     {
       "stage_id": {
         "id": 1,
-        "group_id": 84
+        "group_id": 81
       },
+      "starting_index": 1,
       "enemies": [
         {
           "comment": "Brutal Armored Cyclops (Club)",

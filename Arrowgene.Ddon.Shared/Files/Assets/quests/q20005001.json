@@ -79,7 +79,7 @@
         "id": 1,
         "group_id": 8
       },
-      "starting_index": 6,
+      "placement_type": "manual",
       "enemies": [
         {
           "comment": "Vigilant Redcap Fighter",
@@ -87,7 +87,8 @@
           "named_enemy_params_id": 53,
           "start_think_tbl_no": 1,
           "level": 8,
-          "exp": 50
+          "exp": 50,
+          "index": 7
         },
         {
           "comment": "Vigilant Redcap Sling",
@@ -95,7 +96,8 @@
           "named_enemy_params_id": 53,
           "start_think_tbl_no": 1,
           "level": 8,
-          "exp": 50
+          "exp": 50,
+          "index": 9
         },
         {
           "comment": "Vigilant Redcap Sling",
@@ -103,7 +105,8 @@
           "named_enemy_params_id": 53,
           "start_think_tbl_no": 1,
           "level": 8,
-          "exp": 50
+          "exp": 50,
+          "index": 10
         }
       ]
     },
@@ -115,24 +118,24 @@
       "starting_index": 10,
       "enemies": [
         {
+          "comment": "Vigilant Redcap Sling",
+          "enemy_id": "0x011112",
+          "named_enemy_params_id": 53,
+          "start_think_tbl_no": 1,
+          "level": 8,
+          "exp": 50
+        },
+        {
+          "comment": "Vigilant Redcap Sling",
+          "enemy_id": "0x011112",
+          "named_enemy_params_id": 53,
+          "start_think_tbl_no": 1,
+          "level": 8,
+          "exp": 50
+        },	
+        {
           "comment": "Vigilant Redcap Fighter",
           "enemy_id": "0x011111",
-          "named_enemy_params_id": 53,
-          "start_think_tbl_no": 1,
-          "level": 8,
-          "exp": 50
-        },
-        {
-          "comment": "Vigilant Redcap Sling",
-          "enemy_id": "0x011112",
-          "named_enemy_params_id": 53,
-          "start_think_tbl_no": 1,
-          "level": 8,
-          "exp": 50
-        },
-        {
-          "comment": "Vigilant Redcap Sling",
-          "enemy_id": "0x011112",
           "named_enemy_params_id": 53,
           "start_think_tbl_no": 1,
           "level": 8,
@@ -145,31 +148,34 @@
         "id": 1,
         "group_id": 6
       },
-      "starting_index": 7,
+      "placement_type": "manual",
       "enemies": [
+        {
+          "comment": "Vigilant Redcap Sling",
+          "enemy_id": "0x011112",
+          "named_enemy_params_id": 53,
+          "start_think_tbl_no": 1,
+          "level": 8,
+          "exp": 50,
+          "index": 6
+        },
+        {
+          "comment": "Vigilant Redcap Sling",
+          "enemy_id": "0x011112",
+          "named_enemy_params_id": 53,
+          "start_think_tbl_no": 1,
+          "level": 8,
+          "exp": 50,
+          "index": 7
+        },
         {
           "comment": "Vigilant Redcap Fighter",
           "enemy_id": "0x011111",
           "named_enemy_params_id": 53,
           "start_think_tbl_no": 1,
           "level": 8,
-          "exp": 50
-        },
-        {
-          "comment": "Vigilant Redcap Sling",
-          "enemy_id": "0x011112",
-          "named_enemy_params_id": 53,
-          "start_think_tbl_no": 1,
-          "level": 8,
-          "exp": 50
-        },
-        {
-          "comment": "Vigilant Redcap Sling",
-          "enemy_id": "0x011112",
-          "named_enemy_params_id": 53,
-          "start_think_tbl_no": 1,
-          "level": 8,
-          "exp": 50
+          "exp": 50,
+          "index": 9
         }
       ]
     }

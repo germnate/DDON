@@ -1,7 +1,7 @@
     {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "A Strange Bird Dances In the Forest (II)",
+    "comment": "A Strange Creature Dances In the Forest (II)",
     "quest_id": 20055001,
     "variant_index": 1,
     "base_level": 18,

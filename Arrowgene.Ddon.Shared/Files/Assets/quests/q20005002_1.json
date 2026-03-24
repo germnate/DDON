@@ -55,33 +55,26 @@
           "exp": 98
         },
         {
-          "comment": "Vigilant Orc Vanguard",
-          "enemy_id": "0x015802",
-          "named_enemy_params_id": 53,
-          "level": 15,
-          "exp": 98,
-          "repop_count": 1,
-          "repop_wait_second": 5
-        },
-        {
-          "comment": "Vigilant Orc Vanguard",
-          "enemy_id": "0x015802",
-          "named_enemy_params_id": 53,
-          "level": 15,
-          "exp": 98
-        },
-        {
           "comment": "Vigilant Orc Tosser",
           "enemy_id": "0x015801",
           "named_enemy_params_id": 53,
           "level": 15,
           "exp": 98,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
-          "comment": "Vigilant Orc Tosser",
-          "enemy_id": "0x015801",
+          "comment": "Vigilant Orc Vanguard",
+          "enemy_id": "0x015802",
+          "named_enemy_params_id": 53,
+          "level": 15,
+          "exp": 98,
+          "repop_count": 1,
+          "repop_wait_second": 10
+        },
+        {
+          "comment": "Vigilant Orc Vanguard",
+          "enemy_id": "0x015802",
           "named_enemy_params_id": 53,
           "level": 15,
           "exp": 98
@@ -91,7 +84,9 @@
           "enemy_id": "0x015801",
           "named_enemy_params_id": 53,
           "level": 15,
-          "exp": 98
+          "exp": 98,
+          "repop_count": 1,
+          "repop_wait_second": 10
         }
       ]
     }

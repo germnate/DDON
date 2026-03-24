@@ -1,16 +1,17 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "High Difficulty: Desolate Land",
+  "comment": "High Difficulty: Desolate Land (Crests x Quests 2016)",
   "quest_id": 21000064,
   "base_level": 70,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "DoweValley",
+  "order_conditions": [ { "type": "AreaRank", "Param1": 5, "Param2": 13 } ],
   "rewards": [
     {
       "type": "exp",
-      "amount": 18420
+      "amount": 16020
     },
     {
       "type": "wallet",
@@ -36,9 +37,50 @@
           "num": 1
         },
         {
-          "comment": "Panacea",
-          "item_id": 41,
-          "num": 3
+          "comment": "Crest of Fire Barrier",
+          "item_id": 16080,
+          "num": 1
+        }
+      ]
+    },
+    {
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Crest of Burning+",
+          "item_id": 13653,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Incineration (Decreased Fire Resist)",
+          "item_id": 16061,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Fire Protection",
+          "item_id": 16091,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Herculean Power (Burning)",
+          "item_id": 16035,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Superior Magick (Burning)",
+          "item_id": 16035,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Fire Barrier",
+          "item_id": 16080,
+          "num": 1,
+          "chance": 0.1
         }
       ]
     }

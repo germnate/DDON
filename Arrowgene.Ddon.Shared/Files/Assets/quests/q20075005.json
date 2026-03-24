@@ -27,14 +27,17 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Sentry Tights",
           "item_id": 8733,
           "num": 1
         },
         {
+          "comment": "Throwing Knife",
           "item_id": 9398,
           "num": 3
         },
         {
+          "comment": "Healing Remedy",
           "item_id": 7554,
           "num": 3
         }
@@ -45,27 +48,25 @@
     {
       "stage_id": {
         "id": 1,
-        "group_id": 302
+        "group_id": 301
       },
-      "placement_type": "manual",
+      "starting_index": 4,
       "enemies": [
         {
+          "comment": "Brutal Silver Roar",
           "enemy_id": "0x015505",
-          "start_think_tbl_no": 1,
-		      "named_enemy_params_id": 54,
+		  "named_enemy_params_id": 54,
           "level": 43,
-          "exp": 6824,
-          "is_boss": true,
-          "index": 4
+          "exp": 3401,
+          "is_boss": true
         },
         {
+          "comment": "Brutal Silver Roar",
           "enemy_id": "0x015505",
-          "start_think_tbl_no": 1,
-		      "named_enemy_params_id": 54,
+		  "named_enemy_params_id": 54,
           "level": 43,
-          "exp": 6824,
-          "is_boss": true,
-          "index": 2
+          "exp": 3401,
+          "is_boss": true
         }
       ]
     }

@@ -51,12 +51,12 @@
         "id": 1,
         "group_id": 30
       },
+      "starting_index": 1,
       "enemies": [
         {
           "comment": "Brutal Sphinx",
           "enemy_id": "0x015302",
           "named_enemy_params_id": 54,
-          "start_think_tbl_no": 1,
           "level": 34,
           "exp": 3496,
           "is_boss": true

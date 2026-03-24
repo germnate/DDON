@@ -55,7 +55,7 @@
           "level": 13,
           "exp": 50,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
           "comment": "Vigilant Undead (Male)",
@@ -65,7 +65,7 @@
           "level": 13,
           "exp": 50,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
           "comment": "Vigilant Undead (Male)",
@@ -75,7 +75,7 @@
           "level": 13,
           "exp": 50,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
           "comment": "Vigilant Undead (Male)",

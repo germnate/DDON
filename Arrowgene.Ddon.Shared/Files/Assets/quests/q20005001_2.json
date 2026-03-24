@@ -75,7 +75,7 @@
         "id": 1,
         "group_id": 8
       },
-      "starting_index": 6,
+      "placement_type": "manual",
       "enemies": [
         {
           "comment": "Bounty Redcap Fighter",
@@ -83,7 +83,8 @@
           "named_enemy_params_id": 458,
           "start_think_tbl_no": 1,
           "level": 8,
-          "exp": 50
+          "exp": 50,
+          "index": 7
         },
         {
           "comment": "Bounty Redcap",
@@ -91,7 +92,8 @@
           "named_enemy_params_id": 458,
           "start_think_tbl_no": 1,
           "level": 8,
-          "exp": 50
+          "exp": 50,
+          "index": 9
         },
         {
           "comment": "Bounty Redcap",
@@ -99,7 +101,8 @@
           "named_enemy_params_id": 458,
           "start_think_tbl_no": 1,
           "level": 8,
-          "exp": 50
+          "exp": 50,
+          "index": 10
         }
       ]
     },
@@ -111,24 +114,24 @@
       "starting_index": 10,
       "enemies": [
         {
+          "comment": "Bounty Redcap",
+          "enemy_id": "0x011110",
+          "named_enemy_params_id": 458,
+          "start_think_tbl_no": 1,
+          "level": 8,
+          "exp": 50
+        },
+        {
+          "comment": "Bounty Redcap",
+          "enemy_id": "0x011110",
+          "named_enemy_params_id": 458,
+          "start_think_tbl_no": 1,
+          "level": 8,
+          "exp": 50
+        },
+        {
           "comment": "Bounty Redcap Fighter",
           "enemy_id": "0x011111",
-          "named_enemy_params_id": 458,
-          "start_think_tbl_no": 1,
-          "level": 8,
-          "exp": 50
-        },
-        {
-          "comment": "Bounty Redcap",
-          "enemy_id": "0x011110",
-          "named_enemy_params_id": 458,
-          "start_think_tbl_no": 1,
-          "level": 8,
-          "exp": 50
-        },
-        {
-          "comment": "Bounty Redcap",
-          "enemy_id": "0x011110",
           "named_enemy_params_id": 458,
           "start_think_tbl_no": 1,
           "level": 8,
@@ -151,7 +154,7 @@
           "level": 8,
           "exp": 50,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
           "comment": "Bounty Redcap Fighter",
@@ -169,7 +172,7 @@
           "level": 8,
           "exp": 50,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
           "comment": "Bounty Redcap",

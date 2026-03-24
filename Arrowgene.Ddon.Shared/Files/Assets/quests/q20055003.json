@@ -50,7 +50,6 @@
         "id": 160,
         "group_id": 0
       },
-      "placement_type": "manual",
       "enemies": [
         {
           "comment": "Vigilant Troll",
@@ -58,8 +57,7 @@
           "named_enemy_params_id": 53,
           "level": 18,
           "exp": 1872,
-          "is_boss": true,
-          "index": 0
+          "is_boss": true
         },
         {
           "comment": "Vigilant Stout Undead",
@@ -68,24 +66,21 @@
           "level": 16,
           "exp": 98,
           "repop_count": 1,
-          "repop_wait_second": 5,
-          "index": 1
+          "repop_wait_second": 5
         },
         {
           "comment": "Vigilant Stout Undead",
           "enemy_id": "0x010502",
           "named_enemy_params_id": 53,
           "level": 16,
-          "exp": 98,
-          "index": 3
+          "exp": 98
         },
         {
           "comment": "Vigilant Stout Undead",
           "enemy_id": "0x010502",
           "named_enemy_params_id": 53,
           "level": 16,
-          "exp": 98,
-          "index": 4
+          "exp": 98
         },
         {
           "comment": "Vigilant Stout Undead",
@@ -94,8 +89,7 @@
           "level": 16,
           "exp": 98,
           "repop_count": 1,
-          "repop_wait_second": 5,
-          "index": 5
+          "repop_wait_second": 5
         }
       ]
     }

@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "High Difficulty: Monsters Full of Ambition",
+  "comment": "High Difficulty: Monsters Full of Ambition (Crests x Quests 2017)",
   "quest_id": 21000056,
   "base_level": 70,
   "minimum_item_rank": 0,
@@ -40,6 +40,35 @@
           "comment": "Crest of Herculean Power (Lowered Defense)",
           "item_id": 16050,
           "num": 1
+        }
+      ]
+    },
+    {
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Crest of Power+",
+          "item_id": 11719,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Magick+",
+          "item_id": 11720,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Greater Power+",
+          "item_id": 13658,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Greater Magick+",
+          "item_id": 13659,
+          "num": 1,
+          "chance": 0.1
         }
       ]
     }

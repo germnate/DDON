@@ -57,7 +57,7 @@
           "level": 15,
           "exp": 77,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
           "comment": "Vigilant Rogue Seeker",
@@ -67,7 +67,7 @@
           "level": 15,
           "exp": 77,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         }
       ]
     },
@@ -87,7 +87,7 @@
           "level": 15,
           "exp": 77,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
           "comment": "Vigilant Rogue Seeker",
@@ -97,7 +97,7 @@
           "level": 15,
           "exp": 77,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
           "comment": "Vigilant Rogue Mage",

@@ -1,7 +1,7 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "An Altered Beast Attacks! (Calamity)",
+    "comment": "An Altered Beast Attacks! (The Twelve Calamities Descend!)",
     "quest_id": 20995005,
     "base_level": 55,
     "minimum_item_rank": 0,
@@ -40,6 +40,52 @@
                     "comment": "Bone Meal",
                     "item_id": 9378,
                     "num": 5
+                }
+            ]
+        },
+        {
+            "type": "random",
+            "loot_pool": [
+                {
+                    "comment": "Crest of Unburdening",
+                    "item_id": 9194,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Curse Warding",
+                    "item_id": 9343,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Curse Prevention",
+                    "item_id": 9344,
+                    "num": 1,
+                    "chance": 0.1
+                }
+            ]
+        },
+        {
+            "type": "random",
+            "loot_pool": [
+                {
+                    "comment": "Crest of Unburdening",
+                    "item_id": 9194,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Curse Warding",
+                    "item_id": 9343,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Curse Prevention",
+                    "item_id": 9344,
+                    "num": 1,
+                    "chance": 0.1
                 }
             ]
         }

@@ -57,7 +57,7 @@
           "is_boss": false,
           "hm_present_no": 47,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
           "comment": "Vigilant Rogue Hunter",
@@ -68,7 +68,7 @@
           "is_boss": false,
           "hm_present_no": 47,
           "repop_count": 1,
-          "repop_wait_second": 5
+          "repop_wait_second": 10
         },
         {
           "comment": "Vigilant Rogue Hunter",

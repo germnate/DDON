@@ -50,47 +50,42 @@
         "id": 334,
         "group_id": 6
       },
-      "placement_type": "manual",
+      "starting_index": 4,
       "enemies": [
         {
           "comment": "Medusa",
           "enemy_id": "0x015610",
           "level": 70,
           "exp": 7675,
-          "is_boss": true,
-          "index": 0
+          "is_boss": true
+        },
+        {
+          "comment": "Dark Corpse Punisher",
+          "enemy_id": "0x010516",
+          "start_think_tbl_no": 2,
+          "level": 70,
+          "exp": 1335
+        },
+        {
+          "comment": "Dark Corpse Punisher",
+          "enemy_id": "0x010516",
+          "start_think_tbl_no": 2,
+          "level": 70,
+          "exp": 1335
+        },
+        {
+          "comment": "Dark Corpse Punisher",
+          "enemy_id": "0x010516",
+          "start_think_tbl_no": 2,
+          "level": 70,
+          "exp": 1335
         },
         {
           "comment": "Medusa",
           "enemy_id": "0x015610",
           "level": 70,
           "exp": 7675,
-          "is_boss": true,
-          "index": 1
-        },
-        {
-          "comment": "Dark Corpse Punisher",
-          "enemy_id": "0x010516",
-          "start_think_tbl_no": 2,
-          "level": 70,
-          "exp": 1335,
-          "index": 5
-        },
-        {
-          "comment": "Dark Corpse Punisher",
-          "enemy_id": "0x010516",
-          "start_think_tbl_no": 2,
-          "level": 70,
-          "exp": 1335,
-          "index": 6
-        },
-        {
-          "comment": "Dark Corpse Punisher",
-          "enemy_id": "0x010516",
-          "start_think_tbl_no": 2,
-          "level": 70,
-          "exp": 1335,
-          "index": 7
+          "is_boss": true
         }
       ]
     },
@@ -143,8 +138,7 @@
       "blocks": [
         {
           "type": "DiscoverEnemy",
-          "groups": [0],
-          "result_commands": [ { "type": "QstLayoutFlagOn", "Param1": 3345 } ]
+          "groups": [0]
         },
         {
           "type": "KillGroup",
@@ -170,8 +164,8 @@
           "comment": "Group 0 boss HP check",
           "type": "Raw",
           "check_commands": [
-            { "type": "EmHpLess", "Param1": 825, "Param2": 6, "Param3": 0, "Param4": 40 } ,
-            { "type": "EmHpLess", "Param1": 825, "Param2": 6, "Param3": 1, "Param4": 40 }
+            { "type": "EmHpLess", "Param1": 825, "Param2": 6, "Param3": 4, "Param4": 40 } ,
+            { "type": "EmHpLess", "Param1": 825, "Param2": 6, "Param3": 8, "Param4": 40 }
           ]
         },
         {
@@ -200,11 +194,11 @@
           "comment": "Is group 0 dead",
           "type": "Raw",
           "check_commands": [
-              { "type": "DieEnemy", "Param1": 825, "Param2": 6, "Param3": 0 } ,
-              { "type": "DieEnemy", "Param1": 825, "Param2": 6, "Param3": 1 } ,
+              { "type": "DieEnemy", "Param1": 825, "Param2": 6, "Param3": 4 } ,
               { "type": "DieEnemy", "Param1": 825, "Param2": 6, "Param3": 5 } ,
               { "type": "DieEnemy", "Param1": 825, "Param2": 6, "Param3": 6 } ,
-              { "type": "DieEnemy", "Param1": 825, "Param2": 6, "Param3": 7 }
+              { "type": "DieEnemy", "Param1": 825, "Param2": 6, "Param3": 7 } ,
+              { "type": "DieEnemy", "Param1": 825, "Param2": 6, "Param3": 8 }
           ]
         },
         {

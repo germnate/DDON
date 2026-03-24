@@ -48,8 +48,9 @@
         {
             "stage_id": {
                 "id": 1,
-                "group_id": 128
+                "group_id": 126
             },
+            "starting_index": 5,
             "enemies": [
                 {
                     "comment" : "Vigilant Troll",

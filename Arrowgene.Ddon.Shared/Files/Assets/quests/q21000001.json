@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "HidellPlains",
+  "order_conditions": [ { "type": "AreaRank", "Param1": 1, "Param2": 13 } ],
   "rewards": [
     {
       "type": "exp",
@@ -49,53 +50,60 @@
         "id": 406,
         "group_id": 1
       },
-      "starting_index": 7,
+      "placement_type": "manual",
       "enemies": [
         {
           "comment": "Wight",
           "enemy_id": "0x015600",
           "level": 55,
           "exp": 2836,
-          "is_boss": true
+          "is_boss": true,
+          "index": 5
+        },
+        {
+          "comment": "Frost Skeleton Brute",
+          "enemy_id": "0x010321",
+          "level": 55,
+          "exp": 318,
+          "index": 6
         },
         {
           "comment": "Wight",
           "enemy_id": "0x015600",
           "level": 55,
           "exp": 2836,
-          "is_boss": true
+          "is_boss": true,
+          "index": 7
         },
         {
           "comment": "Frost Skeleton Brute",
           "enemy_id": "0x010321",
           "level": 55,
-          "exp": 318
-        },
-        {
-          "comment": "Frost Skeleton Brute",
-          "enemy_id": "0x010321",
-          "level": 55,
-          "exp": 318
+          "exp": 318,
+          "index": 8
         },
         {
           "comment": "Alchemy Eye",
           "enemy_id": "0x015420",
           "level": 57,
           "exp": 329,
-          "repop_count": 1
+          "repop_count": 1,
+          "index": 11
         },
         {
           "comment": "Alchemy Eye",
           "enemy_id": "0x015420",
           "level": 57,
           "exp": 329,
-          "repop_count": 1
+          "repop_count": 1,
+          "index": 12
         },
         {
           "comment": "Alchemy Eye",
           "enemy_id": "0x015420",
           "level": 57,
-          "exp": 329
+          "exp": 329,
+          "index": 13
         }
       ]
     }

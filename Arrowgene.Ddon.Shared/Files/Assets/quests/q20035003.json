@@ -47,9 +47,8 @@
     {
       "stage_id": {
         "id": 1,
-        "group_id": 487
+        "group_id": 200
       },
-      "starting_index": 2,
       "enemies": [
         {
           "comment": "Bounty Chimera",

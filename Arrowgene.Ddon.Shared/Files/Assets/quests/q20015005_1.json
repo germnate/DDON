@@ -46,6 +46,7 @@
                 "id": 1,
                 "group_id": 94
             },
+            "starting_index": 10,
             "enemies": [
                 {
                     "comment": "Vigilant Harpy",
@@ -53,7 +54,8 @@
                     "named_enemy_params_id": 53,
                     "level": 11,
                     "exp": 62,
-                    "is_boss": false
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 },
                 {
                     "comment": "Vigilant Harpy",
@@ -61,39 +63,22 @@
                     "named_enemy_params_id": 53,
                     "level": 11,
                     "exp": 62,
-                    "is_boss": false
+                    "repop_count": 1,
+                    "repop_wait_second": 10
                 },
                 {
                     "comment": "Vigilant Harpy",
                     "enemy_id": "0x010600",
                     "named_enemy_params_id": 53,
                     "level": 11,
-                    "exp": 62,
-                    "is_boss": false
+                    "exp": 62
                 },
                 {
                     "comment": "Vigilant Harpy",
                     "enemy_id": "0x010600",
                     "named_enemy_params_id": 53,
                     "level": 11,
-                    "exp": 62,
-                    "is_boss": false
-                },
-                {
-                    "comment": "Vigilant Harpy",
-                    "enemy_id": "0x010600",
-                    "named_enemy_params_id": 53,
-                    "level": 11,
-                    "exp": 62,
-                    "is_boss": false
-                },
-                {
-                    "comment": "Vigilant Harpy",
-                    "enemy_id": "0x010600",
-                    "named_enemy_params_id": 53,
-                    "level": 11,
-                    "exp": 62,
-                    "is_boss": false
+                    "exp": 62
                 }
             ]
         }

@@ -45,7 +45,7 @@
         "id": 1,
         "group_id": 21
       },
-      "starting_index": 2,
+      "placement_type": "manual",
       "enemies": [
         {
           "comment": "Vigilant Brute Ape",
@@ -54,8 +54,8 @@
           "level": 9,
           "exp": 104,
           "repop_count": 1,
-          "repop_wait_time": 10,
-          "is_boss": false
+          "repop_wait_second": 10,
+          "index": 2
         },
         {
           "comment": "Vigilant Brute Ape",
@@ -64,8 +64,8 @@
           "level": 9,
           "exp": 104,
           "repop_count": 1,
-          "repop_wait_time": 10,
-          "is_boss": false
+          "repop_wait_second": 10,
+          "index": 4
         }
       ]
     }
@@ -89,7 +89,7 @@
           "comment": "Idle dialogue",
           "type": "QstTalkChg",
           "Param1": 12,
-          "Param2": 10823
+          "Param2": 11867
         }
       ]
     },

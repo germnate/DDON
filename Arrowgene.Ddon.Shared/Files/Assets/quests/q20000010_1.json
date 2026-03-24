@@ -79,7 +79,7 @@
           "level": 16,
           "exp": 81,
           "repop_count": 1,
-          "repop_wait_second": 5,
+          "repop_wait_second": 10,
           "index": 6
         },
         {
@@ -99,7 +99,7 @@
           "level": 16,
           "exp": 81,
           "repop_count": 1,
-          "repop_wait_second": 5,
+          "repop_wait_second": 10,
           "index": 9
         },
         {
