@@ -43,6 +43,52 @@
           "num": 2
         }
       ]
+    },
+    {
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Crest of Intelligence+",
+          "item_id": 11741,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Wisdom",
+          "item_id": 9294,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Sheer Intelligence",
+          "item_id": 9293,
+          "num": 1,
+          "chance": 0.1
+        }
+      ]
+    },
+    {
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Crest of Intelligence+",
+          "item_id": 11741,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Wisdom",
+          "item_id": 9294,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Sheer Intelligence",
+          "item_id": 9293,
+          "num": 1,
+          "chance": 0.1
+        }
+      ]
     }
   ],
   "enemy_groups": [

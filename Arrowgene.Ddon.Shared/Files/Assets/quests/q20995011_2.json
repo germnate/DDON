@@ -1,7 +1,7 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "The Shadow That Roams the Dead City (Calamity II)",
+    "comment": "The Shadow That Roams the Dead City (Nine Calamities)",
     "quest_id": 20995011,
     "base_level": 60,
     "minimum_item_rank": 0,
@@ -40,6 +40,52 @@
                     "comment": "Flame Crystal",
                     "item_id": 7913,
                     "num": 1
+                }
+            ]
+        },
+        {
+            "type": "random",
+            "loot_pool": [
+                {
+                    "comment": "Crest of Restoration+",
+                    "item_id": 11743,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Fortitude",
+                    "item_id": 9298,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Restoration",
+                    "item_id": 9297,
+                    "num": 1,
+                    "chance": 0.1
+                }
+            ]
+        },
+        {
+            "type": "random",
+            "loot_pool": [
+                {
+                    "comment": "Crest of Restoration+",
+                    "item_id": 11743,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Fortitude",
+                    "item_id": 9298,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Restoration",
+                    "item_id": 9297,
+                    "num": 1,
+                    "chance": 0.1
                 }
             ]
         }

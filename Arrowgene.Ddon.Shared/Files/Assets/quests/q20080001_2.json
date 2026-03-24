@@ -50,7 +50,19 @@
                     "comment": "Crest of Stubborn Perseverance",
                     "item_id": 9296,
                     "num": 1,
-                    "chance": 0.15
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Perseverance",
+                    "item_id": 9295,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Fortitude",
+                    "item_id": 9298,
+                    "num": 1,
+                    "chance": 0.1
                 }
             ]
         },
@@ -58,10 +70,22 @@
             "type": "random",
             "loot_pool": [
                 {
+                    "comment": "Crest of Stubborn Perseverance",
+                    "item_id": 9296,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Perseverance",
+                    "item_id": 9295,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
                     "comment": "Crest of Fortitude",
                     "item_id": 9298,
                     "num": 1,
-                    "chance": 0.15
+                    "chance": 0.1
                 }
             ]
         }

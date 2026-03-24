@@ -1,7 +1,7 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "The Accursed Wanderer (Twelve Calamities)",
+    "comment": "The Accursed Wanderer (The Twelve Calamities Descend!)",
     "quest_id": 20095007,
     "base_level": 55,
     "minimum_item_rank": 0,
@@ -48,16 +48,45 @@
             "type": "random",
             "loot_pool": [
                 {
-                    "comment": "Healing Remedy",
-                    "item_id": 7554,
+                    "comment": "Crest of Petrification",
+                    "item_id": 9253,
                     "num": 1,
-                    "chance": 0.6
+                    "chance": 0.1
                 },
                 {
-                    "comment": "Panacea",
-                    "item_id": 41,
+                    "comment": "Crest of Petrification Warding",
+                    "item_id": 9347,
                     "num": 1,
-                    "chance": 0.6
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Petrification Prevention",
+                    "item_id": 9348,
+                    "num": 1,
+                    "chance": 0.1
+                }
+            ]
+        },
+        {
+            "type": "random",
+            "loot_pool": [
+                {
+                    "comment": "Crest of Petrification",
+                    "item_id": 9253,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Petrification Warding",
+                    "item_id": 9347,
+                    "num": 1,
+                    "chance": 0.1
+                },
+                {
+                    "comment": "Crest of Petrification Prevention",
+                    "item_id": 9348,
+                    "num": 1,
+                    "chance": 0.1
                 }
             ]
         }

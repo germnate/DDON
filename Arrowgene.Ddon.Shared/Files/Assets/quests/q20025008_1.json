@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Blue-Scaled Wicked Dragon (Twelve Calamities)",
+  "comment": "The Blue-Scaled Wicked Dragon (The Twelve Calamities Descend!)",
   "quest_id": 20025008,
   "base_level": 55,
   "minimum_item_rank": 0,
@@ -46,12 +46,24 @@
     },
     {
       "type": "random",
-      "loot_pool": [
+      "loot_pool": [        
+        {
+          "comment": "Crest of Dragonsbane II",
+          "item_id": 9236,
+          "num": 1,
+          "chance": 0.1
+        },
         {
           "comment": "Crest of Dragonsbane",
           "item_id": 9235,
           "num": 1,
-          "chance": 0.15
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Drowning",
+          "item_id": 9246,
+          "num": 1,
+          "chance": 0.1
         }
       ]
     },
@@ -59,10 +71,22 @@
       "type": "random",
       "loot_pool": [
         {
+          "comment": "Crest of Dragonsbane II",
+          "item_id": 9236,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
+          "comment": "Crest of Dragonsbane",
+          "item_id": 9235,
+          "num": 1,
+          "chance": 0.1
+        },
+        {
           "comment": "Crest of Drowning",
           "item_id": 9246,
           "num": 1,
-          "chance": 0.15
+          "chance": 0.1
         }
       ]
     }
