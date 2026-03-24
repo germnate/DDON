@@ -177,7 +177,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
         protected Dictionary<uint, QuestState> ActiveQuests { get; set; }
         private Dictionary<StageLayoutId, HashSet<uint>> QuestLookupTable { get; set; }
         private List<QuestId> CompletedWorldQuests { get; set; }
-        private Dictionary<QuestAreaId, HashSet<uint>> RolledInstanceWorldQuests { get; set; }
+        protected Dictionary<QuestAreaId, HashSet<uint>> RolledInstanceWorldQuests { get; set; }
 
         // Deferred Generic Work to be triggered at various points
         public Dictionary<QuestProgressWorkType, List<QuestProgressWork>> ProgressWork { get; set; }
@@ -529,6 +529,24 @@ namespace Arrowgene.Ddon.GameServer.Quests
             }
         }
 
+        protected virtual uint GetEffectiveAreaRank(Character character, QuestAreaId areaId)
+        {
+            return character.AreaRanks.TryGetValue(areaId, out var rank) ? rank.Rank : 0;
+        }
+
+        protected Quest RollEligibleQuestVariant(QuestId questId, Character leaderCharacter)
+        {
+            var candidates = QuestManager.GetQuestScheduleIdsForQuestId(questId)
+                .Select(id => QuestManager.GetQuestByScheduleId(id))
+                .Where(q => q != null && !q.OrderConditions.Any(c => c.Type == QuestOrderConditionType.AreaRank
+                    && (leaderCharacter == null
+                        || GetEffectiveAreaRank(leaderCharacter, (QuestAreaId)c.Param01) < (uint)c.Param02)))
+                .ToList();
+
+            if (candidates.Count == 0) return null;
+            return candidates[Random.Shared.Next(candidates.Count)];
+        }
+
         public QuestState GetQuestState(uint questScheduleId)
         {
             lock (ActiveQuests)
@@ -707,14 +725,24 @@ namespace Arrowgene.Ddon.GameServer.Quests
             return packets;
         }
 
+        public virtual void EnforceInitialPoolEligibility() { }
+
+        protected virtual Quest RollQuestVariant(QuestId questId)
+        {
+            return QuestManager.RollQuestForQuestId(questId);
+        }
+
         public void ResetInstance()
         {
             lock (ActiveQuests)
             {
                 foreach (var questId in CompletedWorldQuests)
                 {
-                    var quest = QuestManager.RollQuestForQuestId(questId);
-                    RolledInstanceWorldQuests[quest.QuestAreaId].Add(quest.QuestScheduleId);
+                    var quest = RollQuestVariant(questId);
+                    if (quest != null)
+                    {
+                        RolledInstanceWorldQuests[quest.QuestAreaId].Add(quest.QuestScheduleId);
+                    }
                 }
                 CompletedWorldQuests.Clear();
             }
@@ -810,6 +838,45 @@ namespace Arrowgene.Ddon.GameServer.Quests
         {
             this.Party = party;
             this.Server = server;
+        }
+
+        public override void EnforceInitialPoolEligibility()
+        {
+            var leaderCharacter = Party.Leader?.Client.Character;
+            if (leaderCharacter == null) return;
+
+            lock (ActiveQuests)
+            {
+                foreach (var (areaId, scheduleIds) in RolledInstanceWorldQuests)
+                {
+                    var ineligible = scheduleIds
+                        .Select(id => QuestManager.GetQuestByScheduleId(id))
+                        .Where(q => q != null && q.OrderConditions.Any(c => c.Type == QuestOrderConditionType.AreaRank
+                            && GetEffectiveAreaRank(leaderCharacter, (QuestAreaId)c.Param01) < (uint)c.Param02))
+                        .ToList();
+
+                    foreach (var quest in ineligible)
+                    {
+                        scheduleIds.Remove(quest.QuestScheduleId);
+                        var replacement = RollEligibleQuestVariant(quest.QuestId, leaderCharacter);
+                        if (replacement != null)
+                        {
+                            scheduleIds.Add(replacement.QuestScheduleId);
+                        }
+                    }
+                }
+            }
+        }
+
+        protected override uint GetEffectiveAreaRank(Character character, QuestAreaId areaId)
+        {
+            if (!character.AreaRanks.ContainsKey(areaId)) return 0;
+            return Server.AreaRankManager.GetEffectiveRank(character, areaId);
+        }
+
+        protected override Quest RollQuestVariant(QuestId questId)
+        {
+            return RollEligibleQuestVariant(questId, Party.Leader?.Client.Character);
         }
 
         public override bool CompleteQuestProgress(uint questScheduleId, DbConnection? connectionIn = null)
