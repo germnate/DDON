@@ -8,6 +8,10 @@
   "discoverable": true,
   "area_id": "NorthernBetlandPlains",
   "news_image": 151,
+  "order_conditions": [
+    {"type": "MinimumLevel", "Param1": 55},
+    {"type": "MainQuestCompleted", "Param1": 30}
+  ],
   "rewards": [
     {
       "type": "exp",
@@ -101,7 +105,6 @@
         "id": 1,
         "group_id": 313
       },
-      "placement_type": "manual",
       "enemies": [
         {
           "comment": "Mogok, the Supreme Warrior",
@@ -109,8 +112,7 @@
           "named_enemy_params_id": 646,
           "level": 60,
           "exp": 8500,
-          "is_boss": true,
-          "index": 0
+          "is_boss": true
         },
         {
           "comment": "Orcish Kingsguard (Orc Blitzer)",
@@ -119,27 +121,7 @@
           "repop_count": 1,
           "repop_wait_second": 10,
           "level": 57,
-          "exp": 311,
-          "index": 2
-        },
-        {
-          "comment": "Orcish Kingsguard (Orc Blitzer)",
-          "enemy_id": "0x015811",
-          "named_enemy_params_id": 648,
-          "repop_count": 1,
-          "repop_wait_second": 10,
-          "level": 57,
-          "exp": 311,
-          "index": 3
-        },
-        {
-          "comment": "Orcish Kingsguard (Orc Blitzer)",
-          "enemy_id": "0x015811",
-          "named_enemy_params_id": 648,
-          "repop_count": 1,
-          "level": 57,
-          "exp": 311,
-          "index": 4
+          "exp": 311
         },
         {
           "comment": "War Beast Savage Chimera (Chimera)",
@@ -147,8 +129,24 @@
           "named_enemy_params_id": 647,
           "level": 59,
           "exp": 4740,
-          "is_boss": true,
-          "index": 5
+          "is_boss": true
+        },
+        {
+          "comment": "Orcish Kingsguard (Orc Blitzer)",
+          "enemy_id": "0x015811",
+          "named_enemy_params_id": 648,
+          "repop_count": 1,
+          "repop_wait_second": 10,
+          "level": 57,
+          "exp": 311
+        },
+        {
+          "comment": "Orcish Kingsguard (Orc Blitzer)",
+          "enemy_id": "0x015811",
+          "named_enemy_params_id": 648,
+          "repop_count": 1,
+          "level": 57,
+          "exp": 311
         }
       ]
     }

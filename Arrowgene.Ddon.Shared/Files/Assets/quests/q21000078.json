@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": false,
   "area_id": "NorthernBetlandPlains",
+  "order_conditions": [ { "type": "AreaRank", "Param1": 9, "Param2": 13 } ],
   "rewards": [
     {
       "type": "exp",
@@ -26,17 +27,17 @@
       "type": "select",
       "loot_pool": [
         {
-		  "comment": "Northern Betland Medal",
+          "comment": "Northern Betland Medal",
           "item_id": 11007,
           "num": 1
         },
         {
-		  "comment": "Superior Quality Gala Extract",
+          "comment": "Superior Quality Gala Extract",
           "item_id": 9362,
           "num": 3
         },
         {
-		  "comment": "Panacea",
+          "comment": "Panacea",
           "item_id": 41,
           "num": 3
         }
@@ -49,13 +50,13 @@
         "id": 334,
         "group_id": 8
       },
-      "starting_index": 1,
       "comment": "Up to two Unappraised Star Trinket (General) and two (Soldier)",
+      "placement_type": "manual",
       "enemies": [
         {
           "comment": "Jewelry-Bearing Manticore",
           "enemy_id": "0x015210",
-		  "named_enemy_params_id": 1121,
+          "named_enemy_params_id": 1121,
           "level": 65,
           "exp": 9000,
           "drop_items": [
@@ -88,12 +89,13 @@
               "drop_chance": 1.0
             }
           ],
-          "is_boss": true
+          "is_boss": true,
+          "index": 0
         },
         {
           "comment": "Jewelry-Bearing Manticore",
           "enemy_id": "0x015210",
-		  "named_enemy_params_id": 1121,
+          "named_enemy_params_id": 1121,
           "level": 63,
           "exp": 8800,
           "drop_items": [
@@ -126,30 +128,13 @@
               "drop_chance": 0.1
             }
           ],
-          "is_boss": true
-        },
-        {
-          "comment": "Infected Hobgoblin Fighter",
-          "enemy_id": "0x010161",
-          "level": 65,
-          "exp": 788
-        },
-        {
-          "comment": "Infected Hobgoblin Fighter",
-          "enemy_id": "0x010161",
-          "level": 65,
-          "exp": 788
-        },
-        {
-          "comment": "Infected Hobgoblin Fighter",
-          "enemy_id": "0x010161",
-          "level": 65,
-          "exp": 788
+          "is_boss": true,
+          "index": 1
         },
         {
           "comment": "Jewelry-Bearing Infected Orc Soldier (Severe)",
           "enemy_id": "0x015813",
-		  "named_enemy_params_id": 1121,
+          "named_enemy_params_id": 1121,
           "infection_type": 2,
           "level": 65,
           "exp": 540,
@@ -168,12 +153,13 @@
               "quality": 0,
               "drop_chance": 0.1
             }
-          ]
+          ],
+          "index": 3
         },
         {
           "comment": "Jewelry-Bearing Infected Orc Soldier (Severe)",
           "enemy_id": "0x015813",
-		  "named_enemy_params_id": 1121,
+          "named_enemy_params_id": 1121,
           "infection_type": 2,
           "level": 65,
           "exp": 540,
@@ -192,7 +178,29 @@
               "quality": 0,
               "drop_chance": 0.1
             }
-          ]
+          ],
+          "index": 4
+        },
+        {
+          "comment": "Infected Hobgoblin Fighter",
+          "enemy_id": "0x010161",
+          "level": 65,
+          "exp": 788,
+          "index": 5
+        },
+        {
+          "comment": "Infected Hobgoblin Fighter",
+          "enemy_id": "0x010161",
+          "level": 65,
+          "exp": 788,
+          "index": 6
+        },
+        {
+          "comment": "Infected Hobgoblin Fighter",
+          "enemy_id": "0x010161",
+          "level": 65,
+          "exp": 788,
+          "index": 8
         }
       ]
     }

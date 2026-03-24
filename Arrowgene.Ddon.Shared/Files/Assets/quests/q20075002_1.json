@@ -49,14 +49,15 @@
     {
       "stage_id": {
         "id": 1,
-        "group_id": 309
+        "group_id": 310
       },
+      "starting_index": 2,
       "enemies": [
         {
           "comment": "Dangerous Black Griffin",
           "enemy_id": "0x015303",
-          "start_think_tbl_no": 1,
           "named_enemy_params_id": 56,
+          "start_think_tbl_no": 2,
           "level": 57,
           "exp": 5187,
           "is_boss": true

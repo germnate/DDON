@@ -1,18 +1,19 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "From One Thing to Another",
+  "comment": "From One Thing to Another (II)",
   "quest_id": 20070006,
   "base_level": 44,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "NorthernBetlandPlains",
   "news_image": 504,
+  "variant_index": 1,
   "rewards": [
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1740
+      "amount": 1880
     },
     {
       "type": "wallet",
@@ -27,30 +28,19 @@
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Protective Cloth",
-          "item_id": 7940,
-          "num": 2
+          "comment": "Crest of Greater Magick",
+          "item_id": 9200,
+          "num": 1
         },
         {
-          "comment": "Blue Whiskey",
-          "item_id": 9417,
-          "num": 2
+          "comment": "Throwblast",
+          "item_id": 52,
+          "num": 3
         },
-        {
-          "comment": "Forest Dwellers' Old Key",
-          "item_id": 9066,
-          "num": 2
-        }
-      ]
-    },
-    {
-      "type": "random",
-      "loot_pool": [
         {
           "comment": "Superior Healing Elixir",
           "item_id": 7553,
-          "num": 1,
-          "chance": 1.0
+          "num": 3
         }
       ]
     }
@@ -61,52 +51,52 @@
         "id": 130,
         "group_id": 0
       },
-      "starting_index": 4,
+      "starting_index": 5,
       "enemies": [
         {
-          "comment": "Blob",
-          "enemy_id": "0x010910",
+          "comment": "Sludgeman",
+          "enemy_id": "0x010510",
           "start_think_tbl_no": 8,
           "level": 43,
-          "exp": 138,
+          "exp": 200,
           "is_required": false,
           "is_manual_set": true
         },
         {
-          "comment": "Blob",
-          "enemy_id": "0x010910",
+          "comment": "Sludgeman",
+          "enemy_id": "0x010510",
           "start_think_tbl_no": 8,
           "level": 43,
-          "exp": 138,
+          "exp": 200,
           "is_required": false,
           "is_manual_set": true
         },
         {
-          "comment": "Blob",
-          "enemy_id": "0x010910",
+          "comment": "Sludgeman",
+          "enemy_id": "0x010510",
           "start_think_tbl_no": 8,
           "level": 43,
-          "exp": 138,
+          "exp": 200,
           "is_required": false,
           "is_manual_set": true
         },
         {
-          "comment": "Blob",
-          "enemy_id": "0x010910",
+          "comment": "Sludgeman",
+          "enemy_id": "0x010510",
           "start_think_tbl_no": 8,
           "level": 43,
-          "exp": 138,
+          "exp": 200,
           "is_required": false,
           "is_manual_set": true
         },
         {
-          "comment": "Blob",
-          "enemy_id": "0x010910",
-          "start_think_tbl_no": 8,
-          "level": 43,
-          "exp": 138,
-          "is_required": false,
-          "is_manual_set": true
+          "comment": "Brutal Witch",
+          "enemy_id": "0x015604",
+          "named_enemy_params_id": 54,
+          "start_think_tbl_no": 2,
+          "level": 44,
+          "exp": 2898,
+          "is_boss": true
         },
         {
           "comment": "Brutal Witch",
@@ -189,7 +179,7 @@
         {
           "comment": "Superior Healing Elixir",
           "id": 7553,
-          "amount": 3
+          "amount": 5
         }
       ],
       "message_id": 13337

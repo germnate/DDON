@@ -176,9 +176,9 @@
           "comment": "Is group 0 dead",
           "type": "Raw",
           "check_commands": [
-              { "type": "DieEnemy", "Param1": 820, "Param2": 7, "Param3": 0 } ,
               { "type": "DieEnemy", "Param1": 820, "Param2": 7, "Param3": 3 } ,
               { "type": "DieEnemy", "Param1": 820, "Param2": 7, "Param3": 4 } ,
+              { "type": "DieEnemy", "Param1": 820, "Param2": 7, "Param3": 5 } ,
               { "type": "DieEnemy", "Param1": 820, "Param2": 7, "Param3": 6 } 
           ]
         },
