@@ -69,6 +69,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     CompletedQuest questStats = client.Party.Leader?.Client.Character.CompletedQuests.GetValueOrDefault(quest.QuestId);
                     res.SetQuestList.Add(quest.ToCDataSetQuestList(0, questStats?.ClearCount ?? 0));
                     client.Party.QuestState.AddNewQuest(quest, 0);
+                    // Enemy requests arrive before the quest list, so loaded groups may have generic enemies. Reset them.
+                    quest.ResetEnemiesForStage(client, client.Character.Stage, onlyLoaded: true);
                 }
             }
 
