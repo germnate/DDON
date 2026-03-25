@@ -6,6 +6,7 @@ using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -40,6 +41,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
                  * are random fetch, deliver and kill type quests.
                  */
 
+                var leaderCharacter = client.Party.Leader?.Client.Character;
+
                 // Populate state for all quests currently in progress by the player
                 foreach (var questScheduleId in client.Party.QuestState.GetActiveQuestScheduleIds())
                 {
@@ -49,7 +52,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         continue;
                     }
 
-                    CompletedQuest questStats = client.Party.Leader?.Client.Character.CompletedQuests.GetValueOrDefault(quest.QuestId);
+                    CompletedQuest questStats = leaderCharacter?.CompletedQuests.GetValueOrDefault(quest.QuestId);
                     QuestState questState = client.Party.QuestState.GetQuestState(quest);
                     res.SetQuestList.Add(quest.ToCDataSetQuestList(questState?.Step ?? 0, questStats?.ClearCount ?? 0));
                 }
@@ -66,7 +69,15 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         continue;
                     }
 
-                    CompletedQuest questStats = client.Party.Leader?.Client.Character.CompletedQuests.GetValueOrDefault(quest.QuestId);
+                    if (quest.OrderConditions.Any(c => c.Type == QuestOrderConditionType.AreaRank
+                        && (leaderCharacter == null
+                            || !leaderCharacter.AreaRanks.ContainsKey((QuestAreaId)c.Param01)
+                            || Server.AreaRankManager.GetEffectiveRank(leaderCharacter, (QuestAreaId)c.Param01) < (uint)c.Param02)))
+                    {
+                        continue;
+                    }
+
+                    CompletedQuest questStats = leaderCharacter?.CompletedQuests.GetValueOrDefault(quest.QuestId);
                     res.SetQuestList.Add(quest.ToCDataSetQuestList(0, questStats?.ClearCount ?? 0));
                     client.Party.QuestState.AddNewQuest(quest, 0);
                     // Enemy requests arrive before the quest list, so loaded groups may have generic enemies. Reset them.
