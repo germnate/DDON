@@ -96,6 +96,7 @@ namespace Arrowgene.Ddon.GameServer
             RentalPawnManager = new RentalPawnManager(this);
             OrbUnlockManager = new OrbUnlockManager(this);
             BitterblackMazeManager = new BitterblackMazeManager(this);
+            WorldQuestManager = new WorldQuestManager(this);
 
             S2CStageGetStageListRes stageListPacket =
                 EntitySerializer.Get<S2CStageGetStageListRes>().Read(GameDump.data_Dump_19);
@@ -141,6 +142,7 @@ namespace Arrowgene.Ddon.GameServer
         public JobEmblemManager JobEmblemManager { get; }
         public RentalPawnManager RentalPawnManager { get; }
         public BitterblackMazeManager BitterblackMazeManager { get; }
+        public WorldQuestManager WorldQuestManager { get; }
         public ChatLogHandler ChatLogHandler { get; }
         public LightQuestManager LightQuestManager { get; }
 
@@ -156,6 +158,7 @@ namespace Arrowgene.Ddon.GameServer
             ScriptManager.Initialize();
 
             QuestManager.LoadQuests(this);
+            WorldQuestManager.Initialize();
             GpCourseManager.EvaluateCourses();
 
             if (ServerUtils.IsHeadServer(this))

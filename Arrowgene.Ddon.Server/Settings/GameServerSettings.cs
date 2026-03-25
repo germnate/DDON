@@ -1,5 +1,6 @@
 using Arrowgene.Ddon.Server.Scripting.utils;
 using Arrowgene.Ddon.Shared.Model;
+using Arrowgene.Ddon.Shared.Model.Quest;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -1782,5 +1783,100 @@ namespace Arrowgene.Ddon.Server.Settings
             }
         }
         private const uint _BBMResetGGCost = 1;
+
+        /// <summary>
+        /// Controls how world quests are rolled and refreshed.
+        /// Both modes cannot be active simultaneously.
+        /// Valid values:
+        ///   InstanceReset - each party instance rolls quests independently on area entry.
+        ///   ServerReset   - all players share a single server-wide pool that rotates on a weekly schedule (original game behavior).
+        /// </summary>
+        [DefaultValue("WorldQuestSystemMode.ServerReset")]
+        public WorldQuestSystemMode WorldQuestSystem
+        {
+            set
+            {
+                SetSetting("WorldQuestSystem", value);
+            }
+            get
+            {
+                return TryGetSetting("WorldQuestSystem", _WorldQuestSystem);
+            }
+        }
+        private const WorldQuestSystemMode _WorldQuestSystem = WorldQuestSystemMode.ServerReset;
+
+        /// <summary>
+        /// Day of the week (UTC) on which the server-wide world quest pool resets.
+        /// Only used when WorldQuestSystem = WorldQuestSystemMode.ServerReset.
+        /// </summary>
+        [DefaultValue("DayOfWeek.Thursday")]
+        public DayOfWeek WorldQuestResetDay
+        {
+            set
+            {
+                SetSetting("WorldQuestResetDay", value);
+            }
+            get
+            {
+                return TryGetSetting("WorldQuestResetDay", _WorldQuestResetDay);
+            }
+        }
+        private const DayOfWeek _WorldQuestResetDay = DayOfWeek.Thursday;
+
+        /// <summary>
+        /// Hour of the day (0-23, UTC) at which the server-wide world quest pool resets.
+        /// Only used when WorldQuestSystem = WorldQuestSystemMode.ServerReset.
+        /// </summary>
+        [DefaultValue(_WorldQuestResetHour)]
+        public uint WorldQuestResetHour
+        {
+            set
+            {
+                SetSetting("WorldQuestResetHour", value);
+            }
+            get
+            {
+                return TryGetSetting("WorldQuestResetHour", _WorldQuestResetHour);
+            }
+        }
+        private const uint _WorldQuestResetHour = 10;
+
+        /// <summary>
+        /// Minute of the hour (0-59, UTC) at which the server-wide world quest pool resets.
+        /// Only used when WorldQuestSystem = WorldQuestSystemMode.ServerReset.
+        /// </summary>
+        [DefaultValue(_WorldQuestResetMinute)]
+        public uint WorldQuestResetMinute
+        {
+            set
+            {
+                SetSetting("WorldQuestResetMinute", value);
+            }
+            get
+            {
+                return TryGetSetting("WorldQuestResetMinute", _WorldQuestResetMinute);
+            }
+        }
+        private const uint _WorldQuestResetMinute = 0;
+
+        /// <summary>
+        /// When true, world quests that the party leader does not meet the area rank requirement for
+        /// are hidden. In InstanceReset mode the slot is re-rolled with an eligible quest. In
+        /// ServerReset mode the ineligible quest is simply removed without replacement.
+        /// Applies to both WorldQuestSystem modes.
+        /// </summary>
+        [DefaultValue(_WorldQuestFilterByLeaderAreaRank)]
+        public bool WorldQuestFilterByLeaderAreaRank
+        {
+            set
+            {
+                SetSetting("WorldQuestFilterByLeaderAreaRank", value);
+            }
+            get
+            {
+                return TryGetSetting("WorldQuestFilterByLeaderAreaRank", _WorldQuestFilterByLeaderAreaRank);
+            }
+        }
+        private const bool _WorldQuestFilterByLeaderAreaRank = false;
     }
 }

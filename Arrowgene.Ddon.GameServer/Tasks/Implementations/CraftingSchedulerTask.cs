@@ -15,7 +15,5 @@ namespace Arrowgene.Ddon.GameServer.Tasks.Implementations
         {
             server.RpcManager.AnnounceAll("internal/command", RpcInternalCommand.UpdateCrafting, null);
         }
-
-        public override string TaskTypeName() => "Crafting";
     }
 }

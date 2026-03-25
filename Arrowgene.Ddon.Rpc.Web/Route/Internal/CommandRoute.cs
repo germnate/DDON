@@ -135,6 +135,15 @@ namespace Arrowgene.Ddon.Rpc.Web.Route.Internal
                             gameServer.CraftManager.UpdateOnlineCraftingProgress();
                             return new RpcCommandResult(this, true);
                         }
+                    case RpcInternalCommand.WorldQuestReset:
+                        {
+                            long seed = _entry.GetData<long>();
+                            gameServer.WorldQuestManager.PerformReset(seed);
+                            return new RpcCommandResult(this, true)
+                            {
+                                Message = $"WorldQuestReset with seed {seed}"
+                            };
+                        }
                     default:
                         return new RpcCommandResult(this, false);
                 }

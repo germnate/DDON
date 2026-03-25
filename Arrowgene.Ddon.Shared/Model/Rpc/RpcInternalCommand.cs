@@ -16,6 +16,7 @@ namespace Arrowgene.Ddon.Shared.Model.Rpc
         BoardQuestDailyRotation, //null
         
         UpdateCrafting, // RpcCraftingTimerData
+        WorldQuestReset, // long (seed)
 
         //InternalChatRoute
         SendTellMessage, // RpcChatData

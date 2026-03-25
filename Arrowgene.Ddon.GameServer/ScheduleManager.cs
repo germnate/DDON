@@ -39,6 +39,10 @@ namespace Arrowgene.Ddon.GameServer
                 new PawnLikabilityIncreaseResetTask(5, 0),
                 new EquipmentRecycleResetTask(5, 0),
                 new BoardQuestRotationTask(5, 0),
+                new WorldQuestResetTask(
+                    server.GameSettings.GameServerSettings.WorldQuestResetDay,
+                    server.GameSettings.GameServerSettings.WorldQuestResetHour,
+                    server.GameSettings.GameServerSettings.WorldQuestResetMinute),
             };
         }
 

@@ -15,6 +15,9 @@ public partial class DdonSqlDb : SqlDb
     private readonly string SqlDeleteQuestProgress =
         "DELETE FROM \"ddon_quest_progress\" WHERE \"character_common_id\"=@character_common_id AND \"quest_type\"=@quest_type AND \"quest_schedule_id\"=@quest_schedule_id;";
 
+    private readonly string SqlDeleteAllQuestProgressByType =
+        "DELETE FROM \"ddon_quest_progress\" WHERE \"quest_type\"=@quest_type;";
+
     private readonly string SqlInsertQuestProgress =
         $"INSERT INTO \"ddon_quest_progress\" ({BuildQueryField(QuestProgressFields)}) VALUES ({BuildQueryInsert(QuestProgressFields)});";
 
@@ -107,6 +110,17 @@ public partial class DdonSqlDb : SqlDb
                 AddParameter(command, "quest_type", (uint)questType);
                 AddParameter(command, "quest_schedule_id", questScheduleId);
             }) == 1;
+        });
+    }
+
+    public override bool RemoveAllQuestProgressByType(QuestType questType, DbConnection? connectionIn = null)
+    {
+        return ExecuteQuerySafe(connectionIn, connection =>
+        {
+            return ExecuteNonQuery(connection, SqlDeleteAllQuestProgressByType, command =>
+            {
+                AddParameter(command, "quest_type", (uint)questType);
+            }) >= 0;
         });
     }
 
