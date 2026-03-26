@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "FeryanaWilderness",
   "news_image": 330,
+  "order_conditions": [{"type": "MainQuestCompleted", "Param1": 30130}, {"type": "AreaRank", "Param1": 19, "Param2": 8}],
   "rewards": [
     {
       "type": "wallet",

@@ -5,7 +5,7 @@
     "quest_id": 20085001,
     "base_level": 47,
     "minimum_item_rank": 0,
-    "discoverable": false,
+    "discoverable": true,
     "area_id": "EasternZandora",
     "variant_index": 1,
     "rewards": [

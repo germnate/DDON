@@ -6,7 +6,8 @@
     "base_level": 73,
     "minimum_item_rank": 0,
     "discoverable": true,
-	"area_id": "MorrowForest",	
+	"area_id": "MorrowForest",
+    "order_conditions": [{"type": "AreaRank", "Param1": 16, "Param2": 4}],
     "rewards": [
         {
             "type": "wallet",

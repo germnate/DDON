@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "BetlandPlains",
   "news_image": 527,
+  "order_conditions": [{"type": "AreaRank", "Param1": 8, "Param2": 7}],
   "rewards": [
     {
       "type": "exp",

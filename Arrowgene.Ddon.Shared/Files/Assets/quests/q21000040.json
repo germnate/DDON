@@ -5,7 +5,7 @@
   "quest_id": 21000040,
   "base_level": 60,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "MysreeGrove",
   "order_conditions": [ { "type": "AreaRank", "Param1": 6, "Param2": 13 } ],
   "rewards": [

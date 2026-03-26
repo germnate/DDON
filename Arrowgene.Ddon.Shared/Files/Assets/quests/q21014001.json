@@ -6,7 +6,8 @@
     "base_level": 75,
     "minimum_item_rank": 0,
     "discoverable": true,
-	"area_id": "ElanWaterGrove",	
+	"area_id": "ElanWaterGrove",
+    "order_conditions": [{"type": "AreaRank", "Param1": 14, "Param2": 10}],
     "rewards": [
         {
             "type": "wallet",

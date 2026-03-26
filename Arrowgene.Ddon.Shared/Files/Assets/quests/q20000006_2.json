@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "HidellPlains",
   "news_image": 541,
+  "order_conditions": [{"type": "AreaRank", "Param1": 1, "Param2": 9}],
   "variant_index": 2,
   "rewards": [
     {

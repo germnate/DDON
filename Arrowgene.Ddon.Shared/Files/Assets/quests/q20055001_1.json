@@ -6,7 +6,7 @@
     "variant_index": 1,
     "base_level": 18,
     "minimum_item_rank": 0,
-    "discoverable": false,
+    "discoverable": true,
     "area_id": "MysreeForest",
     "news_image": 101,
     "rewards": [

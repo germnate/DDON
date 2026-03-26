@@ -5,7 +5,7 @@
   "quest_id": 21000090,
   "base_level": 65,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "MergodaRuins",
   "order_conditions": [ { "type": "AreaRank", "Param1": 12, "Param2": 13 } ],
   "rewards": [

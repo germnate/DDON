@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "HidellPlains",
   "news_image": 14,
+  "order_conditions": [{"type": "ClearPersonalQuest", "Param1": 60000016}],
   "variant_index": 2,
   "rewards": [
     {

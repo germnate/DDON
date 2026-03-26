@@ -5,7 +5,7 @@
   "quest_id": 21000013,
   "base_level": 57,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "HidellPlains",
   "order_conditions": [ { "type": "AreaRank", "Param1": 1, "Param2": 13 } ],
   "rewards": [

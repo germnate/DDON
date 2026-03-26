@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "VoldenMines",
   "news_image": 535,
+  "order_conditions": [{"type": "AreaRank", "Param1": 4, "Param2": 2}],
   "variant_index": 1,
   "rewards": [
     {

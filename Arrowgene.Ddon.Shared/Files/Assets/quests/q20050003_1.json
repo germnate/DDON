@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "MysreeForest",
   "news_image": 102,
+  "order_conditions": [{"type": "MainQuestCompleted", "Param1": 6}],
   "variant_index": 1,
   "rewards": [
     {

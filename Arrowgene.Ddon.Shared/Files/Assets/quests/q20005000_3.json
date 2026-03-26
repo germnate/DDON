@@ -5,7 +5,7 @@
   "quest_id": 20005000,
   "base_level": 34,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "HidellPlains",
   "news_image": 6,
   "variant_index": 3,

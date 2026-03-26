@@ -8,6 +8,7 @@
     "discoverable": true,
     "area_id": "ZandoraWastelands",
     "news_image": 183,
+    "order_conditions": [{"type": "AreaRank", "Param1": 10, "Param2": 6}],
     "rewards": [
         {
             "type": "exp",

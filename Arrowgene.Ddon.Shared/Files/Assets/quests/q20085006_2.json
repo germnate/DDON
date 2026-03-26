@@ -8,6 +8,7 @@
     "discoverable": true,
     "area_id": "EasternZandora",
     "news_image": 544,
+    "order_conditions": [{"type": "AreaRank", "Param1": 11, "Param2": 6}, {"type": "MainQuestCompleted", "Param1": 24}],
     "variant_index": 2,
     "rewards": [
         {

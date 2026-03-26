@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "MysreeForest",
   "news_image": 522,
+  "order_conditions": [{"type": "AreaRank", "Param1": 3, "Param2": 6}],
   "variant_index": 1,
   "rewards": [
     {

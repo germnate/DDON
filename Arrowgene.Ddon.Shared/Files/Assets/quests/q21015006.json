@@ -6,7 +6,8 @@
     "base_level": 75,
     "minimum_item_rank": 0,
     "discoverable": true,
-	"area_id": "FaranaPlains",	
+	"area_id": "FaranaPlains",
+    "order_conditions": [{"type": "AreaRank", "Param1": 15, "Param2": 9}],
     "rewards": [
         {
             "type": "wallet",

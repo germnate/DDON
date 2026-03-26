@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "NorthernBetlandPlains",
   "news_image": 542,
+  "order_conditions": [{"type": "AreaRank", "Param1": 9, "Param2": 4}],
   "rewards": [
     {
       "type": "exp",

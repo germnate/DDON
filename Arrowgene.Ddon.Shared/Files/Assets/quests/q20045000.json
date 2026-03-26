@@ -5,9 +5,10 @@
   "quest_id": 20045000,
   "base_level": 28,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "VoldenMines",
   "news_image": 95,
+  "order_conditions": [{"type": "AreaRank", "Param1": 4, "Param2": 4}],
   "rewards": [
     {
       "type": "wallet",

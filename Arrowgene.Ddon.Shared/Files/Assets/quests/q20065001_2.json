@@ -5,9 +5,10 @@
   "quest_id": 20065001,
   "base_level": 55,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "MysreeGrove",
   "news_image": 567,
+  "order_conditions": [{"type": "AreaRank", "Param1": 6, "Param2": 4}],
   "variant_index": 2,
   "rewards": [
     {
