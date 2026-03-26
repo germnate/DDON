@@ -27,6 +27,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
             party.AddHost(client);
 
             PlayerPartyMember join = party.Join(client);
+            // Re-roll any world quests the leader can't take yet (base constructor rolls unfiltered).
+            party.QuestState.EnforceInitialPoolEligibility();
             
             var progress = Server.Database.GetQuestProgressByType(client.Character.CommonId, QuestType.All);
             foreach (var questProgress in progress)
