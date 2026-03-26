@@ -526,12 +526,14 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 {
                     if (pawn.CraftingFinishAt > 0 && currentTime >= pawn.CraftingFinishAt)
                     {
+                        pawn.PawnState = PawnState.None;
+                        pawn.CraftingFinishAt = 0;
+
                         _server.Database.ExecuteInTransaction(connection =>
                         {
                             _server.Database.UpdatePawnCraftFinishTime(client.Character.CharacterId, pawn.PawnId, 0, connection);
                         });
-
-                        pawn.CraftingFinishAt = 0;
+                        
                         client.Send(new S2CCraftFinishCraftNtc { PawnId = pawn.PawnId });
                     }
                 }

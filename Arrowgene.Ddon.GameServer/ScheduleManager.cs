@@ -94,7 +94,10 @@ namespace Arrowgene.Ddon.GameServer
                     {
                         task.RunTask(Server);
                         entries[task.Type].Timestamp = task.NextTimestamp();
-                        Server.Database.UpdateScheduleInfo(task.Type, entries[task.Type].Timestamp);
+                        if (task.Interval != ScheduleInterval.Secondly)
+                        {
+                            Server.Database.UpdateScheduleInfo(task.Type, entries[task.Type].Timestamp);
+                        }
                     }
                 }, null, timerTick, timerTick);
 
