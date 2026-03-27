@@ -5,7 +5,7 @@
     "quest_id": 20005010,
     "base_level": 28,
     "minimum_item_rank": 0,
-    "discoverable": false,
+    "discoverable": true,
     "area_id": "HidellPlains",
     "news_image": 5,
     "variant_index": 1,
@@ -68,7 +68,6 @@
     "blocks": [
         {
             "type": "DiscoverEnemy",
-            "show_marker": false,
             "groups": [ 0 ]
         },
         {

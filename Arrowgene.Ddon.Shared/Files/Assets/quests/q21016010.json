@@ -5,8 +5,9 @@
     "quest_id": 21016010,
     "base_level": 70,
     "minimum_item_rank": 0,
-    "discoverable": false,
-	"area_id": "MorrowForest",	
+    "discoverable": true,
+	"area_id": "MorrowForest",
+    "order_conditions": [{"type": "AreaRank", "Param1": 16, "Param2": 2}],
     "rewards": [
         {
             "type": "wallet",

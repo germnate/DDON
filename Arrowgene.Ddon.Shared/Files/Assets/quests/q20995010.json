@@ -5,8 +5,9 @@
     "quest_id": 20995010,
     "base_level": 52,
     "minimum_item_rank": 0,
-    "discoverable": false,
+    "discoverable": true,
     "area_id": "MergodaRuins",
+    "order_conditions": [{"type": "MainQuestCompleted", "Param1": 23}],
     "rewards": [
         {
             "type": "wallet",

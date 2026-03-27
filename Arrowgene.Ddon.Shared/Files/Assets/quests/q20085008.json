@@ -5,9 +5,10 @@
     "quest_id": 20085008,
     "base_level": 57,
     "minimum_item_rank": 0,
-    "discoverable": false,
+    "discoverable": true,
     "area_id": "EasternZandora",
     "news_image": 168,
+    "order_conditions": [{"type": "AreaRank", "Param1": 11, "Param2": 9}],
     "rewards": [
         {
             "type": "wallet",

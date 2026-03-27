@@ -5,9 +5,10 @@
   "quest_id": 20025003,
   "base_level": 38,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "BetlandPlains",
   "news_image": 544,
+  "order_conditions": [{"type": "AreaRank", "Param1": 8, "Param2": 4}],
   "rewards": [
     {
       "type": "wallet",

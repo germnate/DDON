@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "BetlandPlains",
+  "order_conditions": [{"type": "MainQuestCompleted", "Param1": 29}],
   "rewards": [
     {
       "type": "exp",

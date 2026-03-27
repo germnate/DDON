@@ -5,7 +5,7 @@
   "quest_id": 20055005,
   "base_level": 60,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "MysreeForest",
   "news_image": 109,
   "variant_index": 3,

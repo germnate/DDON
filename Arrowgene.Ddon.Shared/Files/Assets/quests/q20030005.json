@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "DoweValley",
   "news_image": 548,
+  "order_conditions": [{"type": "AreaRank", "Param1": 5, "Param2": 7}],
   "rewards": [
     {
       "type": "exp",

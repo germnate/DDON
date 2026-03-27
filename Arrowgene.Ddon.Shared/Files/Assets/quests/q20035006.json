@@ -5,9 +5,10 @@
   "quest_id": 20035006,
   "base_level": 38,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "DoweValley",
   "news_image": 532,
+  "order_conditions": [{"type": "AreaRank", "Param1": 5, "Param2": 4}],
   "rewards": [
     {
       "type": "wallet",

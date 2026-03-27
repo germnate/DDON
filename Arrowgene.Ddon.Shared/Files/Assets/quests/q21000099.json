@@ -5,8 +5,9 @@
     "quest_id": 21000099,
     "base_level": 70,
     "minimum_item_rank": 0,
-    "discoverable": false,
+    "discoverable": true,
     "area_id": "BloodbaneIsle",
+    "order_conditions": [{"type": "MainQuestCompleted", "Param1": 20100}],
     "rewards": [
         {
             "type": "wallet",

@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "DoweValley",
   "news_image": 71,
+  "order_conditions": [{"type": "MainQuestCompleted", "Param1": 10}],
   "variant_index": 2,
   "rewards": [
     {

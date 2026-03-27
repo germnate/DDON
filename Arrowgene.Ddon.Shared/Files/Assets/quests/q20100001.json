@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "DeenanWoods",
   "news_image": 201,
+  "order_conditions": [{"type": "AreaRank", "Param1": 7, "Param2": 2}],
   "rewards": [
     {
       "type": "wallet",

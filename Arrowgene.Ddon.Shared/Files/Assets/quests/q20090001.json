@@ -7,7 +7,8 @@
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "ZandoraWastelands", 
-    "news_image": 181,  
+    "news_image": 181,
+    "order_conditions": [{"type": "AreaRank", "Param1": 10, "Param2": 6}],
     "rewards": [
         {
             "type": "exp",

@@ -5,7 +5,7 @@
   "quest_id": 20035008,
   "base_level": 35,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "DoweValley",
   "news_image": 535,
   "variant_index": 1,

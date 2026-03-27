@@ -5,8 +5,9 @@
   "quest_id": 20035004,
   "base_level": 38,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "DoweValley",
+  "order_conditions": [{"type": "AreaRank", "Param1": 5, "Param2": 7}],
   "rewards": [
     {
       "type": "exp",

@@ -5,7 +5,7 @@
   "quest_id": 20075007,
   "base_level": 44,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "NorthernBetlandPlains",
   "news_image": 513,
   "rewards": [

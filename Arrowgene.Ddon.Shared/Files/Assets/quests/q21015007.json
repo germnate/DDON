@@ -5,8 +5,9 @@
     "quest_id": 21015007,
     "base_level": 70,
     "minimum_item_rank": 0,
-    "discoverable": false,
+    "discoverable": true,
     "area_id": "FaranaPlains",
+    "order_conditions": [{"type": "AreaRank", "Param1": 15, "Param2": 4}],
     "rewards": [
         {
             "type": "wallet",

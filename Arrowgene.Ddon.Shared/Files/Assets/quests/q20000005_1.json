@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "HidellPlains",
   "news_image": 555,
+  "order_conditions": [{"type": "MainQuestCompleted", "Param1": 5}],
   "variant_index": 1,
   "rewards": [
     {

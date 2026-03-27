@@ -5,8 +5,9 @@
   "quest_id": 20075000,
   "base_level": 45,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "NorthernBetlandPlains",
+  "order_conditions": [{"type": "AreaRank", "Param1": 9, "Param2": 4}],
   "rewards": [
     {
       "type": "exp",

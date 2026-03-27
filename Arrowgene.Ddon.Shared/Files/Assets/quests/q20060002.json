@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "MysreeGrove",
   "news_image": 566,
+  "order_conditions": [{"type": "AreaRank", "Param1": 6, "Param2": 4}],
   "rewards": [
     {
       "type": "exp",

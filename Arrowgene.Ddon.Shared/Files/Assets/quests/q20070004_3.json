@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "NorthernBetlandPlains",
   "news_image": 151,
+  "order_conditions": [{"type": "MainQuestCompleted", "Param1": 16}],
   "variant_index": 3,
   "rewards": [
     {

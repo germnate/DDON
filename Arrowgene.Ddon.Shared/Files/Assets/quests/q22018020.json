@@ -177,18 +177,18 @@
       ]
     },
     {
-      "comment": "GroupId: 27 - Ogre, Squad Leader Dwarf Orc, Heavy Soldier Dwarf Orcs",
+      "comment": "GroupId: 27 - War-Ready Ogre (Light Armor), Squad Leader Dwarf Orc, Heavy Soldier Dwarf Orcs",
       "stage_id": {
         "id": 463,
         "group_id": 27
       },
       "enemies": [
         {
-          "enemy_id": "0x015500",
+          "enemy_id": "0x015510",
           "level": 88,
           "exp": 44000,
           "is_boss": true,
-          "comment": "Ogre"
+          "comment": "War-Ready Ogre (Light Armor)"
         },
         {
           "enemy_id": "0x015826",

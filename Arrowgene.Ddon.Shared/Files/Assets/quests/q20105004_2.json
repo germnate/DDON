@@ -5,9 +5,10 @@
   "quest_id": 20105004,
   "base_level": 60,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "DeenanWoods",
   "news_image": 206,
+  "order_conditions": [{"type": "AreaRank", "Param1": 7, "Param2": 9}],
   "variant_index": 2,
   "rewards": [
     {

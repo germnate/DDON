@@ -6,7 +6,8 @@
     "base_level": 75,
     "minimum_item_rank": 0,
     "discoverable": true,
-	"area_id": "KingalCanyon",	
+	"area_id": "KingalCanyon",
+    "order_conditions": [{"type": "AreaRank", "Param1": 17, "Param2": 8}],
     "rewards": [
         {
             "type": "wallet",

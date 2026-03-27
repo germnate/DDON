@@ -8,6 +8,7 @@
     "discoverable": true,
     "area_id": "EasternZandora",
     "news_image": 544,
+    "order_conditions": [{"type": "MainQuestCompleted", "Param1": 19}],
     "rewards": [
         {
             "type": "wallet",

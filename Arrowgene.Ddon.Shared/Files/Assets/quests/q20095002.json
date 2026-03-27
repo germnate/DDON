@@ -7,7 +7,7 @@
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "ZandoraWastelands",
-    "variant_index": 0,
+    "order_conditions": [{"type": "MainQuestCompleted", "Param1": 20}],
     "news_image": 182,
     "rewards": [
         {
