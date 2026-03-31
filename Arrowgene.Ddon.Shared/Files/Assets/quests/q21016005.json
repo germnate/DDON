@@ -1,42 +1,37 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "Time Restriction: Fine Weather Harvest",
-    "quest_id": 21016006,
-    "base_level": 75,
+    "comment": "Time Restriction: Dusk Logging",
+    "quest_id": 21016005,
+    "base_level": 70,
     "minimum_item_rank": 0,
     "discoverable": true,
+    "news_image": 322,
     "area_id": "MorrowForest",
-    "news_image": 324,
-    "order_conditions": [{"type": "AreaRank", "Param1": 16, "Param2": 8}],
     "rewards": [
         {
             "type": "wallet",
             "wallet_type": "Gold",
-            "amount": 11233
+            "amount": 5772
         },
         {
             "type": "wallet",
             "wallet_type": "RiftPoints",
-            "amount": 1662
+            "amount": 750
         },
         {
             "type": "exp",
-            "amount": 5470
+            "amount": 3070
         },
         {
             "type": "select",
             "loot_pool": [
                 {
-                    "item_id": "BronzeTailFeather",
+                    "item_id": "CrabBrittlegill",
                     "num": 3
                 },
                 {
-                    "item_id": "SuperiorStrongGalaExtract",
-                    "num": 3
-                },
-                {
-                    "item_id": "Panacea",
+                    "item_id": "SuperiorHealingRemedy",
                     "num": 3
                 }
             ]
@@ -51,17 +46,17 @@
                         "id": 340
                     },
                     "npc_id": "Arthfael",
-                    "message_id": 19684
+                    "message_id": 19679
                 },
                 {
                     "type": "Raw",
                     "announce_type": "Accept",
                     "check_commands": [
                         {"type": "StageNo", "Param1": 920},
-                        {"type": "WeatherEq", "Param1": 1}
+                        {"type": "IngameTimeRangeEq", "Param1": 16, "Param2": 20}
                     ],
                     "result_commands": [
-                        {"type": "QstTalkChg", "Param1": 2600, "Param2": 19685}
+                        {"type": "QstTalkChg", "Param1": 2600, "Param2": 19680}
                     ]
                 },
                 {
@@ -69,10 +64,10 @@
                     "announce_type": "Update",
                     "check_commands": [
                         {"type": "TalkNpc", "Param1": 920, "Param2": 2600},
-                        {"type": "WeatherEq", "Param1": 1}
+                        {"type": "IngameTimeRangeEq", "Param1": 16, "Param2": 20}
                     ],
                     "result_commands": [
-                        {"type": "QstTalkChg", "Param1": 2600, "Param2": 19686}
+                        {"type": "QstTalkChg", "Param1": 2600, "Param2": 19681}
                     ]
                 },
                 {
@@ -80,10 +75,10 @@
                     "announce_type": "Update",
                     "result_commands": [
                         {"type": "MyQstFlagOn", "Param1": 0},
-                        {"type": "QstTalkChg", "Param1": 2600, "Param2": 19687}
+                        {"type": "QstTalkChg", "Param1": 2600, "Param2": 19682}
                     ],
                     "check_commands": [
-                        {"type": "HaveItemAllBag", "Param1": 15952, "Param2": 5}
+                        {"type": "HaveItemAllBag", "Param1": 15950, "Param2": 5}
                     ]
                 },
                 {
@@ -95,12 +90,12 @@
                     "npc_id": "Arthfael",
                     "items": [
                         {
-                            "comment": "Wijnruit",
-                            "id": 15952,
+                            "comment": "Rotten Tree",
+                            "id": 15950,
                             "amount": 5
                         }
                     ],
-                    "message_id": 19688
+                    "message_id": 19683
                 }
             ]
         },
@@ -113,24 +108,24 @@
                 {
                     "type": "Raw",
                     "check_commands": [
-                        {"type": "WeatherEq", "Param1": 1}
+                        {"type": "IngameTimeRangeEq", "Param1": 16, "Param2": 20}
                     ]
                 },
                 {
                     "type": "Raw",
                     "result_commands": [
-                        {"type": "QstLayoutFlagOn", "Param1": 4325},
-                        {"type": "CallMessage", "Param1": 1, "Param1": 19938}
+                        {"type": "QstLayoutFlagOn", "Param1": 4324},
+                        {"type": "CallMessage", "Param1": 1, "Param1": 19934}
                     ],
                     "check_commands": [
-                        {"type": "WeatherNotEq", "Param1": 1}
+                        {"type": "IngameTimeRangeNotEq", "Param1": 16, "Param2": 20}
                     ]
                 },
                 {
                     "type": "Raw",
                     "result_commands": [
-                        {"type": "QstLayoutFlagOff", "Param1": 4325},
-                        {"type": "CallMessage", "Param1": 1, "Param1": 19939}
+                        {"type": "QstLayoutFlagOff", "Param1": 4324},
+                        {"type": "CallMessage", "Param1": 1, "Param1": 19935}
                     ]
                 }
             ]
