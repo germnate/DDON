@@ -1,45 +1,41 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "Guardian of The Diseased Forest",
-  "quest_id": 21016010,
-  "base_level": 70,
+  "comment": "Rampaging Wild Beasts",
+  "quest_id": 21016019,
+  "base_level": 78,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "MorrowForest",
-  "news_image": 538,
-  "order_conditions": [{"type": "AreaRank", "Param1": 16, "Param2": 2}],
+  "order_conditions": [{"type": "AreaRank", "Param1": 16, "Param2": 13}],
   "rewards": [
     {
       "type": "exp",
-      "amount": 13814
+      "amount": 33165
     },
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 2309
+      "amount": 5073
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 300
+      "amount": 555
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "comment": "Ancient Iron Ore",
-          "item_id": 15917,
+          "item_id": "GnarledBranch",
           "num": 3
         },
         {
-          "comment": "Superior Strong Gala Extract",
-          "item_id": 9364,
-          "num": 3
+          "item_id": "MurkyDragonFang",
+          "num": 1
         },
         {
-          "comment": "Panacea",
-          "item_id": 41,
+          "item_id": "SuperiorStrongGalaExtract",
           "num": 3
         }
       ]
@@ -48,55 +44,50 @@
   "enemy_groups" : [
     {
       "stage_id": {
-        "id": 417,
-        "group_id": 3
+        "id": 403,
+        "group_id": 8
       },
+      "starting_index": 7,
       "enemies": [
         {
           "comment": "Severely Infected Behemoth (Severe)",
           "enemy_id": "0x015717",
-          "level": 70,
-          "exp": 7675,
+          "level": 78,
+          "exp": 18425,
           "is_boss": true,
-          "infection_type": 1
+          "infection_type": 2
         }
       ]
     },
     {
       "stage_id": {
-        "id": 417,
-        "group_id": 8
+        "id": 403,
+        "group_id": 14
       },
       "enemies": [
         {
-          "comment": "Severely Infected Pixie",
-          "enemy_id": "0x010170",
-          "level": 70,
-          "exp": 1535
+          "comment": "Severely Infected Stymphalides",
+          "enemy_id": "0x010614",
+          "level": 78,
+          "exp": 3685
+        },
+        {
+          "comment": "Severely Infected Stymphalides",
+          "enemy_id": "0x010614",
+          "level": 78,
+          "exp": 3685
         },
         {
           "comment": "Severely Infected Pixie",
           "enemy_id": "0x010170",
-          "level": 70,
-          "exp": 1535
+          "level": 78,
+          "exp": 3685
         },
         {
           "comment": "Severely Infected Pixie",
           "enemy_id": "0x010170",
-          "level": 70,
-          "exp": 1535
-        },
-        {
-          "comment": "Severely Infected Pixie",
-          "enemy_id": "0x010170",
-          "level": 70,
-          "exp": 1535
-        },
-        {
-          "comment": "Severely Infected Pixie",
-          "enemy_id": "0x010170",
-          "level": 70,
-          "exp": 1535
+          "level": 78,
+          "exp": 3685
         }
       ]
     }
@@ -113,7 +104,7 @@
           "reset_group": false,
           "announce_type": "Accept",
           "groups": [0],
-          "result_commands": [{"type": "MyQstFlagOn", "Param1": 2}]
+          "result_commands": [ { "type": "MyQstFlagOn", "Param1": 2 } ]
         },
         {
           "type": "KillGroup",
@@ -126,26 +117,26 @@
       "blocks": [
         {
           "type": "Raw",
-          "check_commands": [{"type": "MyQstFlagOn", "Param1": 2}]
+          "check_commands": [ { "type": "MyQstFlagOn", "Param1": 2 } ]
         },
         {
           "comment": "Group 0 boss HP check",
           "type": "Raw",
-          "check_commands": [{"type": "EmHpLess", "Param1": 816, "Param2": 3, "Param3": 0, "Param4": 40}]
+          "check_commands": [ { "type": "EmHpLess", "Param1": 951, "Param2": 8, "Param3": 7, "Param4": 40 } ]
         },
         {
           "type": "SpawnGroup",
           "announce_type": "Update",
           "groups": [1],
           "check_commands": [
-            {"type": "MyQstFlagOff", "Param1": 0},
-            {"type": "MyQstFlagOn",  "Param1": 1}
+            { "type": "MyQstFlagOff", "Param1": 0 },
+            { "type": "MyQstFlagOn",  "Param1": 1 }
           ]
         },
         {
           "comment": "Group 1 is dead and group 0 is still alive, update announcement",
           "type": "Raw",
-          "result_commands":  [{"type": "UpdateAnnounce", "Param1": 3}]
+          "result_commands":  [ { "type": "UpdateAnnounce", "Param1": 3 } ]
         }
       ]
     },
@@ -153,12 +144,12 @@
       "blocks": [
         {
           "type": "Raw",
-          "check_commands": [{"type": "MyQstFlagOn", "Param1": 2}]
+          "check_commands": [ { "type": "MyQstFlagOn", "Param1": 2 } ]
         },
         {
           "comment": "Is group 0 dead",
           "type": "Raw",
-          "check_commands": [{"type": "DieEnemy", "Param1": 816, "Param2": 3, "Param3": 0}]
+          "check_commands": [ { "type": "DieEnemy", "Param1": 951, "Param2": 8, "Param3": 7 } ]
         },
         {
           "type": "MyQstFlags",
@@ -170,17 +161,16 @@
       "blocks": [
         {
           "type": "Raw",
-          "check_commands": [{"type": "MyQstFlagOn",  "Param1": 2}]
+          "check_commands": [ { "type": "MyQstFlagOn",  "Param1": 2 } ]
         },
         {
           "comment": "Is group 1 dead",
           "type": "Raw",
           "check_commands": [
-              {"type": "DieEnemy", "Param1": 816, "Param2": 8, "Param3": 0},
-              {"type": "DieEnemy", "Param1": 816, "Param2": 8, "Param3": 1},
-              {"type": "DieEnemy", "Param1": 816, "Param2": 8, "Param3": 2},
-              {"type": "DieEnemy", "Param1": 816, "Param2": 8, "Param3": 3},
-              {"type": "DieEnemy", "Param1": 816, "Param2": 8, "Param3": 4}
+              { "type": "DieEnemy", "Param1": 951, "Param2": 14, "Param3": 0 } ,
+              { "type": "DieEnemy", "Param1": 951, "Param2": 14, "Param3": 1 } ,
+              { "type": "DieEnemy", "Param1": 951, "Param2": 14, "Param3": 2 } ,
+              { "type": "DieEnemy", "Param1": 951, "Param2": 14, "Param3": 3 }
           ]
         },
         {
