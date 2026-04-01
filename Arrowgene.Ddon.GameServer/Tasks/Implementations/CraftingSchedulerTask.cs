@@ -1,7 +1,5 @@
-using System;
-using Arrowgene.Ddon.Shared.Model.Scheduler;
-using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Model.Rpc;
+using Arrowgene.Ddon.Shared.Model.Scheduler;
 
 namespace Arrowgene.Ddon.GameServer.Tasks.Implementations
 {
