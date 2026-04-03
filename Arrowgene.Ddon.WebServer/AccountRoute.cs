@@ -1,6 +1,4 @@
 using System;
-using System.Reflection.Metadata;
-using System.Security.AccessControl;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Arrowgene.Ddon.Database;
@@ -10,19 +8,17 @@ using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Logging;
 using Arrowgene.WebServer;
 using Arrowgene.WebServer.Route;
-using Microsoft.AspNetCore.Server.HttpSys;
 
 namespace Arrowgene.Ddon.WebServer
 {
     public class AccountRoute : WebRoute
     {
         private static readonly ILogger Logger = LogProvider.Logger<Logger>(typeof(AccountRoute));
-
-
         public override string Route => "/api/account";
 
         private readonly IDatabase _database;
         private readonly MailSend _mail;
+        private readonly WebServerSetting _webServerSetting;
         private class AccountRequest
         {
             public string Action { get; set; }
@@ -50,10 +46,10 @@ namespace Arrowgene.Ddon.WebServer
 
             public AccountVerification(string username, string password, string email)
             {
-                Username = username;
-                Password = password;
-                Email = email;
-                
+                Username = (username is not null) ? username : "";
+                Password = (password is not null) ? password : "";
+                Email = (email is not null) ? email : "";
+
                 // Very simple data checks on the parameters.
 
                 if (Username.Trim().Length == 0)
@@ -109,10 +105,11 @@ namespace Arrowgene.Ddon.WebServer
             }
         }
 
-        public AccountRoute(IDatabase database, MailSetting mailSetting)
+        public AccountRoute(IDatabase database, WebServerSetting webServerSetting)
         {
             _database = database;
-            _mail = new MailSend(mailSetting);
+            _mail = new MailSend(webServerSetting.MailSetting, webServerSetting);
+            _webServerSetting = webServerSetting;
         }
 
         public override async Task<WebResponse> Post(WebRequest request)
@@ -124,6 +121,7 @@ namespace Arrowgene.Ddon.WebServer
             }
 
             AccountResponse res = new AccountResponse();
+            AccountVerification accountCheck = new(req.Account, req.Password, req.Email);
 
             switch (req.Action)
             {
@@ -132,13 +130,7 @@ namespace Arrowgene.Ddon.WebServer
                     string token = CreateLoginToken(req.Account, req.Password);
                     if (token == null)
                     {
-                        res.Error = "Account or password wrong";
-                        break;
-                    }
-
-                    if (token == "mail")
-                    {
-                        res.Error = "Email not verified yet.";
+                        res.Error = "Either your account or password are incorrect, or your email isn't verified yet.";
                         break;
                     }
 
@@ -147,7 +139,6 @@ namespace Arrowgene.Ddon.WebServer
                     break;
 
                 case "create":
-                    AccountVerification accountCheck = new(req.Account, req.Password, req.Email);
 
                     if (accountCheck.Error)
                     {
@@ -161,10 +152,24 @@ namespace Arrowgene.Ddon.WebServer
                         res.Error = "Account or e-mail already in use";
                         break;
                     }
-
-                    res.Message = "Account created";
-                    await _mail.SendAsync("new_account", account);
-                    break;
+                    try 
+                    {
+                        if ((bool)_webServerSetting.MailSetting.MailRequired)
+                        {
+                            res.Message = "Account created, please check your email for a validation link";
+                            await _mail.SendAsync(MailSend.MailModel.NewAccount, account);
+                        }
+                        else
+                        {
+                            res.Message = "Account created";
+                        }
+                        break;
+                    }
+                    catch
+                    {
+                        res.Error = "Verification e-mail could not be sent";
+                        break;
+                    }
 
                 case "recover":
                     account = CreatePasswordToken(req.Email);
@@ -181,12 +186,20 @@ namespace Arrowgene.Ddon.WebServer
                         break;
                     }
 
-                    res.Message = "Password token generated";
-                    await _mail.SendAsync("password_reset", account);
-                    break;
+                    try
+                    {
+                        await _mail.SendAsync(MailSend.MailModel.PasswordReset, account);
+                        res.Message = "Password token generated";
+                        break;
+                    }
+                    catch
+                    {
+                        res.Error = "Password reset token could not be sent";
+                        break;
+                    }
 
                 case "reset":
-                    account = ResetPassword(req.Password, req.PasswordToken);
+                    account = ResetPassword(req.Account, req.Password, req.PasswordToken);
 
                     if (account == null)
                     {
@@ -198,7 +211,7 @@ namespace Arrowgene.Ddon.WebServer
                     break;
 
                 case "verify":
-                    bool verification = VerifyEmail(req.EmailToken);
+                    bool verification = VerifyEmail(req.Account, req.EmailToken);
                     if (!verification)
                     {
                         res.Error = "Email not found";
@@ -216,10 +229,18 @@ namespace Arrowgene.Ddon.WebServer
                         break;
                     }
 
-                    res.Message = "Verification token resent";
-                    await _mail.SendAsync("mail_verify", account);
+                    try
+                    {
+                        await _mail.SendAsync(MailSend.MailModel.MailVerify, account);
+                        res.Message = "Verification token resent";
+                        break;
 
-                    break;
+                    }
+                    catch
+                    {
+                        res.Error = "Verification token could not be sent";
+                        break;
+                    }
 
             }
 
@@ -266,10 +287,10 @@ namespace Arrowgene.Ddon.WebServer
                 return null;
             }
 
-            if (!account.MailVerified)
+            if (!account.MailVerified && (bool)_webServerSetting.MailSetting.MailRequired )
             {
                 Logger.Error($"{name} - CreateToken: email not verified yet");
-                return "mail";
+                return null;
             }
 
             account.LoginToken = GameToken.GenerateToken();
@@ -278,9 +299,9 @@ namespace Arrowgene.Ddon.WebServer
             return account.LoginToken;
         }
 
-        private Account ResetPassword(string newPassword, string passwordToken)
+        private Account ResetPassword(string name, string newPassword, string passwordToken)
         {
-            Account account = _database.SelectAccountByPasswordToken(passwordToken);
+            Account account = _database.SelectAccountByPasswordTokenAndName(name, passwordToken);
             if (account == null)
             {
                 Logger.Error("ResetPassword: account does not exist");
@@ -323,10 +344,10 @@ namespace Arrowgene.Ddon.WebServer
             return account;
         }
 
-        private bool VerifyEmail(string emailToken)
+        private bool VerifyEmail(string name, string emailToken)
         {
             
-            Account account = _database.SelectAccountByMailToken(emailToken);
+            Account account = _database.SelectAccountByMailTokenAndName(name, emailToken);
             if (account == null)
             {
                 Logger.Error("VerifyEmail: account does not exist");

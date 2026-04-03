@@ -22,57 +22,71 @@
 </head>
 <body>
 
-    <div id="response_area">
-        <div><span class="label">Message:</span> <span id="resp_message"></span></div>
-        <div><span class="label">Error:</span> <span id="resp_erro"></span></div>
-        <div><span class="label">Token:</span> <span id="resp_token"></span></div>
+    <div>
+        <div>
+            <span class="label">Account ID:</span>
+            <input type="text" id="account_input">
+        </div>
+        <div>
+            <button type="button" onclick="DDON.setup()">Verify</button>
+        </div>
     </div>
 
-<script>
-    (function () {
-        window.DDON = {
-            API_ACCOUNT: "/api/account",
+    <div id="response_area">
+        <div><span class="label">Message:</span> <span id="resp_message"></span></div>
+        <div><span class="label">Error:</span> <span id="resp_error"></span></div>
+    </div>
 
-            setup: function () {
-                DDON.setLoading();
+    <script>
+        (function () {
+            window.DDON = {
+                API_ACCOUNT: "/api/account",
 
-                DDON.post(DDON.API_ACCOUNT, {
-                    Action: "verify",
-                    MailToken: DDON.getTokenFromUrl()
-                }, DDON.showResponse);
-            },
+                setup: function () {
+                    DDON.setLoading();
 
-            getTokenFromUrl: function () {
-                return new URLSearchParams(window.location.search).get("token");
-            },
+                    DDON.post(DDON.API_ACCOUNT, {
+                        Action: "verify",
+                        Account: document.getElementById("account_input").value,
+                        EmailToken: DDON.getTokenFromUrl()
+                    }, DDON.showResponse);
+                },
 
-            setLoading: function () {
-                document.getElementById("resp_message").textContent = "Processing...";
-                document.getElementById("resp_erro").textContent = "";
-                document.getElementById("resp_token").textContent = "";
-            },
+                getTokenFromUrl: function () {
+                    var query = window.location.search.substring(1);
+                    var params = query.split("&");
 
-            showResponse: function (data) {
-                document.getElementById("resp_message").textContent = data.Message;
-                document.getElementById("resp_erro").textContent = data.Erro;
-                document.getElementById("resp_token").textContent = data.Token;
-            },
+                    for (var i = 0; i < params.length; i++) {
+                        var pair = params[i].split("=");
+                        if (pair[0] === "token") {
+                            return decodeURIComponent(pair[1]);
+                        }
+                    }
+                    return null;
+                },
 
-            post: function (url, data, cb) {
-                fetch(url, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(data)
-                })
-                .then(r => r.json())
-                .then(cb);
-            }
-        };
+                setLoading: function () {
+                    document.getElementById("resp_message").textContent = "Processing...";
+                    document.getElementById("resp_error").textContent = "";
+                },
 
-        DDON.setup();
-    })();
-</script>
+                showResponse: function (data) {
+                    document.getElementById("resp_message").textContent = data.Message;
+                    document.getElementById("resp_error").textContent = data.Error;
+                },
 
+                post: function (url, data, cb) {
+                    fetch(url, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(data)
+                    })
+                        .then(r => r.json())
+                        .then(cb);
+                }
+            };
+        })();
+    </script>
 
 </body>
 </html>
