@@ -86,9 +86,44 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     gAreaTrialRanks[quest.QuestAreaId] = new Dictionary<uint, uint>();
                 }
 
-                // Nightmarish
-                var requiredRank = quest.ToCDataQuestList(0).QuestProcessStateList.First().CheckCommandList.First().ResultCommandList.First().Param02;
-                gAreaTrialRanks[quest.QuestAreaId][quest.QuestScheduleId] = (uint) requiredRank;
+                // Search all process states for a CheckAreaRank command rather than assuming
+                // it is always the very first command — JSON quests and scripted .csx quests
+                // serialize their process state lists differently, so .First() is unreliable.
+                var questData = quest.ToCDataQuestList(0);
+                uint requiredRank = 0;
+                QuestAreaId areaId = quest.QuestAreaId;
+                bool found = false;
+
+                foreach (var processState in questData.QuestProcessStateList)
+                {
+                    foreach (var checkCmdGroup in processState.CheckCommandList)
+                    {
+                        foreach (var cmd in checkCmdGroup.ResultCommandList)
+                        {
+                            if (cmd.Command == (ushort)QuestCheckCommand.CheckAreaRank)
+                            {
+                                requiredRank = (uint)cmd.Param02;
+                                if (areaId == QuestAreaId.None)
+                                {
+                                    areaId = (QuestAreaId)cmd.Param01;
+                                }
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found) break;
+                    }
+                    if (found) break;
+                }
+
+                if (found)
+                {
+                    if (!gAreaTrialRanks.ContainsKey(areaId))
+                    {
+                        gAreaTrialRanks[areaId] = new Dictionary<uint, uint>();
+                    }
+                    gAreaTrialRanks[areaId][quest.QuestScheduleId] = requiredRank;
+                }
             }
         }
 
@@ -275,18 +310,16 @@ namespace Arrowgene.Ddon.GameServer.Characters
         public static void PurgeUnstartedTutorialQuests(GameClient client)
         {
             var unstartedTutorialQuests = client.QuestState.GetActiveQuestScheduleIds()
-                .Where(x => QuestManager.GetQuestByScheduleId(x).QuestType == QuestType.Tutorial)
-                .Where(x => QuestManager.GetQuestStateManager(client, x).GetQuestState(x).State == QuestProgressState.Unknown)
                 .Select(x => QuestManager.GetQuestByScheduleId(x))
+                .Where(x => x != null && x.QuestType == QuestType.Tutorial)
+                .Where(x => {
+                    var mgr = QuestManager.GetQuestStateManager(client, x);
+                    return mgr != null && mgr.GetQuestState(x.QuestScheduleId)?.State == QuestProgressState.Unknown;
+                })
                 .ToList();
 
             foreach (var quest in unstartedTutorialQuests)
             {
-                if (quest == null)
-                {
-                    continue;
-                }
-
                 var questStateManager = QuestManager.GetQuestStateManager(client, quest);
                 if (questStateManager != null)
                 {
@@ -316,6 +349,16 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return new();
             }
             return gAreaTrialRanks[areaId];
+        }
+
+        public static QuestAreaId GetAreaIdForTrial(uint questScheduleId)
+        {
+            foreach (var (areaId, rankings) in gAreaTrialRanks)
+            {
+                if (rankings.ContainsKey(questScheduleId))
+                    return areaId;
+            }
+            return QuestAreaId.None;
         }
 
         public static uint GetScheduleId(DdonGameServer server, QuestId questId, uint variantNumber)
