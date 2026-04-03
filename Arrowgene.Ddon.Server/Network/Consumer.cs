@@ -1,36 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using Arrowgene.Ddon.Metrics;
 using Arrowgene.Ddon.Shared.Network;
 using Arrowgene.Logging;
-using Arrowgene.Networking.Tcp;
-using Arrowgene.Networking.Tcp.Consumer.BlockingQueueConsumption;
-using Arrowgene.Networking.Tcp.Server.AsyncEvent;
+using Arrowgene.Networking.Metrics;
+using Arrowgene.Networking.SAEAServer;
+using Arrowgene.Networking.SAEAServer.Consumer.BlockingQueueConsumption;
 
 namespace Arrowgene.Ddon.Server.Network
 {
-    public class Consumer<TClient> : ThreadedBlockingQueueConsumer, IDisposable where TClient : Client
+    public class Consumer<TClient> : ThreadedBlockingQueue, IDisposable, IMetricsCapture<DdonConsumerMetricsSnapshot> where TClient : Client
     {
         private readonly ServerLogger Logger;
         private readonly Dictionary<PacketId, IPacketHandler<TClient>> _packetHandlerLookup;
-        private readonly Dictionary<ITcpSocket, TClient> _clients;
+        private readonly Dictionary<long, TClient> _clients;
+        private readonly DdonConsumerMetricsState _ddonConsumerMetricsState;
         private readonly object _lock;
-        private readonly ServerSetting _setting;
         private readonly IClientFactory<TClient> _clientFactory;
 
         private IPacketHandler<TClient> _fallbackPacketHandler;
-        
+
         public Action<TClient> ClientDisconnected;
         public Action<TClient> ClientConnected;
 
-        public Consumer(ServerSetting setting, AsyncEventSettings socketSetting, IClientFactory<TClient> clientFactory, ServerLogger logger = null)
-            : base(socketSetting, setting.Name)
+
+        public Consumer(
+            int maxUnitOfOrder,
+            int queueCapacityPerLane,
+            string identity,
+            IClientFactory<TClient> clientFactory,
+            ServerLogger logger = null
+        ) : base(maxUnitOfOrder, queueCapacityPerLane, identity)
         {
             Logger = logger ?? LogProvider.Logger<ServerLogger>(GetType());
-            _setting = setting;
             _clientFactory = clientFactory;
             _lock = new object();
-            _clients = new Dictionary<ITcpSocket, TClient>();
+            _clients = new Dictionary<long, TClient>();
             _packetHandlerLookup = new Dictionary<PacketId, IPacketHandler<TClient>>();
+            _ddonConsumerMetricsState = new DdonConsumerMetricsState();
         }
 
         public void Clear()
@@ -55,9 +63,11 @@ namespace Arrowgene.Ddon.Server.Network
             _fallbackPacketHandler = packetHandler;
         }
 
-        protected override void HandleReceived(ITcpSocket socket, byte[] data)
+        protected override void HandleReceived(ClientHandle clientHandle, byte[] data)
         {
-            if (!socket.IsAlive)
+            long receivedTimestamp = Stopwatch.GetTimestamp();
+
+            if (!clientHandle.IsAlive)
             {
                 return;
             }
@@ -65,37 +75,40 @@ namespace Arrowgene.Ddon.Server.Network
             TClient client;
             lock (_lock)
             {
-                if (!_clients.ContainsKey(socket))
+                if (!_clients.TryGetValue(clientHandle.UniqueId, out client))
                 {
-                    Logger.Error(socket, "Client does not exist in lookup");
+                    Logger.Error(clientHandle, "Client does not exist in lookup");
                     return;
                 }
-
-                client = _clients[socket];
             }
 
             List<IPacket> packets = client.Receive(data);
             foreach (IPacket packet in packets)
             {
-                HandlePacket(client, packet);
+                HandlePacket(client, packet, receivedTimestamp);
             }
         }
 
-        private void HandlePacket(TClient client, IPacket packet)
+        private void HandlePacket(TClient client, IPacket packet, long receivedTimestamp)
         {
-            if (!_packetHandlerLookup.ContainsKey(packet.Id))
+            if (!_packetHandlerLookup.TryGetValue(packet.Id, out IPacketHandler<TClient> packetHandler))
             {
                 Logger.LogUnhandledPacket(client, packet);
-
-                if(_fallbackPacketHandler != null)
+                if (_fallbackPacketHandler != null)
                 {
-                    _fallbackPacketHandler.Handle(client, packet);
+                    ExecutePacketHandler(client, packet, _fallbackPacketHandler, receivedTimestamp);
                 }
 
                 return;
             }
 
-            IPacketHandler<TClient> packetHandler = _packetHandlerLookup[packet.Id];
+            ExecutePacketHandler(client, packet, packetHandler, receivedTimestamp);
+        }
+
+        private void ExecutePacketHandler(TClient client, IPacket packet, IPacketHandler<TClient> packetHandler, long receivedTimestamp)
+        {
+            _ddonConsumerMetricsState.RecordParseDuration(receivedTimestamp);
+            long startTimestamp = Stopwatch.GetTimestamp();
             try
             {
                 packetHandler.Handle(client, packet);
@@ -104,22 +117,29 @@ namespace Arrowgene.Ddon.Server.Network
             {
                 Logger.Exception(client, ex);
                 Logger.LogPacketError(client, packet);
+                _ddonConsumerMetricsState.IncrementHandlerErrors(
+                    packetHandler.Id.ToString(),
+                    packetHandler.Id.Name);
+            }
+            finally
+            {
+                _ddonConsumerMetricsState.RecordHandlerExecution(
+                    packetHandler.Id.ToString(),
+                    packetHandler.Id.Name,
+                    startTimestamp);
             }
         }
 
-        protected override void HandleDisconnected(ITcpSocket socket)
+        protected override void HandleDisconnected(ClientSnapshot clientSnapshot)
         {
             TClient client;
             lock (_lock)
             {
-                if (!_clients.ContainsKey(socket))
+                if (!_clients.Remove(clientSnapshot.UniqueId, out client))
                 {
-                    Logger.Error(socket, $"Disconnected client does not exist in lookup");
+                    Logger.Error(clientSnapshot, "Disconnected client does not exist in lookup");
                     return;
                 }
-
-                client = _clients[socket];
-                _clients.Remove(socket);
             }
 
             Action<TClient> onClientDisconnected = ClientDisconnected;
@@ -138,12 +158,12 @@ namespace Arrowgene.Ddon.Server.Network
             Logger.Info($"Disconnected: {client.Identity}");
         }
 
-        protected override void HandleConnected(ITcpSocket socket)
+        protected override void HandleConnected(ClientHandle clientHandle)
         {
-            TClient client = _clientFactory.NewClient(socket);
+            TClient client = _clientFactory.NewClient(clientHandle);
             lock (_lock)
             {
-                _clients.Add(socket, client);
+                _clients.Add(clientHandle.UniqueId, client);
             }
 
             Logger.Info($"Connected: {client.Identity}");
@@ -162,6 +182,51 @@ namespace Arrowgene.Ddon.Server.Network
             }
         }
 
+        protected override void HandleError(ClientSnapshot clientSnapshot, Exception exception, string message)
+        {
+            Logger.Error(clientSnapshot, message);
+            Logger.Exception(clientSnapshot, exception);
+        }
+
+        public DdonConsumerMetricsSnapshot CreateSnapshot(double elapsedSeconds)
+        {
+            long currentExecuted = _ddonConsumerMetricsState.GetHandlersExecuted();
+            long currentErrors = _ddonConsumerMetricsState.GetHandlerErrors();
+
+            long[] durationBuckets = new long[_ddonConsumerMetricsState.HandlerDurationBucketsCount];
+            _ddonConsumerMetricsState.CopyHandlerDurationBuckets(durationBuckets);
+
+            long[] parseBuckets = new long[_ddonConsumerMetricsState.HandlerDurationBucketsCount];
+            _ddonConsumerMetricsState.CopyParseDurationBuckets(parseBuckets);
+
+            var handlerEntries = _ddonConsumerMetricsState.GetHandlerEntries();
+            var handlerMetrics = new Dictionary<string, DdonConsumerMetricsSnapshot.HandlerMetrics>(handlerEntries.Count);
+            foreach (var kvp in handlerEntries)
+            {
+                var entry = kvp.Value;
+                handlerMetrics[kvp.Key] = new DdonConsumerMetricsSnapshot.HandlerMetrics(
+                    entry.HandlerName,
+                    entry.GetExecutionCount(),
+                    entry.GetErrorCount(),
+                    entry.GetTotalDurationTicks(),
+                    entry.GetMinDurationTicks(),
+                    entry.GetMaxDurationTicks());
+            }
+
+            return new DdonConsumerMetricsSnapshot(
+                currentExecuted, currentErrors, durationBuckets, parseBuckets, handlerMetrics);
+        }
+
+        void IMetricsCapture.EnableCapture()
+        {
+            _ddonConsumerMetricsState.EnableCapture();
+        }
+
+        void IMetricsCapture.DisableCapture()
+        {
+            _ddonConsumerMetricsState.DisableCapture();
+        }
+
         public void Dispose()
         {
             foreach (var handler in _packetHandlerLookup.Values)
@@ -171,5 +236,6 @@ namespace Arrowgene.Ddon.Server.Network
 
             _fallbackPacketHandler?.Dispose();
         }
+
     }
 }

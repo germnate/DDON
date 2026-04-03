@@ -6,7 +6,8 @@
     "base_level": 60,
     "minimum_item_rank": 0,
     "discoverable": true,
-	"area_id": "BloodbaneIsle",	
+	"area_id": "BloodbaneIsle",
+    "order_conditions": [{"type": "AreaRank", "Param1": 13, "Param2": 2}],
     "rewards": [
         {
             "type": "exp",

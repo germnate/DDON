@@ -5,9 +5,10 @@
   "quest_id": 20015004,
   "base_level": 34,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "BreyaCoast",
   "news_image": 537,
+  "order_conditions": [{"type": "AreaRank", "Param1": 2, "Param2": 9}],
   "rewards": [
     {
       "type": "exp",
@@ -50,30 +51,35 @@
         "id": 98,
         "group_id": 7
       },
+      "starting_index": 2,
       "enemies": [
         {
-          "comment": "Blue Newt",
+          "comment": "Vigilant Blue Newt",
           "enemy_id": "0x010460",
+          "named_enemy_params_id": 53,
           "level": 34,
-          "exp": 463
+          "exp": 167
         },
         {
-          "comment": "Blue Newt",
+          "comment": "Vigilant Blue Newt",
           "enemy_id": "0x010460",
+          "named_enemy_params_id": 53,
           "level": 34,
-          "exp": 463
+          "exp": 167
         },
         {
-          "comment": "Blue Newt",
+          "comment": "Vigilant Blue Newt",
           "enemy_id": "0x010460",
+          "named_enemy_params_id": 53,
           "level": 34,
-          "exp": 463
+          "exp": 167
         },
         {
-          "comment": "Blue Newt",
+          "comment": "Vigilant Blue Newt",
           "enemy_id": "0x010460",
+          "named_enemy_params_id": 53,
           "level": 34,
-          "exp": 463
+          "exp": 167
         }
       ]
     }

@@ -1,11 +1,11 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "Sky Concealing Wings",
+  "comment": "Sky Concealing Wings (III)",
   "quest_id": 20005000,
-  "base_level": 34,
+  "base_level": 20,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "HidellPlains",
   "news_image": 6,
   "variant_index": 2,
@@ -13,30 +13,33 @@
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1120
+      "amount": 660
     },
     {
       "type": "wallet",
       "wallet_type": "RiftPoints",
-      "amount": 220
+      "amount": 130
     },
     {
       "type": "exp",
-      "amount": 1960
+      "amount": 1150
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "item_id": 9320,
+          "comment": "Buster Knuckles",
+          "item_id": 917,
           "num": 1
         },
         {
-          "item_id": 9398,
-          "num": 2
+          "comment": "Angel's Amulet",
+          "item_id": 9382,
+          "num": 1
         },
         {
-          "item_id": 9383,
+          "comment": "Recovery Decoction",
+          "item_id": 9373,
           "num": 3
         }
       ]
@@ -48,13 +51,14 @@
         "id": 1,
         "group_id": 30
       },
+      "starting_index": 1,
       "enemies": [
         {
+          "comment": "Brutal Sphinx",
           "enemy_id": "0x015302",
-          "start_think_tbl_no": 1,
-          "named_enemy_params_id": 142,
-          "level": 34,
-          "exp": 5834,
+          "named_enemy_params_id": 54,
+          "level": 20,
+          "exp": 2530,
           "is_boss": true
         }
       ]

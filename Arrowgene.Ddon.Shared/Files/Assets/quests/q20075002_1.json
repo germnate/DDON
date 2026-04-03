@@ -1,11 +1,11 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Raging Demonic Bird",
+  "comment": "The Raging Demonic Bird (II)",
   "quest_id": 20075002,
   "base_level": 57,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "NorthernBetlandPlains",
   "news_image": 142,
   "variant_index": 1,
@@ -28,16 +28,19 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Griffin Glossy Plume",
           "item_id": 9439,
           "num": 1
         },
         {
+          "comment": "Moist Black Leather",
           "item_id": 7742,
           "num": 1
         },
         {
+          "comment": "Glossy Black Feather",
           "item_id": 7818,
-          "num": 1
+          "num": 2
         }
       ]
     }
@@ -46,18 +49,18 @@
     {
       "stage_id": {
         "id": 1,
-        "group_id": 309
+        "group_id": 310
       },
-      "placement_type": "manual",
+      "starting_index": 2,
       "enemies": [
         {
-          "enemy_id": "0x015301",
-          "start_think_tbl_no": 1,
-		      "named_enemy_params_id": 56,
+          "comment": "Dangerous Black Griffin",
+          "enemy_id": "0x015303",
+          "named_enemy_params_id": 56,
+          "start_think_tbl_no": 2,
           "level": 57,
-          "exp": 21700,
-          "is_boss": true,
-          "index": 0
+          "exp": 5187,
+          "is_boss": true
         }
       ]
     }

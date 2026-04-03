@@ -5,7 +5,7 @@
   "quest_id": 20025000,
   "base_level": 38,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "BetlandPlains",
   "news_image": 54,
   "rewards": [
@@ -27,14 +27,17 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Crest of Incineration",
           "item_id": 9258,
           "num": 1
         },
         {
+          "comment": "Special Mushroom Dip",
           "item_id": 9419,
           "num": 1
         },
         {
+          "comment": "Exquisite Fried Meat",
           "item_id": 9416,
           "num": 2
         }
@@ -47,13 +50,14 @@
         "id": 74,
         "group_id": 7
       },
+      "starting_index": 4,
       "enemies": [
         {
+          "comment": "Brutal Chimera",
           "enemy_id": "0x015200",
-          "start_think_tbl_no": 1,
           "named_enemy_params_id": 54,
           "level": 38,
-          "exp": 6254,
+          "exp": 3480,
           "is_boss": true
         }
       ]

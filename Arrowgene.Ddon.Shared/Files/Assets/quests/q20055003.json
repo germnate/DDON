@@ -5,7 +5,7 @@
   "quest_id": 20055003,
   "base_level": 18,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "MysreeForest",
   "news_image": 113,
   "rewards": [
@@ -27,14 +27,17 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Strong Hatchet",
           "item_id": 67,
           "num": 1
         },
         {
+          "comment": "Interventive",
           "item_id": 9374,
           "num": 2
         },
         {
+          "comment": "Restorative",
           "item_id": 9369,
           "num": 3
         }
@@ -49,39 +52,44 @@
       },
       "enemies": [
         {
-          "comment": "Troll",
+          "comment": "Vigilant Troll",
           "enemy_id": "0x015040",
+          "named_enemy_params_id": 53,
           "level": 18,
-          "exp": 2950,
+          "exp": 1872,
           "is_boss": true
         },
         {
-          "comment": "Mudman",
-          "enemy_id": "0x010509",
+          "comment": "Vigilant Stout Undead",
+          "enemy_id": "0x010502",
+          "named_enemy_params_id": 53,
           "level": 16,
-          "exp": 150,
-          "is_boss": false
+          "exp": 98,
+          "repop_count": 1,
+          "repop_wait_second": 5
         },
         {
-          "comment": "Mudman",
-          "enemy_id": "0x010509",
+          "comment": "Vigilant Stout Undead",
+          "enemy_id": "0x010502",
+          "named_enemy_params_id": 53,
           "level": 16,
-          "exp": 150,
-          "is_boss": false
+          "exp": 98
         },
         {
-          "comment": "Mudman",
-          "enemy_id": "0x010509",
+          "comment": "Vigilant Stout Undead",
+          "enemy_id": "0x010502",
+          "named_enemy_params_id": 53,
           "level": 16,
-          "exp": 150,
-          "is_boss": false
+          "exp": 98
         },
         {
-          "comment": "Mudman",
-          "enemy_id": "0x010509",
+          "comment": "Vigilant Stout Undead",
+          "enemy_id": "0x010502",
+          "named_enemy_params_id": 53,
           "level": 16,
-          "exp": 150,
-          "is_boss": false
+          "exp": 98,
+          "repop_count": 1,
+          "repop_wait_second": 5
         }
       ]
     }

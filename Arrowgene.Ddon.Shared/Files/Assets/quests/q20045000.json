@@ -5,9 +5,10 @@
   "quest_id": 20045000,
   "base_level": 28,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "VoldenMines",
   "news_image": 95,
+  "order_conditions": [{"type": "AreaRank", "Param1": 4, "Param2": 4}],
   "rewards": [
     {
       "type": "wallet",
@@ -27,14 +28,17 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Sergeant's Cloak",
           "item_id": 1017,
           "num": 1
         },
         {
+          "comment": "Enhanced Lumber Knife",
           "item_id": 9402,
           "num": 2
         },
         {
+          "comment": "Throwing Skull",
           "item_id": 9397,
           "num": 3
         }
@@ -45,13 +49,15 @@
     {
       "stage_id": {
         "id": 72,
-        "group_id": 14
+        "group_id": 21
       },
       "enemies": [
         {
+          "comment": "Brutal Colossus",
           "enemy_id": "0x015020",
+          "named_enemy_params_id": 54,
           "level": 28,
-          "exp": 4500,
+          "exp": 2968,
           "is_boss": true
         }
       ]

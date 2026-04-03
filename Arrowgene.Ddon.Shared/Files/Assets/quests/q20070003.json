@@ -8,6 +8,7 @@
   "discoverable": true,
   "area_id": "NorthernBetlandPlains",
   "news_image": 150,
+  "order_conditions": [{"type": "MainQuestCompleted", "Param1": 16}],
   "rewards": [
     {
       "type": "exp",
@@ -27,14 +28,17 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Dragonleather",
           "item_id": 7941,
           "num": 2
         },
         {
+          "comment": "Witch's Brew",
           "item_id": 9421,
           "num": 1
         },
         {
+          "comment": "Enhanced Lockpick",
           "item_id": 9403,
           "num": 3
         }
@@ -58,11 +62,19 @@
         "layer_no": 1
       },
       "npc_id": "Morten",
-      "message_id": 11372
+      "message_id": 11261
     },
     {
       "type": "CollectItem",
       "announce_type": "Accept",
+      "result_commands": [
+        {
+          "comment": "Idle dialogue",
+          "type": "QstTalkChg",
+          "Param1": 528,
+          "Param2": 11267
+        }
+      ],
       "stage_id": {
         "id": 68,
         "group_id": 1,
@@ -282,7 +294,7 @@
       },
       "announce_type": "Update",
       "npc_id": "Morten",
-      "message_id": 11842
+      "message_id": 11264
     }
   ]
 }

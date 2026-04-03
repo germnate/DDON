@@ -5,7 +5,7 @@
   "quest_id": 20015001,
   "base_level": 15,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "BreyaCoast",
   "news_image": 21,
   "rewards": [
@@ -48,12 +48,14 @@
     {
       "stage_id": {
         "id": 1,
-        "group_id": 84
+        "group_id": 81
       },
+      "starting_index": 1,
       "enemies": [
         {
-          "comment": "Armored Cyclops",
+          "comment": "Vigilant Armored Cyclops",
           "enemy_id": "0x015002",
+          "named_enemy_params_id": 53,
           "level": 15,
           "exp": 2120,
           "is_boss": true
