@@ -8,7 +8,7 @@ public class CorsMiddleware : IWebMiddleware
     {
         WebResponse response;
 
-        if (request.Method == WebRequestMethod.Unknown)
+        if (request.Method.ToString().ToUpper() == "OPTIONS")
         {
             response = new WebResponse();
             response.StatusCode = 200;
