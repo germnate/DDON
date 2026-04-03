@@ -6,7 +6,7 @@ namespace Arrowgene.Ddon.WebServer
 {
     public class IndexRoute : WebRoute
     {
-        public override string Route => "/index";
+        public override string Route => "/";
         
         public override async Task<WebResponse> Get(WebRequest request)
         {

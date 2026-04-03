@@ -18,7 +18,7 @@
     <Import Project="./../SetSourceRevision.targets" />
     <ItemGroup>
         <PackageReference Include="Arrowgene.Logging" Version="1.2.1" />
-        <PackageReference Include="Arrowgene.WebServer" Version="1.1.8" />
+        <PackageReference Include="Arrowgene.WebServer" Version="1.1.4" />
         <PackageReference Include="MailKit" Version="4.14.1" />
         <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
         <PackageReference Include="System.Drawing.Common" Version="10.0.2" />
@@ -31,10 +31,18 @@
         </ContentWithTargetPath>
     </ItemGroup>
     <ItemGroup>
+      <None Remove="Files\www\launcher\background.png" />
+      <None Remove="Files\www\launcher\logo.png" />
+    </ItemGroup>
+    <ItemGroup>
         <ProjectReference Include="..\Arrowgene.Ddon.Database\Arrowgene.Ddon.Database.csproj" />
         <ProjectReference Include="..\Arrowgene.Ddon.Shared\Arrowgene.Ddon.Shared.csproj" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Files\mail_templates\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Resource Include="Files\www\launcher\background.png" />
+      <Resource Include="Files\www\launcher\logo.png" />
     </ItemGroup>
 </Project>
