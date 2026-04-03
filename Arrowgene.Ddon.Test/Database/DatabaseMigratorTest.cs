@@ -284,8 +284,8 @@ namespace Arrowgene.Ddon.Test.Database
         public bool ReplaceCompletedQuest(uint characterCommonId, QuestId questId, QuestType questType, uint count, DbConnection? connectionIn = null) { return true; }
         public Account SelectAccountById(int accountId) { return new Account(); }
         public Account SelectAccountByLoginToken(string loginToken) { return new Account(); }
-        public Account SelectAccountByPasswordToken(string passwordToken) { return new Account(); }
-        public Account SelectAccountByMailToken(string mailToken) { return new Account(); }
+        public Account SelectAccountByPasswordTokenAndName(string accountName, string passwordToken) { return new Account(); }
+        public Account SelectAccountByMailTokenAndName(string accountName, string mailToken) { return new Account(); }
         public Account SelectAccountByName(string accountName) { return new Account(); }
         public Account SelectAccountByEmail(string email) { return new Account(); }
         public List<BazaarExhibition> SelectActiveBazaarExhibitionsByItemIdExcludingOwn(uint itemId, uint excludedCharacterId, DbConnection? connectionIn = null) { return new List<BazaarExhibition>(); }

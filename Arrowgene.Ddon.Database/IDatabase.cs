@@ -70,8 +70,8 @@ public interface IDatabase
     Account? SelectAccountByName(string accountName);
     Account? SelectAccountByEmail(string email);
     Account? SelectAccountByLoginToken(string loginToken);
-    Account? SelectAccountByPasswordToken(string passwordToken);
-    Account? SelectAccountByMailToken(string passwordToken);
+    Account? SelectAccountByPasswordTokenAndName(string accountName, string passwordToken);
+    Account? SelectAccountByMailTokenAndName(string accountName, string mailToken);
 
     bool UpdateAccount(Account account);
     bool DeleteAccount(int accountId);

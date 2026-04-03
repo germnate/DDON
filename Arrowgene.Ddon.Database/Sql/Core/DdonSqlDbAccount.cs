@@ -20,9 +20,9 @@ public partial class DdonSqlDb : SqlDb
     private static readonly string SqlSelectAccountById = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"id\"=@id;";
     private static readonly string SqlSelectAccountByName = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"normal_name\"=@normal_name;";
     private static readonly string SqlSelectAccountByLoginToken = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"login_token\"=@login_token;";
-    private static readonly string SqlSelectAccountByPasswordToken = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"password_token\"=@password_token;";
-    private static readonly string SqlSelectAccountByMailToken = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"mail_token\"=@mail_token;";
-    private static readonly string SqlSelectAccountByEmail = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"mail\"=@mail;";
+    private static readonly string SqlSelectAccountByPasswordTokenAndName = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"password_token\"=@password_token AND \"normal_name\"=@normal_name;";
+    private static readonly string SqlSelectAccountByMailTokenAndName = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"mail_token\"=@mail_token AND \"normal_name\"=@normal_name;";
+    private static readonly string SqlSelectAccountByEmail = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE UPPER(\"mail\")=UPPER(@mail);";
     private static readonly string SqlUpdateAccount = $"UPDATE \"account\" SET {BuildQueryUpdate(AccountFields)} WHERE \"id\"=@id;";
 
     public override Account? CreateAccount(string name, string mail, string hash, string mailToken)
@@ -83,7 +83,6 @@ public partial class DdonSqlDb : SqlDb
 
     public override Account? SelectAccountByEmail(string email)
     {
-        email = email.ToLowerInvariant();
         Account account = null;
         ExecuteReader(SqlSelectAccountByEmail,
             command => { AddParameter(command, "@mail", email); }, reader =>
@@ -116,22 +115,28 @@ public partial class DdonSqlDb : SqlDb
         return account;
     }
 
-    public override Account? SelectAccountByPasswordToken(string passwordToken)
+    public override Account? SelectAccountByPasswordTokenAndName(string accountName, string passwordToken)
     {
         Account account = null;
-        ExecuteReader(SqlSelectAccountByPasswordToken,
-            command => { AddParameter(command, "@password_token", passwordToken); }, reader =>
+        ExecuteReader(SqlSelectAccountByPasswordTokenAndName,
+            command => { 
+                AddParameter(command, "@password_token", passwordToken);
+                AddParameter(command, "@normal_name", accountName); 
+            }, reader =>
             {
                 if (reader.Read()) account = ReadAccount(reader);
             });
 
         return account;
     }
-    public override Account? SelectAccountByMailToken(string mailToken)
+    public override Account? SelectAccountByMailTokenAndName(string accountName, string mailToken)
     {
         Account account = null;
-        ExecuteReader(SqlSelectAccountByMailToken,
-            command => { AddParameter(command, "@mail_token", mailToken); }, reader =>
+        ExecuteReader(SqlSelectAccountByMailTokenAndName,
+            command => { 
+                AddParameter(command, "@mail_token", mailToken);
+                AddParameter(command, "@normal_name", accountName);
+            }, reader =>
             {
                 if (reader.Read()) account = ReadAccount(reader);
             });
