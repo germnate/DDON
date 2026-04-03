@@ -5,7 +5,7 @@
   "quest_id": 20025009,
   "base_level": 36,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "BetlandPlains",
   "news_image": 43,
   "rewards": [
@@ -27,24 +27,19 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Cathedral Bottoms",
           "item_id": 9719,
           "num": 1
         },
         {
+          "comment": "Five-Herb Salad",
           "item_id": 9414,
           "num": 2
         },
         {
+          "comment": "Enhanced Lumber Knife",
           "item_id": 9402,
           "num": 3
-        },
-        {
-          "item_id": 968,
-          "num": 1
-        },
-        {
-          "item_id": 9402,
-          "num": 1
         }
       ]
     }
@@ -58,11 +53,12 @@
       "placement_type": "manual",
       "enemies": [
         {
-          "enemy_id": "0x015303",
+          "comment": "Brutal Griffin",
+          "enemy_id": "0x015300",
           "start_think_tbl_no": 1,
-          "named_enemy_params_id": 53,
+          "named_enemy_params_id": 54,
           "level": 36,
-          "exp": 6040,
+          "exp": 4200,
           "is_boss": true,
           "index": 6
         }
@@ -72,6 +68,8 @@
   "blocks": [
     {
       "type": "DiscoverEnemy",
+      "spawn_time_start": "18 * 3600000 + 0 * 60000",
+      "spawn_time_end": "6 * 3600000 + 59 * 60000",
       "groups": [ 0 ]
     },
     {

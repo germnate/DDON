@@ -5,7 +5,7 @@
   "quest_id": 20025008,
   "base_level": 45,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "BetlandPlains",
   "news_image": 44,
   "rewards": [
@@ -27,14 +27,17 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Angules Horn",
           "item_id": 7756,
           "num": 1
         },
         {
+          "comment": "Strong Gala Extract",
           "item_id": 9363,
           "num": 3
         },
         {
+          "comment": "Rare Meat Paté",
           "item_id": 9420,
           "num": 1
         }
@@ -45,19 +48,15 @@
     {
       "stage_id": {
         "id": 1,
-        "group_id": 271
+        "group_id": 269
       },
       "enemies": [
         {
-          "enemy_id": "0x015707",
+          "comment": "Bounty Angules",
+          "enemy_id": "0x015708",
+          "named_enemy_params_id": 458,
           "level": 45,
-          "exp": 13000,
-          "is_boss": true
-        },
-        {
-          "enemy_id": "0x015500",
-          "level": 45,
-          "exp": 13000,
+          "exp": 7980,
           "is_boss": true
         }
       ]

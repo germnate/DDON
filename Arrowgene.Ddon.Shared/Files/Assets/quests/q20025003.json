@@ -5,9 +5,10 @@
   "quest_id": 20025003,
   "base_level": 38,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "BetlandPlains",
   "news_image": 544,
+  "order_conditions": [{"type": "AreaRank", "Param1": 8, "Param2": 4}],
   "rewards": [
     {
       "type": "wallet",
@@ -27,14 +28,17 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Red Alloy Ingot",
           "item_id": 7888,
           "num": 1
         },
         {
+          "comment": "Witch's Brew",
           "item_id": 9421,
           "num": 1
         },
         {
+          "comment": "Throwblast",
           "item_id": 52,
           "num": 3
         }
@@ -47,30 +51,39 @@
         "id": 91,
         "group_id": 2
       },
+      "placement_type": "manual",
       "enemies": [
         {
+          "comment": "Vigilant Orc Tosser",
           "enemy_id": "0x015801",
+          "named_enemy_params_id": 53,
           "level": 37,
-          "exp": 500,
-          "is_boss": false
+          "exp": 200,
+          "index": 0
         },
         {
+          "comment": "Vigilant Orc Tosser",
           "enemy_id": "0x015801",
+          "named_enemy_params_id": 53,
           "level": 37,
-          "exp": 500,
-          "is_boss": false
+          "exp": 200,
+          "index": 1
         },
         {
-          "enemy_id": "0x015801",
-          "level": 37,
-          "exp": 500,
-          "is_boss": false
+          "comment": "Brutal Orc Captain",
+          "enemy_id": "0x015820",
+          "named_enemy_params_id": 54,
+          "level": 38,
+          "exp": 492,
+          "index": 2
         },
         {
+          "comment": "Vigilant Orc Tosser",
           "enemy_id": "0x015801",
+          "named_enemy_params_id": 53,
           "level": 37,
-          "exp": 500,
-          "is_boss": false
+          "exp": 200,
+          "index": 6
         }
       ]
     }

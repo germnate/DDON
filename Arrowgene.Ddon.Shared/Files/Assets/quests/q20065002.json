@@ -5,7 +5,7 @@
   "quest_id": 20065002,
   "base_level": 35,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "MysreeGrove",
   "news_image": 564,
   "rewards": [
@@ -27,14 +27,17 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Soldier Arms",
           "item_id": 711,
           "num": 1
         },
         {
+          "comment": "Refreshing Remedy",
           "item_id": 9375,
           "num": 3
         },
         {
+          "comment": "Three-Herb Salad",
           "item_id": 9410,
           "num": 2
         }
@@ -47,30 +50,39 @@
         "id": 111,
         "group_id": 2
       },
+      "starting_index": 5,
       "enemies": [
         {
+          "comment": "Vigilant Giant Sulfur Saurian",
           "enemy_id": "0x010411",
+          "named_enemy_params_id": 53,
           "level": 35,
-          "exp": 450,
-          "is_boss": false
+          "exp": 201,
+          "repop_count": 1,
+          "repop_wait_second": 10
         },
         {
+          "comment": "Vigilant Giant Sulfur Saurian",
           "enemy_id": "0x010411",
+          "named_enemy_params_id": 53,
           "level": 35,
-          "exp": 450,
-          "is_boss": false
+          "exp": 201,
+          "repop_count": 1,
+          "repop_wait_second": 10
         },
         {
+          "comment": "Vigilant Giant Sulfur Saurian",
           "enemy_id": "0x010411",
+          "named_enemy_params_id": 53,
           "level": 35,
-          "exp": 450,
-          "is_boss": false
+          "exp": 201
         },
         {
+          "comment": "Vigilant Giant Sulfur Saurian",
           "enemy_id": "0x010411",
+          "named_enemy_params_id": 53,
           "level": 35,
-          "exp": 450,
-          "is_boss": false
+          "exp": 201
         }
       ]
     }

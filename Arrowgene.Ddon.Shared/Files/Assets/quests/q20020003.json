@@ -27,14 +27,17 @@
       "type": "select",
       "loot_pool": [
         {
-          "item_id": 948,
+          "comment": "Angel Circlet",
+          "item_id": 9574,
           "num": 1
         },
         {
+          "comment": "Conqueror's Talisman",
           "item_id": 9387,
           "num": 1
         },
         {
+          "comment": "Rare Meat Paté",
           "item_id": 9420,
           "num": 1
         }
@@ -49,28 +52,53 @@
       },
       "enemies": [
         {
+          "comment": "Brutal Orc Captain",
           "enemy_id": "0x015820",
+          "named_enemy_params_id": 54,
           "level": 37,
-          "exp": 550,
-          "is_boss": false
+          "exp": 483
         },
         {
+          "comment": "Brutal Orc Captain",
           "enemy_id": "0x015820",
+          "named_enemy_params_id": 54,
           "level": 37,
-          "exp": 550,
-          "is_boss": false
+          "exp": 483
         },
         {
+          "comment": "Vigilant Grimwarg",
           "enemy_id": "0x010205",
+          "named_enemy_params_id": 53,
           "level": 35,
-          "exp": 320,
-          "is_boss": false
+          "exp": 190
         },
         {
+          "comment": "Vigilant Grimwarg",
           "enemy_id": "0x010205",
+          "named_enemy_params_id": 53,
           "level": 35,
-          "exp": 320,
-          "is_boss": false
+          "exp": 190
+        },
+        {
+          "comment": "Vigilant Grimwarg",
+          "enemy_id": "0x010205",
+          "named_enemy_params_id": 53,
+          "level": 35,
+          "exp": 190
+        },
+        {
+          "comment": "Vigilant Grimwarg",
+          "enemy_id": "0x010205",
+          "named_enemy_params_id": 53,
+          "level": 35,
+          "exp": 190
+        },
+        {
+          "comment": "Vigilant Grimwarg",
+          "enemy_id": "0x010205",
+          "named_enemy_params_id": 53,
+          "level": 35,
+          "exp": 190
         }
       ]
     }
@@ -92,12 +120,20 @@
         "layer_no": 1
       },
       "npc_id": "ArisenCorpsRegimentalSoldier6",
-      "message_id": 11372
+      "message_id": 11125
     },
     {
       "type": "SeekOutEnemiesAtMarkedLocation",
       "announce_type": "Accept",
-      "groups": [ 0 ]
+      "groups": [ 0 ],
+      "result_commands": [
+        {
+          "comment": "Idle dialogue",
+          "type": "QstTalkChg",
+          "Param1": 529,
+          "Param2": 11131
+        }
+      ]
     },
     {
       "type": "KillGroup",
@@ -114,7 +150,7 @@
       },
       "announce_type": "Update",
       "npc_id": "ArisenCorpsRegimentalSoldier6",
-      "message_id": 11842
+      "message_id": 11128
     }
   ]
 }

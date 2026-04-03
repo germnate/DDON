@@ -1,11 +1,11 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Evil in the Dark Night",
+  "comment": "The Evil in the Dark Night (Bounty)",
   "quest_id": 20075006,
-  "base_level": 44,
+  "base_level": 45,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "NorthernBetlandPlains",
   "news_image": 142,
   "variant_index": 2,
@@ -13,7 +13,7 @@
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 1450
+      "amount": 2970
     },
     {
       "type": "wallet",
@@ -22,79 +22,113 @@
     },
     {
       "type": "exp",
-      "amount": 1740
+      "amount": 3560
     },
     {
       "type": "select",
       "loot_pool": [
         {
-          "item_id": 8728,
+          "comment": "Sinister Black Cloth",
+          "item_id": 7947,
           "num": 1
         },
         {
-          "item_id": 9410,
+          "comment": "Grilled Mushroom",
+          "item_id": 9415,
           "num": 2
         },
         {
-          "item_id": 9363,
-          "num": 3
+          "comment": "Conqueror's Talisman",
+          "item_id": 9387,
+          "num": 1
         }
       ]
     },
     {
-          "type": "random",
-          "loot_pool": [
-            {
-              "item_id": 9412,
-              "num": 2,
-              "chance": 1.0
-            },
-            {
-              "item_id": 9378,
-              "num": 1,
-              "chance": 1.0
-            }
-          ]
+      "type": "random",
+      "loot_pool": [
+        {
+          "comment": "Superior Healing Potion",
+          "item_id": 35,
+          "num": 2,
+          "chance": 1.0
+        },
+        {
+          "comment": "Meatloaf",
+          "item_id": 9408,
+          "num": 1,
+          "chance": 1.0
         }
+      ]
+    }
   ],
   "enemy_groups": [
     {
       "stage_id": {
         "id": 1,
         "group_id": 315
-      },
+    },
+      "placement_type": "manual",
       "enemies": [
         {
-          "enemy_id": "0x015810",
+          "comment": "Bounty Witch",
+          "enemy_id": "0x015604",
+          "named_enemy_params_id": 458,
           "start_think_tbl_no": 1,
-          "level": 42,
-          "exp": 4706,
-          "is_boss": false
+          "level": 45,
+          "exp": 2940,
+          "is_boss": true,
+          "index": 0
         },
         {
-          "enemy_id": "0x015810",
-          "start_think_tbl_no": 1,
-          "level": 42,
-          "exp": 4706,
-          "is_boss": false
+          "comment": "Frost Corpse Punisher",
+          "enemy_id": "0x010511",
+          "start_think_tbl_no": 8,
+          "is_manual_set": true,
+          "is_required": false,
+          "level": 45,
+          "exp": 238,
+          "index": 3
         },
         {
-          "enemy_id": "0x015503",
-          "start_think_tbl_no": 1,
-		      "named_enemy_params_id": 54,
-          "is_manual_set": false,
-          "level": 44,
-          "exp": 6824,
-          "is_boss": true
+          "comment": "Frost Corpse Punisher",
+          "enemy_id": "0x010511",
+          "start_think_tbl_no": 8,
+          "is_manual_set": true,
+          "is_required": false,
+          "level": 45,
+          "exp": 238,
+          "index": 4
         },
         {
-          "enemy_id": "0x015503",
-          "start_think_tbl_no": 2,
-		      "named_enemy_params_id": 54,
-          "is_manual_set": false,
-          "level": 44,
-          "exp": 6824,
-          "is_boss": true
+          "comment": "Frost Corpse Punisher",
+          "enemy_id": "0x010511",
+          "start_think_tbl_no": 8,
+          "is_manual_set": true,
+          "is_required": false,
+          "level": 45,
+          "exp": 238,
+          "index": 5
+        },
+        {
+          "comment": "Frost Corpse Punisher",
+          "enemy_id": "0x010511",
+          "start_think_tbl_no": 8,
+          "is_manual_set": true,
+          "is_required": false,
+          "level": 45,
+          "exp": 238,
+          "index": 6
+        },
+        {
+          "comment": "Frost Corpse Punisher",
+          "enemy_id": "0x010511",
+          "start_think_tbl_no": 8,
+          "is_manual_set": true,
+          "is_required": false,
+          "level": 45,
+          "exp": 238,
+          "index": 7
         }
       ]
     }
@@ -102,8 +136,8 @@
   "blocks": [
     {
       "type": "DiscoverEnemy",
-      "spawn_time_start": "18 * 3600000 + 0 * 60000",
-      "spawn_time_end": "6 * 3600000 + 59 * 60000",
+      "spawn_time_start": "(18 * 3600000) + (0 * 60000)",
+      "spawn_time_end": "(6 * 3600000) + (59 * 60000)",
       "groups": [ 0 ]
     },
     { "type": "KillGroup",
@@ -113,6 +147,3 @@
     }
   ]
 }
-
- 
-

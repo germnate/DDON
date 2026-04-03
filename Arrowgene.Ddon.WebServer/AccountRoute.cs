@@ -29,7 +29,7 @@ namespace Arrowgene.Ddon.WebServer
             public string PasswordToken { get; set; }
         }
 
-        private class AccountResponse
+        public class AccountResponse
         {
             public string Error { get; set; }
             public string Message { get; set; }

@@ -5,7 +5,7 @@
   "quest_id": 20015002,
   "base_level": 14,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "BreyaCoast",
   "news_image": 25,
   "rewards": [
@@ -45,40 +45,46 @@
         "id": 1,
         "group_id": 85
       },
+      "starting_index": 3,
       "enemies": [
         {
-          "comment": "Mist Fighter",
-          "enemy_id": "0x011030",
-          "level": 14,
-          "exp": 79,
-          "hm_present_no": 68
-        },
-        {
-          "comment": "Mist Fighter",
-          "enemy_id": "0x011030",
-          "level": 14,
-          "exp": 79,
-          "hm_present_no": 68
-        },
-        {
-          "comment": "Mist Hunter",
+          "comment": "Vigilant Mist Hunter",
           "enemy_id": "0x011031",
+          "named_enemy_params_id": 53,
           "level": 14,
-          "exp": 79,
+          "exp": 83,
           "hm_present_no": 69
         },
         {
-          "comment": "Mist Hunter",
-          "enemy_id": "0x011031",
+          "comment": "Vigilant Mist Fighter",
+          "enemy_id": "0x011030",
+          "named_enemy_params_id": 53,
           "level": 14,
-          "exp": 79,
+          "exp": 83,
+          "hm_present_no": 68
+        },
+        {
+          "comment": "Vigilant Mist Hunter",
+          "enemy_id": "0x011031",
+          "named_enemy_params_id": 53,
+          "level": 14,
+          "exp": 83,
           "hm_present_no": 69
         },
         {
-          "comment": "Mist Hunter",
-          "enemy_id": "0x011031",
+          "comment": "Vigilant Mist Fighter",
+          "enemy_id": "0x011030",
+          "named_enemy_params_id": 53,
           "level": 14,
-          "exp": 79,
+          "exp": 83,
+          "hm_present_no": 68
+        },
+        {
+          "comment": "Vigilant Mist Hunter",
+          "enemy_id": "0x011031",
+          "named_enemy_params_id": 53,
+          "level": 14,
+          "exp": 83,
           "hm_present_no": 69
         }
       ]

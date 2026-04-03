@@ -5,7 +5,7 @@
   "quest_id": 20005001,
   "base_level": 8,
   "minimum_item_rank": 0,
-  "discoverable": false,
+  "discoverable": true,
   "area_id": "HidellPlains",
   "news_image": 6,
   "quest_layout_set_info_flags": [
@@ -60,12 +60,12 @@
     },
     {
       "type": "exp",
-      "amount": 510
+      "amount": 310
     },
     {
       "type": "wallet",
       "wallet_type": "Gold",
-      "amount": 420
+      "amount": 260
     },
     {
       "type": "wallet",
@@ -79,31 +79,34 @@
         "id": 1,
         "group_id": 8
       },
-      "starting_index": 6,
+      "placement_type": "manual",
       "enemies": [
         {
-          "enemy_id": "0x011110",
-          "start_think_tbl_no": 1,
+          "comment": "Vigilant Redcap Fighter",
+          "enemy_id": "0x011111",
           "named_enemy_params_id": 53,
+          "start_think_tbl_no": 1,
           "level": 8,
-          "exp": 94,
-          "is_boss": false
+          "exp": 50,
+          "index": 7
         },
         {
-          "enemy_id": "0x011110",
-          "start_think_tbl_no": 1,
+          "comment": "Vigilant Redcap Sling",
+          "enemy_id": "0x011112",
           "named_enemy_params_id": 53,
+          "start_think_tbl_no": 1,
           "level": 8,
-          "exp": 94,
-          "is_boss": false
+          "exp": 50,
+          "index": 9
         },
         {
-          "enemy_id": "0x011110",
-          "start_think_tbl_no": 1,
+          "comment": "Vigilant Redcap Sling",
+          "enemy_id": "0x011112",
           "named_enemy_params_id": 53,
+          "start_think_tbl_no": 1,
           "level": 8,
-          "exp": 94,
-          "is_boss": false
+          "exp": 50,
+          "index": 10
         }
       ]
     },
@@ -112,31 +115,31 @@
         "id": 1,
         "group_id": 28
       },
-      "starting_index": 6,
+      "starting_index": 10,
       "enemies": [
         {
-          "enemy_id": "0x011110",
-          "start_think_tbl_no": 1,
+          "comment": "Vigilant Redcap Sling",
+          "enemy_id": "0x011112",
           "named_enemy_params_id": 53,
+          "start_think_tbl_no": 1,
           "level": 8,
-          "exp": 94,
-          "is_boss": false
+          "exp": 50
         },
         {
-          "enemy_id": "0x011110",
-          "start_think_tbl_no": 1,
+          "comment": "Vigilant Redcap Sling",
+          "enemy_id": "0x011112",
           "named_enemy_params_id": 53,
+          "start_think_tbl_no": 1,
           "level": 8,
-          "exp": 94,
-          "is_boss": false
-        },
+          "exp": 50
+        },	
         {
-          "enemy_id": "0x011110",
-          "start_think_tbl_no": 1,
+          "comment": "Vigilant Redcap Fighter",
+          "enemy_id": "0x011111",
           "named_enemy_params_id": 53,
+          "start_think_tbl_no": 1,
           "level": 8,
-          "exp": 94,
-          "is_boss": false
+          "exp": 50
         }
       ]
     },
@@ -145,47 +148,34 @@
         "id": 1,
         "group_id": 6
       },
-      "starting_index": 6,
+      "placement_type": "manual",
       "enemies": [
         {
-          "enemy_id": "0x011110",
-          "start_think_tbl_no": 1,
+          "comment": "Vigilant Redcap Sling",
+          "enemy_id": "0x011112",
           "named_enemy_params_id": 53,
+          "start_think_tbl_no": 1,
           "level": 8,
-          "exp": 94,
-          "is_boss": false
+          "exp": 50,
+          "index": 6
         },
         {
-          "enemy_id": "0x011110",
-          "start_think_tbl_no": 1,
+          "comment": "Vigilant Redcap Sling",
+          "enemy_id": "0x011112",
           "named_enemy_params_id": 53,
+          "start_think_tbl_no": 1,
           "level": 8,
-          "exp": 94,
-          "is_boss": false
+          "exp": 50,
+          "index": 7
         },
         {
-          "enemy_id": "0x011110",
-          "start_think_tbl_no": 1,
+          "comment": "Vigilant Redcap Fighter",
+          "enemy_id": "0x011111",
           "named_enemy_params_id": 53,
-          "level": 8,
-          "exp": 94,
-          "is_boss": false
-        },
-        {
-          "enemy_id": "0x011110",
           "start_think_tbl_no": 1,
-          "named_enemy_params_id": 53,
           "level": 8,
-          "exp": 94,
-          "is_boss": false
-        },
-        {
-          "enemy_id": "0x011110",
-          "start_think_tbl_no": 1,
-          "named_enemy_params_id": 53,
-          "level": 8,
-          "exp": 94,
-          "is_boss": false
+          "exp": 50,
+          "index": 9
         }
       ]
     }
