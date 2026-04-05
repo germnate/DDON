@@ -269,6 +269,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         public uint QuestScheduleId { get; set; }
         public int NumRandomRewards { get; set; }
         public List<int> RandomRewardIndices { get; set; }
+        public bool IsRepeatReward { get; set; }
 
         public QuestBoxRewards()
         {

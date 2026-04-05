@@ -236,6 +236,29 @@ Next we can define the rewards. The rewards have a variable format depending on 
 - If the type is `select` it will describe a reward where 1 item can be selected.
 - If the type is `random` it will describe a reward where 1 random item will be selected.
 - If the type is `fixed` it will always reward the fixed item.
+- If the type is `repeat` it defines the item pool given to players on repeat clears of the quest within the same period.
+
+When a player completes a world quest for the first time in a period, they receive the normal first-clear rewards. On every subsequent clear within that same period, they receive one item drawn at random from the `repeat` pool instead.
+
+If no `repeat` reward is defined on the quest, the server automatically constructs one by combining all items from the `select` and `random` reward pools into a single flat pool and drawing one item at random. This means most quests do not need an explicit `repeat` reward unless the designer wants a different pool from the first-clear rewards.
+
+The `repeat` reward accepts a `loot_pool` array with the same format as `fixed` and `select`. One item is chosen at random from the pool each time the reward is granted.
+
+```json
+{
+    "type": "repeat",
+    "loot_pool": [
+        {
+            "item_id": 95,
+            "num": 1
+        },
+        {
+            "item_id": 58,
+            "num": 3
+        }
+    ]
+}
+```
 
 Putting this all together, we will get a reward list which looks like
 ```json

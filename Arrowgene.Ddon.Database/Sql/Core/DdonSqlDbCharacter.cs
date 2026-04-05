@@ -426,6 +426,10 @@ public partial class DdonSqlDb : SqlDb
                 }
             });
 
+        // World quest period first-clears: drives per-period clear count in quest list packets
+        foreach (var scheduleId in SelectWorldQuestFirstClears(character.CommonId, conn))
+            character.WorldQuestPeriodFirstClears.Add(scheduleId);
+
         // Clan membership
         character.ClanId = SelectClanMembershipByCharacterId(character.CharacterId, conn);
         character.ClanName = GetClanNameByClanId(character.ClanId);

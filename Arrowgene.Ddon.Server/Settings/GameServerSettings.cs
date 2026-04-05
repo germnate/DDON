@@ -1923,5 +1923,68 @@ namespace Arrowgene.Ddon.Server.Settings
             }
         }
         private const bool _WorldQuestFilterByLeaderAreaRank = false;
+
+        /// <summary>
+        /// When true, world quests use a first-clear / repeat-clear reward system per period.
+        /// First clear per period: full rewards (fixed, random, selectable).
+        /// Repeat clears: reduced random item pool (if defined per quest) plus configurable wallet reward penalties.
+        /// The WorldQuestResetTask resets first-clear records when it fires, regardless of WorldQuestSystem mode.
+        /// When false, every clear gives full rewards as if it were a first clear.
+        /// </summary>
+        [DefaultValue(_WorldQuestFirstClearRewards)]
+        public bool WorldQuestFirstClearRewards
+        {
+            set { SetSetting("WorldQuestFirstClearRewards", value); }
+            get { return TryGetSetting("WorldQuestFirstClearRewards", _WorldQuestFirstClearRewards); }
+        }
+        private const bool _WorldQuestFirstClearRewards = true;
+
+        /// <summary>
+        /// EXP reward ratio for repeat world quest clears (0.0 = none, 1.0 = full).
+        /// Only applies when WorldQuestFirstClearRewards = true.
+        /// </summary>
+        [DefaultValue(_WorldQuestRepeatClearExpPct)]
+        public double WorldQuestRepeatClearExpPct
+        {
+            set { SetSetting("WorldQuestRepeatClearExpPct", value); }
+            get { return TryGetSetting("WorldQuestRepeatClearExpPct", _WorldQuestRepeatClearExpPct); }
+        }
+        private const double _WorldQuestRepeatClearExpPct = 1.0;
+
+        /// <summary>
+        /// Rift Points reward ratio for repeat world quest clears (0.0 = none, 1.0 = full).
+        /// Only applies when WorldQuestFirstClearRewards = true.
+        /// </summary>
+        [DefaultValue(_WorldQuestRepeatClearRpPct)]
+        public double WorldQuestRepeatClearRpPct
+        {
+            set { SetSetting("WorldQuestRepeatClearRpPct", value); }
+            get { return TryGetSetting("WorldQuestRepeatClearRpPct", _WorldQuestRepeatClearRpPct); }
+        }
+        private const double _WorldQuestRepeatClearRpPct = 1.0;
+
+        /// <summary>
+        /// Gold reward ratio for repeat world quest clears (0.0 = none, 1.0 = full).
+        /// Only applies when WorldQuestFirstClearRewards = true.
+        /// </summary>
+        [DefaultValue(_WorldQuestRepeatClearGoldPct)]
+        public double WorldQuestRepeatClearGoldPct
+        {
+            set { SetSetting("WorldQuestRepeatClearGoldPct", value); }
+            get { return TryGetSetting("WorldQuestRepeatClearGoldPct", _WorldQuestRepeatClearGoldPct); }
+        }
+        private const double _WorldQuestRepeatClearGoldPct = 1.0;
+
+        /// <summary>
+        /// Job Points reward ratio for repeat world quest clears (0.0 = none, 1.0 = full).
+        /// Only applies when WorldQuestFirstClearRewards = true.
+        /// </summary>
+        [DefaultValue(_WorldQuestRepeatClearJpPct)]
+        public double WorldQuestRepeatClearJpPct
+        {
+            set { SetSetting("WorldQuestRepeatClearJpPct", value); }
+            get { return TryGetSetting("WorldQuestRepeatClearJpPct", _WorldQuestRepeatClearJpPct); }
+        }
+        private const double _WorldQuestRepeatClearJpPct = 1.0;
     }
 }

@@ -165,17 +165,42 @@ namespace Arrowgene.Ddon.GameServer.Handler
         private PacketQueue CompleteQuest(Quest quest, GameClient client, QuestStateManager questState, DbConnection? connectionIn = null)
         {
             PacketQueue packets = new();
+
+            // Snapshot repeat-clear state before DistributeQuestRewards mutates WorldQuestPeriodFirstClears.
+            bool isWorldQuest = QuestManager.IsWorldQuest(quest);
+            bool rewardSystemEnabled = Server.GameSettings.GameServerSettings.WorldQuestFirstClearRewards;
+            bool isRepeatClear = isWorldQuest && rewardSystemEnabled
+                && client.Character.WorldQuestPeriodFirstClears.Contains(quest.QuestScheduleId);
+
             packets.AddRange(questState.DistributeQuestRewards(quest.QuestScheduleId, connectionIn));
             packets.AddRange(Server.AreaRankManager.NotifyAreaRankUpOnQuestComplete(client, quest));
             questState.CompleteQuestProgress(quest.QuestScheduleId, connectionIn);
 
+            byte randomRewardNum;
+            bool isRepeatRewardFlag;
+            if (isRepeatClear)
+            {
+                isRepeatRewardFlag = true;
+                if (quest.HasRepeatClearItemRewards())
+                    randomRewardNum = quest.RepeatClearRandomRewardNum();
+                else if (quest.GetAutoRepeatPool().Count > 0)
+                    randomRewardNum = 1; // auto-repeat yields one item from the combined first-clear pool
+                else
+                    randomRewardNum = 0;
+            }
+            else
+            {
+                isRepeatRewardFlag = quest.RewardParams.IsRepeatReward;
+                randomRewardNum = quest.RandomRewardNum();
+            }
+
             S2CQuestCompleteNtc completeNtc = new S2CQuestCompleteNtc()
             {
                 QuestScheduleId = quest.QuestScheduleId,
-                RandomRewardNum = quest.RandomRewardNum(),
+                RandomRewardNum = randomRewardNum,
                 ChargeRewardNum = quest.RewardParams.ChargeRewardNum,
                 ProgressBonusNum = quest.RewardParams.ProgressBonusNum,
-                IsRepeatReward = quest.RewardParams.IsRepeatReward,
+                IsRepeatReward = isRepeatRewardFlag,
                 IsUndiscoveredReward = quest.RewardParams.IsUndiscoveredReward,
                 IsHelpReward = quest.RewardParams.IsHelpReward,
                 IsPartyBonus = quest.RewardParams.IsPartyBonus,
