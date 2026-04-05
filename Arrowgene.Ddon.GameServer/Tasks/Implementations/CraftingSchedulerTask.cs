@@ -1,7 +1,5 @@
-using System;
-using Arrowgene.Ddon.Shared.Model.Scheduler;
-using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Model.Rpc;
+using Arrowgene.Ddon.Shared.Model.Scheduler;
 
 namespace Arrowgene.Ddon.GameServer.Tasks.Implementations
 {
@@ -15,7 +13,5 @@ namespace Arrowgene.Ddon.GameServer.Tasks.Implementations
         {
             server.RpcManager.AnnounceAll("internal/command", RpcInternalCommand.UpdateCrafting, null);
         }
-
-        public override string TaskTypeName() => "Crafting";
     }
 }

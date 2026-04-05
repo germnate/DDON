@@ -176,7 +176,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
 
         protected Dictionary<uint, QuestState> ActiveQuests { get; set; }
         private Dictionary<StageLayoutId, HashSet<uint>> QuestLookupTable { get; set; }
-        private List<QuestId> CompletedWorldQuests { get; set; }
+        protected List<QuestId> CompletedWorldQuests { get; set; }
         protected Dictionary<QuestAreaId, HashSet<uint>> RolledInstanceWorldQuests { get; set; }
 
         // Deferred Generic Work to be triggered at various points
@@ -842,6 +842,18 @@ namespace Arrowgene.Ddon.GameServer.Quests
 
         public override void EnforceInitialPoolEligibility()
         {
+            var settings = Server.GameSettings.GameServerSettings;
+
+            if (settings.WorldQuestSystem == WorldQuestSystemMode.ServerReset)
+            {
+                // Copy the server-wide pool and apply rank filter (no re-roll replacement).
+                ApplyServerPool(Server.WorldQuestManager.GetCurrentPool());
+                return;
+            }
+
+            // InstanceReset mode: re-roll ineligible slots for this party.
+            if (!settings.WorldQuestFilterByLeaderAreaRank) return;
+
             var leaderCharacter = Party.Leader?.Client.Character;
             if (leaderCharacter == null) return;
 
@@ -866,6 +878,84 @@ namespace Arrowgene.Ddon.GameServer.Quests
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Replaces RolledInstanceWorldQuests with a copy of serverPool, then removes any quests
+        /// the party leader is not eligible for (no re-roll replacement — server pool is canonical).
+        /// </summary>
+        public void ApplyServerPool(Dictionary<QuestAreaId, HashSet<uint>> serverPool)
+        {
+            lock (ActiveQuests)
+            {
+                foreach (var (areaId, scheduleIds) in serverPool)
+                    RolledInstanceWorldQuests[areaId] = new HashSet<uint>(scheduleIds);
+
+                if (!Server.GameSettings.GameServerSettings.WorldQuestFilterByLeaderAreaRank) return;
+
+                var leaderCharacter = Party.Leader?.Client.Character;
+                if (leaderCharacter == null) return;
+
+                foreach (var (areaId, scheduleIds) in RolledInstanceWorldQuests)
+                {
+                    var ineligible = scheduleIds
+                        .Select(id => QuestManager.GetQuestByScheduleId(id))
+                        .Where(q => q != null && q.OrderConditions.Any(c => c.Type == QuestOrderConditionType.AreaRank
+                            && GetEffectiveAreaRank(leaderCharacter, (QuestAreaId)c.Param01) < (uint)c.Param02))
+                        .Select(q => q.QuestScheduleId)
+                        .ToList();
+                    foreach (var sid in ineligible)
+                        scheduleIds.Remove(sid);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when the server broadcasts a world quest reset. Drops all in-progress world quests,
+        /// clears the completed list, applies the new server pool, and notifies online clients.
+        /// </summary>
+        public void OnServerWorldQuestReset(Dictionary<QuestAreaId, HashSet<uint>> serverPool)
+        {
+            lock (ActiveQuests)
+            {
+                var toRemove = ActiveQuests.Values
+                    .Where(qs => QuestManager.IsWorldQuest(qs.QuestId))
+                    .Select(qs => qs.QuestScheduleId)
+                    .ToList();
+                foreach (var schedId in toRemove)
+                    RemoveQuest(schedId);
+
+                CompletedWorldQuests.Clear();
+            }
+
+            ApplyServerPool(serverPool);
+            SendWorldQuestListNtc();
+        }
+
+        private void SendWorldQuestListNtc()
+        {
+            var leaderCharacter = Party.Leader?.Client?.Character;
+            if (leaderCharacter == null) return;
+
+            var areaId = leaderCharacter.AreaId;
+            var questList = new List<CDataSetQuestList>();
+
+            foreach (var scheduleId in AreaQuests(areaId))
+            {
+                var quest = QuestManager.GetQuestByScheduleId(scheduleId);
+                if (quest == null || IsQuestActive(scheduleId) || IsCompletedWorldQuest(scheduleId))
+                    continue;
+
+                CompletedQuest questStats = leaderCharacter.CompletedQuests.GetValueOrDefault(quest.QuestId);
+                questList.Add(quest.ToCDataSetQuestList(0, questStats?.ClearCount ?? 0));
+            }
+
+            Party.SendToAll(new S2CQuestGetSetQuestListNtc
+            {
+                DistributeId = areaId,
+                SelectCharacterId = leaderCharacter.CharacterId,
+                SetQuestList = questList
+            });
         }
 
         protected override uint GetEffectiveAreaRank(Character character, QuestAreaId areaId)

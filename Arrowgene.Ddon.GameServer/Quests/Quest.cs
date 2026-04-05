@@ -9,10 +9,12 @@ using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.Quest;
+using Arrowgene.Ddon.Shared.Model.Scheduler;
 using Arrowgene.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace Arrowgene.Ddon.GameServer.Quests
@@ -822,7 +824,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
 
         public virtual CDataSetQuestList ToCDataSetQuestList(uint step, uint clearCount)
         {
-            return new CDataSetQuestList()
+            var data = new CDataSetQuestList()
             {
                 Param = ToCDataQuestList(step),
                 Detail = new CDataSetQuestDetail()
@@ -832,6 +834,12 @@ namespace Arrowgene.Ddon.GameServer.Quests
                     ClearCount = clearCount
                 }
             };
+
+            // Does this work?
+            data.Param.DistributionStartDate = DateTimeOffset.FromUnixTimeSeconds(Server.ScheduleManager.TaskExpiry(TaskType.WorldQuestRotation));
+            data.Param.DistributionEndDate = DateTimeOffset.FromUnixTimeSeconds(Server.ScheduleManager.TaskExpiry(TaskType.WorldQuestRotation));
+
+            return data;
         }
 
         public virtual CDataContentsPlayStartData ToCDataContentsPlayStartData(uint step = 0)
