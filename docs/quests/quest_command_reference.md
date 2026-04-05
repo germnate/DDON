@@ -400,9 +400,11 @@ IsEnemyFound(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
 
 ```
 /**
- * @brief
- * @param randomNo
- * @param value
+ * @brief Returns true if the value stored in random slot randomNo equals value.
+ *        Slot must have been set by SetRandom first; returns false if unset.
+ *        Ghidra: 0x00636F60. param03/param04 unused.
+ * @param randomNo  Index of the random slot (0-based).
+ * @param value     Value to compare against.
  */
 RandomEq(int randomNo, int value, int param03 = 0, int param04 = 0);
 ```
@@ -411,9 +413,10 @@ RandomEq(int randomNo, int value, int param03 = 0, int param04 = 0);
 
 ```
 /**
- * @brief
- * @param randomNo
- * @param value
+ * @brief Returns true if the value stored in random slot randomNo does not equal value.
+ *        Ghidra: 0x00637030. param03/param04 unused.
+ * @param randomNo  Index of the random slot (0-based).
+ * @param value     Value to compare against.
  */
 RandomNotEq(int randomNo, int value, int param03 = 0, int param04 = 0);
 ```
@@ -422,9 +425,10 @@ RandomNotEq(int randomNo, int value, int param03 = 0, int param04 = 0);
 
 ```
 /**
- * @brief
- * @param randomNo
- * @param value
+ * @brief Returns true if the value stored in random slot randomNo is less than value.
+ *        Ghidra: 0x00637100. param03/param04 unused.
+ * @param randomNo  Index of the random slot (0-based).
+ * @param value     Value to compare against.
  */
 RandomLess(int randomNo, int value, int param03 = 0, int param04 = 0);
 ```
@@ -433,9 +437,10 @@ RandomLess(int randomNo, int value, int param03 = 0, int param04 = 0);
 
 ```
 /**
- * @brief
- * @param randomNo
- * @param value
+ * @brief Returns true if the value stored in random slot randomNo is less than or equal to value.
+ *        Ghidra: 0x006371D0. param03/param04 unused.
+ * @param randomNo  Index of the random slot (0-based).
+ * @param value     Value to compare against.
  */
 RandomNotGreater(int randomNo, int value, int param03 = 0, int param04 = 0);
 ```
@@ -444,9 +449,10 @@ RandomNotGreater(int randomNo, int value, int param03 = 0, int param04 = 0);
 
 ```
 /**
- * @brief
- * @param randomNo
- * @param value
+ * @brief Returns true if the value stored in random slot randomNo is greater than value.
+ *        Ghidra: 0x006372A0. param03/param04 unused.
+ * @param randomNo  Index of the random slot (0-based).
+ * @param value     Value to compare against.
  */
 RandomGreater(int randomNo, int value, int param03 = 0, int param04 = 0);
 ```
@@ -455,9 +461,10 @@ RandomGreater(int randomNo, int value, int param03 = 0, int param04 = 0);
 
 ```
 /**
- * @brief
- * @param randomNo
- * @param value
+ * @brief Returns true if the value stored in random slot randomNo is greater than or equal to value.
+ *        Ghidra: 0x00637370. param03/param04 unused.
+ * @param randomNo  Index of the random slot (0-based).
+ * @param value     Value to compare against.
  */
 RandomNotLess(int randomNo, int value, int param03 = 0, int param04 = 0);
 ```
@@ -2361,11 +2368,15 @@ StartTimer(int timerNo, int sec, int param03 = 0, int param04 = 0);
 ### SetRandom
 ```
 /**
- * @brief
- * @param randomNo
- * @param minValue
- * @param maxValue
- * @param resultValue
+ * @brief Rolls a random integer in [minValue, maxValue] and stores it in random slot randomNo.
+ *        The slot can then be tested with RandomEq/RandomLess/etc. and cleared with ResetRandom.
+ *        Ghidra: 0x00639290.
+ *        The server generates Random(minValue, maxValue) and sends the result as resultValue.
+ *        The client stores resultValue directly; minValue/maxValue are unused by the client handler.
+ * @param randomNo    Index of the random slot to write (0-based).
+ * @param minValue    Inclusive lower bound of the random range (server-side only).
+ * @param maxValue    Inclusive upper bound of the random range (server-side only).
+ * @param resultValue The rolled value, computed server-side from [minValue, maxValue].
  */
 SetRandom(int randomNo, int minValue, int maxValue, int resultValue);
 ```
@@ -2373,8 +2384,10 @@ SetRandom(int randomNo, int minValue, int maxValue, int resultValue);
 ### ResetRandom
 ```
 /**
- * @brief
- * @param randomNo
+ * @brief Clears the value in random slot randomNo. Subsequent check commands for this slot
+ *        will return false until SetRandom is called again.
+ *        Ghidra: 0x006393B0. Only randomNo is used; param02–param04 are unused.
+ * @param randomNo  Index of the random slot to clear (0-based).
  */
 ResetRandom(int randomNo, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
@@ -3053,4 +3066,1386 @@ KilledTargetEmSetGrpNoMarker(int flagNo, StageNo stageNo, int groupNo, int work0
  * @param npcId
  */
 KilledTargetEnemySetGroup1(NpcId npcId, int work02 = 0, int work03 = 0, int work04 = 0);
+```
+
+---
+
+## Ghidra-Discovered Commands (Result)
+
+The following result commands were found by analysing the result function dispatch table at `.data:02126770` in `DDO_DUMP_FIX.exe`.
+The dispatch function is at `.text:0063E254`. It validates `commandId < 0x87` (135 entries, indices 0–134).
+
+> [!NOTE]
+> Parameter names are inferred from decompilation. Internal function addresses are provided so you can verify the decompilation yourself in Ghidra.
+
+### SubstoryProgress (99)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633730` |
+| Table index | 99 |
+
+```
+/**
+ * @brief Progress a substory objective.
+ * @param subCatNo Substory category number
+ * @param subObjNo Substory objective number
+ * @param value    Value to set/add
+ */
+SubstoryProgress(int subCatNo, int subObjNo, int value, int param04 = 0);
+```
+
+### AddSubstoryProgress (100)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006338E0` |
+| Table index | 100 |
+| Key callees | `FUN_00bd3730` (substory list lookup), clamps result to [0, 100] |
+
+```
+/**
+ * @brief Finds a substory entry by substoryId and adds progressDelta to its progress value.
+ * Result is clamped to [0, 100].
+ * @param substoryId   Substory identifier
+ * @param progressDelta Amount to add (can be negative)
+ */
+AddSubstoryProgress(int substoryId, int progressDelta, int param03 = 0, int param04 = 0);
+```
+
+### TriggerSubstoryEvent (101)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633920` |
+| Table index | 101 |
+| Key callees | `FUN_009cffc0` (mode check, must return 0xb), `FUN_00bdee50(0xb)`, `FUN_00598590` |
+
+```
+/**
+ * @brief Triggers a substory event sequence when the quest mode is 0xb.
+ * Calls FUN_00598590 to set timer data on the substory structure.
+ */
+TriggerSubstoryEvent(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### EnableSubstoryUIElement (102)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006339B0` |
+| Table index | 102 |
+| Key callees | `FUN_009cff50` (area context), `FUN_00bdee50(0xb)`, `FUN_005986d0` (sets field +0x44) |
+
+```
+/**
+ * @brief Enables the substory UI element overlay.
+ * Gets area context, then enables the element via FUN_005986d0 which sets offset +0x44.
+ */
+EnableSubstoryUIElement(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### DisableSubstoryUIElement (103)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633A00` |
+| Table index | 103 |
+| Key callees | `FUN_00bdee50(0xb)`, `FUN_00598670` (clears field +0x44 to DAT_02141084 sentinel) |
+
+```
+/**
+ * @brief Disables the substory UI element overlay.
+ * Clears the element reference at offset +0x44.
+ */
+DisableSubstoryUIElement(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### SetSubstoryTalkTarget (104)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633A30` |
+| Table index | 104 |
+| Key callees | `FUN_009cff50` (area context), `FUN_009ce930(param01, param02)` (NPC talk redirect) |
+
+```
+/**
+ * @brief Redirects NPC dialogue to a substory-specific target.
+ * @param param01 NPC/group identifier
+ * @param param02 Talk context identifier
+ */
+SetSubstoryTalkTarget(int param01, int param02, int param03 = 0, int param04 = 0);
+```
+
+### SetSubstoryEnemyInvincible (105)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633A80` |
+| Table index | 105 |
+| Key callees | `FUN_00b5ba00(4, 0x15, enemyGroupFlag, 1, 0)`, `FUN_00be9b60(invincible)` |
+
+```
+/**
+ * @brief Sets or clears invincibility on a substory enemy group.
+ * Uses enemy type 4 / category 0x15. FUN_00be9b60 writes flag at +0x92 on matching NPCs.
+ * @param enemyGroupFlag  Group flag / filter value passed to FUN_00b5ba00
+ * @param invincible      1 = invincible, 0 = vulnerable
+ */
+SetSubstoryEnemyInvincible(int enemyGroupFlag, int invincible, int param03 = 0, int param04 = 0);
+```
+
+### AddFsmTalkNpc (107)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633B30` |
+| Table index | 107 |
+| Key callees | `FUN_009d07f0` (FSM mode check), `FUN_009cfe00`, `FUN_009d2ba0(npcId, param04)` |
+
+```
+/**
+ * @brief Adds an NPC to the FSM talk NPC list (this+0x94/0xa0).
+ * Only executes when in FSM quest mode.
+ * @param npcId   NPC or group identifier
+ * @param param04 Secondary value passed to FUN_009d2ba0
+ */
+AddFsmTalkNpc(int npcId, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### SetSubstoryEnemyGroupFlag (108)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633B80` |
+| Table index | 108 |
+| Key callees | `FUN_00bd3870(groupId, flagValue-1)`, `FUN_00b68090` (sends opcode 0x21) |
+
+```
+/**
+ * @brief Sends an animation/sound trigger event (opcode 0x21) to a substory enemy group.
+ * Does nothing if param02 == 0.
+ * @param groupId   Enemy group identifier
+ * @param flagValue Event value; passed as (flagValue - 1) to FUN_00bd3870
+ */
+SetSubstoryEnemyGroupFlag(int groupId, int flagValue, int param03 = 0, int param04 = 0);
+```
+
+### EnableSubstoryElementB (109)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633BB0` |
+| Table index | 109 |
+| Key callees | `FUN_009cff50`, `FUN_00bdee50(0xb)`, `FUN_00598860` (sets field +0x4c) |
+
+```
+/**
+ * @brief Enables substory element variant B (field +0x4c). Paired with DisableSubstoryElementB.
+ */
+EnableSubstoryElementB(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### DisableSubstoryElementB (110)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633BF0` |
+| Table index | 110 |
+| Key callees | `FUN_00bdee50(0xb)`, `FUN_005986A0` (clears field +0x4c) |
+
+```
+/**
+ * @brief Disables substory element variant B (field +0x4c). Paired with EnableSubstoryElementB.
+ */
+DisableSubstoryElementB(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### SetWorldManageBarrierOn (111)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633CE0` |
+| Table index | 111 |
+| Key callees | `FUN_00c19920(param01, param02)`, sets bit 0 of `*(DAT_021c1250 + 0x850)` |
+
+```
+/**
+ * @brief Enables a world-management barrier gate.
+ * Calls FUN_00c19920 then sets bit 0 at DAT_021c1250+0x850.
+ * @param param01 Barrier identifier / parameter A
+ * @param param02 Parameter B passed to FUN_00c19920
+ */
+SetWorldManageBarrierOn(int param01, int param02, int param03 = 0, int param04 = 0);
+```
+
+### SetWorldManageBarrierOff (112)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633D20` |
+| Table index | 112 |
+| Key callees | `FUN_00c1baa0()`, clears bit 0 of `*(DAT_021c1250 + 0x850)` |
+
+```
+/**
+ * @brief Disables the world-management barrier gate. Paired with SetWorldManageBarrierOn.
+ */
+SetWorldManageBarrierOff(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### SetFsmNpcSchedule (113)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633D50` |
+| Table index | 113 |
+| Key callees | `FUN_009d1a60(scheduleId)` — param04 is read from stack at +0x10 |
+
+```
+/**
+ * @brief Schedules an FSM NPC behavior by schedule ID.
+ * @note  param04 / scheduleId is consumed from the stack slot at offset +0x10.
+ * @param scheduleId Schedule identifier
+ */
+SetFsmNpcSchedule(int param01 = 0, int param02 = 0, int param03 = 0, int scheduleId = 0);
+```
+
+### SetQuestEnemyLevel (114)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633D80` |
+| Table index | 114 |
+| Key callees | `FUN_00a41780(stageNo, groupNo, setNo, 0)` (quest enemy type 3 lookup), `FUN_00bc0670(enemy, level)` |
+
+```
+/**
+ * @brief Sets the level tier (bits controlling level) of a quest enemy group (type 3).
+ * Phase-gated: checks DAT_0220456c offsets 0x4654 vs 0x45cc.
+ * @param stageNo  Stage number
+ * @param groupNo  Enemy group number
+ * @param setNo    Enemy set number
+ * @param level    Level tier value passed to FUN_00bc0670
+ */
+SetQuestEnemyLevel(StageNo stageNo, int groupNo, int setNo, int level);
+```
+
+### SetQuestEnemyLevelEx (115)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633E30` |
+| Table index | 115 |
+| Key callees | `FUN_00a36090` (area mode check), `FUN_00a3f620` + `FUN_00a41890` (area-aware lookup), `FUN_00bc0670` |
+
+```
+/**
+ * @brief Area-aware variant of SetQuestEnemyLevel.
+ * Uses FUN_00a41890 when an area instance is active (FUN_009cff70 != 0).
+ * @param stageNo  Stage number
+ * @param groupNo  Enemy group number
+ * @param setNo    Enemy set number
+ * @param level    Level tier value
+ */
+SetQuestEnemyLevelEx(StageNo stageNo, int groupNo, int setNo, int level);
+```
+
+### SetQuestEnemyTierUp (116)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633F30` |
+| Table index | 116 |
+| Key callees | `FUN_00a41780` (quest enemy lookup), `FUN_00bc0720(enemy, tier)` (sets bits 23–21 = "danger tier") |
+
+```
+/**
+ * @brief Sets the danger tier (bits 23–21) of a quest enemy group.
+ * Phase-gated like SetQuestEnemyLevel.
+ * @param stageNo  Stage number
+ * @param groupNo  Enemy group number
+ * @param setNo    Enemy set number
+ * @param tier     Danger tier value
+ */
+SetQuestEnemyTierUp(StageNo stageNo, int groupNo, int setNo, int tier);
+```
+
+### SetQuestEnemyTierUpEx (117)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633FC0` |
+| Table index | 117 |
+| Key callees | Area-aware lookup (same as SetQuestEnemyLevelEx), `FUN_00bc0720` |
+
+```
+/**
+ * @brief Area-aware variant of SetQuestEnemyTierUp.
+ * @param stageNo  Stage number
+ * @param groupNo  Enemy group number
+ * @param setNo    Enemy set number
+ * @param tier     Danger tier value
+ */
+SetQuestEnemyTierUpEx(StageNo stageNo, int groupNo, int setNo, int tier);
+```
+
+### SetQuestNpcBodyPose (118)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006341A0` |
+| Table index | 118 |
+| Key callees | `FUN_00a41780(stageNo, groupNo, setNo, 0)`, `FUN_00bbf670(npc, poseId)` (6-bit field, values 1–6) |
+
+```
+/**
+ * @brief Sets a body/stance pose on a quest NPC. Pose IDs 1–6 map to different stances.
+ * @param stageNo  Stage number
+ * @param groupNo  NPC group number
+ * @param setNo    NPC set number
+ * @param poseId   Pose/stance index (1–6)
+ */
+SetQuestNpcBodyPose(StageNo stageNo, int groupNo, int setNo, int poseId);
+```
+
+### SetQuestNpcBodyPoseEx (119)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006341F0` |
+| Table index | 119 |
+| Key callees | Area-aware NPC lookup, `FUN_00bbf670` |
+
+```
+/**
+ * @brief Area-aware variant of SetQuestNpcBodyPose.
+ * @param stageNo  Stage number
+ * @param groupNo  NPC group number
+ * @param setNo    NPC set number
+ * @param poseId   Pose/stance index (1–6)
+ */
+SetQuestNpcBodyPoseEx(StageNo stageNo, int groupNo, int setNo, int poseId);
+```
+
+### SetQuestLayoutEnemyLevel (121)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00634300` |
+| Table index | 121 |
+| Key callees | `FUN_00a416a0(stageNo, groupNo, setNo, 0)` (layout enemy type 2), `FUN_00b55e70(enemy, level)` |
+| Notes | GM-mode guarded. Queues into a CS-guarded buffer (max 10 entries) at `this+0xe48`. |
+
+```
+/**
+ * @brief Sets the level of a layout enemy (type 2) via a thread-safe queue.
+ * Guarded by GM mode check (FUN_00b19cc0) and player ID comparison.
+ * Buffer at this+0xe48 holds up to 10 entries.
+ * @param stageNo  Stage number
+ * @param groupNo  Layout enemy group number
+ * @param setNo    Layout enemy set number
+ * @param level    Level value passed to FUN_00b55e70
+ */
+SetQuestLayoutEnemyLevel(StageNo stageNo, int groupNo, int setNo, int level);
+```
+
+### RemoveFsmNpcFromSchedule (124)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006343F0` |
+| Table index | 124 |
+| Key callees | `FUN_0063dda0(param01)` — removes entry from this+0x28/0x1c, frees children, shrinks list |
+
+```
+/**
+ * @brief Removes an FSM NPC entry from the process list and frees its children.
+ * Paired with AddFsmTalkNpc / SetFsmNpcSchedule.
+ * @param param01 NPC or process list entry identifier
+ */
+RemoveFsmNpcFromSchedule(int param01, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### SetEnemyExpeditionState (126)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00634450` |
+| Table index | 126 |
+| Key callees | mode=2: `FUN_00bc6ff0(9)` (sets global to 10, signals start); mode=3: `FUN_00bc7070(param02)` (iterates party, fires signal via `FUN_008fdf80`/`FUN_005b8070`) |
+
+```
+/**
+ * @brief Controls enemy expedition state / area boss trigger.
+ * @param mode    2 = start expedition signal, 3 = fire per-party-member signal
+ * @param param02 Secondary value passed to FUN_00bc7070 when mode == 3
+ */
+SetEnemyExpeditionState(int mode, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### TriggerSubstoryEndSequence (128)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006345D0` |
+| Table index | 128 |
+| Key callees | `FUN_00be9960` (sets flag +0xf4 on NPC ID 8), `FUN_00bdf4e0` (area ref), `FUN_00b85670` (phase complete), sends messages 0x25f and 0x260 via `FUN_00b82b00` |
+
+```
+/**
+ * @brief Fires the substory ending sequence, completing the current substory phase.
+ * Sends world-manager NPC messages 0x25f and 0x260.
+ */
+TriggerSubstoryEndSequence(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### CheckSubstoryCondition (130)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006346B0` |
+| Table index | 130 |
+| Key callees | `FUN_0087dc50()` — checks pawn OM state == 4 and animation condition |
+
+```
+/**
+ * @brief Checks if a pawn has OM state == 4 and a specific animation condition (via FUN_0087dc50).
+ */
+CheckSubstoryCondition(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### SetPawnExpeditionFlag (133)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006347A0` |
+| Table index | 133 |
+| Key callees | mode=1: `FUN_00b6ce30()` (writes action `DAT_01d4db50`); mode=2: `FUN_00b6cde0()` (writes action `DAT_01d4db54`) |
+
+```
+/**
+ * @brief Starts or stops a pawn expedition.
+ * @param mode  1 = start expedition, 2 = stop expedition
+ */
+SetPawnExpeditionFlag(int mode, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### SetQuestLayoutEnemyBodyPose (134)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00634820` |
+| Table index | 134 |
+| Key callees | `FUN_00a41780(stageNo, groupNo, setNo, 0)` (layout enemy type 2), `FUN_00bc6f70(enemy, poseId)`, `FUN_005be380(poseId)` |
+| Notes | Checks OM alive before setting pose/stance mode. |
+
+```
+/**
+ * @brief Sets a body/stance mode on a layout enemy (type 2).
+ * Verifies the entity's OM is alive before calling FUN_005be380(poseId).
+ * @param stageNo  Stage number
+ * @param groupNo  Layout enemy group number
+ * @param setNo    Layout enemy set number
+ * @param poseId   Stance/pose mode value
+ */
+SetQuestLayoutEnemyBodyPose(StageNo stageNo, int groupNo, int setNo, int poseId);
+```
+
+---
+
+## Ghidra-Discovered Commands (Check)
+
+The following check commands were found by analysing the check function dispatch table at `.data:02126998`.
+The dispatch function is at approximately `.text:0063E04A`. It validates `commandId < 0x101` (257 entries, indices 0–256).
+
+### IsSubstoryStateBit18 (211)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00635A00` |
+| Table index | 211 |
+| State offset | `cQuestProcess+0x5c+0x20c` (substory state word), bit 18 (0x12) |
+
+```
+/**
+ * @brief Returns bit 18 of the substory state word.
+ * State word is at *(cQuestProcess+0x5c)+0x20c.
+ */
+IsSubstoryStateBit18(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### StoreLinkageEnemyFlagGlobal (212)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00635A30` |
+| Table index | 212 |
+| Key fields | Reads bit 17 (`>> 0x11`) of `*(ctx+0x5c)+0x20c`; writes inverted result to `DAT_021c06b8+0x263` |
+
+```
+/**
+ * @brief Reads bit 17 of the substory context flags bitfield, inverts it, and stores the result
+ * to the global side-effect slot at DAT_021c06b8+0x263.
+ * @note This is NOT a conditional check — it only writes global state. No quest params are used.
+ * @note Formerly named "IsLinkageEnemyFlagVariant"; renamed after Ghidra verification showed no
+ *       stageNo/groupNo/setNo/flagNo params in the actual function signature.
+ */
+StoreLinkageEnemyFlagGlobal(int param01_unused = 0, int param02_unused = 0, int param03_unused = 0, int param04_unused = 0);
+```
+
+### SetNpcOrderFlagAndCheckBit18 (213)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00635A60` |
+| Table index | 213 |
+| Key callees | `FUN_009d0170(npcLookupId)` — NPC/object lookup at ctx+0x214/+0x218 |
+| Key fields | Sets `foundObject+0x11 = 1`; writes `storeVal` to ctx+0x5c+0x24c; returns bit 18 of ctx+0x5c+0x220 |
+
+```
+/**
+ * @brief Combined setter + state-bit check. Looks up an NPC object by npcLookupId in the list at
+ * ctx+0x214/+0x218, sets byte +0x11 on that object to 1, stores storeVal at ctx+0x5c+0x24c,
+ * then returns bit 18 of ctx+0x5c+0x220.
+ * @note This is not a pure conditional — it has side effects on the NPC object and quest context.
+ * @note Formerly named "IsNpcInteractAndOrderUI"; renamed after Ghidra verification.
+ * @param stageNo      Stage number (param01)
+ * @param npcId_or_obj NPC or object ID (param02)
+ * @param npcLookupId  ID used to find the NPC object in the ctx list (param03)
+ * @param storeVal     Value written to ctx+0x5c+0x24c (param04)
+ */
+SetNpcOrderFlagAndCheckBit18(StageNo stageNo, int npcId_or_obj, int npcLookupId, int storeVal);
+```
+
+### IsNpcTalkChoice (214)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00635B10` |
+| Table index | 214 |
+| Key callees | `sGame::mpInstance+0x28` (current stage), `FUN_00c0e9e0()` (current NPC entity ID), `FUN_00c0eda0()` (NPC talk-active state), `FUN_00c0eab0()` (NPC choice field +0x90) |
+
+```
+/**
+ * @brief Progresses when the player chooses a specific dialogue option with an NPC.
+ * Validates: stageNo == current stage, npcId == current NPC entity ID, NPC is in talk-active state,
+ * and NPC choice field (+0x90) == choice. Used in branching quests (e.g. Extend Garden).
+ * NPC is not auto-marked; pair with TalkNpc and QstTalkChg to set up the NPC talk first.
+ * @param stageNo Stage number
+ * @param npcId   NPC entity ID
+ * @param choice  Expected dialogue choice value (from NPC+0x90)
+ * @param param04 Unused
+ */
+IsNpcTalkChoice(StageNo stageNo, int npcId, int choice, int param04 = 0);
+```
+
+### SubstoryEnemyHpNotLess (215)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00635BF0` |
+| Table index | 215 |
+| Key callees | `FUN_00be10d0(substoryId)` returns HP ratio as float; `ratio * 100 >= hpRatePercent` |
+
+```
+/**
+ * @brief Checks if a specific substory enemy's current HP% >= hpRatePercent.
+ * @param substoryId    Substory identifier used to look up the enemy
+ * @param hpRatePercent HP percentage threshold (0–100)
+ */
+SubstoryEnemyHpNotLess(int substoryId, int hpRatePercent, int param03 = 0, int param04 = 0);
+```
+
+### SubstoryEnemyHpLess (216)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00635C40` |
+| Table index | 216 |
+| Key callees | Same as SubstoryEnemyHpNotLess but inverted: `ratio * 100 < hpRatePercent` |
+
+```
+/**
+ * @brief Checks if a specific substory enemy's current HP% < hpRatePercent.
+ * @param substoryId    Substory identifier
+ * @param hpRatePercent HP percentage threshold (0–100)
+ */
+SubstoryEnemyHpLess(int substoryId, int hpRatePercent, int param03 = 0, int param04 = 0);
+```
+
+### SubstoryAvgEnemyHpNotLess (217)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00635C90` |
+| Table index | 217 |
+| Key callees | `FUN_00be1130()` computes average HP ratio across ALL substory NPCs |
+
+```
+/**
+ * @brief Checks if the average HP% of all substory NPCs >= hpRatePercent.
+ * Uses the whole-list average, not a specific enemy.
+ * @param param01       Unused / reserved
+ * @param hpRatePercent HP percentage threshold (0–100)
+ */
+SubstoryAvgEnemyHpNotLess(int param01 = 0, int hpRatePercent = 0, int param03 = 0, int param04 = 0);
+```
+
+### SubstoryAvgEnemyHpLess (218)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00635CD0` |
+| Table index | 218 |
+| Key callees | `FUN_00be1130()`, inverted: average HP% < hpRatePercent |
+
+```
+/**
+ * @brief Checks if the average HP% of all substory NPCs < hpRatePercent.
+ * @param param01       Unused / reserved
+ * @param hpRatePercent HP percentage threshold (0–100)
+ */
+SubstoryAvgEnemyHpLess(int param01 = 0, int hpRatePercent = 0, int param03 = 0, int param04 = 0);
+```
+
+### IsOmBehaviorState (219)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00635D70` |
+| Table index | 219 |
+| Key callees | `FUN_0063d480(stageNo, groupNo, setNo)` (resolves OM), `FUN_00c0eab0()` reads field +0x90 |
+
+```
+/**
+ * @brief Checks if an OM's behavior state enum equals the expected value.
+ * Resolves the OM via FUN_0063d480, reads the state from entity+0x90.
+ * @param stageNo       Stage number
+ * @param groupNo       OM group number
+ * @param setNo         OM set number
+ * @param behaviorState Expected behavior state enum value
+ */
+IsOmBehaviorState(StageNo stageNo, int groupNo, int setNo, int behaviorState);
+```
+
+### IsPlayerSpecificLayoutFlag (220)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00635EF0` |
+| Table index | 220 |
+| Key callees | `FUN_00b19cc0` (GM check), `DAT_022044c4+0x3834+0x8c` (stored player ID), `FUN_00bfc1e0(flagId)` |
+
+```
+/**
+ * @brief Checks a player-specific substory item flag.
+ * Guards on GM mode and matching the stored player ID. Returns 1 if FUN_00bfc1e0(flagId) == expectedValue.
+ * @param playerId      Player identifier to match against DAT_022044c4+0x3834+0x8c
+ * @param flagId        Flag identifier passed to FUN_00bfc1e0
+ * @param expectedValue Expected return value from FUN_00bfc1e0
+ */
+IsPlayerSpecificLayoutFlag(int playerId, int flagId, int expectedValue, int param04 = 0);
+```
+
+### IsQuestEnemyAlive (221)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636000` |
+| Table index | 221 |
+| Key callees | `FUN_00a41780(stageNo, groupNo, setNo, 0)` (quest enemy type 3), `FUN_00bc2da0` (checks status bit 15) |
+
+```
+/**
+ * @brief Checks if a quest enemy group (type 3) is alive (status bit 15 set).
+ * @param stageNo  Stage number
+ * @param groupNo  Enemy group number
+ * @param setNo    Enemy set number
+ */
+IsQuestEnemyAlive(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
+```
+
+### IsQuestEnemyAlive2 (222)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636060` |
+| Table index | 222 |
+| Notes | Identical decompilation to IsQuestEnemyAlive (221). May differ in calling convention. |
+
+```
+/**
+ * @brief Duplicate/variant of IsQuestEnemyAlive. Identical behaviour.
+ * @param stageNo  Stage number
+ * @param groupNo  Enemy group number
+ * @param setNo    Enemy set number
+ */
+IsQuestEnemyAlive2(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
+```
+
+### IsQuestOrAreaEnemyAlive (223)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006360B0` |
+| Table index | 223 |
+| Key callees | `FUN_009cff70` (area instance check); if non-zero: `FUN_00a41890`; else `FUN_00a41780`; then `FUN_00bc2da0` |
+
+```
+/**
+ * @brief Area-aware version of IsQuestEnemyAlive.
+ * Uses the area-specific lookup (FUN_00a41890) when an area instance is active.
+ * @param stageNo  Stage number
+ * @param groupNo  Enemy group number
+ * @param setNo    Enemy set number
+ */
+IsQuestOrAreaEnemyAlive(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
+```
+
+### IsQuestOrAreaEnemyAlive2 (224)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636110` |
+| Table index | 224 |
+| Notes | Duplicate of IsQuestOrAreaEnemyAlive (223). |
+
+```
+/**
+ * @brief Duplicate/variant of IsQuestOrAreaEnemyAlive.
+ * @param stageNo  Stage number
+ * @param groupNo  Enemy group number
+ * @param setNo    Enemy set number
+ */
+IsQuestOrAreaEnemyAlive2(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
+```
+
+### OmSetTouchRadius (226)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636400` (thunk → `0x00638940`) |
+| Table index | 226 |
+| Key callees | `FUN_006380c0` — validates ctx+0x210 (touch event present), packed `(groupNo<<16\|stageNo)` vs stored touch ID, `FUN_00be0670()` for setNo; checks **bit 3** of ctx+0x208 (touch-enter flag) |
+| Side effects | Calls `FUN_00a336e0(param04)` to update radius marker display on match |
+
+```
+/**
+ * @brief Displays a radius marker around an OM object and progresses when the player enters and interacts with it.
+ * Validates: stage+group match, setNo match, touch event present, enter bit (ctx+0x208 bit 3) set.
+ * On match, updates the radius marker display via FUN_00a336e0(param04).
+ * @note Complement is OmReleaseTouchRadius (227) which fires on exit (bit 4).
+ * @param stageNo Stage number
+ * @param groupNo OM group number
+ * @param setNo   OM set number
+ * @param param04 Passed to FUN_00a336e0 for marker display
+ */
+OmSetTouchRadius(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
+```
+
+### OmReleaseTouchRadius (227)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636450` (thunk → `0x00638AB0`) |
+| Table index | 227 |
+| Key callees | `FUN_00638150` — same structure as OmSetTouchRadius but checks **bit 4** of ctx+0x208 (touch-exit flag) |
+
+```
+/**
+ * @brief Displays a radius marker around an OM object and progresses when the player exits its radius.
+ * Complementary to OmSetTouchRadius (226) — fires on exit (ctx+0x208 bit 4), not entry.
+ * @param stageNo Stage number
+ * @param groupNo OM group number
+ * @param setNo   OM set number
+ * @param param04 Radius marker parameter
+ */
+OmReleaseTouchRadius(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
+```
+
+### IsNpcInteractionComplete (228)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006364A0` (thunk → `0x00638B90`) |
+| Table index | 228 |
+| Key callees | `FUN_0064c1f0()` (cutscene check), `FUN_0063d480(stageNo, npcId, choiceId, param04)` (NPC interaction validator), `FUN_009d0170()` (NPC lookup), `FUN_00c0ee60()` (NPC talk state) |
+| Key fields | `DAT_0220456c+0x9f4+0x4654` vs `+0x45cc` — scene-change counters (cutscene path) |
+
+```
+/**
+ * @brief Checks if an NPC interaction with a specific choice has completed. Two code paths:
+ * (1) Cutscene path (FUN_0064c1f0 returns true): checks scene-change counter equality.
+ * (2) Normal path: validates local player entity, NPC talk state, and that an interaction record
+ *     matches stageNo/npcId/choiceId via FUN_0063d480.
+ * @note param03 is the choiceId distinguishing dialogue branches, not a generic param.
+ * @note Formerly named "NpcInteraction" — renamed after Ghidra verification.
+ * @param stageNo  Stage number
+ * @param npcId    NPC entity ID
+ * @param choiceId Dialogue branch/choice identifier
+ * @param param04  Secondary interaction context value
+ */
+IsNpcInteractionComplete(StageNo stageNo, int npcId, int choiceId, int param04 = 0);
+```
+
+### IsRewardPointNotLess (225)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636390` |
+| Table index | 225 |
+| Key callees | `FUN_00bfc5d0(rewardId)` (checks flag at +0x274); `FUN_00bfc5a0(rewardId, expectedValue)` (queues reward collection) |
+
+```
+/**
+ * @brief Reward point check / collection trigger. Guards on GM mode and player ID match.
+ * If expectedValue < 0, checks flag at reward entry +0x274 via FUN_00bfc5d0.
+ * If expectedValue >= 0, queues a reward collection action via FUN_00bfc5a0.
+ * @param playerId      Player identifier
+ * @param rewardId      Reward table entry identifier
+ * @param expectedValue Comparison value or collection trigger (< 0 = flag-check only)
+ */
+IsRewardPointNotLess(int playerId, int rewardId, int expectedValue, int param04 = 0);
+```
+
+### IsEnemyFoundForOrderRadius (230)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636560` (thunk → `0x00636C20`) |
+| Table index | 230 |
+| Key callees | `FUN_00b19320(stageNo)` — stage-to-area-ID map; `FUN_00b2c2a0` / `FUN_00b2c910` — scan packet buffers for SceHit type-9/type-12 entries; `DAT_021af4f4` — area trigger manager |
+
+```
+/**
+ * @brief Places a radius marker on the enemy group position and progresses when the player
+ * discovers the enemy. param03 (setNo) = -1 matches any set in the group.
+ * Must be followed by a kill command (e.g. DieEnemy) to complete the quest block.
+ * @note Params match the DieEnemy / IsEnemyFound (stageNo, groupNo, setNo) convention.
+ * @param stageNo    Stage number
+ * @param groupNo    Enemy group number (marker drawn at group position on map)
+ * @param setNo      Enemy set number (-1 = any)
+ * @param markerFlag Marker display control
+ */
+IsEnemyFoundForOrderRadius(StageNo stageNo, int groupNo, int setNo = -1, int markerFlag = 0);
+```
+
+### IsEnemyFoundForOrderRadiusNoMarker (231)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636610` |
+| Table index | 231 |
+| Key callees | `FUN_00bda180()` / `FUN_00bda1a0()` — acquire/release spin lock; `FUN_009cfad0()` — lock contention test; `FUN_00636c20` — same proximity hit function as ID 230 |
+
+```
+/**
+ * @brief No-marker, lock-guarded variant of IsEnemyFoundForOrderRadius.
+ * Acquires FUN_00bda180() spin lock before checking; if already locked returns false immediately.
+ * Always passes markerFlag=0 internally — param04 is unused.
+ * @param stageNo  Stage number
+ * @param groupNo  Enemy group number
+ * @param setNo    Enemy set number (-1 = any)
+ * @param param04  Unused (markerFlag forced to 0 internally)
+ */
+IsEnemyFoundForOrderRadiusNoMarker(StageNo stageNo, int groupNo, int setNo = -1, int param04 = 0);
+```
+
+### IsPawnAvailable (233)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636900` |
+| Table index | 233 |
+| Key callees | `FUN_00868170()` — pawn list manager from `this+0x29cc+0x45c` |
+| Key fields | List entry `+8` = pawn ID; `+0x18` / `+0x1c` = active state fields |
+
+```
+/**
+ * @brief Checks if a pawn with the given ID is active/available.
+ * Retrieves the pawn list manager via FUN_00868170() (accesses this+0x29cc+0x45c),
+ * iterates entries matching pawnId at entry+8, returns true if any match has entry+0x18 or +0x1c non-zero.
+ * Only pawnId (param01) is used; params 2-4 are ignored.
+ * @note Formerly named "IsPawnActionReady" with incorrect "action type 6" description — no such constant exists.
+ * @param pawnId  Pawn ID to look up in the pawn list
+ */
+IsPawnAvailable(int pawnId, int param02_unused = 0, int param03_unused = 0, int param04_unused = 0);
+```
+
+### IsOmBrokenInCurrentPhase (229)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006364F0` |
+| Table index | 229 |
+| Key callees | `FUN_009cff50` / `FUN_00bdf6c0` (phase context), `FUN_00be3160(groupNo, setNo)` (OM broken check), bit 18 of `this+0x5c+0x208` |
+
+```
+/**
+ * @brief Checks if an OM set is broken in the current substory phase.
+ * Gets phase context via FUN_009cff50/FUN_00bdf6c0, then calls FUN_00be3160.
+ * Also validates bit 18 of this+0x5c+0x208.
+ * @param stageNo  Stage number
+ * @param groupNo  OM group number
+ * @param setNo    OM set number
+ */
+IsOmBrokenInCurrentPhase(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
+```
+
+### IsTutorialSequenceActive (232)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006368A0` |
+| Table index | 232 |
+| Key callees | `FUN_00be4e10` reads byte at substory+0x262 |
+
+```
+/**
+ * @brief Checks if a tutorial cutscene/sequence OM is active.
+ * Reads the single-byte flag at substoryObject+0x262 via FUN_00be4e10.
+ */
+IsTutorialSequenceActive(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### IsSubstoryStateBit19 (234)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636980` |
+| Table index | 234 |
+| State offset | `cQuestProcess+0x5c+0x20c`, bit 19 (0x13) |
+
+```
+/**
+ * @brief Returns bit 19 of the substory state word at *(cQuestProcess+0x5c)+0x20c.
+ */
+IsSubstoryStateBit19(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### IsPartyMemberHasItem (235)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006369F0` |
+| Table index | 235 |
+| Key callees | `FUN_00b956a0` (iterate up to 15 party members), `FUN_004dadf0` / `FUN_004df8d0` (check item lists), item ID list at `PTR_LAB_02141040[itemListIdx]` |
+
+```
+/**
+ * @brief Checks if any party member (up to 15) has an item matching a list entry.
+ * Checks both main pawn and hired pawn item lists.
+ * @param itemListIdx Index into the item ID list at PTR_LAB_02141040
+ */
+IsPartyMemberHasItem(int itemListIdx, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### IsSubstoryStateBit20 (236)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636B10` |
+| Table index | 236 |
+| State offset | `cQuestProcess+0x5c+0x20c`, bit 20 (0x14) |
+
+```
+/**
+ * @brief Returns bit 20 of the substory state word at *(cQuestProcess+0x5c)+0x20c.
+ */
+IsSubstoryStateBit20(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### IsSubstoryStateBit21 (237)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636B70` |
+| Table index | 237 |
+| State offset | `cQuestProcess+0x5c+0x20c`, bit 21 (0x15) |
+
+```
+/**
+ * @brief Returns bit 21 of the substory state word at *(cQuestProcess+0x5c)+0x20c.
+ */
+IsSubstoryStateBit21(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### IsSubstoryStateBit22 (238)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636BA0` |
+| Table index | 238 |
+| State offset | `cQuestProcess+0x5c+0x20c`, bit 22 (0x16) |
+
+```
+/**
+ * @brief Returns bit 22 of the substory state word at *(cQuestProcess+0x5c)+0x20c.
+ */
+IsSubstoryStateBit22(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### IsSubstoryStateBit23 (239)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636BD0` |
+| Table index | 239 |
+| State offset | `cQuestProcess+0x5c+0x20c`, bit 23 (0x17) |
+
+```
+/**
+ * @brief Returns bit 23 of the substory state word at *(cQuestProcess+0x5c)+0x20c.
+ */
+IsSubstoryStateBit23(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### IsFsmNpcTalkComplete (240)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636C10` |
+| Table index | 240 |
+| Key callees | Thunks to `FUN_00634090`; checks completed-talk list at `DAT_022044a0+0x7678`; FSM mode validation of current stage |
+
+```
+/**
+ * @brief Checks if an FSM NPC talk event has been completed.
+ * Validates the NPC against the completed-talk list and, in FSM mode, confirms the episode matches the active stage.
+ * @param npcId NPC identifier to look up in the completed-talk list
+ */
+IsFsmNpcTalkComplete(int npcId, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### IsSubstoryIngameHourInRange (241)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636EF0` |
+| Table index | 241 |
+| Key callees | `FUN_009cfdf0` / `FUN_009d0160` / `FUN_00bdee50(0xb)` / `FUN_00597d20` (substory clock); multiplier `DAT_01aeaa98` converts raw time to hours |
+
+```
+/**
+ * @brief Checks if the substory clock is within [minHour, maxHour].
+ * Parameters are sorted internally so order does not matter.
+ * @param minHour Minimum hour (inclusive)
+ * @param maxHour Maximum hour (inclusive)
+ */
+IsSubstoryIngameHourInRange(int minHour, int maxHour, int param03 = 0, int param04 = 0);
+```
+
+### IsQuestClearCountNotLess (245)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00637250` |
+| Table index | 245 |
+| Key callees | `FUN_009d0230`, `FUN_0064d170`; compares against `DAT_0220456c+0xb28` / `+0xb2c` |
+
+```
+/**
+ * @brief Checks if the current quest clear count has reached or exceeded a threshold.
+ * @param param01 Threshold or context value passed to FUN_009d0230
+ */
+IsQuestClearCountNotLess(int param01, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### IsContentsModeTimerNotLess (246)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00637320` |
+| Table index | 246 |
+| Key callees | `FUN_00bc15d0` (elapsed timer); guards on S3 season-phase pointer at `DAT_0220456c+0x9f4` |
+
+```
+/**
+ * @brief S3-only: checks if the contents mode elapsed timer >= timeSec.
+ * Returns 0 if not in the correct season phase.
+ * @param timeSec Minimum elapsed seconds
+ */
+IsContentsModeTimerNotLess(int timeSec, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### IsTriggerFlagSetAndClear (247)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006373F0` |
+| Table index | 247 |
+| Flag address | `DAT_021af4f4 + 0xEEA` |
+
+```
+/**
+ * @brief Fire-once trigger: reads byte at DAT_021af4f4+0xEEA.
+ * If the byte equals 1, clears it to 0 and returns 1. Otherwise returns 0.
+ * The flag is set by an external event; this command consumes it atomically.
+ */
+IsTriggerFlagSetAndClear(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### IsGameProgressionLevelReached (250)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006374C0` |
+| Table index | 250 |
+| Key callees | param01==0: checks tutorial-complete flag at game instance +0x10 and fires message 0x25e; param01>0: compares `param01 <= *(sGame::mpInstance + 0x3a0c)` |
+
+```
+/**
+ * @brief Checks global story progression level.
+ * progressLevel == 0: checks if tutorial is complete (fires announce 0x25e if so).
+ * progressLevel  > 0: checks if progressLevel <= *(sGame::mpInstance + 0x3a0c).
+ * @param progressLevel Story progression threshold (0 = tutorial-complete check)
+ */
+IsGameProgressionLevelReached(int progressLevel, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### IsContentsModeStateFlag (253)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00637820` |
+| Table index | 253 |
+| Key callees | `FUN_00bdee50(0xc)` (area context mode 0xc), reads byte at context+0x3b |
+
+```
+/**
+ * @brief Checks if contents/dungeon mode is currently active.
+ * Reads byte at +0x3b from the mode-0xc area context; returns true if non-zero.
+ */
+IsContentsModeStateFlag(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+```
+
+### IsQuestEnemyHpNotGreater (255)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00637890` |
+| Table index | 255 |
+| Key callees | `FUN_00a41780` (quest enemy type 3 lookup), `FUN_00bc0ab0` computes HP-lost% = `100 - (current/max)*100` |
+
+```
+/**
+ * @brief Checks if a quest enemy's HP-lost percentage is within [0, hpLostPct].
+ * Effectively checks that the enemy's remaining HP >= (100 - hpLostPct)%.
+ * @param stageNo   Stage number
+ * @param groupNo   Enemy group number
+ * @param setNo     Enemy set number
+ * @param hpLostPct Maximum HP-lost percentage (0 = full HP required, 100 = any HP)
+ */
+IsQuestEnemyHpNotGreater(StageNo stageNo, int groupNo, int setNo, int hpLostPct);
+```
+
+### IsAreaLinkageQuestFlagOn (256)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00637950` |
+| Table index | 256 |
+| System | **Grand Mission / Extreme Mission** (Area-Linkage battle content) |
+| Key callees | Content-mode guard: `DAT_0220456c+0x9f4+0x4654 == +0x45cc`; `FUN_00a336e0(flagKey)` (constructs Grand Mission vtable wrapper); `FUN_00be1ce0` → `FUN_00be1f70(9)` (walks type-9 flag list at manager+0x90) |
+| Vtable ID | `PTR_FUN_01afa2d0` — same vtable as "Grand Mission:Raid Boss" (`0x01afae08`) and "Grand Mission:Fort Defense" (`0x01afa388`) |
+| Content-mode guard | `+0x4654 == +0x45cc` — general content-phase equality check; fails during transitions. Same guard used by commands 242/243/244/251. |
+
+```
+/**
+ * @brief Checks whether a Grand Mission / Extreme Mission area-linkage flag (content sub-type 9) is set.
+ * This is a **flag/state presence check** — it is NOT a kill check and NOT a proximity check.
+ * Constructs a typed Grand Mission wrapper via FUN_00a336e0(flagKey), then walks the type-9 flag
+ * list at Grand Mission manager+0x90 via FUN_00be1f70(9). Returns 1 if any entry's +4 field matches flagKey.
+ * Guarded by content-mode equality (DAT_0220456c+0x9f4+0x4654 == +0x45cc); returns 0 if not in the expected phase.
+ * @note This is a Grand Mission system check, not a generic world-quest flag.
+ *       Other sub-types: 3 (+0x68), 4 (+0x7c), 0xb (+0xa4) — each has a parallel check command.
+ * @param flagKey Key matched against entry+4 in the type-9 flag list (params 2-4 unused)
+ */
+IsAreaLinkageQuestFlagOn(int flagKey, int param02_unused = 0, int param03_unused = 0, int param04_unused = 0);
+```
+
+### IsKilledTargetEnemySetGroupMode15 (242)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00636FE0` |
+| Table index | 242 |
+| Key callees | Content-mode guard: `DAT_0220456c+0x9f4+0x4654` vs `+0x45cc`, `FUN_009d07f0()`, `*(this+0x82)` byte; delegates to `FUN_0063a5e0` |
+| Key fields | Kill-group entries: `entry+0x14`=flagNo, `entry+0x18`=valid, `entry+4`=kill-completion counter (0=done) |
+
+```
+/**
+ * @brief Kill-group completion check, gated on content mode. Verifies content mode via counter equality
+ * (ctx+0x4654 == ctx+0x45cc) and FUN_009d07f0(). If not in content mode and this+0x82 != 0, returns early.
+ * Delegates to FUN_0063a5e0 which iterates the kill-group list, matches flagNo at entry+0x14,
+ * checks entry+0x18 (valid byte) and entry+4 == 0 (all kills done).
+ * The marker vs no-marker distinction (vs ID 243) is a runtime property of this+0x82, not code structure.
+ * @note "mode=15" is not a literal constant in the code.
+ * @note 5 total parameters (not 4).
+ * @param flagNo  Kill-group flag identifier
+ * @param param03 Passed to FUN_0063a5e0
+ * @param param04 Passed to FUN_0063a5e0
+ * @param param05 Passed to FUN_0063a5e0
+ */
+IsKilledTargetEnemySetGroupMode15(int flagNo, int param03 = 0, int param04 = 0, int param05 = 0);
+```
+
+### IsKilledTargetEnemySetGroupMode15NoMarker (243)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006370B0` |
+| Table index | 243 |
+| Notes | Byte-for-byte identical decompilation to ID 242. No-marker is a runtime property of `this+0x82`. |
+
+```
+/**
+ * @brief Identical implementation to IsKilledTargetEnemySetGroupMode15 (242).
+ * The no-marker variant is distinguished at runtime by this+0x82 being non-zero, not by code structure.
+ * See IsKilledTargetEnemySetGroupMode15 for full documentation.
+ * @note Original name had a mixed-case typo ("IsKIlled...ENemy") — corrected here.
+ * @param flagNo  Kill-group flag identifier
+ * @param param03 Passed to FUN_0063a5e0
+ * @param param04 Passed to FUN_0063a5e0
+ * @param param05 Passed to FUN_0063a5e0
+ */
+IsKilledTargetEnemySetGroupMode15NoMarker(int flagNo, int param03 = 0, int param04 = 0, int param05 = 0);
+```
+
+### IsContentsTimerBElapsed (244)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00637180` |
+| Table index | 244 |
+| Key callees | `FUN_0064d170(timerNo)` — Timer List B lookup at ctx+0x104; returns `entry+8` (elapsed value) |
+| Key fields | `DAT_0220456c+0xb28` / `+0xb2c` — 64-bit time boundary |
+
+```
+/**
+ * @brief Checks if a Timer List B entry's elapsed value is within a stored 64-bit time boundary.
+ * Calls FUN_0064d170(timerNo) to find the entry in Timer List B (ctx+0x104) and gets its elapsed
+ * value at entry+8. Returns 1 if elapsed <= boundary.
+ * @note Formerly named "IsEndContentsTimer0". Previous description "evaluates bit-flag, not elapsed time"
+ *       was INCORRECT — this performs a 64-bit elapsed-time comparison against DAT_0220456c+0xb28/+0xb2c.
+ * @note Params 2-4 are unused.
+ * @param timerNo Timer identifier
+ */
+IsContentsTimerBElapsed(int timerNo, int param02_unused = 0, int param03_unused = 0, int param04_unused = 0);
+```
+
+### IsKillGroupCompleteInRadius (248)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00637430` (direct thunk → `FUN_0063A5E0`) |
+| Table index | 248 |
+| Key callees | `FUN_0063a5e0` — same kill-group completion function as IDs 242/243, but with no content-mode guard |
+| Key fields | Kill-group entry: `+0x14`=flagNo, `+0x18`=valid, `+4`=kill counter (0=done) |
+
+```
+/**
+ * @brief Direct thunk to FUN_0063a5e0 with no content-mode guard (unlike IDs 242/243).
+ * Iterates the kill-group list on this, finds entry matching flagNo at entry+0x14,
+ * checks entry+0x18 (valid) and entry+4 == 0 (kill complete). Only flagNo is used.
+ * @note Formerly named "IsKilledTargetEnemySetGroupInRadius". Previous description "shape type 4 radius"
+ *       was INCORRECT — no shape-type filtering exists in this function. The "radius" refers to the
+ *       visual kill zone representation, not code behaviour.
+ * @note Only 2 parameters are used (this, flagNo); params 3-4 are ignored.
+ * @param flagNo Kill-group flag identifier
+ */
+IsKillGroupCompleteInRadius(int flagNo, int param02_unused = 0, int param03_unused = 0, int param04_unused = 0);
+```
+
+### IsContentsTimerAZero (251)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006375E0` |
+| Table index | 251 |
+| Key callees | Content-mode guard (same as IDs 242/243); `FUN_0064d130(timerNo)` — Timer List A lookup at ctx+0xf0 |
+| Key fields | Returns `entry+8 == 0` — true when timer state is zero |
+
+```
+/**
+ * @brief Checks if a Timer List A entry's state value equals zero. Content-mode gated (same guard as 242/243).
+ * Calls FUN_0064d130(timerNo) to find the entry in Timer List A (ctx+0xf0) and checks if entry+8 == 0.
+ * @note Formerly named "IsEndContentsTimer1". Previous description "byte-flag at +0x1e95" was INCORRECT
+ *       — offset +0x1e95 does not appear in the decompilation. Timer List A is correct.
+ * @note Only timerNo (param01) is used; param02-04 are ignored.
+ * @param timerNo Timer identifier to look up in Timer List A
+ */
+IsContentsTimerAZero(int timerNo, int param02_unused = 0, int param03_unused = 0, int param04_unused = 0);
+```
+
+### IsWildHuntTargetEnemyKilled (252)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006376E0` |
+| Table index | 252 |
+| System | **Wild Hunt** (`cMobHuntQuestManager` — "MobHunt" is the internal engine name for Wild Hunt) |
+| Key callees | `FUN_00a39f80(entry)` reads `entry+0x14` (zone/linkage ID); `FUN_00a3c2b0(sub)` reads `sub+4` (em ID field 1); `FUN_00a3a000(sub)` reads `sub+8` (em ID field 2); `FUN_00636c20(id1, id2, -1, param04)` — generic OM enemy killed-state checker |
+| Kill state | vtable+0x2ec returns `0xc` (killed); fallback via `FUN_00c82ac0` |
+
+```
+/**
+ * @brief Checks whether a Wild Hunt target enemy has been killed.
+ * "MobHunt" is the internal engine name for the Wild Hunt system (cMobHuntQuestManager).
+ * Iterates the check-command object's zone-entry list (this[2] = count, this[5] = entry array).
+ * Finds the entry where entry+0x14 == param01 (zone/linkage ID), then for each sub-entry calls
+ * FUN_00636c20(em_id1, em_id2, -1, markerFlag) which checks vtable+0x2ec for kill state 0xc,
+ * with FUN_00c82ac0 as an alternate confirmation path.
+ * @note param02 and param03 are unused.
+ * @param zoneLinkageId Zone/linkage ID matched against entry+0x14 (param01)
+ * @param markerFlag    Passed directly to FUN_00636c20 as its 4th arg (param04)
+ */
+IsWildHuntTargetEnemyKilled(int zoneLinkageId, int param02_unused = 0, int param03_unused = 0, int markerFlag = 0);
+```
+
+---
+
+## Ghidra-Verified Commands (Result, corrected)
+
+The following result commands were originally added experimentally and have since been verified against Ghidra decompilation.
+
+### SubstoryProgress (99)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00633730` |
+| Table index | 99 |
+| Key callees | `FUN_00597d20(id1, id2)` — compute progress ratio; `FUN_00597970(id1, id2, delta)` — add delta, clamp to max; `FUN_00bd3390` — send UI packet 0x117 (increase) or 0x118 (decrease); `FUN_00bd3280(id1, id2, old, new)` — send progress-change packet |
+| Key fields | Substory ID pair at ctx+0x5c+0x244 / +0x248 |
+
+```
+/**
+ * @brief Adds a signed delta to a substory progress value, clamped to [0, max].
+ * Reads substory ID pair from ctx+0x5c+0x244/+0x248. Sends packet 0x117 (increase) or
+ * 0x118 (decrease) to the UI, then FUN_00bd3280 to report old/new progress values to the client.
+ * @param delta Signed progress change (positive = advance, negative = regress). Params 3-4 unused.
+ */
+SubstoryProgress(int delta, int param03_unused = 0, int param04_unused = 0);
+```
+
+### SetSubstoryDisplayValue (102)
+
+| Field | Value |
+|-------|-------|
+| Address | `0x006339B0` |
+| Table index | 102 |
+| Key callees | `FUN_009cff50` — push/get player context; `FUN_00bdee50(0xb)` — look up entry ID 11 in timer/event list at ctx+0xf8/+0x104; `FUN_005986d0` — writes result to substory object +0x44 |
+
+```
+/**
+ * @brief Writes a looked-up value into the substory display object at field +0x44.
+ * Calls FUN_00bdee50(0xb) to look up entry ID 11 in the ctx event list, then passes
+ * the result to FUN_005986d0 which writes it to the substory object's +0x44 field.
+ * No parameters used beyond 'this'.
+ * @note Formerly named "EnableSubstoryUIElement" — renamed after Ghidra verification showed this
+ *       writes a data value, not a boolean enable flag.
+ */
+SetSubstoryDisplayValue(void);
 ```

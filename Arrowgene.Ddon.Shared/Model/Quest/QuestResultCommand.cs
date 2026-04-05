@@ -36,8 +36,8 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         AddResultPoint = 26, // (cQuestProcess* this, s32 tableIndex, s32 param02, s32 param03, s32 param04))
         PushImteToPlBag = 27, // (cQuestProcess* this, s32 itemId, s32 itemNum, s32 param03, s32 param04))
         StartTimer = 28, // (cQuestProcess* this, s32 timerNo, s32 sec, s32 param03, s32 param04))
-        SetRandom = 29, // (cQuestProcess* this, s32 randomNo, s32 minValue, s32 maxValue, s32 resultValue))
-        ResetRandom = 30, // (cQuestProcess* this, s32 randomNo, s32 param02, s32 param03, s32 param04))
+        SetRandom = 29, // 0x00639290 (cQuestProcess* this, s32 randomNo, s32 minValue, s32 maxValue, s32 resultValue)
+        ResetRandom = 30, // 0x006393B0 (cQuestProcess* this, s32 randomNo, s32 param02_unused, s32 param03_unused, s32 param04_unused)
         BgmRequest = 31, // (cQuestProcess* this, s32 type, s32 bgmId, s32 param03, s32 param04))
         BgmStop = 32, // (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04))
         SetWaypoint = 33, // (cQuestProcess* this, s32 npcId, s32 waypointNo0, s32 waypointNo1, s32 waypointNo2))
@@ -106,5 +106,179 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         SwitchPawnQuestTalk = 96, // (cQuestProcess* this, s32 type, s32 param02, s32 param03, s32 param04))
         LinkageEnemyFlagOn = 97, // (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 flagId))
         LinkageEnemyFlagOff = 98, // (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 flagId))
+
+        // The commands below were found through Ghidra analysis of the result function table at .data:02126770
+        // Result dispatch function: .text:0063E254  Table bounds check: commandId < 0x87 (135 entries, indices 0-134)
+        // @note Parameter names are inferred from decompilation and may not match original source.
+        /// <summary>
+        /// Adds a signed delta to a substory progress value, clamped to [0, max].
+        /// The substory category key and objective key are read from stored quest-state fields at
+        /// ctx+0x5c+0x244 and ctx+0x5c+0x248 — they are baked into the quest context, not passed as params.
+        /// Only param01 (delta) is used: positive advances progress, negative regresses it, zero is a no-op.
+        /// Sends packet 0x117 (increase) or 0x118 (decrease) to update the UI, then FUN_00bd3280 to
+        /// report old and new progress ratios to the client.
+        /// </summary>
+        SubstoryProgress = 99, // 0x00633730 (cQuestProcess* this, s32 delta, s32 param02_unused, s32 param03_unused, s32 param04_unused)
+
+        /// <summary>
+        /// Finds a substory entry by substoryId and adds progressDelta to its progress value, clamped to [0,100].
+        /// </summary>
+        AddSubstoryProgress = 100, // 0x006338E0 (cQuestProcess* this, s32 substoryId, s32 progressDelta, s32 param03, s32 param04)
+
+        /// <summary>
+        /// Triggers a substory event sequence. Checks mode via FUN_009cffc0; if mode==0xb fires FUN_00bdee50 and FUN_00598590.
+        /// </summary>
+        TriggerSubstoryEvent = 101, // 0x00633920 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04)
+
+        /// <summary>
+        /// Triggers display of the substory UI element by writing a value from quest state into the substory
+        /// object's display field (+0x44), then signalling a state-machine transition via FUN_00a34da0.
+        /// The value written comes from ctx+0x5c+0x228 (a stored quest-state field), not from command params.
+        /// The UI element does appear as a downstream effect of the state-machine transition.
+        /// No command parameters (param01-param04) are used; the function takes only 'this'.
+        /// Chain: FUN_009cff50 (read ctx+0x228) → FUN_00bdee50(0xb) (get substory obj) →
+        ///        FUN_005986d0 (write +0x44) → FUN_00a34da0 (reset state-machine dispatch ptr).
+        /// </summary>
+        EnableSubstoryUIElement = 102, // 0x006339B0 (cQuestProcess* this, s32 param01_unused, s32 param02_unused, s32 param03_unused, s32 param04_unused)
+
+        /// <summary>
+        /// Disables the substory UI element. Calls FUN_00bdee50(0xb) then FUN_00598670 which clears the +0x44 reference.
+        /// </summary>
+        DisableSubstoryUIElement = 103, // 0x00633A00 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04)
+
+        /// <summary>
+        /// Redirects NPC talk for a substory context. Calls FUN_009cff50 then FUN_009ce930(param01, param02).
+        /// </summary>
+        SetSubstoryTalkTarget = 104, // 0x00633A30 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04)
+
+        /// <summary>
+        /// Sets invincibility on a substory enemy group. param01=groupFlag triggers FUN_00b5ba00(4,0x15,param01,1,0);
+        /// param02=1 sets invincible via FUN_00be9b60.
+        /// </summary>
+        SetSubstoryEnemyInvincible = 105, // 0x00633A80 (cQuestProcess* this, s32 enemyGroupFlag, s32 invincible, s32 param03, s32 param04)
+
+        Padding106 = 106, // 0x00633B00 stub/nop — always returns 0
+
+        /// <summary>
+        /// Adds an NPC to the FSM talk NPC list at this+0x94/0xa0. Validates FSM mode via FUN_009d07f0 first.
+        /// Uses param01 as npcId/groupId.
+        /// </summary>
+        AddFsmTalkNpc = 107, // 0x00633B30 (cQuestProcess* this, s32 npcId, s32 param02, s32 param03, s32 param04)
+
+        /// <summary>
+        /// Sends an animation/event trigger (opcode 0x21 via FUN_00b68090) to a substory enemy group.
+        /// If param02 != 0, calls FUN_00bd3870(param01, param02-1).
+        /// </summary>
+        SetSubstoryEnemyGroupFlag = 108, // 0x00633B80 (cQuestProcess* this, s32 groupId, s32 flagValue, s32 param03, s32 param04)
+
+        /// <summary>
+        /// Enables substory element variant B. Gets area context, calls FUN_00bdee50(0xb) then FUN_00598860 to set +0x4c.
+        /// </summary>
+        EnableSubstoryElementB = 109, // 0x00633BB0 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04)
+
+        /// <summary>
+        /// Disables substory element variant B. Calls FUN_00bdee50(0xb) then FUN_005986A0 which clears +0x4c.
+        /// </summary>
+        DisableSubstoryElementB = 110, // 0x00633BF0 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04)
+
+        /// <summary>
+        /// Enables a world-management barrier. Calls FUN_00c19920(param01, param02) then sets bit 0 of DAT_021c1250+0x850.
+        /// </summary>
+        SetWorldManageBarrierOn = 111, // 0x00633CE0 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04)
+
+        /// <summary>
+        /// Disables the world-management barrier. Calls FUN_00c1baa0() then clears bit 0 of DAT_021c1250+0x850.
+        /// </summary>
+        SetWorldManageBarrierOff = 112, // 0x00633D20 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04)
+
+        /// <summary>
+        /// Schedules an FSM NPC behavior by calling FUN_009d1a60(param04). param04 is read from stack at +0x10.
+        /// </summary>
+        SetFsmNpcSchedule = 113, // 0x00633D50 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 scheduleId)
+
+        /// <summary>
+        /// Sets the level tier of a quest enemy group (type 3). Looks up by (stageNo, groupNo, setNo) via FUN_00a41780,
+        /// then calls FUN_00bc0670(enemy, level). Phase-gated.
+        /// </summary>
+        SetQuestEnemyLevel = 114, // 0x00633D80 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 level)
+
+        /// <summary>
+        /// Area-aware variant of SetQuestEnemyLevel. Uses FUN_00a41890 when an area instance exists.
+        /// </summary>
+        SetQuestEnemyLevelEx = 115, // 0x00633E30 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 level)
+
+        /// <summary>
+        /// Sets the danger tier of a quest enemy group (bits 23-21) via FUN_00bc0720. Phase-gated.
+        /// </summary>
+        SetQuestEnemyTierUp = 116, // 0x00633F30 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 tier)
+
+        /// <summary>
+        /// Area-aware variant of SetQuestEnemyTierUp.
+        /// </summary>
+        SetQuestEnemyTierUpEx = 117, // 0x00633FC0 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 tier)
+
+        /// <summary>
+        /// Sets a body/stance pose (1-6) on a quest NPC/enemy via FUN_00bbf670. Looks up by (stageNo, groupNo, setNo).
+        /// </summary>
+        SetQuestNpcBodyPose = 118, // 0x006341A0 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 poseId)
+
+        /// <summary>
+        /// Area-aware variant of SetQuestNpcBodyPose.
+        /// </summary>
+        SetQuestNpcBodyPoseEx = 119, // 0x006341F0 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 poseId)
+
+        Padding120 = 120, // 0x006342D0 stub/nop — always returns 0
+
+        /// <summary>
+        /// Sets the level of a layout enemy (type 2) by queuing it into a critical-section-guarded buffer via FUN_00b55e70.
+        /// GM-mode guarded. Buffer holds up to 10 entries at this+0xe48.
+        /// </summary>
+        SetQuestLayoutEnemyLevel = 121, // 0x00634300 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 level)
+
+        Padding122 = 122, // 0x00634390 stub/nop — always returns 0
+        Padding123 = 123, // 0x006343C0 stub/nop — always returns 0
+
+        /// <summary>
+        /// Removes an FSM NPC entry from the process list at this+0x28/0x1c, freeing its children. Calls FUN_0063dda0(param01).
+        /// </summary>
+        RemoveFsmNpcFromSchedule = 124, // 0x006343F0 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04)
+
+        Padding125 = 125, // 0x00634410 stub/nop — always returns 0
+
+        /// <summary>
+        /// Controls enemy expedition state. mode=2: FUN_00bc6ff0(9) sets global to 10 and signals start.
+        /// mode=3: FUN_00bc7070(param02) iterates party members and fires expedition signal.
+        /// </summary>
+        SetEnemyExpeditionState = 126, // 0x00634450 (cQuestProcess* this, s32 mode, s32 param02, s32 param03, s32 param04)
+
+        Padding127 = 127, // 0x006344B0 stub/nop — always returns 0
+
+        /// <summary>
+        /// Fires a substory ending sequence. Calls FUN_00be9960, FUN_00b85670, then sends messages 0x25f and 0x260
+        /// to the world manager NPC via FUN_00b82b00.
+        /// </summary>
+        TriggerSubstoryEndSequence = 128, // 0x006345D0 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04)
+
+        Padding129 = 129, // 0x00634690 stub/nop — always returns 0
+
+        /// <summary>
+        /// Checks if a pawn has OM state == 4 and a specific animation condition via FUN_0087dc50.
+        /// </summary>
+        CheckSubstoryCondition = 130, // 0x006346B0 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04)
+
+        Padding131 = 131, // 0x00634720 stub/nop — always returns 0
+        Padding132 = 132, // 0x00634750 stub/nop — always returns 0
+
+        /// <summary>
+        /// Controls pawn expedition. mode=1: FUN_00b6ce30() starts expedition (writes action DAT_01d4db50).
+        /// mode=2: FUN_00b6cde0() stops expedition (writes action DAT_01d4db54).
+        /// </summary>
+        SetPawnExpeditionFlag = 133, // 0x006347A0 (cQuestProcess* this, s32 mode, s32 param02, s32 param03, s32 param04)
+
+        /// <summary>
+        /// Sets a body/pose mode on a layout enemy (type 2). Looks up entity via FUN_00a41780, checks OM alive,
+        /// then calls FUN_005be380(poseId) to set the stance mode.
+        /// </summary>
+        SetQuestLayoutEnemyBodyPose = 134, // 0x00634820 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 poseId)
     }
 }

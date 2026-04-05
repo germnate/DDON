@@ -701,5 +701,301 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             questBlock.CheckCommands[commandListIndex].AddCheckCmdNewTalkNpcWithoutMarker(stageInfo, groupNo, setNo, questId);
             return questBlock;
         }
+
+        public static QuestBlock AddCheckCmdIsNpcTalkChoice(this QuestBlock questBlock, StageInfo stageInfo, NpcId npcId, int choice, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsNpcTalkChoice(stageInfo, npcId, choice);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdOmSetTouchRadius(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdOmSetTouchRadius(stageInfo, groupNo, setNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdOmReleaseTouchRadius(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdOmReleaseTouchRadius(stageInfo, groupNo, setNo);
+            return questBlock;
+        }
+
+        // Ghidra-discovered check commands (IDs 211–256)
+
+        public static QuestBlock AddCheckCmdIsSubstoryStateBit18(this QuestBlock questBlock, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsSubstoryStateBit18();
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdStoreLinkageEnemyFlagGlobal(this QuestBlock questBlock, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdStoreLinkageEnemyFlagGlobal();
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdSetNpcOrderFlagAndCheckBit18(this QuestBlock questBlock, int stageNo, int npcIdOrObjId, int npcLookupId, int storeVal, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdSetNpcOrderFlagAndCheckBit18(stageNo, npcIdOrObjId, npcLookupId, storeVal);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdSubstoryEnemyHpNotLess(this QuestBlock questBlock, int substoryId, int hpRatePercent, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdSubstoryEnemyHpNotLess(substoryId, hpRatePercent);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdSubstoryEnemyHpLess(this QuestBlock questBlock, int substoryId, int hpRatePercent, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdSubstoryEnemyHpLess(substoryId, hpRatePercent);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdSubstoryAvgEnemyHpNotLess(this QuestBlock questBlock, int param01, int hpRatePercent, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdSubstoryAvgEnemyHpNotLess(param01, hpRatePercent);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdSubstoryAvgEnemyHpLess(this QuestBlock questBlock, int param01, int hpRatePercent, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdSubstoryAvgEnemyHpLess(param01, hpRatePercent);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsOmBehaviorState(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int behaviorState, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsOmBehaviorState(stageInfo, groupNo, setNo, behaviorState);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsPlayerSpecificLayoutFlag(this QuestBlock questBlock, int playerId, int flagId, int expectedValue, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsPlayerSpecificLayoutFlag(playerId, flagId, expectedValue);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsQuestEnemyAlive(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestEnemyAlive(stageInfo, groupNo, setNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsQuestEnemyAlive2(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestEnemyAlive2(stageInfo, groupNo, setNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsQuestOrAreaEnemyAlive(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestOrAreaEnemyAlive(stageInfo, groupNo, setNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsQuestOrAreaEnemyAlive2(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestOrAreaEnemyAlive2(stageInfo, groupNo, setNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsRewardPointNotLess(this QuestBlock questBlock, int playerId, int rewardId, int expectedValue, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsRewardPointNotLess(playerId, rewardId, expectedValue);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsNpcInteractionComplete(this QuestBlock questBlock, StageInfo stageInfo, NpcId npcId, int choiceId, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsNpcInteractionComplete(stageInfo, npcId, choiceId);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsOmBrokenInCurrentPhase(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsOmBrokenInCurrentPhase(stageInfo, groupNo, setNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsEnemyFoundForOrderRadius(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo = -1, int markerFlag = 0, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsEnemyFoundForOrderRadius(stageInfo, groupNo, setNo, markerFlag);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsEnemyFoundForOrderRadiusNoMarker(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo = -1, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsEnemyFoundForOrderRadiusNoMarker(stageInfo, groupNo, setNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsPawnAvailable(this QuestBlock questBlock, int pawnId, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsPawnAvailable(pawnId);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsSubstoryStateBit19(this QuestBlock questBlock, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsSubstoryStateBit19();
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsPartyMemberHasItem(this QuestBlock questBlock, int itemListIdx, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsPartyMemberHasItem(itemListIdx);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsSubstoryStateBit20(this QuestBlock questBlock, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsSubstoryStateBit20();
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsSubstoryStateBit21(this QuestBlock questBlock, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsSubstoryStateBit21();
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsSubstoryStateBit22(this QuestBlock questBlock, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsSubstoryStateBit22();
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsSubstoryStateBit23(this QuestBlock questBlock, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsSubstoryStateBit23();
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsFsmNpcTalkComplete(this QuestBlock questBlock, int npcId, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsFsmNpcTalkComplete(npcId);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsSubstoryIngameHourInRange(this QuestBlock questBlock, int minHour, int maxHour, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsSubstoryIngameHourInRange(minHour, maxHour);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsKilledTargetEnemySetGroupMode15(this QuestBlock questBlock, int flagNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsKilledTargetEnemySetGroupMode15(flagNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsKilledTargetEnemySetGroupMode15NoMarker(this QuestBlock questBlock, int flagNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsKilledTargetEnemySetGroupMode15NoMarker(flagNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsContentsTimerBElapsed(this QuestBlock questBlock, int timerNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsContentsTimerBElapsed(timerNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsQuestClearCountNotLess(this QuestBlock questBlock, int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestClearCountNotLess(param01, param02, param03, param04);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsContentsModeTimerNotLess(this QuestBlock questBlock, int timeSec, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsContentsModeTimerNotLess(timeSec);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsTriggerFlagSetAndClear(this QuestBlock questBlock, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsTriggerFlagSetAndClear();
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsKillGroupCompleteInRadius(this QuestBlock questBlock, int flagNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsKillGroupCompleteInRadius(flagNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsContentsTimerAZero(this QuestBlock questBlock, int timerNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsContentsTimerAZero(timerNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsWildHuntTargetEnemyKilled(this QuestBlock questBlock, int zoneLinkageId, int markerFlag = 0, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsWildHuntTargetEnemyKilled(zoneLinkageId, markerFlag);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsContentsModeStateFlag(this QuestBlock questBlock, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsContentsModeStateFlag();
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsQuestEnemyHpNotGreater(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int hpLostPct, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestEnemyHpNotGreater(stageInfo, groupNo, setNo, hpLostPct);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsAreaLinkageQuestFlagOn(this QuestBlock questBlock, int flagKey, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsAreaLinkageQuestFlagOn(flagKey);
+            return questBlock;
+        }
     }
 }
