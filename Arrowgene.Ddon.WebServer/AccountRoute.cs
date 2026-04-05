@@ -308,14 +308,6 @@ namespace Arrowgene.Ddon.WebServer
                 return null;
             }
 
-            if (account.PasswordToken != passwordToken)
-            {
-                Logger.Error($"ResetPassword: invalid token");
-                account.PasswordToken = null;
-                _database.UpdateAccount(account);
-                return null;
-            }
-
             if (string.IsNullOrWhiteSpace(newPassword))
             {
                 Logger.Error($"ResetPassword: invalid password");
