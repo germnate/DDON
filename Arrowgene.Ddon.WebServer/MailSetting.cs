@@ -85,7 +85,7 @@ namespace Arrowgene.Ddon.WebServer
             SmtpPassword ??= "p@55VV0rD";
             FromAddress ??= "no-reply@dd.on";
             TemplatePath ??= Path.Combine(Util.ExecutingDirectory(), "Files/mail_templates");
-            LogoLink ??= "DDON - Welcome to Ddon!";
+            LogoLink ??= "http://www.dd.on:52099/launcher/logo.png";
             SubjectNewAccount ??= "DDON - Welcome to Ddon!";
             SubjectVerifyEmail ??= "DDON - Verify your email address";
             SubjectPasswordReset ??= "DDON - Password reset request";
@@ -102,7 +102,7 @@ namespace Arrowgene.Ddon.WebServer
             SmtpPassword = "p@55VV0rD";
             FromAddress = "no-reply@dd.on";
             TemplatePath = Path.Combine(Util.ExecutingDirectory(), "Files/mail_templates");
-            LogoLink = "DDON - Welcome to Ddon!";
+            LogoLink = "http://www.dd.on:52099/launcher/logo.png";
             SubjectNewAccount = "DDON - Welcome to Ddon!";
             SubjectVerifyEmail = "DDON - Verify your email address";
             SubjectPasswordReset = "DDON - Password reset request";

@@ -66,12 +66,12 @@ namespace Arrowgene.Ddon.WebServer
             
             placeholders = new Dictionary<string, string>
             {
+                ["{{LogoLink}}"] = _mailSetting.LogoLink,
                 ["{{UserName}}"] = WebUtility.HtmlEncode(account.Name),
                 ["{{DomainUrl}}"] = baseUrl,
                 ["{{Schema}}"] = (bool)_mailSetting.IsHttps ? "https" : "http",
                 ["{{Year}}"] = DateTime.UtcNow.Year.ToString()
             };
-
 
             if (mailModel == MailModel.NewAccount || mailModel == MailModel.MailVerify)
             {
@@ -114,6 +114,7 @@ namespace Arrowgene.Ddon.WebServer
                 MailModel.PasswordReset => _mailSetting.SubjectPasswordReset,
                 _ => throw new InvalidOperationException("Unsupported mail subject")
             };
+
             message.Body = new TextPart("html")
             {
                 Text = body

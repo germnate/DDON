@@ -53,16 +53,7 @@
                 },
 
                 getTokenFromUrl: function () {
-                    var query = window.location.search.substring(1);
-                    var params = query.split("&");
-
-                    for (var i = 0; i < params.length; i++) {
-                        var pair = params[i].split("=");
-                        if (pair[0] === "token") {
-                            return decodeURIComponent(pair[1]);
-                        }
-                    }
-                    return null;
+                    return new URLSearchParams(window.location.search).get("token");
                 },
 
                 setLoading: function () {

@@ -222,7 +222,7 @@ namespace Arrowgene.Ddon.WebServer
                     break;
 
                 case "resend":
-                    account = ResendEmailVerification(req.Email);
+                    account = ResendEmailVerification(req.Account, req.Email);
                     if (account == null)
                     {
                         res.Error = "Email not found";
@@ -359,9 +359,9 @@ namespace Arrowgene.Ddon.WebServer
             return true;
         }
 
-        private Account ResendEmailVerification(string mail)
+        private Account ResendEmailVerification(string accountName, string email)
         {
-            Account account = _database.SelectAccountByEmail(mail);
+            Account account = _database.SelectAccountByEmailAndName(accountName, email);
             if (account == null)
             {
                 Logger.Error("ResendEmailVerification: account does not exist");
