@@ -1,4 +1,3 @@
-using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.GameServer.Quests;
 using Arrowgene.Ddon.Shared;
 using Arrowgene.Ddon.Shared.Asset;

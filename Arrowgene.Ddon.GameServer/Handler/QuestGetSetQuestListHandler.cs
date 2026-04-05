@@ -69,10 +69,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         continue;
                     }
 
-                    if (quest.OrderConditions.Any(c => c.Type == QuestOrderConditionType.AreaRank
-                        && (leaderCharacter == null
-                            || !leaderCharacter.AreaRanks.ContainsKey((QuestAreaId)c.Param01)
-                            || Server.AreaRankManager.GetEffectiveRank(leaderCharacter, (QuestAreaId)c.Param01) < (uint)c.Param02)))
+                    if (Server.GameSettings.GameServerSettings.WorldQuestFilterByLeaderAreaRank
+                        && quest.OrderConditions.Any(c => c.Type == QuestOrderConditionType.AreaRank
+                            && (leaderCharacter == null
+                                || !leaderCharacter.AreaRanks.ContainsKey((QuestAreaId)c.Param01)
+                                || Server.AreaRankManager.GetEffectiveRank(leaderCharacter, (QuestAreaId)c.Param01) < (uint)c.Param02)))
                     {
                         continue;
                     }

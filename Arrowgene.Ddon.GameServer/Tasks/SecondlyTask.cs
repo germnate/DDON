@@ -27,7 +27,7 @@ namespace Arrowgene.Ddon.GameServer.Tasks
 
         public override string TaskTypeName()
         {
-            return "Seconds Amount Task";
+            return "Secondly Task";
         }
     }
 }
