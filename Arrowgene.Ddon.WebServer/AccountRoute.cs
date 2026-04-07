@@ -174,7 +174,7 @@ namespace Arrowgene.Ddon.WebServer
                         break;
                     }
 
-                    if (!account.MailVerified)
+                    if (!account.MailVerified && (bool)_webServerSetting.MailSetting.MailRequired)
                     {
                         res.Message = "E-mail not verified yet";
                         break;
