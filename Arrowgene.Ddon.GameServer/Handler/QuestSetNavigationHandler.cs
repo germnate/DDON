@@ -42,8 +42,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     case QuestType.World:
                         ntc.SetQuestOrderList.Add(quest.ToCDataSetQuestOrderList(0, 0));
                         break;
-                        // case QuestType.ExpiredQuestList:
-                        //    break;
+                    // case QuestType.ExpiredQuestList:
+                    //    break;
                 }
                 client.Party.SendToAll(ntc);
             }

@@ -128,6 +128,11 @@ public class PartyManager
         return true;
     }
 
+    public IEnumerable<PartyGroup> GetAllParties()
+    {
+        return _parties.Values;
+    }
+
     public PartyGroup GetParty(uint partyId)
     {
         if (!_parties.TryGetValue(partyId, out PartyGroup party))
