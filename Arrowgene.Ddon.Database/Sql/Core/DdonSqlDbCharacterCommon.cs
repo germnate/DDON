@@ -68,13 +68,44 @@ public partial class DdonSqlDb : SqlDb
         $"UPDATE \"ddon_character_common\" SET {BuildQueryUpdate(CharacterCommonFields)} WHERE \"character_common_id\" = @character_common_id;";
 
     private static readonly string SqlSelectCharacterProfile =
-    $"SELECT {BuildQueryField(CDataProfileFields)} FROM \"ddon_character_profile\" WHERE \"character_common_id\" = @character_common_id;";
+        $"SELECT {BuildQueryField(CDataProfileFields)} FROM \"ddon_character_profile\" WHERE \"character_common_id\" = @character_common_id;";
 
     private readonly string SqlInsertCharacterProfile =
         $"INSERT INTO \"ddon_character_profile\" ({BuildQueryField(CDataProfileFields)}) VALUES ({BuildQueryInsert(CDataProfileFields)});";
 
     private static readonly string SqlUpdateCharacterProfile =
         $"UPDATE \"ddon_character_profile\" SET {BuildQueryUpdate(CDataProfileFields)} WHERE \"character_common_id\" = @character_common_id;";
+
+    // Local copies of field arrays from other partial files.
+    // We cannot reference those static fields directly here because C# does not
+    // guarantee static initializer order across partial class files, which causes
+    // a type initializer exception at startup if this file initializes first.
+    private static readonly string[] StorageItemFieldsLocal = new[]
+    {
+        "item_uid", "item_id", "safety", "color", "plus_value", "equip_points"
+    };
+
+    private static readonly string[] CrestFieldsLocal = new[]
+    {
+        "character_common_id", "item_uid", "slot", "crest_id", "crest_amount"
+    };
+
+    private static readonly string[] EquipmentLimitBreakFieldsLocal = new[]
+    {
+        "item_uid", "effect_id", "unk1", "effect_type", "unk0"
+    };
+
+    // Batch fetch: all storage items for a set of UIDs in one round-trip (Postgres ANY array syntax)
+    private static readonly string SqlSelectStorageItemsByUIds =
+        $"SELECT {BuildQueryField(StorageItemFieldsLocal)} FROM \"ddon_storage_item\" WHERE \"item_uid\" = ANY(@uids);";
+
+    // Batch fetch: all crests for a character's set of item UIDs in one round-trip
+    private static readonly string SqlSelectCrestDataByUIds =
+        $"SELECT {BuildQueryField(CrestFieldsLocal)} FROM \"ddon_crests\" WHERE \"character_common_id\" = @character_common_id AND \"item_uid\" = ANY(@uids);";
+
+    // Batch fetch: all limit break records for a set of item UIDs in one round-trip
+    private static readonly string SqlSelectEquipmentLimitBreakByUIds =
+        $"SELECT {BuildQueryField(EquipmentLimitBreakFieldsLocal)} FROM \"ddon_equipment_limit_break\" WHERE \"item_uid\" = ANY(@uids);";
 
 
     public override bool UpdateCharacterCommonBaseInfo(CharacterCommon common, DbConnection? connectionIn = null)
@@ -84,7 +115,6 @@ public partial class DdonSqlDb : SqlDb
         try
         {
             int commonUpdateRowsAffected = ExecuteNonQuery(connection, SqlUpdateCharacterCommon, command => { AddParameter(command, common); });
-
             return commonUpdateRowsAffected > NoRowsAffected;
         }
         finally
@@ -102,7 +132,6 @@ public partial class DdonSqlDb : SqlDb
     public bool UpdateEditInfo(DbConnection conn, CharacterCommon common)
     {
         int commonUpdateRowsAffected = ExecuteNonQuery(conn, SqlUpdateEditInfo, command => { AddParameter(command, common); });
-
         return commonUpdateRowsAffected > NoRowsAffected;
     }
 
@@ -115,7 +144,6 @@ public partial class DdonSqlDb : SqlDb
     public bool UpdateStatusInfo(DbConnection conn, CharacterCommon common)
     {
         int commonUpdateRowsAffected = ExecuteNonQuery(conn, SqlUpdateStatusInfo, command => { AddParameter(command, common); });
-
         return commonUpdateRowsAffected > NoRowsAffected;
     }
 
@@ -134,93 +162,165 @@ public partial class DdonSqlDb : SqlDb
     {
         // Job data
         ExecuteReader(conn, SqlSelectCharacterJobDataByCharacter,
-            command => { AddParameter(command, "@character_common_id", common.CommonId); }, reader =>
+            command => { AddParameter(command, "@character_common_id", common.CommonId); },
+            reader =>
             {
                 while (reader.Read()) common.CharacterJobDataList.Add(ReadCharacterJobData(reader));
             });
 
-        // Equips
+        // Materialize equip slot records before running batch item/crest/limit-break queries.
+        var equipSlots = new List<(string? UId, JobId Job, EquipType EquipType, byte EquipSlot)>();
         ExecuteReader(conn, SqlSelectEquipItemByCharacter,
             command => { AddParameter(command, "@character_common_id", common.CommonId); },
             reader =>
             {
                 while (reader.Read())
-                {
-                    string UId = GetString(reader, "item_uid");
-                    JobId job = (JobId)GetByte(reader, "job");
-                    EquipType equipType = (EquipType)GetByte(reader, "equip_type");
-                    byte equipSlot = GetByte(reader, "equip_slot");
-
-                    using DbConnection connection = OpenNewConnection();
-                    ExecuteReader(connection, SqlSelectStorageItemsByUId,
-                        command2 => { AddParameter(command2, "@item_uid", UId); },
-                        reader2 =>
-                        {
-                            if (reader2.Read())
-                            {
-                                Item item = new();
-                                item.UId = GetString(reader2, "item_uid");
-                                item.ItemId = GetUInt32(reader2, "item_id");
-                                item.SafetySetting = GetByte(reader2, "safety");
-                                item.Color = GetByte(reader2, "color");
-                                item.PlusValue = GetByte(reader2, "plus_value");
-                                item.EquipPoints = GetUInt32(reader2, "equip_points");
-                                using DbConnection connection2 = OpenNewConnection();
-                                ExecuteReader(connection2, SqlSelectAllCrestData,
-                                    command3 =>
-                                    {
-                                        AddParameter(command3, "character_common_id", common.CommonId);
-                                        AddParameter(command3, "item_uid", item.UId);
-                                    }, reader4 =>
-                                    {
-                                        while (reader4.Read())
-                                        {
-                                            Crest result = ReadCrestData(reader4);
-                                            item.EquipElementParamList.Add(result.ToCDataEquipElementParam());
-                                        }
-                                    });
-
-                                using DbConnection connection3 = OpenNewConnection();
-                                item.AddStatusParamList = GetEquipmentLimitBreakRecord(item.UId, connection3);
-
-                                common.EquipmentTemplate.SetEquipItem(item, job, equipType, equipSlot);
-                            }
-                        });
-                }
+                    equipSlots.Add((
+                        GetStringNullable(reader, "item_uid"),
+                        (JobId)GetByte(reader, "job"),
+                        (EquipType)GetByte(reader, "equip_type"),
+                        GetByte(reader, "equip_slot")
+                    ));
             });
 
-        // Job Items
+        if (equipSlots.Count > 0)
+        {
+            string[] equipUids = equipSlots.Where(e => e.UId != null).Select(e => e.UId!).Distinct().ToArray();
+
+            var equipItemMap = new Dictionary<string, Item>();
+            using DbConnection equipItemConn = OpenNewConnection();
+            ExecuteReader(equipItemConn, SqlSelectStorageItemsByUIds,
+                command => { AddParameter(command, "@uids", (string[])equipUids); },
+                reader =>
+                {
+                    while (reader.Read())
+                    {
+                        var item = new Item
+                        {
+                            UId           = GetString(reader, "item_uid"),
+                            ItemId        = GetUInt32(reader, "item_id"),
+                            SafetySetting = GetByte(reader, "safety"),
+                            Color         = GetByte(reader, "color"),
+                            PlusValue     = GetByte(reader, "plus_value"),
+                            EquipPoints   = GetUInt32(reader, "equip_points")
+                        };
+                        equipItemMap[item.UId] = item;
+                    }
+                });
+
+            var crestMap = new Dictionary<string, List<CDataEquipElementParam>>();
+            using DbConnection crestConn = OpenNewConnection();
+            ExecuteReader(crestConn, SqlSelectCrestDataByUIds,
+                command =>
+                {
+                    AddParameter(command, "character_common_id", common.CommonId);
+                    AddParameter(command, "@uids", (string[])equipUids);
+                },
+                reader =>
+                {
+                    while (reader.Read())
+                    {
+                        string uid = GetString(reader, "item_uid");
+                        if (!crestMap.TryGetValue(uid, out var list))
+                            crestMap[uid] = list = new List<CDataEquipElementParam>();
+                        list.Add(ReadCrestData(reader).ToCDataEquipElementParam());
+                    }
+                });
+
+            var limitBreakMap = new Dictionary<string, List<CDataAddStatusParam>>();
+            using DbConnection limitBreakConn = OpenNewConnection();
+            ExecuteReader(limitBreakConn, SqlSelectEquipmentLimitBreakByUIds,
+                command => { AddParameter(command, "@uids", (string[])equipUids); },
+                reader =>
+                {
+                    while (reader.Read())
+                    {
+                        string uid = GetString(reader, "item_uid");
+                        if (!limitBreakMap.TryGetValue(uid, out var list))
+                            limitBreakMap[uid] = list = new List<CDataAddStatusParam>();
+                        list.Add(new CDataAddStatusParam
+                        {
+                            EnhanceId   = GetUInt16(reader, "effect_id"),
+                            Unk1        = GetUInt16(reader, "unk1"),
+                            EnhanceType = (EquipEnhanceType)GetByte(reader, "effect_type"),
+                            Unk0        = GetByte(reader, "unk0")
+                        });
+                    }
+                });
+
+            foreach (var (uid, job, equipType, equipSlot) in equipSlots)
+            {
+                if (string.IsNullOrEmpty(uid))
+                {
+                    common.EquipmentTemplate.SetEquipItem(null, job, equipType, equipSlot);
+                    continue;
+                }
+                if (!equipItemMap.TryGetValue(uid, out Item? item))
+                {
+                    // No storage row found — leave slot as null, same as vanilla silent failure
+                    continue;
+                }
+                if (crestMap.TryGetValue(uid, out var crests))
+                    item.EquipElementParamList.AddRange(crests);
+                item.AddStatusParamList = limitBreakMap.GetValueOrDefault(uid, new List<CDataAddStatusParam>());
+                common.EquipmentTemplate.SetEquipItem(item, job, equipType, equipSlot);
+            }
+        }
+
+        var jobItemSlots = new List<(string? UId, JobId Job, byte EquipSlot)>();
         ExecuteReader(conn, SqlSelectEquipJobItemsByCharacter,
             command => { AddParameter(command, "@character_common_id", common.CommonId); },
             reader =>
             {
                 while (reader.Read())
-                {
-                    string UId = GetString(reader, "item_uid");
-                    JobId job = (JobId)GetByte(reader, "job");
-                    byte equipSlot = GetByte(reader, "equip_slot");
-
-                    using DbConnection connection = OpenNewConnection();
-                    ExecuteReader(connection, SqlSelectStorageItemsByUId,
-                        command2 => { AddParameter(command2, "@item_uid", UId); },
-                        reader2 =>
-                        {
-                            if (reader2.Read())
-                            {
-                                Item item = new();
-                                item.UId = GetString(reader2, "item_uid");
-                                item.ItemId = GetUInt32(reader2, "item_id");
-                                item.SafetySetting = GetByte(reader2, "safety");
-                                item.Color = GetByte(reader2, "color");
-                                item.PlusValue = GetByte(reader2, "plus_value");
-                                item.EquipPoints = GetUInt32(reader2, "equip_points");
-                                common.EquipmentTemplate.SetJobItem(item, job, equipSlot);
-                            }
-                        });
-                }
+                    jobItemSlots.Add((
+                        GetStringNullable(reader, "item_uid"),
+                        (JobId)GetByte(reader, "job"),
+                        GetByte(reader, "equip_slot")
+                    ));
             });
 
-        // Normal Skills
+        if (jobItemSlots.Count > 0)
+        {
+            string[] jobUids = jobItemSlots.Where(e => e.UId != null).Select(e => e.UId!).Distinct().ToArray();
+
+            var jobItemMap = new Dictionary<string, Item>();
+            using DbConnection jobItemConn = OpenNewConnection();
+            ExecuteReader(jobItemConn, SqlSelectStorageItemsByUIds,
+                command => { AddParameter(command, "@uids", (string[])jobUids); },
+                reader =>
+                {
+                    while (reader.Read())
+                    {
+                        var item = new Item
+                        {
+                            UId           = GetString(reader, "item_uid"),
+                            ItemId        = GetUInt32(reader, "item_id"),
+                            SafetySetting = GetByte(reader, "safety"),
+                            Color         = GetByte(reader, "color"),
+                            PlusValue     = GetByte(reader, "plus_value"),
+                            EquipPoints   = GetUInt32(reader, "equip_points")
+                        };
+                        jobItemMap[item.UId] = item;
+                    }
+                });
+
+            foreach (var (uid, job, equipSlot) in jobItemSlots)
+            {
+                if (string.IsNullOrEmpty(uid))
+                {
+                    common.EquipmentTemplate.SetJobItem(null, job, equipSlot);
+                    continue;
+                }
+                if (!jobItemMap.TryGetValue(uid, out Item? item))
+                {
+                    // No storage row found — leave slot as null, same as vanilla silent failure
+                    continue;
+                }
+                common.EquipmentTemplate.SetJobItem(item, job, equipSlot);
+            }
+        }
+
         ExecuteReader(conn, SqlSelectNormalSkillParam,
             command => { AddParameter(command, "@character_common_id", common.CommonId); },
             reader =>
@@ -228,13 +328,13 @@ public partial class DdonSqlDb : SqlDb
                 while (reader.Read()) common.LearnedNormalSkills.Add(ReadNormalSkillParam(reader));
             });
 
-        // Custom Skills
         ExecuteReader(conn, SqlSelectLearnedCustomSkills,
             command => { AddParameter(command, "@character_common_id", common.CommonId); },
             reader =>
             {
                 while (reader.Read()) common.LearnedCustomSkills.Add(ReadLearnedCustomSkill(reader));
             });
+
         ExecuteReader(conn, SqlSelectEquippedCustomSkills,
             command => { AddParameter(command, "@character_common_id", common.CommonId); },
             reader =>
@@ -242,10 +342,12 @@ public partial class DdonSqlDb : SqlDb
                 while (reader.Read())
                 {
                     uint skillId = GetUInt32(reader, "skill_id");
-                    JobId job = (JobId)GetByte(reader, "job");
-                    byte slotNo = GetByte(reader, "slot_no");
+                    JobId job    = (JobId)GetByte(reader, "job");
+                    byte slotNo  = GetByte(reader, "slot_no");
 
-                    CustomSkill? skill = common.LearnedCustomSkills.Where(x => x.Job == job && x.SkillId == skillId).SingleOrDefault();
+                    CustomSkill? skill = common.LearnedCustomSkills
+                        .Where(x => x.Job == job && x.SkillId == skillId)
+                        .SingleOrDefault();
 
                     if (skill is null)
                     {
@@ -257,25 +359,27 @@ public partial class DdonSqlDb : SqlDb
                 }
             });
 
-        // Abilities
         ExecuteReader(conn, SqlSelectLearnedAbilities,
             command => { AddParameter(command, "@character_common_id", common.CommonId); },
             reader =>
             {
                 while (reader.Read()) common.LearnedAbilities.Add(ReadLearnedAbility(reader));
             });
+
         ExecuteReader(conn, SqlSelectEquippedAbilities,
             command => { AddParameter(command, "@character_common_id", common.CommonId); },
             reader =>
             {
                 while (reader.Read())
                 {
-                    AbilityId abilityId = (AbilityId)GetUInt32(reader, "ability_id");
-                    JobId job = (JobId)GetByte(reader, "job");
-                    JobId equippedToJob = (JobId)GetByte(reader, "equipped_to_job");
-                    byte slotNo = GetByte(reader, "slot_no");
+                    AbilityId abilityId  = (AbilityId)GetUInt32(reader, "ability_id");
+                    JobId job            = (JobId)GetByte(reader, "job");
+                    JobId equippedToJob  = (JobId)GetByte(reader, "equipped_to_job");
+                    byte slotNo          = GetByte(reader, "slot_no");
 
-                    Ability? aug = common.LearnedAbilities.Where(x => x.Job == job && x.AbilityId == abilityId).SingleOrDefault();
+                    Ability? aug = common.LearnedAbilities
+                        .Where(x => x.Job == job && x.AbilityId == abilityId)
+                        .SingleOrDefault();
 
                     if (aug is null)
                     {
@@ -292,9 +396,11 @@ public partial class DdonSqlDb : SqlDb
 
     private void StoreCharacterCommonData(DbConnection conn, CharacterCommon common)
     {
-        foreach (CDataCharacterJobData characterJobData in common.CharacterJobDataList) ReplaceCharacterJobData(common.CommonId, characterJobData, conn);
+        foreach (CDataCharacterJobData characterJobData in common.CharacterJobDataList)
+            ReplaceCharacterJobData(common.CommonId, characterJobData, conn);
 
-        foreach (CDataNormalSkillParam normalSkillParam in common.LearnedNormalSkills) ReplaceNormalSkillParam(conn, common.CommonId, normalSkillParam);
+        foreach (CDataNormalSkillParam normalSkillParam in common.LearnedNormalSkills)
+            ReplaceNormalSkillParam(conn, common.CommonId, normalSkillParam);
 
         foreach (CustomSkill learnedSkills in common.LearnedCustomSkills)
             ExecuteNonQuery(conn, SqlInsertLearnedCustomSkill, command => { AddParameter(command, common.CommonId, learnedSkills); });
@@ -307,7 +413,8 @@ public partial class DdonSqlDb : SqlDb
                 if (skill != null) ReplaceEquippedCustomSkill(conn, common.CommonId, slotNo, skill);
             }
 
-        foreach (Ability ability in common.LearnedAbilities) ExecuteNonQuery(conn, SqlInsertLearnedAbility, command => { AddParameter(command, common.CommonId, ability); });
+        foreach (Ability ability in common.LearnedAbilities)
+            ExecuteNonQuery(conn, SqlInsertLearnedAbility, command => { AddParameter(command, common.CommonId, ability); });
 
         foreach (KeyValuePair<JobId, List<Ability>> jobAndAugs in common.EquippedAbilitiesDictionary)
         {
@@ -512,6 +619,5 @@ public partial class DdonSqlDb : SqlDb
         AddParameter(command, "@motion_id", common.CharacterProfile.MotionId);
         AddParameter(command, "@motion_frame_no", common.CharacterProfile.MotionFrameNo);
         AddParameter(command, "@comment", common.CharacterProfile.Comment);
-
     }
 }

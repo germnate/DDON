@@ -209,6 +209,15 @@ public abstract class SqlDb : IDatabase
         AddParameter(command, name, value, DbType.Boolean);
     }
 
+    /// <summary>
+    /// Passes a string array as a parameter. Postgres overrides this with a typed NpgsqlParameter
+    /// for use with the ANY(@uids) batch query pattern.
+    /// </summary>
+    public virtual void AddParameter(DbCommand command, string name, string[] value)
+    {
+        throw new NotImplementedException("string[] parameters require a database-specific implementation (e.g. Postgres).");
+    }
+
     public virtual string? GetStringNullable(DbDataReader reader, int ordinal)
     {
         if (reader.IsDBNull(ordinal)) return null;

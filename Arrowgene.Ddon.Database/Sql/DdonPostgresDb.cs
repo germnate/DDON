@@ -33,7 +33,10 @@ public partial class DdonPostgresDb : DdonSqlDb
         if (_dataSource == null)
         {
             NpgsqlDataSourceBuilder dataSourceBuilder = new(_connectionString);
+
+            // Log parameter values during tracing
             dataSourceBuilder.EnableParameterLogging();
+
             _dataSource = dataSourceBuilder.Build();
         }
 
@@ -71,17 +74,22 @@ public partial class DdonPostgresDb : DdonSqlDb
             Username = user,
             Password = password,
             Database = database,
+
             MaxAutoPrepare = (int)maxAutoPrepare,
-            MinPoolSize = enablePooling ? 1 : 0,
+            MinPoolSize = enablePooling ? 2 : 0,
+            MaxPoolSize = enablePooling ? 100 : 1,
+            ConnectionIdleLifetime = 300,
             ConnectionLifetime = 0,
             ReadBufferSize = (int)bufferSize,
             WriteBufferSize = (int)bufferSize,
-            NoResetOnClose = noResetOnClose,
             SocketReceiveBufferSize = (int)bufferSize,
             SocketSendBufferSize = (int)bufferSize,
+            NoResetOnClose = noResetOnClose,
             Pooling = enablePooling,
-            IncludeErrorDetail = enableTracing
+            IncludeErrorDetail = enableTracing,
+            WriteCoalescingBufferThresholdBytes = 1000,
         };
+
         string connectionString = builder.ToString();
         Logger.Info($"Connection String: {connectionString}");
         return connectionString;
@@ -220,6 +228,11 @@ public partial class DdonPostgresDb : DdonSqlDb
     public override void AddParameter(DbCommand command, string name, bool value)
     {
         AddTypedParameter(command, name, value);
+    }
+
+    public override void AddParameter(DbCommand command, string name, string[] value)
+    {
+        command.Parameters.Add(new NpgsqlParameter<string[]>(name, value));
     }
 
     #endregion

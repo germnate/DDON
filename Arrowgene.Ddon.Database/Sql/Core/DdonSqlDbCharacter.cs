@@ -99,6 +99,37 @@ public partial class DdonSqlDb : SqlDb
 
     private readonly string SqlUpdatePartnerPawnId = "UPDATE \"ddon_character\" SET \"partner_pawn_id\" = @partner_pawn_id WHERE \"character_id\" = @character_id;";
 
+    // Batch fetch: all completed quests for a character in one round-trip.
+    // Replaces the per-QuestType loop in QueryCharacterData.
+    private readonly string SqlSelectAllCompletedQuests =
+        $"SELECT {BuildQueryField(CompletedQuestsFields)} FROM \"ddon_completed_quests\" WHERE \"character_common_id\" = @character_common_id;";
+
+    // Local copies of field arrays from other partial files used for batch storage item loading.
+    // Cannot reference those static fields directly here due to C# static initializer ordering
+    // across partial class files — same pattern used in DdonSqlDb_CharacterCommon.cs.
+    private static readonly string[] StorageItemFieldsForCharacter = new[]
+    {
+        "item_uid", "item_id", "safety", "color", "plus_value", "equip_points"
+    };
+
+    private static readonly string[] CrestFieldsForCharacter = new[]
+    {
+        "character_common_id", "item_uid", "slot", "crest_id", "crest_amount"
+    };
+
+    private static readonly string[] EquipmentLimitBreakFieldsForCharacter = new[]
+    {
+        "item_uid", "effect_id", "unk1", "effect_type", "unk0"
+    };
+
+    // Batch fetch: all crests for a character's storage items in one round-trip.
+    private static readonly string SqlSelectStorageCrestDataByUIds =
+        $"SELECT {BuildQueryField(CrestFieldsForCharacter)} FROM \"ddon_crests\" WHERE \"character_common_id\" = @character_common_id AND \"item_uid\" = ANY(@uids);";
+
+    // Batch fetch: all limit break records for a set of storage item UIDs in one round-trip.
+    private static readonly string SqlSelectStorageLimitBreakByUIds =
+        $"SELECT {BuildQueryField(EquipmentLimitBreakFieldsForCharacter)} FROM \"ddon_equipment_limit_break\" WHERE \"item_uid\" = ANY(@uids);";
+
     public override bool CreateCharacter(Character character)
     {
         return ExecuteInTransaction(conn =>
@@ -271,44 +302,84 @@ public partial class DdonSqlDb : SqlDb
                     character.Storage.AddStorage(tuple.Item1, tuple.Item2);
                 }
             });
+
+        // Materialize storage item rows before running batch crest/limit-break queries.
+        var storageRows = new List<(StorageType StorageType, ushort Slot, uint ItemNum, Item Item)>();
         ExecuteReader(conn, SqlSelectStorageItemsByCharacter,
-            (Action<DbCommand>)(command2 => { AddParameter(command2, "@character_id", character.CharacterId); }),
-            reader2 =>
+            (Action<DbCommand>)(command => { AddParameter(command, "@character_id", character.CharacterId); }),
+            reader =>
             {
-                while (reader2.Read())
+                while (reader.Read())
                 {
-                    StorageType storageType = (StorageType)GetByte(reader2, "storage_type");
-                    ushort slot = GetUInt16(reader2, "slot_no");
-                    uint itemNum = GetUInt32(reader2, "item_num");
-                    Item item = new();
-
-                    item.UId = GetString(reader2, "item_uid");
-                    item.ItemId = GetUInt32(reader2, "item_id");
-                    item.SafetySetting = GetByte(reader2, "safety");
-                    item.Color = GetByte(reader2, "color");
-                    item.PlusValue = GetByte(reader2, "plus_value");
-                    item.EquipPoints = GetUInt32(reader2, "equip_points");
-
-                    using DbConnection connection = OpenNewConnection();
-                    ExecuteReader(connection, SqlSelectAllCrestData,
-                        command4 =>
+                    storageRows.Add((
+                        (StorageType)GetByte(reader, "storage_type"),
+                        GetUInt16(reader, "slot_no"),
+                        GetUInt32(reader, "item_num"),
+                        new Item
                         {
-                            AddParameter(command4, "character_common_id", character.CommonId);
-                            AddParameter(command4, "item_uid", item.UId);
-                        }, reader4 =>
-                        {
-                            while (reader4.Read())
-                            {
-                                Crest result = ReadCrestData(reader4);
-                                item.EquipElementParamList.Add(result.ToCDataEquipElementParam());
-                            }
-                        });
-
-                    item.AddStatusParamList = GetEquipmentLimitBreakRecord(item.UId, connection);
-
-                    character.Storage.GetStorage(storageType).SetItem(item, itemNum, slot);
+                            UId           = GetString(reader, "item_uid"),
+                            ItemId        = GetUInt32(reader, "item_id"),
+                            SafetySetting = GetByte(reader, "safety"),
+                            Color         = GetByte(reader, "color"),
+                            PlusValue     = GetByte(reader, "plus_value"),
+                            EquipPoints   = GetUInt32(reader, "equip_points")
+                        }
+                    ));
                 }
             });
+
+        if (storageRows.Count > 0)
+        {
+            string[] storageUids = storageRows.Select(r => r.Item.UId).Distinct().ToArray();
+
+            var crestMap = new Dictionary<string, List<CDataEquipElementParam>>();
+            using DbConnection crestConn = OpenNewConnection();
+            ExecuteReader(crestConn, SqlSelectStorageCrestDataByUIds,
+                command =>
+                {
+                    AddParameter(command, "@character_common_id", character.CommonId);
+                    AddParameter(command, "@uids", storageUids);
+                },
+                reader =>
+                {
+                    while (reader.Read())
+                    {
+                        string uid = GetString(reader, "item_uid");
+                        if (!crestMap.TryGetValue(uid, out var list))
+                            crestMap[uid] = list = new List<CDataEquipElementParam>();
+                        list.Add(ReadCrestData(reader).ToCDataEquipElementParam());
+                    }
+                });
+
+            var limitBreakMap = new Dictionary<string, List<CDataAddStatusParam>>();
+            using DbConnection limitBreakConn = OpenNewConnection();
+            ExecuteReader(limitBreakConn, SqlSelectStorageLimitBreakByUIds,
+                command => { AddParameter(command, "@uids", storageUids); },
+                reader =>
+                {
+                    while (reader.Read())
+                    {
+                        string uid = GetString(reader, "item_uid");
+                        if (!limitBreakMap.TryGetValue(uid, out var list))
+                            limitBreakMap[uid] = list = new List<CDataAddStatusParam>();
+                        list.Add(new CDataAddStatusParam
+                        {
+                            EnhanceId   = GetUInt16(reader, "effect_id"),
+                            Unk1        = GetUInt16(reader, "unk1"),
+                            EnhanceType = (EquipEnhanceType)GetByte(reader, "effect_type"),
+                            Unk0        = GetByte(reader, "unk0")
+                        });
+                    }
+                });
+
+            foreach (var (storageType, slot, itemNum, item) in storageRows)
+            {
+                if (crestMap.TryGetValue(item.UId, out var crests))
+                    item.EquipElementParamList.AddRange(crests);
+                item.AddStatusParamList = limitBreakMap.GetValueOrDefault(item.UId, new List<CDataAddStatusParam>());
+                character.Storage.GetStorage(storageType).SetItem(item, itemNum, slot);
+            }
+        }
 
         // Wallet Points
         ExecuteReader(conn, SqlSelectWalletPoints,
@@ -350,29 +421,25 @@ public partial class DdonSqlDb : SqlDb
                 while (reader.Read()) character.AbilityPresets.Add(ReadAbilityPreset(reader));
             });
 
-        // Quest Completion
-        foreach (QuestType questType in Enum.GetValues<QuestType>())
-            ExecuteReader(conn, SqlSelectCompletedQuestByType,
-                command =>
+        // Quest Completion - single query for all types, replaces per-QuestType loop.
+        // QuestType is read directly from the stored column, identical end result to vanilla.
+        ExecuteReader(conn, SqlSelectAllCompletedQuests,
+            command => { AddParameter(command, "@character_common_id", character.CommonId); },
+            reader =>
+            {
+                while (reader.Read())
                 {
-                    AddParameter(command, "@character_common_id", character.CommonId);
-                    AddParameter(command, "@quest_type", (uint)questType);
-                }, reader =>
-                {
-                    while (reader.Read())
+                    CompletedQuest quest = new()
                     {
-                        CompletedQuest quest = new()
-                        {
-                            QuestId = (QuestId)GetUInt32(reader, "quest_id"),
-                            QuestType = questType,
-                            ClearCount = GetUInt32(reader, "clear_count")
-                        };
+                        QuestId    = (QuestId)GetUInt32(reader, "quest_id"),
+                        QuestType  = (QuestType)GetUInt32(reader, "quest_type"),
+                        ClearCount = GetUInt32(reader, "clear_count")
+                    };
+                    character.CompletedQuests.TryAdd(quest.QuestId, quest);
+                }
+            });
 
-                        character.CompletedQuests.TryAdd(quest.QuestId, quest);
-                    }
-                });
-
-        //Clan membership
+        // Clan membership
         character.ClanId = SelectClanMembershipByCharacterId(character.CharacterId, conn);
         character.ClanName = GetClanNameByClanId(character.ClanId);
 
@@ -470,7 +537,7 @@ public partial class DdonSqlDb : SqlDb
                     continue;
 
                 // Give starter weapon for all classes
-                // If creating a character for normal mode, Wwe are only interested in slot 1 and 2
+                // If creating a character for normal mode, we are only interested in slot 1 and 2
                 for (byte i = 0; i < 2; i++)
                 {
                     Item item = jobEquipment.Value[EquipType.Performance][i];
@@ -512,7 +579,7 @@ public partial class DdonSqlDb : SqlDb
         }
     }
 
-    //Helper function to add specific items to a storage
+    // Helper function to add specific items to a storage
     public override void CreateListItems(DbConnection conn, Character character, StorageType storageType, List<(uint ItemId, uint Amount)> itemList)
     {
         Storage itemType = character.Storage.GetAllStorages()[storageType];
@@ -533,11 +600,7 @@ public partial class DdonSqlDb : SqlDb
     /// <summary>
     /// TODO: Optimize connection handling here and avoid nested loops re-using a single connection which is not supported with Npgsql.
     ///     Temporary workaround: Open a new connection for each nested read.
-    /// 
     /// </summary>
-    /// <param name="connection"></param>
-    /// <param name="characterId"></param>
-    /// <returns></returns>
     public Storages SelectAllStoragesByCharacterId(DbConnection connection, uint characterId)
     {
         Storages storages = new(new Dictionary<StorageType, ushort>());
@@ -643,8 +706,6 @@ public partial class DdonSqlDb : SqlDb
         character.MatchingProfile.PlayStyle = GetUInt32(reader, "play_style");
         character.MatchingProfile.Comment = GetString(reader, "comment");
         character.MatchingProfile.IsJoinParty = GetBoolean(reader, "is_join_party");
-
-        
 
         character.FavWarpSlotNum = GetUInt32(reader, "fav_warp_slot_num");
 

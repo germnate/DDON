@@ -6,7 +6,6 @@ using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -20,8 +19,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         public override S2CQuestGetSetQuestListRes Handle(GameClient client, C2SQuestGetSetQuestListReq request)
         {
-            // client.Send(GameFull.Dump_132);
-
             client.Character.AreaId = request.DistributeId;
 
             S2CQuestGetSetQuestListRes res = new S2CQuestGetSetQuestListRes()
@@ -29,21 +26,55 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 DistributeId = request.DistributeId
             };
 
-            // Remove all world quests which have no progress made
+            // If shared QuestState is empty and this client is the leader, reload their quest
+            // progress from DB into shared state.
+            if (client.Party.Leader?.Client == client && client.Party.QuestState.GetActiveQuestScheduleIds().Count == 0)
+            {
+                var progress = Server.Database.GetQuestProgressByType(client.Character.CommonId, QuestType.All);
+                foreach (var questProgress in progress)
+                {
+                    var quest = QuestManager.GetQuestByScheduleId(questProgress.QuestScheduleId);
+                    if (quest is null) continue;
+                    QuestStateManager questStateManager = QuestManager.GetQuestStateManager(client, quest);
+                    questStateManager.AddNewQuest(questProgress.QuestScheduleId, questProgress.Step);
+                }
+                Logger.Info(client, $"[QuestGetSetQuestList] Reloaded quest state for promoted leader {client.Character.CharacterId}");
+            }
+
+            // Remove all world quests which have no progress made.
             client.Party.QuestState.RemoveInactiveWorldQuests();
 
-            if (QuestManager.HasWorldQuestAreaReleased(client.Character, request.DistributeId))
+            // Build the NTC, mutating path
+            S2CQuestGetSetQuestListNtc ntc = BuildQuestListNtc(client, request.DistributeId, mutating: true);
+            res.SetQuestList = ntc.SetQuestList;
+
+            // Only broadcast to all if the requesting client is the leader.
+            // Non-leader area entry should not overwrite other members' displayed quest state.
+            if (client.Party.Leader?.Client == client)
             {
-                /**
-                 * World quests get added here instead of QuestGetWorldManageQuestListHandler because
-                 * "World Manage Quests" are different from "World Quests". World manage quests appear
-                 * to control the state of the game world (doors, paths, gates, etc.). World quests
-                 * are random fetch, deliver and kill type quests.
-                 */
+                client.Party.SendToAll(ntc);
+            }
+            else
+            {
+                client.Send(ntc);
+            }
 
-                var leaderCharacter = client.Party.Leader?.Client.Character;
+            return res;
+        }
 
-                // Populate state for all quests currently in progress by the player
+        public static S2CQuestGetSetQuestListNtc BuildQuestListNtc(GameClient client, QuestAreaId areaId, bool mutating = false)
+        {
+            var leaderCharacter = client.Party.Leader?.Client?.Character;
+
+            var ntc = new S2CQuestGetSetQuestListNtc()
+            {
+                DistributeId = areaId,
+                SelectCharacterId = leaderCharacter?.CharacterId ?? client.Character.CharacterId,
+                SetQuestList = new List<CDataSetQuestList>()
+            };
+
+            if (QuestManager.HasWorldQuestAreaReleased(client.Character, areaId))
+            {
                 foreach (var questScheduleId in client.Party.QuestState.GetActiveQuestScheduleIds())
                 {
                     Quest quest = client.Party.QuestState.GetQuest(questScheduleId);
@@ -54,10 +85,10 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
                     CompletedQuest questStats = leaderCharacter?.CompletedQuests.GetValueOrDefault(quest.QuestId);
                     QuestState questState = client.Party.QuestState.GetQuestState(quest);
-                    res.SetQuestList.Add(quest.ToCDataSetQuestList(questState?.Step ?? 0, questStats?.ClearCount ?? 0));
+                    ntc.SetQuestList.Add(quest.ToCDataSetQuestList(questState?.Step ?? 0, questStats?.ClearCount ?? 0));
                 }
 
-                foreach (var questScheduleId in client.Party.QuestState.AreaQuests(request.DistributeId))
+                foreach (var questScheduleId in client.Party.QuestState.AreaQuests(areaId))
                 {
                     Quest quest = QuestManager.GetQuestByScheduleId(questScheduleId);
 
@@ -65,49 +96,40 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         || client.Party.QuestState.IsQuestActive(questScheduleId)
                         || client.Party.QuestState.IsCompletedWorldQuest(questScheduleId))
                     {
-                        // Skip quests already populated or completed
                         continue;
                     }
 
-                    if (Server.GameSettings.GameServerSettings.WorldQuestFilterByLeaderAreaRank
-                        && quest.OrderConditions.Any(c => c.Type == QuestOrderConditionType.AreaRank
-                            && (leaderCharacter == null
-                                || !leaderCharacter.AreaRanks.ContainsKey((QuestAreaId)c.Param01)
-                                || Server.AreaRankManager.GetEffectiveRank(leaderCharacter, (QuestAreaId)c.Param01) < (uint)c.Param02)))
-                    {
-                        continue;
-                    }
+                    // Area rank filtering is applied upstream in QuestStateManager.RollEligibleQuestVariant
+                    // when the world quest rotation is rolled, so quests that don't meet the leader's rank
+                    // requirement never appear in AreaQuests() at all. No handler-level check needed.
 
                     CompletedQuest questStats = leaderCharacter?.CompletedQuests.GetValueOrDefault(quest.QuestId);
-                    res.SetQuestList.Add(quest.ToCDataSetQuestList(0, questStats?.ClearCount ?? 0));
-                    client.Party.QuestState.AddNewQuest(quest, 0);
-                    // Enemy requests arrive before the quest list, so loaded groups may have generic enemies. Reset them.
-                    quest.ResetEnemiesForStage(client, client.Character.Stage, onlyLoaded: true);
+                    ntc.SetQuestList.Add(quest.ToCDataSetQuestList(0, questStats?.ClearCount ?? 0));
+
+                    if (mutating)
+                    {
+                        client.Party.QuestState.AddNewQuest(quest, 0);
+                        // Enemy requests arrive before the quest list, so loaded groups may have generic enemies. Reset them.
+                        quest.ResetEnemiesForStage(client, client.Character.Stage, onlyLoaded: true);
+                    }
                 }
             }
 
-            // Add Debug Quest
             var debugQuest = QuestManager.GetQuestByQuestId((QuestId)70000001);
-            res.SetQuestList.Add(new CDataSetQuestList()
+            if (debugQuest != null)
             {
-                Detail = new CDataSetQuestDetail()
+                ntc.SetQuestList.Add(new CDataSetQuestList()
                 {
-                    IsDiscovery = false,
-                    ClearCount = 0
-                },
-                Param = debugQuest.ToCDataQuestList(0),
-            });
+                    Detail = new CDataSetQuestDetail()
+                    {
+                        IsDiscovery = false,
+                        ClearCount = 0
+                    },
+                    Param = debugQuest.ToCDataQuestList(0),
+                });
+            }
 
-            S2CQuestGetSetQuestListNtc ntc = new S2CQuestGetSetQuestListNtc()
-            {
-                DistributeId = request.DistributeId,
-                SelectCharacterId = client.Party.Leader.Client.Character.CharacterId,
-                SetQuestList = res.SetQuestList
-            };
-
-            client.Party.SendToAll(ntc);
-
-            return res;
+            return ntc;
         }
     }
 }
