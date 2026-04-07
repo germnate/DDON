@@ -89,17 +89,11 @@ namespace Arrowgene.Ddon.WebServer
                     return;
                 }
 
-                if (Regex.IsMatch(Email, @"\s"))
-                {
-                    Error = true;
-                    Message = "E-mail cannot contain spaces";
-                    return;
-                }
 
                 if (!Regex.IsMatch(Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
                 {
                     Error = true;
-                    Message = "Invalid e-mail";
+                    Message = "Invalid e-mail format";
                     return;
                 }
             }
