@@ -99,10 +99,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         continue;
                     }
 
-                    // Area rank filtering is applied upstream in QuestStateManager.RollEligibleQuestVariant
-                    // when the world quest rotation is rolled, so quests that don't meet the leader's rank
-                    // requirement never appear in AreaQuests() at all. No handler-level check needed.
-
                     CompletedQuest questStats = leaderCharacter?.CompletedQuests.GetValueOrDefault(quest.QuestId);
                     ntc.SetQuestList.Add(quest.ToCDataSetQuestList(0, questStats?.ClearCount ?? 0));
 

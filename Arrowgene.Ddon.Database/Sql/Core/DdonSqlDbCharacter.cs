@@ -122,13 +122,11 @@ public partial class DdonSqlDb : SqlDb
         "item_uid", "effect_id", "unk1", "effect_type", "unk0"
     };
 
-    // Batch fetch: all crests for a character's storage items in one round-trip.
-    private static readonly string SqlSelectStorageCrestDataByUIds =
-        $"SELECT {BuildQueryField(CrestFieldsForCharacter)} FROM \"ddon_crests\" WHERE \"character_common_id\" = @character_common_id AND \"item_uid\" = ANY(@uids);";
+    private static readonly string SqlSelectStorageCrestDataByUIdsBase =
+        $"SELECT {BuildQueryField(CrestFieldsForCharacter)} FROM \"ddon_crests\" WHERE \"character_common_id\" = @character_common_id AND \"item_uid\"";
 
-    // Batch fetch: all limit break records for a set of storage item UIDs in one round-trip.
-    private static readonly string SqlSelectStorageLimitBreakByUIds =
-        $"SELECT {BuildQueryField(EquipmentLimitBreakFieldsForCharacter)} FROM \"ddon_equipment_limit_break\" WHERE \"item_uid\" = ANY(@uids);";
+    private static readonly string SqlSelectStorageLimitBreakByUIdsBase =
+        $"SELECT {BuildQueryField(EquipmentLimitBreakFieldsForCharacter)} FROM \"ddon_equipment_limit_break\" WHERE \"item_uid\"";
 
     public override bool CreateCharacter(Character character)
     {
@@ -331,14 +329,15 @@ public partial class DdonSqlDb : SqlDb
         if (storageRows.Count > 0)
         {
             string[] storageUids = storageRows.Select(r => r.Item.UId).Distinct().ToArray();
+            var (storageUidsClause, bindStorageUids) = PrepareArrayParameter("uids", storageUids);
 
             var crestMap = new Dictionary<string, List<CDataEquipElementParam>>();
             using DbConnection crestConn = OpenNewConnection();
-            ExecuteReader(crestConn, SqlSelectStorageCrestDataByUIds,
+            ExecuteReader(crestConn, $"{SqlSelectStorageCrestDataByUIdsBase} {storageUidsClause}",
                 command =>
                 {
                     AddParameter(command, "@character_common_id", character.CommonId);
-                    AddParameter(command, "@uids", storageUids);
+                    bindStorageUids(command);
                 },
                 reader =>
                 {
@@ -353,8 +352,8 @@ public partial class DdonSqlDb : SqlDb
 
             var limitBreakMap = new Dictionary<string, List<CDataAddStatusParam>>();
             using DbConnection limitBreakConn = OpenNewConnection();
-            ExecuteReader(limitBreakConn, SqlSelectStorageLimitBreakByUIds,
-                command => { AddParameter(command, "@uids", storageUids); },
+            ExecuteReader(limitBreakConn, $"{SqlSelectStorageLimitBreakByUIdsBase} {storageUidsClause}",
+                command => { bindStorageUids(command); },
                 reader =>
                 {
                     while (reader.Read())

@@ -230,9 +230,12 @@ public partial class DdonPostgresDb : DdonSqlDb
         AddTypedParameter(command, name, value);
     }
 
-    public override void AddParameter(DbCommand command, string name, string[] value)
+    public override (string SqlFragment, Action<DbCommand> Bind) PrepareArrayParameter(string paramName, string[] values)
     {
-        command.Parameters.Add(new NpgsqlParameter<string[]>(name, value));
+        return (
+            $"= ANY(@{paramName})",
+            cmd => cmd.Parameters.Add(new NpgsqlParameter<string[]>($"@{paramName}", values))
+        );
     }
 
     #endregion

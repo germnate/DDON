@@ -210,12 +210,29 @@ public abstract class SqlDb : IDatabase
     }
 
     /// <summary>
-    /// Passes a string array as a parameter. Postgres overrides this with a typed NpgsqlParameter
-    /// for use with the ANY(@uids) batch query pattern.
+    /// Prepares an array of string values for use in a batch WHERE clause.
+    /// Returns the SQL fragment to embed (e.g. "IN (@uids_0, @uids_1)") and an action
+    /// that binds the parameters to a command. Call-site usage:
+    /// <code>
+    ///   var (clause, bind) = PrepareArrayParameter("uids", values);
+    ///   string sql = $"SELECT ... WHERE \"col\" {clause}";
+    ///   ExecuteReader(conn, sql, cmd => bind(cmd), reader => { ... });
+    /// </code>
+    /// Postgres overrides this to use the more efficient "= ANY(@uids)" array syntax.
     /// </summary>
-    public virtual void AddParameter(DbCommand command, string name, string[] value)
+    public virtual (string SqlFragment, Action<DbCommand> Bind) PrepareArrayParameter(string paramName, string[] values)
     {
-        throw new NotImplementedException("string[] parameters require a database-specific implementation (e.g. Postgres).");
+        string[] names = new string[values.Length];
+        for (int i = 0; i < values.Length; i++)
+            names[i] = $"@{paramName}_{i}";
+        return (
+            $"IN ({string.Join(", ", names)})",
+            cmd =>
+            {
+                for (int i = 0; i < values.Length; i++)
+                    AddParameter(cmd, names[i], values[i]);
+            }
+        );
     }
 
     public virtual string? GetStringNullable(DbDataReader reader, int ordinal)

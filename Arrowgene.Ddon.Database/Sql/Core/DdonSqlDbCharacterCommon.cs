@@ -95,17 +95,14 @@ public partial class DdonSqlDb : SqlDb
         "item_uid", "effect_id", "unk1", "effect_type", "unk0"
     };
 
-    // Batch fetch: all storage items for a set of UIDs in one round-trip (Postgres ANY array syntax)
-    private static readonly string SqlSelectStorageItemsByUIds =
-        $"SELECT {BuildQueryField(StorageItemFieldsLocal)} FROM \"ddon_storage_item\" WHERE \"item_uid\" = ANY(@uids);";
+    private static readonly string SqlSelectStorageItemsByUIdsBase =
+        $"SELECT {BuildQueryField(StorageItemFieldsLocal)} FROM \"ddon_storage_item\" WHERE \"item_uid\"";
 
-    // Batch fetch: all crests for a character's set of item UIDs in one round-trip
-    private static readonly string SqlSelectCrestDataByUIds =
-        $"SELECT {BuildQueryField(CrestFieldsLocal)} FROM \"ddon_crests\" WHERE \"character_common_id\" = @character_common_id AND \"item_uid\" = ANY(@uids);";
+    private static readonly string SqlSelectCrestDataByUIdsBase =
+        $"SELECT {BuildQueryField(CrestFieldsLocal)} FROM \"ddon_crests\" WHERE \"character_common_id\" = @character_common_id AND \"item_uid\"";
 
-    // Batch fetch: all limit break records for a set of item UIDs in one round-trip
-    private static readonly string SqlSelectEquipmentLimitBreakByUIds =
-        $"SELECT {BuildQueryField(EquipmentLimitBreakFieldsLocal)} FROM \"ddon_equipment_limit_break\" WHERE \"item_uid\" = ANY(@uids);";
+    private static readonly string SqlSelectEquipmentLimitBreakByUIdsBase =
+        $"SELECT {BuildQueryField(EquipmentLimitBreakFieldsLocal)} FROM \"ddon_equipment_limit_break\" WHERE \"item_uid\"";
 
 
     public override bool UpdateCharacterCommonBaseInfo(CharacterCommon common, DbConnection? connectionIn = null)
@@ -187,10 +184,12 @@ public partial class DdonSqlDb : SqlDb
         {
             string[] equipUids = equipSlots.Where(e => e.UId != null).Select(e => e.UId!).Distinct().ToArray();
 
+            var (equipUidsClause, bindEquipUids) = PrepareArrayParameter("uids", equipUids);
+
             var equipItemMap = new Dictionary<string, Item>();
             using DbConnection equipItemConn = OpenNewConnection();
-            ExecuteReader(equipItemConn, SqlSelectStorageItemsByUIds,
-                command => { AddParameter(command, "@uids", (string[])equipUids); },
+            ExecuteReader(equipItemConn, $"{SqlSelectStorageItemsByUIdsBase} {equipUidsClause}",
+                command => { bindEquipUids(command); },
                 reader =>
                 {
                     while (reader.Read())
@@ -210,11 +209,11 @@ public partial class DdonSqlDb : SqlDb
 
             var crestMap = new Dictionary<string, List<CDataEquipElementParam>>();
             using DbConnection crestConn = OpenNewConnection();
-            ExecuteReader(crestConn, SqlSelectCrestDataByUIds,
+            ExecuteReader(crestConn, $"{SqlSelectCrestDataByUIdsBase} {equipUidsClause}",
                 command =>
                 {
-                    AddParameter(command, "character_common_id", common.CommonId);
-                    AddParameter(command, "@uids", (string[])equipUids);
+                    AddParameter(command, "@character_common_id", common.CommonId);
+                    bindEquipUids(command);
                 },
                 reader =>
                 {
@@ -229,8 +228,8 @@ public partial class DdonSqlDb : SqlDb
 
             var limitBreakMap = new Dictionary<string, List<CDataAddStatusParam>>();
             using DbConnection limitBreakConn = OpenNewConnection();
-            ExecuteReader(limitBreakConn, SqlSelectEquipmentLimitBreakByUIds,
-                command => { AddParameter(command, "@uids", (string[])equipUids); },
+            ExecuteReader(limitBreakConn, $"{SqlSelectEquipmentLimitBreakByUIdsBase} {equipUidsClause}",
+                command => { bindEquipUids(command); },
                 reader =>
                 {
                     while (reader.Read())
@@ -283,11 +282,12 @@ public partial class DdonSqlDb : SqlDb
         if (jobItemSlots.Count > 0)
         {
             string[] jobUids = jobItemSlots.Where(e => e.UId != null).Select(e => e.UId!).Distinct().ToArray();
+            var (jobUidsClause, bindJobUids) = PrepareArrayParameter("uids", jobUids);
 
             var jobItemMap = new Dictionary<string, Item>();
             using DbConnection jobItemConn = OpenNewConnection();
-            ExecuteReader(jobItemConn, SqlSelectStorageItemsByUIds,
-                command => { AddParameter(command, "@uids", (string[])jobUids); },
+            ExecuteReader(jobItemConn, $"{SqlSelectStorageItemsByUIdsBase} {jobUidsClause}",
+                command => { bindJobUids(command); },
                 reader =>
                 {
                     while (reader.Read())
