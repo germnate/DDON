@@ -99,14 +99,9 @@ public partial class DdonSqlDb : SqlDb
 
     private readonly string SqlUpdatePartnerPawnId = "UPDATE \"ddon_character\" SET \"partner_pawn_id\" = @partner_pawn_id WHERE \"character_id\" = @character_id;";
 
-    // Batch fetch: all completed quests for a character in one round-trip.
-    // Replaces the per-QuestType loop in QueryCharacterData.
     private readonly string SqlSelectAllCompletedQuests =
         $"SELECT {BuildQueryField(CompletedQuestsFields)} FROM \"ddon_completed_quests\" WHERE \"character_common_id\" = @character_common_id;";
 
-    // Local copies of field arrays from other partial files used for batch storage item loading.
-    // Cannot reference those static fields directly here due to C# static initializer ordering
-    // across partial class files — same pattern used in DdonSqlDb_CharacterCommon.cs.
     private static readonly string[] StorageItemFieldsForCharacter = new[]
     {
         "item_uid", "item_id", "safety", "color", "plus_value", "equip_points"
@@ -122,11 +117,11 @@ public partial class DdonSqlDb : SqlDb
         "item_uid", "effect_id", "unk1", "effect_type", "unk0"
     };
 
-    private static readonly string SqlSelectStorageCrestDataByUIdsBase =
-        $"SELECT {BuildQueryField(CrestFieldsForCharacter)} FROM \"ddon_crests\" WHERE \"character_common_id\" = @character_common_id AND \"item_uid\"";
+    private static readonly string SqlSelectStorageCrestDataByCharacter =
+        $"SELECT {BuildQueryField(CrestFieldsForCharacter)} FROM \"ddon_crests\" WHERE \"character_common_id\" = @character_common_id;";
 
-    private static readonly string SqlSelectStorageLimitBreakByUIdsBase =
-        $"SELECT {BuildQueryField(EquipmentLimitBreakFieldsForCharacter)} FROM \"ddon_equipment_limit_break\" WHERE \"item_uid\"";
+    private static readonly string SqlSelectStorageLimitBreakByCharacter =
+        $"SELECT {BuildQueryField(EquipmentLimitBreakFieldsForCharacter)} FROM \"ddon_equipment_limit_break\" WHERE \"character_id\" = @character_id;";
 
     public override bool CreateCharacter(Character character)
     {
@@ -271,7 +266,7 @@ public partial class DdonSqlDb : SqlDb
 
     private void QueryCharacterData(DbConnection conn, Character character)
     {
-        QueryCharacterCommonData(conn, character);
+        QueryCharacterCommonData(conn, character, character.CharacterId);
 
         // Shortcuts
         ExecuteReader(conn, SqlSelectShortcuts,
@@ -328,17 +323,10 @@ public partial class DdonSqlDb : SqlDb
 
         if (storageRows.Count > 0)
         {
-            string[] storageUids = storageRows.Select(r => r.Item.UId).Distinct().ToArray();
-            var (storageUidsClause, bindStorageUids) = PrepareArrayParameter("uids", storageUids);
-
             var crestMap = new Dictionary<string, List<CDataEquipElementParam>>();
             using DbConnection crestConn = OpenNewConnection();
-            ExecuteReader(crestConn, $"{SqlSelectStorageCrestDataByUIdsBase} {storageUidsClause}",
-                command =>
-                {
-                    AddParameter(command, "@character_common_id", character.CommonId);
-                    bindStorageUids(command);
-                },
+            ExecuteReader(crestConn, SqlSelectStorageCrestDataByCharacter,
+                command => { AddParameter(command, "@character_common_id", character.CommonId); },
                 reader =>
                 {
                     while (reader.Read())
@@ -352,8 +340,8 @@ public partial class DdonSqlDb : SqlDb
 
             var limitBreakMap = new Dictionary<string, List<CDataAddStatusParam>>();
             using DbConnection limitBreakConn = OpenNewConnection();
-            ExecuteReader(limitBreakConn, $"{SqlSelectStorageLimitBreakByUIdsBase} {storageUidsClause}",
-                command => { bindStorageUids(command); },
+            ExecuteReader(limitBreakConn, SqlSelectStorageLimitBreakByCharacter,
+                command => { AddParameter(command, "@character_id", character.CharacterId); },
                 reader =>
                 {
                     while (reader.Read())

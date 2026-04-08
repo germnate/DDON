@@ -98,11 +98,11 @@ public partial class DdonSqlDb : SqlDb
     private static readonly string SqlSelectStorageItemsByUIdsBase =
         $"SELECT {BuildQueryField(StorageItemFieldsLocal)} FROM \"ddon_storage_item\" WHERE \"item_uid\"";
 
-    private static readonly string SqlSelectCrestDataByUIdsBase =
-        $"SELECT {BuildQueryField(CrestFieldsLocal)} FROM \"ddon_crests\" WHERE \"character_common_id\" = @character_common_id AND \"item_uid\"";
+    private static readonly string SqlSelectCrestDataByCharacter =
+        $"SELECT {BuildQueryField(CrestFieldsLocal)} FROM \"ddon_crests\" WHERE \"character_common_id\" = @character_common_id;";
 
-    private static readonly string SqlSelectEquipmentLimitBreakByUIdsBase =
-        $"SELECT {BuildQueryField(EquipmentLimitBreakFieldsLocal)} FROM \"ddon_equipment_limit_break\" WHERE \"item_uid\"";
+    private static readonly string SqlSelectEquipmentLimitBreakByCharacter =
+        $"SELECT {BuildQueryField(EquipmentLimitBreakFieldsLocal)} FROM \"ddon_equipment_limit_break\" WHERE \"character_id\" = @character_id;";
 
 
     public override bool UpdateCharacterCommonBaseInfo(CharacterCommon common, DbConnection? connectionIn = null)
@@ -155,7 +155,7 @@ public partial class DdonSqlDb : SqlDb
         });
     }
 
-    private void QueryCharacterCommonData(DbConnection conn, CharacterCommon common)
+    private void QueryCharacterCommonData(DbConnection conn, CharacterCommon common, uint characterId)
     {
         // Job data
         ExecuteReader(conn, SqlSelectCharacterJobDataByCharacter,
@@ -189,7 +189,7 @@ public partial class DdonSqlDb : SqlDb
             var equipItemMap = new Dictionary<string, Item>();
             using DbConnection equipItemConn = OpenNewConnection();
             ExecuteReader(equipItemConn, $"{SqlSelectStorageItemsByUIdsBase} {equipUidsClause}",
-                command => { bindEquipUids(command); },
+                bindEquipUids,
                 reader =>
                 {
                     while (reader.Read())
@@ -209,12 +209,8 @@ public partial class DdonSqlDb : SqlDb
 
             var crestMap = new Dictionary<string, List<CDataEquipElementParam>>();
             using DbConnection crestConn = OpenNewConnection();
-            ExecuteReader(crestConn, $"{SqlSelectCrestDataByUIdsBase} {equipUidsClause}",
-                command =>
-                {
-                    AddParameter(command, "@character_common_id", common.CommonId);
-                    bindEquipUids(command);
-                },
+            ExecuteReader(crestConn, SqlSelectCrestDataByCharacter,
+                command => { AddParameter(command, "@character_common_id", common.CommonId); },
                 reader =>
                 {
                     while (reader.Read())
@@ -228,8 +224,8 @@ public partial class DdonSqlDb : SqlDb
 
             var limitBreakMap = new Dictionary<string, List<CDataAddStatusParam>>();
             using DbConnection limitBreakConn = OpenNewConnection();
-            ExecuteReader(limitBreakConn, $"{SqlSelectEquipmentLimitBreakByUIdsBase} {equipUidsClause}",
-                command => { bindEquipUids(command); },
+            ExecuteReader(limitBreakConn, SqlSelectEquipmentLimitBreakByCharacter,
+                command => { AddParameter(command, "@character_id", characterId); },
                 reader =>
                 {
                     while (reader.Read())
