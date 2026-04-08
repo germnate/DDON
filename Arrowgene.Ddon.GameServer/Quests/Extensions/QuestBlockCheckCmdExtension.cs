@@ -997,5 +997,47 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             questBlock.CheckCommands[commandListIndex].AddCheckCmdIsAreaLinkageQuestFlagOn(flagKey);
             return questBlock;
         }
+
+        public static QuestBlock AddCheckCmdRandomEq(this QuestBlock questBlock, int randomNo, int value, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdRandomEq(randomNo, value);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdRandomNotEq(this QuestBlock questBlock, int randomNo, int value, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdRandomNotEq(randomNo, value);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdRandomLess(this QuestBlock questBlock, int randomNo, int value, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdRandomLess(randomNo, value);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdRandomNotGreater(this QuestBlock questBlock, int randomNo, int value, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdRandomNotGreater(randomNo, value);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdRandomGreater(this QuestBlock questBlock, int randomNo, int value, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdRandomGreater(randomNo, value);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdRandomNotLess(this QuestBlock questBlock, int randomNo, int value, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdRandomNotLess(randomNo, value);
+            return questBlock;
+        }
     }
 }

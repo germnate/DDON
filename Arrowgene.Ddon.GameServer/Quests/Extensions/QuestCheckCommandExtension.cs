@@ -893,5 +893,41 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             checkCommands.Add(QuestManager.CheckCommand.IsAreaLinkageQuestFlagOn(flagKey));
             return checkCommands;
         }
+
+        public static List<CDataQuestCommand> AddCheckCmdRandomEq(this List<CDataQuestCommand> checkCommands, int randomNo, int value)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.RandomEq(randomNo, value));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdRandomNotEq(this List<CDataQuestCommand> checkCommands, int randomNo, int value)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.RandomNotEq(randomNo, value));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdRandomLess(this List<CDataQuestCommand> checkCommands, int randomNo, int value)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.RandomLess(randomNo, value));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdRandomNotGreater(this List<CDataQuestCommand> checkCommands, int randomNo, int value)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.RandomNotGreater(randomNo, value));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdRandomGreater(this List<CDataQuestCommand> checkCommands, int randomNo, int value)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.RandomGreater(randomNo, value));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdRandomNotLess(this List<CDataQuestCommand> checkCommands, int randomNo, int value)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.RandomNotLess(randomNo, value));
+            return checkCommands;
+        }
     }
 }

@@ -460,5 +460,18 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             resultCommands.Add(QuestManager.ResultCommand.SetQuestLayoutEnemyBodyPose(stageInfo.StageNo, groupNo, setNo, poseId));
             return resultCommands;
         }
+
+        public static List<CDataQuestCommand> AddResultCmdSetRandom(this List<CDataQuestCommand> resultCommands, int randomNo, int minValue, int maxValue)
+        {
+            // resultValue=0 here; PatchRandomCommands overwrites Param04 with the server-rolled value at dispatch time.
+            resultCommands.Add(QuestManager.ResultCommand.SetRandom(randomNo, minValue, maxValue, resultValue: 0));
+            return resultCommands;
+        }
+
+        public static List<CDataQuestCommand> AddResultCmdResetRandom(this List<CDataQuestCommand> resultCommands, int randomNo)
+        {
+            resultCommands.Add(QuestManager.ResultCommand.ResetRandom(randomNo));
+            return resultCommands;
+        }
     }
 }

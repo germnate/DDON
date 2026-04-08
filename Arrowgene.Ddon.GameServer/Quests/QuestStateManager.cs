@@ -50,6 +50,9 @@ namespace Arrowgene.Ddon.GameServer.Quests
         public Dictionary<ItemId, QuestDeliveryRecord> DeliveryRecords { get; set; } = [];
         public Dictionary<EnemyUIId, QuestEnemyHuntRecord> HuntRecords { get; set; } = [];
         public QuestInstanceVars InstanceVars { get; set; }
+        // Rolled values for SetRandom result commands, keyed by randomNo. Populated lazily
+        // at block dispatch time; persists for the lifetime of this quest instance.
+        public Dictionary<int, int> RandomSlots { get; set; } = [];
 
         public QuestState()
         {

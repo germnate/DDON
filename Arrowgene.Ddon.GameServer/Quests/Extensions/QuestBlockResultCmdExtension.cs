@@ -457,5 +457,17 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             questBlock.ResultCommands.AddResultCmdSetQuestLayoutEnemyBodyPose(stageInfo, groupNo, setNo, poseId);
             return questBlock;
         }
+
+        public static QuestBlock AddResultCmdSetRandom(this QuestBlock questBlock, int randomNo, int minValue, int maxValue)
+        {
+            questBlock.ResultCommands.AddResultCmdSetRandom(randomNo, minValue, maxValue);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdResetRandom(this QuestBlock questBlock, int randomNo)
+        {
+            questBlock.ResultCommands.AddResultCmdResetRandom(randomNo);
+            return questBlock;
+        }
     }
 }
