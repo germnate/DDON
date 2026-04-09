@@ -124,7 +124,11 @@ namespace Arrowgene.Ddon.WebServer
                     string token = CreateLoginToken(req.Account, req.Password);
                     if (token == null)
                     {
-                        res.Error = "Either your account or password are incorrect, or your email isn't verified yet.";
+                        if((bool)_webServerSetting.MailSetting.MailRequired)
+                            res.Error = "Either your account or password are incorrect, or your email isn't verified yet";
+                        else
+                            res.Error = "Account or password wrong";
+
                         break;
                     }
 
@@ -161,7 +165,7 @@ namespace Arrowgene.Ddon.WebServer
                     }
                     catch
                     {
-                        res.Error = "Verification e-mail could not be sent";
+                        res.Error = $"Verification e-mail could not be sent, try resend it at {((bool)_webServerSetting.MailSetting.IsHttps ? "https" : "http")}://{_webServerSetting.MailSetting.DomainUrl}:{_webServerSetting.PublicWebEndPoint.Port}/web/verify_resend.html";
                         break;
                     }
 
@@ -188,7 +192,7 @@ namespace Arrowgene.Ddon.WebServer
                     }
                     catch
                     {
-                        res.Error = "Password reset token could not be sent";
+                        res.Error = "Password reset token could not be sent, check your info try again";
                         break;
                     }
 
@@ -219,7 +223,7 @@ namespace Arrowgene.Ddon.WebServer
                     account = ResendEmailVerification(req.Account, req.Email);
                     if (account == null)
                     {
-                        res.Error = "Email not found";
+                        res.Error = "Account and Email combination not found";
                         break;
                     }
 
@@ -232,7 +236,7 @@ namespace Arrowgene.Ddon.WebServer
                     }
                     catch
                     {
-                        res.Error = "Verification token could not be sent";
+                        res.Error = "Verification token could not be sent, check your info try again";
                         break;
                     }
 
