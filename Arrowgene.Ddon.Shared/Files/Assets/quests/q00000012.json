@@ -130,13 +130,13 @@
             "message_id": 14855
         },
         {
-            "type": "IsStageNo",
+            "type": "Raw",
             "checkpoint": true,
             "announce_type": "Update",
-            "comment": "This is a filler step that should be replaced. It is supposed to check for any world quest to be completed.",
-            "stage_id": {
-                "id": 137
-            }
+            "comment": "Wait for player to complete any world quest in Mysree Grove.",
+            "check_commands": [
+                {"type": "SetQuestClearNum", "Param1": 1, "Param2": 6}
+            ]
         },
         {
             "type": "TalkToNpc",

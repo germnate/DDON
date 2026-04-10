@@ -348,10 +348,22 @@ HaveMoney(int gold, int type, int param03 = 0, int param04 = 0);
 
 ```
 /**
- * @brief
- * @note might be required when a quest asks you to go complete one world quest to progress?
- * @param clearNum
- * @param areaId
+ * @brief Waits until the player has cleared at least one world quest ("Set Quest") in the given area.
+ *        Client handler: 0x00636B30
+ *
+ * @note "Set Quest" is the internal engine name; "World Quest" is the English localisation.
+ *
+ * @param clearNum  The required clear count. NOTE: NEVER READ by the client handler — the client
+ *                  only checks whether areaId appears in a 4-slot cleared-area byte array at
+ *                  ctx+0x5c+0x25a. The count is advisory for the server-side work item only.
+ * @param areaId    The QuestAreaId to check. Scanned against up to 4 stored area-ID bytes.
+ *
+ * @note The check also requires bit 5 of ctx+0x5c+0x208 to be set. This bit and the area-ID
+ *       slot are written by the S2CQuestQuestProgressWorkSaveNtc carrying
+ *       QuestNotifyCommand.SetQuestClearNum (notify ID 32). The server sends this NTC either:
+ *         (a) When a world quest in the target area completes (WorldQuestClearedProgressWork), or
+ *         (b) Immediately at block dispatch time if a matching world quest was already cleared
+ *             (HandlePreSatisfiedWorldQuestWork in QuestQuestProgressHandler).
  */
 SetQuestClearNum(int clearNum, int areaId, int param03 = 0, int param04 = 0);
 ```
