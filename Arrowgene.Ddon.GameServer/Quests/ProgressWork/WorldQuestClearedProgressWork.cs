@@ -12,8 +12,14 @@ namespace Arrowgene.Ddon.GameServer.Quests.Work
         public readonly QuestAreaId AreaId;
         public readonly uint Amount;
 
-        public WorldQuestClearedProgressWork(uint questScheduleId, QuestProcessState processState, QuestAreaId areaId, uint amount) : base(questScheduleId, processState, QuestProgressWorkType.WorldQuestCleared)
+        // The block is stored by reference so that BlockNo is read at NTC-generation time,
+        // after AddBlock() has assigned the final block number.
+        private readonly QuestBlock _block;
+
+        public WorldQuestClearedProgressWork(QuestBlock block, QuestAreaId areaId, uint amount)
+            : base(block.QuestScheduleId, QuestProgressWorkType.WorldQuestCleared)
         {
+            _block = block;
             AreaId = areaId;
             Amount = amount;
         }
@@ -25,13 +31,12 @@ namespace Arrowgene.Ddon.GameServer.Quests.Work
 
         public override S2CQuestQuestProgressWorkSaveNtc GetWork()
         {
-            Console.WriteLine($"QuestScheduleId={QuestScheduleId}, ProcessWork={ProcessState}, AreaId={AreaId}");
             return new S2CQuestQuestProgressWorkSaveNtc()
             {
                 QuestScheduleId = QuestScheduleId,
-                ProcessNo = ProcessState.ProcessNo,
-                SequenceNo = ProcessState.SequenceNo,
-                BlockNo = ProcessState.BlockNo,
+                ProcessNo = _block.ProcessNo,
+                SequenceNo = _block.SequenceNo,
+                BlockNo = _block.BlockNo,
                 WorkList = new List<CDataQuestProgressWork>
                 {
                     QuestManager.NotifyCommand.WorldQuestClearNum(AreaId, Amount)

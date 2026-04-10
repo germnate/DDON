@@ -1,5 +1,6 @@
 using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.GameServer.Quests.Extensions;
+using Arrowgene.Ddon.GameServer.Quests.Work;
 using Arrowgene.Ddon.GameServer.Scripting.Interfaces;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
@@ -106,6 +107,21 @@ namespace Arrowgene.Ddon.GameServer.Quests
                     quest.ContentsRelease.UnionWith(block.ContentsReleased);
                     quest.AddWorldManageUnlock(block.WorldManageUnlocks);
                     quest.AddProgressWorkItems(block.QuestProgressWork);
+
+                    // Scan for SetQuestClearNum check commands and synthesize matching
+                    // WorldQuestClearedProgressWork items after BlockNo is finalised.
+                    foreach (var cmdGroup in block.CheckCommands)
+                    {
+                        foreach (var cmd in cmdGroup)
+                        {
+                            if (cmd.Command == (ushort)QuestCheckCommand.SetQuestClearNum)
+                            {
+                                var areaId = (QuestAreaId)cmd.Param02;
+                                var amount = (uint)cmd.Param01;
+                                quest.AddProgressWorkItem(new WorldQuestClearedProgressWork(block, areaId, amount));
+                            }
+                        }
+                    }
 
                     switch (block.BlockType)
                     {
