@@ -189,7 +189,7 @@ namespace Arrowgene.Ddon.Test.Database
         public void ExecuteQuerySafe(DbConnection? connectionIn, Action<DbConnection> work) {}
         T IDatabase.ExecuteQuerySafe<T>(DbConnection? connectionIn, Func<DbConnection, T> work) { throw new NotImplementedException(); }
 
-        public Account CreateAccount(string name, string mail, string hash) { return new Account(); }
+        public Account CreateAccount(string name, string mail, string hash, string mailToken) { return new Account(); }
         public bool CreateCharacter(Character character) { return true; }
         public bool CreateDatabase() { return true; }
         public bool CreatePawn(Pawn pawn) { return true; }
@@ -285,7 +285,11 @@ namespace Arrowgene.Ddon.Test.Database
         public bool ReplaceCompletedQuest(uint characterCommonId, QuestId questId, QuestType questType, uint count, DbConnection? connectionIn = null) { return true; }
         public Account SelectAccountById(int accountId) { return new Account(); }
         public Account SelectAccountByLoginToken(string loginToken) { return new Account(); }
+        public Account SelectAccountByPasswordTokenAndName(string accountName, string passwordToken) { return new Account(); }
+        public Account SelectAccountByMailTokenAndName(string accountName, string mailToken) { return new Account(); }
+        public Account SelectAccountByEmailAndName(string accountName, string email) { return new Account(); }
         public Account SelectAccountByName(string accountName) { return new Account(); }
+        public Account SelectAccountByEmail(string email) { return new Account(); }
         public List<BazaarExhibition> SelectActiveBazaarExhibitionsByItemIdExcludingOwn(uint itemId, uint excludedCharacterId, DbConnection? connectionIn = null) { return new List<BazaarExhibition>(); }
         public List<BazaarExhibition> SelectActiveBazaarExhibitionsByItemIdsExcludingOwn(List<uint> itemIds, uint excludedCharacterId, DbConnection? connectionIn = null) { return new List<BazaarExhibition>(); }
         public List<AbilityId> SelectAllUnlockedSecretAbilities(uint commonId, DbConnection? connectionIn = null) { return new List<AbilityId>(); }

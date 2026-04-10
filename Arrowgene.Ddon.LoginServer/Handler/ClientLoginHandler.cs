@@ -54,6 +54,8 @@ namespace Arrowgene.Ddon.LoginServer.Handler
                 {
                     if (account == null)
                     {
+                        L2CEjectionNtc message = new L2CEjectionNtc { Message = "Invalid login attempt" };
+                        client.Send(message);
                         throw new ResponseErrorException(ErrorCode.ERROR_CODE_AUTH_ONETIME_TOKEN_FAIL, "Invalid OneTimeToken");
                     }
                 }
@@ -66,7 +68,7 @@ namespace Arrowgene.Ddon.LoginServer.Handler
                         account = Database.SelectAccountByName(oneTimeToken);
                         if (account == null)
                         {
-                            account = Database.CreateAccount(oneTimeToken, oneTimeToken, oneTimeToken)
+                            account = Database.CreateAccount(oneTimeToken, oneTimeToken, oneTimeToken, oneTimeToken)
                                 ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_AUTH_ACCOUNT_GENERATION_FAIL, "Could not create account from OneTimeToken, choose another token");
 
                             Logger.Info(client, "Created new account from OneTimeToken");

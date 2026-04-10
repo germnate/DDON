@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Arrowgene.Ddon.Database;
 using Arrowgene.Logging;
 using Arrowgene.WebServer;
@@ -27,6 +27,8 @@ namespace Arrowgene.Ddon.WebServer
             IWebServerCore core = new KestrelWebServer(_setting.WebSetting);
             _webService = new WebService(core);
 
+            AddMiddleware(new CorsMiddleware());
+
             Logger.Info($"Serving Directory: {_setting.WebSetting.WebFolder}");
             var staticFile = new StaticFileMiddleware(new PhysicalFileProvider(_setting.WebSetting.WebFolder));
             foreach (string servingFile in staticFile.GetServingFilesUrl(_setting.PublicWebEndPoint))
@@ -37,7 +39,7 @@ namespace Arrowgene.Ddon.WebServer
             AddMiddleware(staticFile);
 
             AddRoute(new IndexRoute());
-            AddRoute(new AccountRoute(database));
+            AddRoute(new AccountRoute(database, setting));
         }
 
         public void AddMiddleware(IWebMiddleware middleware)

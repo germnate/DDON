@@ -2,6 +2,7 @@ using System;
 using System.Data.Common;
 using System.Text;
 using Arrowgene.Ddon.Database.Model;
+using Arrowgene.Ddon.Shared.Model;
 
 namespace Arrowgene.Ddon.Database.Sql.Core;
 
@@ -19,9 +20,13 @@ public partial class DdonSqlDb : SqlDb
     private static readonly string SqlSelectAccountById = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"id\"=@id;";
     private static readonly string SqlSelectAccountByName = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"normal_name\"=@normal_name;";
     private static readonly string SqlSelectAccountByLoginToken = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"login_token\"=@login_token;";
+    private static readonly string SqlSelectAccountByPasswordTokenAndName = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"password_token\"=@password_token AND \"normal_name\"=@normal_name;";
+    private static readonly string SqlSelectAccountByMailTokenAndName = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE \"mail_token\"=@mail_token AND \"normal_name\"=@normal_name;";
+    private static readonly string SqlSelectAccountByEmail = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE UPPER(\"mail\")=UPPER(@mail);";
+    private static readonly string SqlSelectAccountByEmailAndName = $"SELECT \"id\", {BuildQueryField(AccountFields)} FROM \"account\" WHERE UPPER(\"mail\")=UPPER(@mail) AND \"normal_name\"=@normal_name;";
     private static readonly string SqlUpdateAccount = $"UPDATE \"account\" SET {BuildQueryUpdate(AccountFields)} WHERE \"id\"=@id;";
 
-    public override Account? CreateAccount(string name, string mail, string hash)
+    public override Account? CreateAccount(string name, string mail, string hash, string mailToken)
     {
         Account account = new();
         account.Name = name;
@@ -30,9 +35,9 @@ public partial class DdonSqlDb : SqlDb
         account.Hash = hash;
         account.State = AccountStateType.User;
         account.Created = DateTime.UtcNow;
-        account.MailToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(mail));
-        account.PasswordToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(name));
-        account.LoginToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(name));
+        account.MailToken = mailToken;
+        account.PasswordToken = null;
+        account.LoginToken = null;
         account.LoginTokenCreated = DateTime.UtcNow;
         account.MailVerifiedAt = DateTime.SpecifyKind(DateTime.MinValue, DateTimeKind.Utc);
         account.LastAuthentication = DateTime.UtcNow;
@@ -77,6 +82,18 @@ public partial class DdonSqlDb : SqlDb
         return account;
     }
 
+    public override Account? SelectAccountByEmail(string email)
+    {
+        Account account = null;
+        ExecuteReader(SqlSelectAccountByEmail,
+            command => { AddParameter(command, "@mail", email); }, reader =>
+            {
+                if (reader.Read()) account = ReadAccount(reader);
+            });
+
+        return account;
+    }
+
     public override Account SelectAccountById(int accountId)
     {
         Account account = null;
@@ -92,6 +109,49 @@ public partial class DdonSqlDb : SqlDb
         Account account = null;
         ExecuteReader(SqlSelectAccountByLoginToken,
             command => { AddParameter(command, "@login_token", loginToken); }, reader =>
+            {
+                if (reader.Read()) account = ReadAccount(reader);
+            });
+
+        return account;
+    }
+
+    public override Account? SelectAccountByPasswordTokenAndName(string accountName, string passwordToken)
+    {
+        Account account = null;
+        ExecuteReader(SqlSelectAccountByPasswordTokenAndName,
+            command => { 
+                AddParameter(command, "@password_token", passwordToken);
+                AddParameter(command, "@normal_name", accountName); 
+            }, reader =>
+            {
+                if (reader.Read()) account = ReadAccount(reader);
+            });
+
+        return account;
+    }
+    public override Account? SelectAccountByMailTokenAndName(string accountName, string mailToken)
+    {
+        Account account = null;
+        ExecuteReader(SqlSelectAccountByMailTokenAndName,
+            command => { 
+                AddParameter(command, "@mail_token", mailToken);
+                AddParameter(command, "@normal_name", accountName);
+            }, reader =>
+            {
+                if (reader.Read()) account = ReadAccount(reader);
+            });
+
+        return account;
+    }
+    public override Account? SelectAccountByEmailAndName(string accountName, string email)
+    {
+        Account account = null;
+        ExecuteReader(SqlSelectAccountByEmailAndName,
+            command => { 
+                AddParameter(command, "@mail", email);
+                AddParameter(command, "@normal_name", accountName);
+            }, reader =>
             {
                 if (reader.Read()) account = ReadAccount(reader);
             });
