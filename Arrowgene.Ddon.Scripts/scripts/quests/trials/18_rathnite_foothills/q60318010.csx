@@ -84,10 +84,10 @@ public class ScriptedQuest : IQuest
 		process0.AddRawBlock(QuestAnnounceType.CheckpointAndUpdate)
             .AddResultCmdQstTalkChg(NpcId.Endale, 23663)
 			.AddCheckCommands([
-				QuestManager.CheckCommand.IsNpcTalkChoice(443, 2800, 0)
+				QuestManager.CheckCommand.TalkNpcChoice(443, 2800, 0)
 			])
 			.AddCheckCommands([
-				QuestManager.CheckCommand.IsNpcTalkChoice(443, 2800, 1)
+				QuestManager.CheckCommand.TalkNpcChoice(443, 2800, 1)
 			])
 			.AddCheckCommands([
 				QuestManager.CheckCommand.TalkNpc(443, NpcId.Endale),
@@ -106,10 +106,10 @@ public class ScriptedQuest : IQuest
 		process0.AddRawBlock(QuestAnnounceType.CheckpointAndUpdate)
             .AddResultCmdQstTalkChg(NpcId.Joaquim, 25360)
 			.AddCheckCommands([
-				QuestManager.CheckCommand.IsNpcTalkChoice(1001, 2953, 0)
+				QuestManager.CheckCommand.TalkNpcChoice(1001, 2953, 0)
 			])
 			.AddCheckCommands([
-				QuestManager.CheckCommand.IsNpcTalkChoice(1001, 2953, 1)
+				QuestManager.CheckCommand.TalkNpcChoice(1001, 2953, 1)
 			])
 			.AddCheckCommands([
 				QuestManager.CheckCommand.TalkNpc(1001, NpcId.Joaquim),

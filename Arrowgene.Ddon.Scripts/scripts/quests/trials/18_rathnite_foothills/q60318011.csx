@@ -214,7 +214,7 @@ public class ScriptedQuest : IQuest
 		// Branch 1 - Meirova
         var process1 = AddNewProcess(1);
 		process1.AddRawBlock(QuestAnnounceType.None)
-			.AddCheckCmdIsNpcTalkChoice(Stage.RothgillTravelersInn, NpcId.Ozgur, 0);
+			.AddCheckCmdTalkNpcChoice(Stage.RothgillTravelersInn, NpcId.Ozgur, 0);
 		process1.AddRawBlock(QuestAnnounceType.None)
             .AddResultCmdMyQstFlagOn(1)
             .AddCheckCmdMyQstFlagOn(3293);
@@ -238,7 +238,7 @@ public class ScriptedQuest : IQuest
 		// Branch 2 - Lise
         var process2 = AddNewProcess(2);
 		process2.AddRawBlock(QuestAnnounceType.None)
-			.AddCheckCmdIsNpcTalkChoice(Stage.RothgillTravelersInn, NpcId.Ozgur, 1);
+			.AddCheckCmdTalkNpcChoice(Stage.RothgillTravelersInn, NpcId.Ozgur, 1);
 		process2.AddRawBlock(QuestAnnounceType.None)
             .AddResultCmdMyQstFlagOn(2)
             .AddCheckCmdMyQstFlagOn(3293);
