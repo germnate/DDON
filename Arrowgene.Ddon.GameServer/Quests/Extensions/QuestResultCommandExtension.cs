@@ -329,9 +329,9 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return resultCommands;
         }
 
-        public static List<CDataQuestCommand> AddResultCmdSetSubstoryTalkTarget(this List<CDataQuestCommand> resultCommands, int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+        public static List<CDataQuestCommand> AddResultCmdQstTalkChgFsm(this List<CDataQuestCommand> resultCommands, NpcId npcId, int msgNo, int param03 = 0, int param04 = 0)
         {
-            resultCommands.Add(QuestManager.ResultCommand.SetSubstoryTalkTarget(param01, param02, param03, param04));
+            resultCommands.Add(QuestManager.ResultCommand.QstTalkChgFsm(npcId, msgNo, param03, param04));
             return resultCommands;
         }
 
@@ -407,15 +407,15 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return resultCommands;
         }
 
-        public static List<CDataQuestCommand> AddResultCmdSetQuestNpcBodyPose(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, int groupNo, int setNo, int poseId)
+        public static List<CDataQuestCommand> AddResultCmdSetQuestOmMontageFix(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, int groupNo, int setNo, int poseId)
         {
-            resultCommands.Add(QuestManager.ResultCommand.SetQuestNpcBodyPose(stageInfo.StageNo, groupNo, setNo, poseId));
+            resultCommands.Add(QuestManager.ResultCommand.SetQuestOmMontageFix(stageInfo.StageNo, groupNo, setNo, poseId));
             return resultCommands;
         }
 
-        public static List<CDataQuestCommand> AddResultCmdSetQuestNpcBodyPoseEx(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, int groupNo, int setNo, int poseId)
+        public static List<CDataQuestCommand> AddResultCmdSetQuestOmMontageFixEx(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, int groupNo, int setNo, int poseId)
         {
-            resultCommands.Add(QuestManager.ResultCommand.SetQuestNpcBodyPoseEx(stageInfo.StageNo, groupNo, setNo, poseId));
+            resultCommands.Add(QuestManager.ResultCommand.SetQuestOmMontageFixEx(stageInfo.StageNo, groupNo, setNo, poseId));
             return resultCommands;
         }
 

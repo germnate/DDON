@@ -2494,9 +2494,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
             /**
              * @brief
              */
-            public static CDataQuestCommand IsNpcTalkChoice(int stageNo, int npcId, int choice, int param04 = 0)
+            public static CDataQuestCommand NpcTalkChoice(int stageNo, NpcId npcId, int choice, int param04 = 0)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsNpcTalkChoice, Param01 = stageNo, Param02 = npcId, Param03 = choice, Param04 = param04 };
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.NpcTalkChoice, Param01 = stageNo, Param02 = (int) npcId, Param03 = choice, Param04 = param04 };
             }
 
             public static CDataQuestCommand OmSetTouchRadius(int stageNo, int groupNo, int setNo, int param04 = 0)
@@ -2596,9 +2596,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             /** @brief Checks if an NPC interaction with a specific choice/event has completed. */
-            public static CDataQuestCommand IsNpcInteractionComplete(uint stageNo, NpcId npcId, int choiceId, int param04 = 0)
+            public static CDataQuestCommand QuestTalkNpcRadius(uint stageNo, uint groupNo, int setNo, int param04 = 0)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsNpcInteractionComplete, Param01 = (int)stageNo, Param02 = (int)npcId, Param03 = choiceId, Param04 = param04 };
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.QuestTalkNpcRadius, Param01 = (int)stageNo, Param02 = (int)groupNo, Param03 = setNo, Param04 = param04 };
             }
 
             /** @brief Checks if the OM matching (stageNo, groupNo, setNo) is broken in the current phase. */
@@ -2608,15 +2608,15 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             /** @brief Places a radius marker on an enemy group; progresses when the player discovers the enemy. setNo=-1 matches any. Must be followed by a kill command. */
-            public static CDataQuestCommand IsEnemyFoundForOrderRadius(uint stageNo, int groupNo, int setNo = -1, int markerFlag = 0)
+            public static CDataQuestCommand IsEnemyFoundRadius(uint stageNo, int groupNo, int setNo = -1, int markerFlag = 0)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsEnemyFoundForOrderRadius, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = markerFlag };
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsEnemyFoundRadius, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = markerFlag };
             }
 
             /** @brief No-marker, lock-guarded variant of IsEnemyFoundForOrderRadius. markerFlag always 0 internally. setNo=-1 matches any. */
-            public static CDataQuestCommand IsEnemyFoundForOrderRadiusNoMarker(uint stageNo, int groupNo, int setNo = -1, int param04 = 0)
+            public static CDataQuestCommand IsEnemyFoundForOrderRadius(uint stageNo, int groupNo, int setNo = -1, int param04 = 0)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsEnemyFoundForOrderRadiusNoMarker, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsEnemyFoundForOrderRadius, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
             }
 
             /** @brief Checks if a pawn with pawnId is active/available in the pawn list. */
@@ -3704,9 +3704,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             /** @brief Redirects NPC talk for a substory context via FUN_009ce930(param01, param02). */
-            public static CDataQuestCommand SetSubstoryTalkTarget(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            public static CDataQuestCommand QstTalkChgFsm(NpcId npcId, int msgNo = 0, int param03 = 0, int param04 = 0)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetSubstoryTalkTarget, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.QstTalkChgFsm, Param01 = (int) npcId, Param02 = msgNo, Param03 = param03, Param04 = param04 };
             }
 
             /** @brief Sets invincibility on a substory enemy group. param02=1 sets invincible. */
@@ -3782,15 +3782,15 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             /** @brief Sets a body/stance pose (1-6) on a quest NPC/enemy via FUN_00bbf670. */
-            public static CDataQuestCommand SetQuestNpcBodyPose(uint stageNo, int groupNo, int setNo, int poseId)
+            public static CDataQuestCommand SetQuestOmMontageFix(uint stageNo, int groupNo, int setNo, int poseId)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestNpcBodyPose, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = poseId };
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestOmMontageFix, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = poseId };
             }
 
-            /** @brief Area-aware variant of SetQuestNpcBodyPose. */
-            public static CDataQuestCommand SetQuestNpcBodyPoseEx(uint stageNo, int groupNo, int setNo, int poseId)
+            /** @brief Area-aware variant of AddResultCmdSetQuestOmMontageFix. */
+            public static CDataQuestCommand SetQuestOmMontageFixEx(uint stageNo, int groupNo, int setNo, int poseId)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestNpcBodyPoseEx, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = poseId };
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestOmMontageFixEx, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = poseId };
             }
 
             /** @brief Sets the level of a layout enemy (type 2) by queuing it into a critical-section-guarded buffer. */

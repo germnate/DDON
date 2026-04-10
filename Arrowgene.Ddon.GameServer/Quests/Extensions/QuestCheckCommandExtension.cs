@@ -640,9 +640,9 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsNpcTalkChoice(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, NpcId npcId, int choice)
+        public static List<CDataQuestCommand> AddCheckCmdNpcTalkChoice(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, NpcId npcId, int choice)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsNpcTalkChoice((int) stageInfo.StageNo, (int) npcId, choice));
+            checkCommands.Add(QuestManager.CheckCommand.NpcTalkChoice((int) stageInfo.StageNo, npcId, choice));
             return checkCommands;
         }
 
@@ -744,9 +744,9 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsNpcInteractionComplete(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, NpcId npcId, int choiceId)
+        public static List<CDataQuestCommand> AddCheckCmdQuestTalkNpcRadius(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, uint groupNo, int setNo, int param04 = 0)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsNpcInteractionComplete(stageInfo.StageNo, npcId, choiceId));
+            checkCommands.Add(QuestManager.CheckCommand.QuestTalkNpcRadius(stageInfo.StageNo, groupNo, setNo, param04));
             return checkCommands;
         }
 
@@ -756,15 +756,15 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsEnemyFoundForOrderRadius(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo = -1, int markerFlag = 0)
+        public static List<CDataQuestCommand> AddCheckCmdIsEnemyFoundRadius(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo = -1, int markerFlag = 0)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsEnemyFoundForOrderRadius(stageInfo.StageNo, groupNo, setNo, markerFlag));
+            checkCommands.Add(QuestManager.CheckCommand.IsEnemyFoundRadius(stageInfo.StageNo, groupNo, setNo, markerFlag));
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsEnemyFoundForOrderRadiusNoMarker(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo = -1)
+        public static List<CDataQuestCommand> AddCheckCmdIsEnemyFoundForOrderRadius(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo = -1)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsEnemyFoundForOrderRadiusNoMarker(stageInfo.StageNo, groupNo, setNo));
+            checkCommands.Add(QuestManager.CheckCommand.IsEnemyFoundForOrderRadius(stageInfo.StageNo, groupNo, setNo));
             return checkCommands;
         }
 

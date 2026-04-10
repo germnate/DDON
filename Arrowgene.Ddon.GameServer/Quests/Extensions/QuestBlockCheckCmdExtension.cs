@@ -702,10 +702,10 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsNpcTalkChoice(this QuestBlock questBlock, StageInfo stageInfo, NpcId npcId, int choice, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdNpcTalkChoice(this QuestBlock questBlock, StageInfo stageInfo, NpcId npcId, int choice, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsNpcTalkChoice(stageInfo, npcId, choice);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdNpcTalkChoice(stageInfo, npcId, choice);
             return questBlock;
         }
 
@@ -823,10 +823,10 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsNpcInteractionComplete(this QuestBlock questBlock, StageInfo stageInfo, NpcId npcId, int choiceId, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdQuestTalkNpcRadius(this QuestBlock questBlock, StageInfo stageInfo, uint groupNo, int setNo, int param04 = 0, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsNpcInteractionComplete(stageInfo, npcId, choiceId);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdQuestTalkNpcRadius(stageInfo, groupNo, setNo, param04);
             return questBlock;
         }
 
@@ -837,17 +837,17 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsEnemyFoundForOrderRadius(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo = -1, int markerFlag = 0, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdIsEnemyFoundRadius(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo = -1, int markerFlag = 0, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsEnemyFoundForOrderRadius(stageInfo, groupNo, setNo, markerFlag);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsEnemyFoundRadius(stageInfo, groupNo, setNo, markerFlag);
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsEnemyFoundForOrderRadiusNoMarker(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo = -1, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdIsEnemyFoundForOrderRadius(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo = -1, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsEnemyFoundForOrderRadiusNoMarker(stageInfo, groupNo, setNo);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsEnemyFoundForOrderRadius(stageInfo, groupNo, setNo);
             return questBlock;
         }
 

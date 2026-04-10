@@ -149,7 +149,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// <summary>
         /// Redirects NPC talk for a substory context. Calls FUN_009cff50 then FUN_009ce930(param01, param02).
         /// </summary>
-        SetSubstoryTalkTarget = 104, // 0x00633A30 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04)
+        QstTalkChgFsm = 104, // 0x00633A30 (cQuestProcess* this, s32 npcId, s32 msgNo, s32 param03, s32 param04)
 
         /// <summary>
         /// Sets invincibility on a substory enemy group. param01=groupFlag triggers FUN_00b5ba00(4,0x15,param01,1,0);
@@ -220,12 +220,12 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// <summary>
         /// Sets a body/stance pose (1-6) on a quest NPC/enemy via FUN_00bbf670. Looks up by (stageNo, groupNo, setNo).
         /// </summary>
-        SetQuestNpcBodyPose = 118, // 0x006341A0 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 poseId)
+        SetQuestOmMontageFix = 118, // 0x006341A0 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 poseId)
 
         /// <summary>
-        /// Area-aware variant of SetQuestNpcBodyPose.
+        /// Area-aware variant of SetQuestOmMontageFix.
         /// </summary>
-        SetQuestNpcBodyPoseEx = 119, // 0x006341F0 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 poseId)
+        SetQuestOmMontageFixEx = 119, // 0x006341F0 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 poseId)
 
         Padding120 = 120, // 0x006342D0 stub/nop — always returns 0
 

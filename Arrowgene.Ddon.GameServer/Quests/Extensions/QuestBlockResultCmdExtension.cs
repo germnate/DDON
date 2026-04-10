@@ -326,9 +326,9 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddResultCmdSetSubstoryTalkTarget(this QuestBlock questBlock, int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+        public static QuestBlock AddResultCmdQstTalkChgFsm(this QuestBlock questBlock, NpcId npcId, int msgNo, int param03 = 0, int param04 = 0)
         {
-            questBlock.ResultCommands.AddResultCmdSetSubstoryTalkTarget(param01, param02, param03, param04);
+            questBlock.ResultCommands.AddResultCmdQstTalkChgFsm(npcId, msgNo, param03, param04);
             return questBlock;
         }
 
@@ -404,15 +404,15 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddResultCmdSetQuestNpcBodyPose(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int poseId)
+        public static QuestBlock AddResultCmdSetQuestOmMontageFix(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int poseId)
         {
-            questBlock.ResultCommands.AddResultCmdSetQuestNpcBodyPose(stageInfo, groupNo, setNo, poseId);
+            questBlock.ResultCommands.AddResultCmdSetQuestOmMontageFix(stageInfo, groupNo, setNo, poseId);
             return questBlock;
         }
 
-        public static QuestBlock AddResultCmdSetQuestNpcBodyPoseEx(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int poseId)
+        public static QuestBlock AddResultCmdSetQuestOmMontageFixEx(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int poseId)
         {
-            questBlock.ResultCommands.AddResultCmdSetQuestNpcBodyPoseEx(stageInfo, groupNo, setNo, poseId);
+            questBlock.ResultCommands.AddResultCmdSetQuestOmMontageFixEx(stageInfo, groupNo, setNo, poseId);
             return questBlock;
         }
 

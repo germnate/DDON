@@ -248,7 +248,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// Validates stageNo == current stage, npcId == current NPC entity, NPC is in talk-active state,
         /// and NPC choice field +0x90 == choice.
         /// </summary>
-        IsNpcTalkChoice = 214, // 0x00635B10 (cQuestProcess* this, s32 stageNo, s32 npcId, s32 choice, s32 param04_unused)
+        NpcTalkChoice = 214, // 0x00635B10 (cQuestProcess* this, s32 stageNo, s32 npcId, s32 choice, s32 param04_unused)
 
         /// <summary>
         /// Checks if a specific substory enemy's HP% >= hpRatePercent. Calls FUN_00be10d0(substoryId) to get HP ratio,
@@ -328,11 +328,12 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// <summary>
         /// Checks if an NPC interaction with a specific choice has completed. Two code paths:
         /// (1) Cutscene path (FUN_0064c1f0 returns true): checks scene-change counter equality (ctx+0x4654 == ctx+0x45cc).
-        /// (2) Normal path: calls FUN_0063d480(stageNo, npcId, choiceId, param04) which validates the local player
-        /// entity, NPC talk state, and that an NPC interaction record matches stageNo/npcId/choiceId.
-        /// param03 is the choice/event ID distinguishing different dialogue branches, not a generic param.
+        /// (2) Normal path: calls FUN_0063d480(stageNo, groupNo, setNo, param04) which validates the local player
+        /// entity, NPC talk state, and that an NPC interaction record matches stageNo/npcId/setNo.
+        /// @note Use result 104 instead of QstTalkChg so the FSM is allowed to play out.
+        /// @note Both work, but 104 works better.
         /// </summary>
-        IsNpcInteractionComplete = 228, // 0x006364A0 (cQuestProcess* this, s32 stageNo, s32 npcId, s32 choiceId, s32 param04)
+        QuestTalkNpcRadius = 228, // 0x006364A0 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
 
         /// <summary>
         /// Checks if the OM matching (stageNo, groupNo, setNo) is broken in the current phase.
@@ -343,21 +344,22 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
 
         /// <summary>
         /// Places a radius marker on an enemy group and progresses when the player discovers the enemy position.
+        /// This works for marking both order and non-order enemies.
         /// Thunks to FUN_00636c20 which iterates area-trigger objects (DAT_021af4f4) matching stageNo+groupNo
         /// (mapped via FUN_00b19320). Delegates to FUN_00b2c2a0/FUN_00b2c910 which scan SceHit packet buffers.
         /// param03 = setNo filter (-1 = any set); param04 = marker display flag.
         /// Must be followed by a kill command to complete the quest block.
         /// @note Internal decompilation matched (stageNo, groupNo, setNo) params against DieEnemy/IsEnemyFound naming.
         /// </summary>
-        IsEnemyFoundForOrderRadius = 230, // 0x00636560 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 markerFlag)
+        IsEnemyFoundRadius = 230, // 0x00636560 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 markerFlag)
 
         /// <summary>
-        /// Lock-guarded, no-marker variant of IsEnemyFoundForOrderRadius. Acquires FUN_00bda180() spin lock;
+        /// Lock-guarded, no-marker variant of IsEnemyFoundRadius. Acquires FUN_00bda180() spin lock;
         /// if already locked (FUN_009cfad0() != 0) returns false immediately, then releases via FUN_00bda1a0().
         /// Calls the same underlying FUN_00636c20 but always passes markerFlag=0.
         /// param03 = setNo filter (-1 = any set); param04 unused (markerFlag forced to 0 internally).
         /// </summary>
-        IsEnemyFoundForOrderRadiusNoMarker = 231, // 0x00636610 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04_unused)
+        IsEnemyFoundForOrderRadius = 231, // 0x00636610 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04_unused)
 
         /// <summary>
         /// Checks if a pawn with a given ID is active/available. Retrieves the pawn list manager via
