@@ -18,7 +18,6 @@ public class PartyManager
     public const uint InvalidPartyId = 0;
     public const ushort InvitationTimeoutSec = 30;
 
-
     private static readonly ServerLogger Logger = LogProvider.Logger<ServerLogger>(typeof(PartyManager));
 
     public readonly DdonGameServer Server;
@@ -42,6 +41,15 @@ public class PartyManager
 
     public bool InviteParty(GameClient invitee, GameClient host, PartyGroup party, bool createTimeout)
     {
+        // Clean up any existing invite before adding the new one (handles cross-invites and stale DC slots).
+        // TryRemove is atomic, so concurrent timer expiry is safe.
+        if (_invites.TryRemove(invitee, out PartyInvitation stale))
+        {
+            stale.CancelTimer();
+            stale.Party?.Leave(invitee);
+            Logger.Info($"[PartyId:{party.Id}][Invite] cleared stale invite for invitee {invitee.Identity} before re-inviting");
+        }
+
         PartyInvitation invitation = new PartyInvitation
         {
             Invitee = invitee,
@@ -52,7 +60,8 @@ public class PartyManager
 
         if (!_invites.TryAdd(invitee, invitation))
         {
-            throw new ResponseErrorException(ErrorCode.ERROR_CODE_PARTY_ALREADY_INVITE, $"[PartyId:{party.Id}][Invite] could not be invited; already has pending invite");
+            throw new ResponseErrorException(ErrorCode.ERROR_CODE_PARTY_ALREADY_INVITE,
+                $"[PartyId:{party.Id}][Invite] could not be invited; already has pending invite");
         }
 
         if (createTimeout)
@@ -63,22 +72,63 @@ public class PartyManager
         return true;
     }
 
-    private void RemoveExpiredInvite(PartyInvitation invitation) 
+    private void NotifyPartyInviteeClearedFromSlot(PartyInvitation invitation)
     {
-        if (_invites.ContainsKey(invitation.Invitee) && _invites.TryRemove(invitation.Invitee, out _))
+        if (invitation.Party == null || invitation.Invitee == null)
+        {
+            return;
+        }
+
+        // Capture MemberIndex before Leave() frees the slot.
+        PlayerPartyMember inviteeMember = invitation.Party.GetPlayerPartyMember(invitation.Invitee);
+        int memberIndex = inviteeMember?.MemberIndex ?? PartyGroup.InvalidSlotIndex;
+
+        Logger.Info($"[NotifyPartyInviteeClearedFromSlot] PartyId:{invitation.Party.Id} " +
+                    $"Invitee:{invitation.Invitee.Identity} MemberIndex:{memberIndex} " +
+                    $"PartyMemberCount:{invitation.Party.MemberCount()} " +
+                    $"AliveClients:{invitation.Party.Clients.Count}");
+
+        // KickNtc must be sent before Leave() — after Leave() frees the slot, SendToAll
+        // won't include the invitee and they won't see their own ghost slot removal.
+        if (memberIndex != PartyGroup.InvalidSlotIndex)
+        {
+            Logger.Info($"[NotifyPartyInviteeClearedFromSlot] Sending KickNtc MemberIndex:{memberIndex} to all {invitation.Party.Clients.Count} alive clients");
+            invitation.Party.SendToAll(new S2CPartyPartyMemberKickNtc
+            {
+                MemberIndex = (byte)memberIndex
+            });
+        }
+        else
+        {
+            Logger.Info($"[NotifyPartyInviteeClearedFromSlot] MemberIndex is InvalidSlotIndex, skipping KickNtc");
+        }
+
+        invitation.Party.Leave(invitation.Invitee);
+    }
+
+    private void RemoveExpiredInvite(PartyInvitation invitation)
+    {
+        if (invitation == null)
+        {
+            return;
+        }
+
+        // TryRemove is atomic - if DC cleanup or InviteParty already removed this entry, we stop.
+        if (_invites.TryRemove(invitation.Invitee, out _))
         {
             var ntc = new S2CPartyPartyInviteFailNtc
             {
                 ErrorCode = ErrorCode.ERROR_CODE_PARTY_INVITE_FAIL_REASON_TIMEOUT,
                 ServerId = (ushort)Server.Id,
-                PartyId = invitation.Party.Id
+                PartyId = invitation.Party?.Id ?? InvalidPartyId
             };
 
-            invitation.Invitee.Send(ntc);
-            invitation.Host.Send(ntc);
-            invitation.Party.Leave(invitation.Invitee);
+            invitation.Invitee?.Send(ntc);
+            invitation.Host?.Send(ntc);
 
-            Logger.Info(invitation.Invitee, "Invitation removed due to timeout.");
+            NotifyPartyInviteeClearedFromSlot(invitation);
+
+            Logger.Info($"Invitation removed due to timeout (Host: {invitation.Host?.Identity ?? "disconnected"}, Invitee: {invitation.Invitee?.Identity ?? "unknown"})");
         }
     }
 
@@ -90,6 +140,12 @@ public class PartyManager
             return null;
         }
 
+        return partyInvitation;
+    }
+
+    public PartyInvitation TryRemovePartyInvitation(GameClient client)
+    {
+        _invites.TryRemove(client, out PartyInvitation partyInvitation);
         return partyInvitation;
     }
 
@@ -106,9 +162,15 @@ public class PartyManager
 
     public bool CancelPartyInvitation(PartyGroup party)
     {
-        PartyInvitation invitation = _invites.Values.Where(x => x.Party == party).FirstOrDefault()
-            ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_PARTY_INVITE_FAIL_REASON_WRONG_PARTY,
-            $"Can't find invitation to cancel for party {party.Id}");
+        PartyInvitation invitation = _invites.Values
+            .Where(x => x.Party == party)
+            .FirstOrDefault();
+
+        if (invitation == null)
+        {
+            Logger.Info($"[CancelPartyInvitation] no active invitation found for PartyId:{party.Id}, already resolved");
+            return false;
+        }
 
         RemovePartyInvitation(invitation.Invitee);
 
@@ -120,9 +182,11 @@ public class PartyManager
         };
 
         invitation.CancelTimer();
-        invitation.Invitee.Send(ntc);
-        invitation.Host.Send(ntc);
-        invitation.Party.Leave(invitation.Invitee);
+
+        invitation.Invitee?.Send(ntc);
+        invitation.Host?.Send(ntc);
+
+        NotifyPartyInviteeClearedFromSlot(invitation);
 
         Logger.Info(invitation.Invitee, "Invitation removed due to cancellation.");
         return true;
@@ -180,7 +244,7 @@ public class PartyManager
         }
 
         LogPartyIdCount();
-        
+
         return party;
     }
 
@@ -194,7 +258,7 @@ public class PartyManager
         // TODO: Thread safety, logs, error handling
         foreach (KeyValuePair<uint, PartyGroup> pair in _parties)
         {
-            if(pair.Value.MemberCount() == 0)
+            if (pair.Value.MemberCount() == 0)
             {
                 _idPool.Push(pair.Key);
                 _parties.TryRemove(pair);
