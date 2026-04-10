@@ -397,7 +397,7 @@ public partial class DdonSqlDb : SqlDb
 
     private void QueryPawnData(DbConnection conn, Pawn pawn)
     {
-        QueryCharacterCommonData(conn, pawn);
+        QueryCharacterCommonData(conn, pawn, pawn.CharacterId);
 
         ExecuteReader(
             conn,

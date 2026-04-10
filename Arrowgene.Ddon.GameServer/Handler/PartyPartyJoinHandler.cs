@@ -5,6 +5,7 @@ using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
+using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -53,15 +54,39 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 }
             }
 
+            // Exclude JoinState.Prepare members and their pawns from all NTCs
+            // they have a reserved slot but haven't accepted yet.
+            var prepareOwnerIds = party.Members
+                .OfType<PlayerPartyMember>()
+                .Where(p => p.JoinState == JoinState.Prepare)
+                .Select(p => p.Client?.Character?.CharacterId ?? 0)
+                .ToHashSet();
+
             S2CPartyPartyJoinNtc ntc = new S2CPartyPartyJoinNtc();
-            ntc.HostCharacterId = party.Host.Client.Character.CharacterId;
+            uint hostCharacterId = (party.Host?.Client != null && party.Host.Client.IsAlive)
+                ? party.Host.Client.Character.CharacterId
+                : partyLeader.CharacterId;
+            ntc.HostCharacterId = hostCharacterId;
             ntc.LeaderCharacterId = partyLeader.CharacterId;
             foreach (PartyMember member in party.Members)
             {
+                if (member is PlayerPartyMember pm && prepareOwnerIds.Contains(pm.Client?.Character?.CharacterId ?? 0))
+                    continue;
+
+                if (member is PawnPartyMember pawnMember && prepareOwnerIds.Contains(pawnMember.Pawn?.CharacterId ?? 0))
+                    continue;
+
                 ntc.PartyMembers.Add(member.CDataPartyMember);
             }
 
-            party.SendToAll(ntc);
+            // Only send JoinNtc to fully joined members - Prepare members haven't accepted yet.
+            foreach (PartyMember member in party.Members)
+            {
+                if (member is PlayerPartyMember onMember && onMember.JoinState == JoinState.On)
+                {
+                    onMember.Client?.Send(ntc);
+                }
+            }
 
             S2CContextGetPartyPlayerContextNtc newMemberContext = join.GetPartyContext();
             if (partyLeader.CommonId != client.Character.CommonId)
@@ -74,28 +99,32 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             if (party.Clients.Count > 0)
             {
-                // Send existing party player context NTCs to the new member
                 foreach (PartyMember member in party.Members)
                 {
                     if (member.MemberIndex == join.MemberIndex)
-                    {
-                        // Skip ourselves
                         continue;
-                    }
 
                     if (member is PlayerPartyMember playerMember)
                     {
+                        if (prepareOwnerIds.Contains(playerMember.Client?.Character?.CharacterId ?? 0))
+                            continue;
                         client.Send(playerMember.GetPartyContext());
                     }
                     else if (member is PawnPartyMember pawnPartyMember)
                     {
+                        if (prepareOwnerIds.Contains(pawnPartyMember.Pawn?.CharacterId ?? 0))
+                            continue;
                         client.Send(pawnPartyMember.GetPartyContext());
                     }
                 }
 
-                // Send new members to all existing party members
-                // client.Party.SendToAllExcept(newMemberContext, client);
-                client.Party.SendToAll(newMemberContext);
+                foreach (PartyMember member in party.Members)
+                {
+                    if (member is PlayerPartyMember onMember && onMember.JoinState == JoinState.On)
+                    {
+                        onMember.Client?.Send(newMemberContext);
+                    }
+                }
             }
 
             res.PartyId = party.Id;
