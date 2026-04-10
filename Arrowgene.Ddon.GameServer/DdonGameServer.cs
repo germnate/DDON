@@ -198,6 +198,16 @@ namespace Arrowgene.Ddon.GameServer
 
             client.Party?.Leave(client);
 
+            // Free reserved invite slot if this client DC'd while holding a pending invite.
+            // TryRemovePartyInvitation is atomic; concurrent timer expiry is handled safely.
+            var staleInvite = PartyManager.TryRemovePartyInvitation(client);
+            if (staleInvite != null)
+            {
+                staleInvite.CancelTimer();
+                staleInvite.Party?.Leave(client);
+                Logger.Info($"[ClientDisconnected] Freed stale invite slot PartyId:{staleInvite.Party?.Id}");
+            }
+
             EventHandler<ClientConnectionChangeArgs> connectionChangeEvent = ClientConnectionChangeEvent;
             if (connectionChangeEvent != null)
             {

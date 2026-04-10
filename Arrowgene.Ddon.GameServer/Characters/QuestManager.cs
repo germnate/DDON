@@ -2492,6 +2492,260 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             /**
+             * @brief
+             */
+            public static CDataQuestCommand NpcTalkChoice(int stageNo, NpcId npcId, int choice, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.NpcTalkChoice, Param01 = stageNo, Param02 = (int) npcId, Param03 = choice, Param04 = param04 };
+            }
+
+            public static CDataQuestCommand OmSetTouchRadius(int stageNo, int groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.OmSetTouchRadius, Param01 = stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            public static CDataQuestCommand OmReleaseTouchRadius(int stageNo, int groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.OmReleaseTouchRadius, Param01 = stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            // Ghidra-discovered check commands (IDs 211–256)
+
+            /** @brief Returns bit 18 of the substory state word at ctx+0x5c+0x20c. */
+            public static CDataQuestCommand IsSubstoryStateBit18(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsSubstoryStateBit18, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Side-effect writer: reads bit 17 of ctx+0x5c+0x20c, inverts it, stores to DAT_021c06b8+0x263. No quest params. */
+            public static CDataQuestCommand StoreLinkageEnemyFlagGlobal(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.StoreLinkageEnemyFlagGlobal, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Sets byte +0x11 on an NPC object matching npcLookupId, stores storeVal at ctx+0x5c+0x24c, returns bit 18 of ctx+0x5c+0x220. */
+            public static CDataQuestCommand SetNpcOrderFlagAndCheckBit18(int stageNo, int npcIdOrObjId, int npcLookupId, int storeVal)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.SetNpcOrderFlagAndCheckBit18, Param01 = stageNo, Param02 = npcIdOrObjId, Param03 = npcLookupId, Param04 = storeVal };
+            }
+
+            /** @brief Checks if substory enemy's HP% >= hpRatePercent. */
+            public static CDataQuestCommand SubstoryEnemyHpNotLess(int substoryId, int hpRatePercent, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.SubstoryEnemyHpNotLess, Param01 = substoryId, Param02 = hpRatePercent, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if substory enemy's HP% < hpRatePercent. Inverse of SubstoryEnemyHpNotLess. */
+            public static CDataQuestCommand SubstoryEnemyHpLess(int substoryId, int hpRatePercent, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.SubstoryEnemyHpLess, Param01 = substoryId, Param02 = hpRatePercent, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if average HP% across all substory NPCs >= hpRatePercent. */
+            public static CDataQuestCommand SubstoryAvgEnemyHpNotLess(int param01, int hpRatePercent, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.SubstoryAvgEnemyHpNotLess, Param01 = param01, Param02 = hpRatePercent, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if average HP% across all substory NPCs < hpRatePercent. */
+            public static CDataQuestCommand SubstoryAvgEnemyHpLess(int param01, int hpRatePercent, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.SubstoryAvgEnemyHpLess, Param01 = param01, Param02 = hpRatePercent, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if an OM's behavior state enum matches behaviorState. */
+            public static CDataQuestCommand IsOmBehaviorState(uint stageNo, int groupNo, int setNo, int behaviorState)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsOmBehaviorState, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = behaviorState };
+            }
+
+            /** @brief Player-specific layout flag check. Guards on playerId; calls FUN_00bfc1e0(flagId) and compares result == expectedValue. */
+            public static CDataQuestCommand IsPlayerSpecificLayoutFlag(int playerId, int flagId, int expectedValue, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsPlayerSpecificLayoutFlag, Param01 = playerId, Param02 = flagId, Param03 = expectedValue, Param04 = param04 };
+            }
+
+            /** @brief Checks if a quest enemy group (type 3) is alive. */
+            public static CDataQuestCommand IsQuestEnemyAlive(uint stageNo, int groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsQuestEnemyAlive, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            /** @brief Duplicate/variant of IsQuestEnemyAlive. */
+            public static CDataQuestCommand IsQuestEnemyAlive2(uint stageNo, int groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsQuestEnemyAlive2, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            /** @brief Area-aware version of IsQuestEnemyAlive using FUN_00a41890 when an area instance exists. */
+            public static CDataQuestCommand IsQuestOrAreaEnemyAlive(uint stageNo, int groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsQuestOrAreaEnemyAlive, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            /** @brief Duplicate/variant of IsQuestOrAreaEnemyAlive. */
+            public static CDataQuestCommand IsQuestOrAreaEnemyAlive2(uint stageNo, int groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsQuestOrAreaEnemyAlive2, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            /** @brief Reward point check guarded on playerId. Checks flag at +0x274 (param03 < 0) or queues collection action. */
+            public static CDataQuestCommand IsRewardPointNotLess(int playerId, int rewardId, int expectedValue, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsRewardPointNotLess, Param01 = playerId, Param02 = rewardId, Param03 = expectedValue, Param04 = param04 };
+            }
+
+            /** @brief Checks if an NPC interaction with a specific choice/event has completed. */
+            public static CDataQuestCommand QuestTalkNpcRadius(uint stageNo, uint groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.QuestTalkNpcRadius, Param01 = (int)stageNo, Param02 = (int)groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            /** @brief Checks if the OM matching (stageNo, groupNo, setNo) is broken in the current phase. */
+            public static CDataQuestCommand IsOmBrokenInCurrentPhase(uint stageNo, int groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsOmBrokenInCurrentPhase, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            /** @brief Places a radius marker on an enemy group; progresses when the player discovers the enemy. setNo=-1 matches any. Must be followed by a kill command. */
+            public static CDataQuestCommand IsEnemyFoundRadius(uint stageNo, int groupNo, int setNo = -1, int markerFlag = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsEnemyFoundRadius, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = markerFlag };
+            }
+
+            /** @brief No-marker, lock-guarded variant of IsEnemyFoundForOrderRadius. markerFlag always 0 internally. setNo=-1 matches any. */
+            public static CDataQuestCommand IsEnemyFoundForOrderRadius(uint stageNo, int groupNo, int setNo = -1, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsEnemyFoundForOrderRadius, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            /** @brief Checks if a pawn with pawnId is active/available in the pawn list. */
+            public static CDataQuestCommand IsPawnAvailable(int pawnId, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsPawnAvailable, Param01 = pawnId, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Returns bit 19 of the substory state word at ctx+0x5c+0x20c. */
+            public static CDataQuestCommand IsSubstoryStateBit19(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsSubstoryStateBit19, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if any party member has an item from the list at PTR_LAB_02141040[itemListIdx]. */
+            public static CDataQuestCommand IsPartyMemberHasItem(int itemListIdx, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsPartyMemberHasItem, Param01 = itemListIdx, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Returns bit 20 of the substory state word at ctx+0x5c+0x20c. */
+            public static CDataQuestCommand IsSubstoryStateBit20(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsSubstoryStateBit20, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Returns bit 21 of the substory state word at ctx+0x5c+0x20c. */
+            public static CDataQuestCommand IsSubstoryStateBit21(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsSubstoryStateBit21, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Returns bit 22 of the substory state word at ctx+0x5c+0x20c. */
+            public static CDataQuestCommand IsSubstoryStateBit22(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsSubstoryStateBit22, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Returns bit 23 of the substory state word at ctx+0x5c+0x20c. */
+            public static CDataQuestCommand IsSubstoryStateBit23(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsSubstoryStateBit23, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if an FSM NPC talk event is complete. Validates against the completed-talk-NPC list. */
+            public static CDataQuestCommand IsFsmNpcTalkComplete(int npcId, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsFsmNpcTalkComplete, Param01 = npcId, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if the substory clock is within [minHour, maxHour]. Min/max order does not matter. */
+            public static CDataQuestCommand IsSubstoryIngameHourInRange(int minHour, int maxHour, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsSubstoryIngameHourInRange, Param01 = minHour, Param02 = maxHour, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Kill-group completion check gated on content mode. Marker vs no-marker determined by this+0x82 at runtime. */
+            public static CDataQuestCommand IsKilledTargetEnemySetGroupMode15(int flagNo, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsKilledTargetEnemySetGroupMode15, Param01 = flagNo, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Identical to IsKilledTargetEnemySetGroupMode15; no-marker variant determined at runtime via this+0x82. */
+            public static CDataQuestCommand IsKilledTargetEnemySetGroupMode15NoMarker(int flagNo, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsKilledTargetEnemySetGroupMode15NoMarker, Param01 = flagNo, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if a contents timer (Timer List B) has elapsed past its stored boundary. */
+            public static CDataQuestCommand IsContentsTimerBElapsed(int timerNo, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsContentsTimerBElapsed, Param01 = timerNo, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if the quest clear count has reached a threshold. */
+            public static CDataQuestCommand IsQuestClearCountNotLess(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsQuestClearCountNotLess, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief S3-only: checks if the contents mode elapsed timer >= timeSec. */
+            public static CDataQuestCommand IsContentsModeTimerNotLess(int timeSec, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsContentsModeTimerNotLess, Param01 = timeSec, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Fire-once trigger: reads and clears a byte flag at DAT_021af4f4+0xEEA. Returns 1 if flag was set. */
+            public static CDataQuestCommand IsTriggerFlagSetAndClear(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsTriggerFlagSetAndClear, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Direct kill-group completion check (no content-mode guard). Checks flagNo against kill-group list entry+0x14. */
+            public static CDataQuestCommand IsKillGroupCompleteInRadius(int flagNo, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsKillGroupCompleteInRadius, Param01 = flagNo, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if a Timer List A entry's state value equals zero. Content-mode gated. */
+            public static CDataQuestCommand IsContentsTimerAZero(int timerNo, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsContentsTimerAZero, Param01 = timerNo, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Wild Hunt system: checks if a target enemy in the zone-entry list has been killed. markerFlag is passed to the kill checker. */
+            public static CDataQuestCommand IsWildHuntTargetEnemyKilled(int zoneLinkageId, int param02 = 0, int param03 = 0, int markerFlag = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsWildHuntTargetEnemyKilled, Param01 = zoneLinkageId, Param02 = param02, Param03 = param03, Param04 = markerFlag };
+            }
+
+            /** @brief Checks if contents/dungeon mode is active (area context mode 0xc, byte at +0x3b non-zero). */
+            public static CDataQuestCommand IsContentsModeStateFlag(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsContentsModeStateFlag, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if a quest enemy's HP-lost% <= hpLostPct (i.e., enemy HP >= threshold). */
+            public static CDataQuestCommand IsQuestEnemyHpNotGreater(uint stageNo, int groupNo, int setNo, int hpLostPct)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsQuestEnemyHpNotGreater, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = hpLostPct };
+            }
+
+            /** @brief Grand Mission / Extreme Mission: checks if an area-linkage flag (type-9) is set. flagKey matched against entry+4. */
+            public static CDataQuestCommand IsAreaLinkageQuestFlagOn(int flagKey, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsAreaLinkageQuestFlagOn, Param01 = flagKey, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /**
              * @brief Used when command is unknown but seen in packet captures.
              */
             public static CDataQuestCommand Unknown(ushort commandId, int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
@@ -3415,6 +3669,170 @@ namespace Arrowgene.Ddon.GameServer.Characters
             public static CDataQuestCommand LinkageEnemyFlagOff(uint stageNo, int groupNo, int setNo, int flagId)
             {
                 return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.LinkageEnemyFlagOff, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = flagId };
+            }
+
+            // Ghidra-discovered result commands (IDs 99–134)
+
+            /** @brief Adds a signed delta to the current substory progress value. Baked context, no subid params. */
+            public static CDataQuestCommand SubstoryProgress(int delta, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SubstoryProgress, Param01 = delta, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Finds a substory entry by substoryId and adds progressDelta to its progress, clamped to [0,100]. */
+            public static CDataQuestCommand AddSubstoryProgress(int substoryId, int progressDelta, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.AddSubstoryProgress, Param01 = substoryId, Param02 = progressDelta, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Triggers a substory event sequence. Checks mode; if mode==0xb fires substory FSM transition. */
+            public static CDataQuestCommand TriggerSubstoryEvent(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.TriggerSubstoryEvent, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Triggers display of the substory UI element. No command params used; value read from baked quest context. */
+            public static CDataQuestCommand EnableSubstoryUIElement(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.EnableSubstoryUIElement, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Disables the substory UI element (+0x44 reference cleared). */
+            public static CDataQuestCommand DisableSubstoryUIElement(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.DisableSubstoryUIElement, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Redirects NPC talk for a substory context via FUN_009ce930(param01, param02). */
+            public static CDataQuestCommand QstTalkChgFsm(NpcId npcId, int msgNo = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.QstTalkChgFsm, Param01 = (int) npcId, Param02 = msgNo, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Sets invincibility on a substory enemy group. param02=1 sets invincible. */
+            public static CDataQuestCommand SetSubstoryEnemyInvincible(int enemyGroupFlag, int invincible, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetSubstoryEnemyInvincible, Param01 = enemyGroupFlag, Param02 = invincible, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Adds an NPC to the FSM talk NPC list. Validates FSM mode first. */
+            public static CDataQuestCommand AddFsmTalkNpc(int npcId, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.AddFsmTalkNpc, Param01 = npcId, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Sends an animation/event trigger to a substory enemy group. If flagValue != 0, also calls FUN_00bd3870. */
+            public static CDataQuestCommand SetSubstoryEnemyGroupFlag(int groupId, int flagValue, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetSubstoryEnemyGroupFlag, Param01 = groupId, Param02 = flagValue, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Enables substory element variant B. Sets +0x4c reference via FUN_00598860. */
+            public static CDataQuestCommand EnableSubstoryElementB(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.EnableSubstoryElementB, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Disables substory element variant B. Clears +0x4c reference via FUN_005986A0. */
+            public static CDataQuestCommand DisableSubstoryElementB(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.DisableSubstoryElementB, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Enables a world-management barrier via FUN_00c19920 and sets bit 0 of the barrier flag. */
+            public static CDataQuestCommand SetWorldManageBarrierOn(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetWorldManageBarrierOn, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Disables the world-management barrier via FUN_00c1baa0 and clears the barrier flag bit. */
+            public static CDataQuestCommand SetWorldManageBarrierOff(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetWorldManageBarrierOff, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Schedules an FSM NPC behavior by calling FUN_009d1a60(scheduleId). scheduleId = param04. */
+            public static CDataQuestCommand SetFsmNpcSchedule(int param01 = 0, int param02 = 0, int param03 = 0, int scheduleId = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetFsmNpcSchedule, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = scheduleId };
+            }
+
+            /** @brief Sets the level of a quest enemy group (type 3) via FUN_00bc0670. Phase-gated. */
+            public static CDataQuestCommand SetQuestEnemyLevel(uint stageNo, int groupNo, int setNo, int level)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestEnemyLevel, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = level };
+            }
+
+            /** @brief Area-aware variant of SetQuestEnemyLevel using FUN_00a41890. */
+            public static CDataQuestCommand SetQuestEnemyLevelEx(uint stageNo, int groupNo, int setNo, int level)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestEnemyLevelEx, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = level };
+            }
+
+            /** @brief Sets the danger tier (bits 23-21) of a quest enemy group via FUN_00bc0720. Phase-gated. */
+            public static CDataQuestCommand SetQuestEnemyTierUp(uint stageNo, int groupNo, int setNo, int tier)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestEnemyTierUp, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = tier };
+            }
+
+            /** @brief Area-aware variant of SetQuestEnemyTierUp. */
+            public static CDataQuestCommand SetQuestEnemyTierUpEx(uint stageNo, int groupNo, int setNo, int tier)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestEnemyTierUpEx, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = tier };
+            }
+
+            /** @brief Sets a body/stance pose (1-6) on a quest NPC/enemy via FUN_00bbf670. */
+            public static CDataQuestCommand SetQuestOmMontageFix(uint stageNo, int groupNo, int setNo, int poseId)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestOmMontageFix, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = poseId };
+            }
+
+            /** @brief Area-aware variant of AddResultCmdSetQuestOmMontageFix. */
+            public static CDataQuestCommand SetQuestOmMontageFixEx(uint stageNo, int groupNo, int setNo, int poseId)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestOmMontageFixEx, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = poseId };
+            }
+
+            /** @brief Sets the level of a layout enemy (type 2) by queuing it into a critical-section-guarded buffer. */
+            public static CDataQuestCommand SetQuestLayoutEnemyLevel(uint stageNo, int groupNo, int setNo, int level)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestLayoutEnemyLevel, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = level };
+            }
+
+            /** @brief Removes an FSM NPC entry from the process list via FUN_0063dda0(param01). */
+            public static CDataQuestCommand RemoveFsmNpcFromSchedule(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.RemoveFsmNpcFromSchedule, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Controls enemy expedition state. mode=2: starts; mode=3: iterates party members and fires expedition signal. */
+            public static CDataQuestCommand SetEnemyExpeditionState(int mode, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetEnemyExpeditionState, Param01 = mode, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Fires a substory ending sequence: calls FUN_00be9960, FUN_00b85670, and sends messages 0x25f/0x260. */
+            public static CDataQuestCommand TriggerSubstoryEndSequence(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.TriggerSubstoryEndSequence, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if a pawn has OM state == 4 and a specific animation condition via FUN_0087dc50. */
+            public static CDataQuestCommand CheckSubstoryCondition(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.CheckSubstoryCondition, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Controls pawn expedition. mode=1: starts; mode=2: stops. */
+            public static CDataQuestCommand SetPawnExpeditionFlag(int mode, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetPawnExpeditionFlag, Param01 = mode, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Sets a body/pose mode on a layout enemy (type 2) via FUN_005be380(poseId). */
+            public static CDataQuestCommand SetQuestLayoutEnemyBodyPose(uint stageNo, int groupNo, int setNo, int poseId)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestLayoutEnemyBodyPose, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = poseId };
             }
 
             /**
