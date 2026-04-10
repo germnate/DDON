@@ -114,6 +114,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     Logger.Info("==========================================================================================");
                 }
 
+
                 if (!quest.IsPersonal)
                 {
                     foreach (var memberClient in client.Party.Clients)

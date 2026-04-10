@@ -610,6 +610,11 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             public static QuestFlagInfo RothgillFrontGate { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(2816, QuestId.Q70030001);
 
             /// <summary>
+            /// Opens the "Demon Army War Machine Gate"
+            /// </summary>
+            public static QuestFlagInfo DemonArmyWarMachineGate { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(3284, QuestId.Q70030001);
+
+            /// <summary>
             /// Closes the hole in the wall when set.
             /// </summary>
             public static QuestFlagInfo FortDacriumWallBreach { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(5589, QuestId.Q70030001, StageInfo);
@@ -653,6 +658,11 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             /// Opens gate next to "West Feryana Wilderness" warp point
             /// </summary>
             public static QuestFlagInfo WestFeryanaGate { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(2930, QuestId.Q70030001);
+
+            /// <summary>
+            /// Opens the entrance to "Old Tekia Grotto"
+            /// </summary>
+            public static QuestFlagInfo OldTekiaGrotto { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(3286, QuestId.Q70031001);
         }
 
         public static class MephiteTravelersInn

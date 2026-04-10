@@ -43,12 +43,9 @@ public class ScriptedQuest : IQuest
             .AddResultCmdReleaseAnnounce(ContentsRelease.AreaMastersWorldQuestInfo, TutorialId.PurchasingWorldQuestInformation)
             .AddCheckCmdOpenAreaMaster(QuestAreaId.HidellPlains);
         process0.AddTalkToNpcBlock(QuestAnnounceType.CheckpointAndUpdate, Stage.BlackGrapeInn, NpcId.Alfred, 14519);
-        // Temporary step until WorkQuestClearNum works properly always
-        process0.AddIsStageNoBlock(QuestAnnounceType.CheckpointAndUpdate, Stage.BlackGrapeInn)
-            .AddResultCmdTutorialDialog(TutorialId.QuestRecommendedLevel);
-        // process0.AddRawBlock(QuestAnnounceType.CheckpointAndUpdate)
-        //   .AddResultCmdTutorialDialog(TutorialId.QuestRecommendedLevel)
-        //   .AddCheckCmdWorldQuestClearNum(QuestAreaId.HidellPlains, 1);
+        process0.AddRawBlock(QuestAnnounceType.CheckpointAndUpdate)
+            .AddResultCmdTutorialDialog(TutorialId.QuestRecommendedLevel)
+            .AddCheckCmdWorldQuestClearNum(QuestAreaId.HidellPlains, 1);
         process0.AddTalkToNpcBlock(QuestAnnounceType.CheckpointAndUpdate, Stage.BlackGrapeInn, NpcId.Alfred, 13809);
         process0.AddTalkToNpcBlock(QuestAnnounceType.CheckpointAndUpdate, Stage.TheWhiteDragonTemple0, NpcId.Seneka0, 11295)
             .AddResultCmdTutorialDialog(TutorialId.ReapRewardsfortheWorldQuest);
