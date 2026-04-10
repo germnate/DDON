@@ -10,15 +10,22 @@ public class PartyInvitation
     public PartyGroup Party { get; set; }
     public DateTime Date { get; set; }
     private Timer _timer;
+
     public bool IsTimerDisposed =>
-     _timer == null || !_timer.Change(Timeout.Infinite, Timeout.Infinite);
+        _timer == null || !_timer.Change(Timeout.Infinite, Timeout.Infinite);
 
     public void StartTimer(Action<PartyInvitation> onTimeout, int timeoutSec)
     {
         _timer = new Timer(state =>
         {
-            onTimeout(this);
-            _timer.Dispose();
+            try
+            {
+                onTimeout?.Invoke(this);
+            }
+            finally
+            {
+                _timer?.Dispose();
+            }
         }, null, timeoutSec * 1000, Timeout.Infinite);
     }
 
@@ -28,7 +35,7 @@ public class PartyInvitation
         {
             if (!IsTimerDisposed)
             {
-                _timer.Dispose();
+                _timer?.Dispose();
             }
         }
         catch { }

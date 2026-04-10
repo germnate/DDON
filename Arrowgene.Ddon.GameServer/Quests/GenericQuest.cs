@@ -340,7 +340,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 {
                     questProcessState.ResultCommandList.AddRange(cbParam.ResultCommands);
                 }
-                
+
                 if (cbParam.CheckCommands.Count > 0)
                 {
                     questProcessState.CheckCommandList = QuestManager.CheckCommand.AppendCheckCommands(questProcessState.CheckCommandList, cbParam.CheckCommands);
@@ -351,10 +351,49 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 questProcessState = questBlock.QuestProcessState;
             }
 
+            PatchRandomCommands(ref questProcessState, questState);
+
             return new List<CDataQuestProcessState>()
             {
                 questProcessState
             };
+        }
+
+        // For any SetRandom result commands in the block, roll the value once per slot per quest
+        // instance and substitute it into param_4 before the state is sent to the client.
+        // The client stores param_4 and evaluates RandomEq/RandomLess/etc. locally.
+        private static void PatchRandomCommands(ref CDataQuestProcessState processState, QuestState questState)
+        {
+            bool hasSetRandom = processState.ResultCommandList
+                .Any(c => c.Command == (ushort)QuestResultCommand.SetRandom);
+            if (!hasSetRandom)
+            {
+                return;
+            }
+
+            // Always copy before mutating - processState may be the shared static block state
+            // (assigned directly from questBlock.QuestProcessState) or already a per-dispatch copy
+            // (created by the callback path). Either way a fresh copy is safe and correct.
+            processState = new CDataQuestProcessState(processState);
+
+            foreach (var cmd in processState.ResultCommandList)
+            {
+                if (cmd.Command != (ushort)QuestResultCommand.SetRandom)
+                {
+                    continue;
+                }
+
+                int slot = cmd.Param01;
+                int min  = cmd.Param02;
+                int max  = cmd.Param03;
+
+                if (!questState.RandomSlots.ContainsKey(slot))
+                {
+                    questState.RandomSlots[slot] = Random.Shared.Next(min, max + 1);
+                }
+
+                cmd.Param04 = questState.RandomSlots[slot];
+            }
         }
 
         private static CDataQuestProcessState BlockAsCDataQuestProcessState(GenericQuest quest, QuestBlock questBlock)

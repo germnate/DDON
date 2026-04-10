@@ -209,6 +209,32 @@ public abstract class SqlDb : IDatabase
         AddParameter(command, name, value, DbType.Boolean);
     }
 
+    /// <summary>
+    /// Prepares an array of string values for use in a batch WHERE clause.
+    /// Returns the SQL fragment to embed (e.g. "IN (@uids_0, @uids_1)") and an action
+    /// that binds the parameters to a command. Call-site usage:
+    /// <code>
+    ///   var (clause, bind) = PrepareArrayParameter("uids", values);
+    ///   string sql = $"SELECT ... WHERE \"col\" {clause}";
+    ///   ExecuteReader(conn, sql, cmd => bind(cmd), reader => { ... });
+    /// </code>
+    /// Postgres overrides this to use the more efficient "= ANY(@uids)" array syntax.
+    /// </summary>
+    public virtual (string SqlFragment, Action<DbCommand> Bind) PrepareArrayParameter(string paramName, string[] values)
+    {
+        string[] names = new string[values.Length];
+        for (int i = 0; i < values.Length; i++)
+            names[i] = $"@{paramName}_{i}";
+        return (
+            $"IN ({string.Join(", ", names)})",
+            cmd =>
+            {
+                for (int i = 0; i < values.Length; i++)
+                    AddParameter(cmd, names[i], values[i]);
+            }
+        );
+    }
+
     public virtual string? GetStringNullable(DbDataReader reader, int ordinal)
     {
         if (reader.IsDBNull(ordinal)) return null;
