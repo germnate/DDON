@@ -241,7 +241,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// byte +0x11 on that object to 1. Also stores param04 at ctx+0x5c+0x24c. Returns bit 18 of ctx+0x5c+0x220.
         /// A combined setter+state-bit-check, not a pure conditional.
         /// </summary>
-        SetNpcOrderFlagAndCheckBit18 = 213, // 0x00635A60 (cQuestProcess* this, s32 stageNo, s32 npcId_or_objId, s32 npcLookupId, s32 storeVal)
+        NpcPreTalkAndOrderUi = 213, // 0x00635A60 (cQuestProcess* this, s32 stageNo, s32 npcId, s32 noOrderGroupSerial, s32 storeVal)
 
         /// <summary>
         /// Progresses when player chooses a specific dialogue option (int). Used in branching quests (like Extend Garden).

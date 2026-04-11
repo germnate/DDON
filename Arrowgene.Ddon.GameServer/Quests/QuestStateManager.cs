@@ -1055,6 +1055,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
                     uint clearCount = ++memberClient.Character.CompletedQuests[quest.QuestId].ClearCount;
                     Server.Database.UpdateCompletedQuest(memberClient.Character.CommonId, quest.QuestId, quest.QuestType, clearCount, connectionIn);
                 }
+
+                if (quest.QuestType == QuestType.Substory)
+                {
+                    QuestManager.AdvanceSubstoryProgress(Server, memberClient.Character, quest.QuestId, connectionIn);
+                }
             }
 
             // Remove the quest data from the party object
@@ -1273,6 +1278,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
             {
                 uint clearCount = ++Member.Client.Character.CompletedQuests[quest.QuestId].ClearCount;
                 Server.Database.ReplaceCompletedQuest(Member.Client.Character.CommonId, quest.QuestId, quest.QuestType, clearCount, connectionIn);
+            }
+
+            if (quest.QuestType == QuestType.Substory)
+            {
+                QuestManager.AdvanceSubstoryProgress(Server, Member.Client.Character, quest.QuestId, connectionIn);
             }
 
             CompleteQuest(quest.QuestScheduleId);

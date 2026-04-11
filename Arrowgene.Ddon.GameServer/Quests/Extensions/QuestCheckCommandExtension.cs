@@ -462,13 +462,13 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
 
         public static List<CDataQuestCommand> AddCheckCmdWorldManageQuestFlagOn(this List<CDataQuestCommand> checkCommands, QuestId questId, uint flagNo)
         {
-            checkCommands.Add(QuestManager.CheckCommand.WorldManageQuestFlagOn((int)questId, (int)flagNo));
+            checkCommands.Add(QuestManager.CheckCommand.WorldManageQuestFlagOn((int)flagNo, (int)questId));
             return checkCommands;
         }
 
         public static List<CDataQuestCommand> AddCheckCmdWorldManageQuestFlagOff(this List<CDataQuestCommand> checkCommands, QuestId questId, uint flagNo)
         {
-            checkCommands.Add(QuestManager.CheckCommand.WorldManageQuestFlagOff((int)questId, (int)flagNo));
+            checkCommands.Add(QuestManager.CheckCommand.WorldManageQuestFlagOff((int)flagNo, (int)questId));
             return checkCommands;
         }
 
@@ -672,9 +672,9 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdSetNpcOrderFlagAndCheckBit18(this List<CDataQuestCommand> checkCommands, int stageNo, int npcIdOrObjId, int npcLookupId, int storeVal)
+        public static List<CDataQuestCommand> AddCheckCmdNpcPreTalkAndOrderUi(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, NpcId npcId, int noOrderGroupSerial, int storeVal)
         {
-            checkCommands.Add(QuestManager.CheckCommand.SetNpcOrderFlagAndCheckBit18(stageNo, npcIdOrObjId, npcLookupId, storeVal));
+            checkCommands.Add(QuestManager.CheckCommand.NpcPreTalkAndOrderUi((int) stageInfo.StageNo, (int) npcId, noOrderGroupSerial, storeVal));
             return checkCommands;
         }
 

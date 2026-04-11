@@ -23,9 +23,17 @@ There are certain acronyms used in the command names
 Check commands are commands which gate the progress/advancement of the current quest block in a process to the next quest block in a process.
 
 ### TalkNpc
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00635020` |
+| Table index | 1 (check) |
+| Key fields | Looks up NPC by npcId; **returns 0 (blocks) when NPC+0x11 != 0** (i.e. NPC is in order mode) |
+
 ```
 /**
- * @brief
+ * @brief Progresses when the player talks to the specified NPC.
+ * Fails immediately if the NPC's order mode flag (NPC+0x11) is set — NPC is reserved for an order interaction.
  * @param stageNo
  * @param npcId
  */
@@ -280,21 +288,35 @@ IsEndResult(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
 
 ### NpcTalkAndOrderUi
 
+| Field | Value |
+|-------|-------|
+| Address | `0x00636570` |
+| Table index | 26 (check) |
+| Key fields | Sets NPC+0x11 = 1 (order flag); stores `noOrderGroupSerial` at **NPC object +0xc**; delegates to TalkNpc sub-check; clears NPC+0x11 on success |
+
 ```
 /**
- * @brief Used to order a quest from an NPC with multiple talking options.
+ * @brief Orders a quest from an NPC with multiple talking options.
+ * Sets the NPC's order mode flag (NPC+0x11 = 1), stores noOrderGroupSerial on the NPC object (+0xc)
+ * for the UI to select the right dialog group, then gates on TalkNpc (player must physically talk).
+ * On success: clears NPC+0x11 = 0 and calls the order-confirm function.
  * @param stageNo
  * @param npcId
- * @param noOrderGroupSerial
+ * @param noOrderGroupSerial  Stored at NPC+0xc; selects which dialog group to present.
  */
 NpcTalkAndOrderUi(StageNo stageNo, NpcId npcId, int noOrderGroupSerial, int param04 = 0);
 ```
 
 ### NpcTouchAndOrderUi
 
+| Field | Value |
+|-------|-------|
+| Address | `0x00636660` |
+| Table index | 27 (check) |
+
 ```
 /**
- * @brief Used to order a quest from an NPC with no additional talking options.
+ * @brief Orders a quest from an NPC with no additional talking options (touch/proximity only).
  * @param stageNo
  * @param npcId
  * @param noOrderGroupSerial
@@ -3687,7 +3709,7 @@ SetQuestLayoutOmMontageFix(StageNo stageNo, int groupNo, int setNo, int montague
 The following check commands were found by analysing the check function dispatch table at `.data:02126998`.
 The dispatch function is at approximately `.text:0063E04A`. It validates `commandId < 0x101` (257 entries, indices 0–256).
 
-### IsSubstoryStateBit18 (211)
+### IsSubstoryProgressBit18 (211)
 
 | Field | Value |
 |-------|-------|
@@ -3697,13 +3719,14 @@ The dispatch function is at approximately `.text:0063E04A`. It validates `comman
 
 ```
 /**
- * @brief Returns bit 18 of the substory state word.
+ * @brief Returns bit 18 of the substory progress state word.
+ * All four quest params are unused — only the implicit `this` context is read.
  * State word is at *(cQuestProcess+0x5c)+0x20c.
  */
-IsSubstoryStateBit18(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+IsSubstoryProgressBit18(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
 
-### StoreLinkageEnemyFlagGlobal (212)
+### SetGlobalSubstoryProgressBit17Inverse (212)
 
 | Field | Value |
 |-------|-------|
@@ -3713,37 +3736,47 @@ IsSubstoryStateBit18(int param01 = 0, int param02 = 0, int param03 = 0, int para
 
 ```
 /**
- * @brief Reads bit 17 of the substory context flags bitfield, inverts it, and stores the result
- * to the global side-effect slot at DAT_021c06b8+0x263.
+ * @brief Reads bit 17 of the substory progress state word (+0x20c), inverts it, and stores the
+ * result to the global flag at DAT_021c06b8+0x263.
  * @note This is NOT a conditional check — it only writes global state. No quest params are used.
- * @note Formerly named "IsLinkageEnemyFlagVariant"; renamed after Ghidra verification showed no
- *       stageNo/groupNo/setNo/flagNo params in the actual function signature.
+ * @note Formerly named "StoreLinkageEnemyFlagGlobal"; renamed after Ghidra verification confirmed
+ *       this reads the same substory state field (+0x20c) as IsSubstoryProgressBit18/index 211.
  */
-StoreLinkageEnemyFlagGlobal(int param01_unused = 0, int param02_unused = 0, int param03_unused = 0, int param04_unused = 0);
+SetGlobalSubstoryProgressBit17Inverse(int param01_unused = 0, int param02_unused = 0, int param03_unused = 0, int param04_unused = 0);
 ```
 
-### SetNpcOrderFlagAndCheckBit18 (213)
+### NpcPreTalkAndOrderUi (213)
 
 | Field | Value |
 |-------|-------|
 | Address | `0x00635A60` |
 | Table index | 213 |
-| Key callees | `FUN_009d0170(npcLookupId)` — NPC/object lookup at ctx+0x214/+0x218 |
-| Key fields | Sets `foundObject+0x11 = 1`; writes `storeVal` to ctx+0x5c+0x24c; returns bit 18 of ctx+0x5c+0x220 |
+| Key callees | `NpcPreTalkAndOrderUi→FUN_009d0170(noOrderGroupSerial)` — NPC lookup at ctx+0x214/+0x218, matches by NPC+0x8 |
+| Key fields | Sets `npcObject+0x11 = 1` (order mode flag); writes `storeVal` to ctx+0x5c+0x24c; returns bit 18 of ctx+0x5c+0x220 |
 
 ```
 /**
- * @brief Combined setter + state-bit check. Looks up an NPC object by npcLookupId in the list at
- * ctx+0x214/+0x218, sets byte +0x11 on that object to 1, stores storeVal at ctx+0x5c+0x24c,
- * then returns bit 18 of ctx+0x5c+0x220.
- * @note This is not a pure conditional — it has side effects on the NPC object and quest context.
- * @note Formerly named "IsNpcInteractAndOrderUI"; renamed after Ghidra verification.
- * @param stageNo      Stage number (param01)
- * @param npcId_or_obj NPC or object ID (param02)
- * @param npcLookupId  ID used to find the NPC object in the ctx list (param03)
- * @param storeVal     Value written to ctx+0x5c+0x24c (param04)
+ * @brief Pre-talk setup for substory NPC order interactions.
+ *
+ * Looks up the NPC object by noOrderGroupSerial in the stage NPC list (ctx+0x214/+0x218).
+ * Sets byte +0x11 on the NPC object to 1 — this is the order mode flag:
+ *   - Shows the order marker above the NPC head in the UI.
+ *   - Blocks the normal TalkNpc check (TalkNpc returns 0 when NPC+0x11 != 0).
+ * Plays the message identified by noOrderGroupSerial when the player clicks the NPC,
+ * before the order UI (NpcTalkAndOrderUi) is shown.
+ * Stores storeVal at ctx+0x5c+0x24c.
+ * Returns bit 18 of ctx+0x5c+0x220 (the NPC order interaction state field).
+ * The check passes (returns 1) when proximity triggers the order interaction, which sets bit 18.
+ *
+ * @note Not a pure check — has side effects on the NPC object and quest context each call.
+ * @note Formerly named "SetNpcOrderFlagAndCheckBit18" / "SetNpcOrderModeAndCheckTriggered".
+ * @param stageNo            Stage number — not used in the function body.
+ * @param npcId              NPC ID — not referenced in the function body (used by the framework).
+ * @param noOrderGroupSerial Used to look up the NPC object; also identifies the pre-talk message
+ *                           shown when the player clicks the NPC before the order UI appears.
+ * @param storeVal           Written to ctx+0x5c+0x24c.
  */
-SetNpcOrderFlagAndCheckBit18(StageNo stageNo, int npcId_or_obj, int npcLookupId, int storeVal);
+NpcPreTalkAndOrderUi(StageNo stageNo, NpcId npcId, int noOrderGroupSerial, int storeVal);
 ```
 
 ### TalkNpcChoice (214)

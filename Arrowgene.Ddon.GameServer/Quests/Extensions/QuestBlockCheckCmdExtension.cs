@@ -735,10 +735,10 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdSetNpcOrderFlagAndCheckBit18(this QuestBlock questBlock, int stageNo, int npcIdOrObjId, int npcLookupId, int storeVal, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdNpcPreTalkAndOrderUi(this QuestBlock questBlock, StageInfo stageInfo, NpcId npcId, int noOrderGroupSerial, int storeVal, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdSetNpcOrderFlagAndCheckBit18(stageNo, npcIdOrObjId, npcLookupId, storeVal);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdNpcPreTalkAndOrderUi(stageInfo, npcId, noOrderGroupSerial, storeVal);
             return questBlock;
         }
 

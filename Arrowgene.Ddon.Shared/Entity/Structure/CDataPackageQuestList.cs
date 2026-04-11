@@ -1,9 +1,6 @@
 using Arrowgene.Buffers;
-using System;
+using Arrowgene.Ddon.Shared.Model.Quest;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Arrowgene.Ddon.Shared.Entity.Structure
 {
@@ -13,22 +10,21 @@ namespace Arrowgene.Ddon.Shared.Entity.Structure
         {
         }
 
-        public uint Unk0 { get; set; }
+        public QuestSubstoryGroupId SubstoryGroupId { get; set; }
         public List<CDataPackageQuestDetail> Details { get; set; } = new();
-
 
         public class Serializer : EntitySerializer<CDataPackageQuestList>
         {
             public override void Write(IBuffer buffer, CDataPackageQuestList obj)
             {
-                WriteUInt32(buffer, obj.Unk0);
+                WriteUInt32(buffer, (uint) obj.SubstoryGroupId);
                 WriteEntityList(buffer, obj.Details);
             }
 
             public override CDataPackageQuestList Read(IBuffer buffer)
             {
                 CDataPackageQuestList obj = new CDataPackageQuestList();
-                obj.Unk0 = ReadUInt32(buffer);
+                obj.SubstoryGroupId = (QuestSubstoryGroupId) ReadUInt32(buffer);
                 obj.Details = ReadEntityList<CDataPackageQuestDetail>(buffer);
                 return obj;
             }

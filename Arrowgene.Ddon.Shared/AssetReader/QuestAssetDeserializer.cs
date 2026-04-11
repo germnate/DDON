@@ -98,7 +98,7 @@ namespace Arrowgene.Ddon.Shared.AssetReader
             }
 
             assetData.StageLayoutId = StageLayoutId.Invalid;
-            if (questType == QuestType.Tutorial)
+            if ((questType == QuestType.Tutorial) || (questType == QuestType.Substory))
             {
                 assetData.StageLayoutId = AssetCommonDeserializer.ParseStageId(jQuest.GetProperty("stage_id"));
             }

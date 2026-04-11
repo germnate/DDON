@@ -500,6 +500,10 @@ public interface IDatabase
     List<CDataRewardItemInfo> SelectAreaRankSupply(uint characterId, QuestAreaId areaId, DbConnection? connectionIn = null);
     bool DeleteAreaRankSupply(DbConnection? connectionIn = null);
 
+    // Substory Progress
+    Dictionary<QuestSubstoryGroupId, SubstoryProgress> SelectSubstoryProgress(uint characterId, DbConnection? connectionIn = null);
+    bool UpsertSubstoryProgress(uint characterId, SubstoryProgress progress, DbConnection? connectionIn = null);
+
     // Rank Boards
     bool InsertRankRecord(uint characterId, uint questId, long score, DbConnection? connectionIn = null);
     List<uint> SelectUsedRankingBoardQuests(DbConnection? connectionIn = null);

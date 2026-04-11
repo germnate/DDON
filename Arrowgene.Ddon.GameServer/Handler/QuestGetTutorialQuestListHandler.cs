@@ -25,7 +25,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             // This handler should return personal quests which have not been started
             // yet when the player enters the StageNo
-            foreach (var questScheduleId in QuestManager.GetTutorialQuestsByStageNo(request.StageNo))
+            foreach (var questScheduleId in QuestManager.GetQuestByStageNo(QuestType.Tutorial, request.StageNo))
             {
                 var quest = QuestManager.GetQuestByScheduleId(questScheduleId);
                 if (quest == null || !quest.IsActive(client))

@@ -665,6 +665,9 @@ namespace Arrowgene.Ddon.GameServer
             AddHandler(new QuestSendLeaderWaitOrderQuestListHandler(this));
             AddHandler(new QuestSetNavigationHandler(this));
             AddHandler(new QuestSetPriorityQuestHandler(this));
+            AddHandler(new QuestGetPackageQuestInfoHandler(this));
+            AddHandler(new QuestGetPackageQuestInfoDetailHandler(this));
+            AddHandler(new QuestAddPackageQuestPointHandler(this));
 
             AddHandler(new RankingBoardListHandler(this));
             AddHandler(new RankingRankListHandler(this));

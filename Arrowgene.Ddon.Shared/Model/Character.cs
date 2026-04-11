@@ -57,6 +57,7 @@ namespace Arrowgene.Ddon.Shared.Model
             JobEmblems = new();
 
             DispelSeals = [];
+            SubstoryProgress = new();
         }
 
         public int AccountId { get; set; }
@@ -161,8 +162,8 @@ namespace Arrowgene.Ddon.Shared.Model
         public Dictionary<JobId, List<CDataAbilityParam>> AcquirableAbilities { get; set; }
 
         public HashSet<uint> DispelSeals { get; set; }
-
         public ulong GroupChatId { get; set; }
+        public Dictionary<QuestSubstoryGroupId, SubstoryProgress> SubstoryProgress { get; set; }
 
         // TODO: Move to a more sensible place
         public uint LastEnteredShopId { get; set; }
