@@ -12,7 +12,7 @@ public class ScriptedQuest : IQuest
     public override byte MinimumItemRank => 0;
     public override bool IsDiscoverable => false;
     public override StageInfo StageInfo => Stage.FortThines1;
-    public override QuestAdventureGuideCategory? AdventureGuideCategory => QuestAdventureGuideCategory.QuestUsefulForAdventure;
+    public override QuestAdventureGuideCategory? AdventureGuideCategory => QuestAdventureGuideCategory.AreaTrialOrMission;
 
     private class EnemyGroupId
     {
@@ -151,7 +151,7 @@ public class ScriptedQuest : IQuest
         process0.AddTalkToNpcBlock(QuestAnnounceType.Accept, Stage.RathniteFoothillsLakeside0, NpcId.Victor, 23899)
             .AddResultCmdQstTalkChg(NpcId.Endale, 23898);
 
-        // 3. Ask Ozgur about the strength of the Liberation Army
+        // 2. Ask Ozgur about the strength of the Liberation Army
 		process0.AddRawBlock(QuestAnnounceType.CheckpointAndUpdate)
             .AddResultCmdQstTalkChg(NpcId.Ozgur, 23900)
 			.AddCheckCommands([
@@ -165,13 +165,13 @@ public class ScriptedQuest : IQuest
 				QuestManager.CheckCommand.DummyNotProgress()
 			]);
 
-        // 4. Head into enemy territory and strike with a surprise attack
+        // 3. Head into enemy territory and strike with a surprise attack
         process0.AddDiscoverGroupBlock(QuestAnnounceType.Update, EnemyGroupId.Encounter1)
             .AddResultCmdQstTalkChg(NpcId.Ozgur, 25529)
             .AddQuestFlag(QuestFlagType.QstLayout, QuestFlagAction.Set, QstLayoutFlag.AlliedAlways)
             .AddQuestFlag(QuestFlagType.WorldManageQuest, QuestFlagAction.Set, 3284, (QuestId)70030001);
 
-        // 5. Destroy enemy artillery
+        // 4. Destroy enemy artillery
 		process0.AddRawBlock(QuestAnnounceType.Update)
             .AddQuestFlag(QuestFlagType.MyQst, QuestFlagAction.Set, 3293)
             .AddQuestFlag(QuestFlagType.QstLayout, QuestFlagAction.Set, QstLayoutFlag.CannonOm1)
@@ -183,28 +183,28 @@ public class ScriptedQuest : IQuest
 				QuestManager.CheckCommand.IsOmBrokenQuest(131, 2, 0)
 			]);
 
-        // 6. Defeat the leader of the reinforcements
+        // 5. Defeat the leader of the reinforcements
         process0.AddDiscoverGroupBlock(QuestAnnounceType.Update, EnemyGroupId.Encounter2)
             .AddQuestFlag(QuestFlagType.MyQst, QuestFlagAction.Set, 3294);
 		process0.AddRawBlock(QuestAnnounceType.None)
 			.AddCheckCmdDieEnemy(Stage.RathniteFoothillsLakeside0, 50, 1);
 
-        // 7. Head to the enemy's main stronghold deeper in
+        // 6. Head to the enemy's main stronghold deeper in
         process0.AddDiscoverGroupBlock(QuestAnnounceType.Update, EnemyGroupId.Encounter3)
             .AddQuestFlag(QuestFlagType.MyQst, QuestFlagAction.Set, 3295);
 
-        // 8. Defeat enemy forces in the mountains
+        // 7. Defeat enemy forces in the mountains
         process0.AddDestroyGroupBlock(QuestAnnounceType.Update, EnemyGroupId.Encounter3, resetGroup: false)
             .AddQuestFlag(QuestFlagType.MyQst, QuestFlagAction.Set, 3296);
 
-        // 9. Head to the deep stronghold again
+        // 8. Head to the deep stronghold again
         process0.AddDiscoverGroupBlock(QuestAnnounceType.Update, EnemyGroupId.Encounter4)
             .AddQuestFlag(QuestFlagType.MyQst, QuestFlagAction.Set, 3297);
 
-        // 8. Subdue the enemy's main unit
+        // 9. Subdue the enemy's main unit
         process0.AddDestroyGroupBlock(QuestAnnounceType.Update, EnemyGroupId.Encounter4, resetGroup: false);
 
-        // 7. Report the War Situation results to Endale
+        // 10. Report the War Situation results to Endale
         process0.AddTalkToNpcBlock(QuestAnnounceType.CheckpointAndUpdate, Stage.FortThines1, NpcId.Endale, 25542)
             .AddResultCmdQstTalkChg(NpcId.Ozgur, 25543)
             .AddResultCmdQstTalkChg(NpcId.Victor, 25544)
