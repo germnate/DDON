@@ -2494,9 +2494,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
             /**
              * @brief
              */
-            public static CDataQuestCommand NpcTalkChoice(int stageNo, NpcId npcId, int choice, int param04 = 0)
+            public static CDataQuestCommand TalkNpcChoice(int stageNo, NpcId npcId, int choice, int param04 = 0)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.NpcTalkChoice, Param01 = stageNo, Param02 = (int) npcId, Param03 = choice, Param04 = param04 };
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.TalkNpcChoice, Param01 = stageNo, Param02 = (int) npcId, Param03 = choice, Param04 = param04 };
             }
 
             public static CDataQuestCommand OmSetTouchRadius(int stageNo, int groupNo, int setNo, int param04 = 0)
