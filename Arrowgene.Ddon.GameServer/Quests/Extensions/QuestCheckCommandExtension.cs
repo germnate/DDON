@@ -640,9 +640,9 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdNpcTalkChoice(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, NpcId npcId, int choice)
+        public static List<CDataQuestCommand> AddCheckCmdTalkNpcChoice(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, NpcId npcId, int choice)
         {
-            checkCommands.Add(QuestManager.CheckCommand.NpcTalkChoice((int) stageInfo.StageNo, npcId, choice));
+            checkCommands.Add(QuestManager.CheckCommand.TalkNpcChoice((int) stageInfo.StageNo, npcId, choice));
             return checkCommands;
         }
 

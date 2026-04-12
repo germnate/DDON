@@ -176,7 +176,7 @@ public class ScriptedQuest : IQuest
         var process1 = AddNewProcess(1);
 		process1.AddRawBlock(QuestAnnounceType.None)
 			.AddCheckCommands([
-				QuestManager.CheckCommand.TalkNpcChoice(130, 2881, 0)
+				QuestManager.CheckCommand.TalkNpcChoice(130, NpcId.Youin, 0)
 			]);
 		process1.AddRawBlock(QuestAnnounceType.None)
 			.AddResultCommands([
@@ -239,7 +239,7 @@ public class ScriptedQuest : IQuest
         var process5 = AddNewProcess(5);
 		process5.AddRawBlock(QuestAnnounceType.None)
 			.AddCheckCommands([
-				QuestManager.CheckCommand.TalkNpcChoice(130, 2881, 1)
+				QuestManager.CheckCommand.TalkNpcChoice(130, NpcId.Youin, 1)
 			]);
 		process5.AddRawBlock(QuestAnnounceType.None)
 			.AddResultCommands([
