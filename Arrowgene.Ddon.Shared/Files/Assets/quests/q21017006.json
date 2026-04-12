@@ -6,7 +6,7 @@
     "base_level": 75,
     "minimum_item_rank": 0,
     "discoverable": true,
-	"area_id": "KingalCanyon",
+    "area_id": "KingalCanyon",
     "order_conditions": [{"type": "AreaRank", "Param1": 17, "Param2": 8}],
     "rewards": [
         {
@@ -27,57 +27,112 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "item_id": 15960,
+                    "item_id": "DemonWolfsSinewyMeat",
                     "num": 3
                 },
-                {					
-                    "item_id": 7555,
+                {
+                    "item_id": "SuperiorHealingRemedy",
                     "num": 3
                 },
-                {				
-                    "item_id": 41,
-                    "num": 3					
+                {
+                    "item_id": "Panacea",
+                    "num": 3
                 }
             ]
         }
     ],
-    "blocks": [
+    "processes": [
         {
-            "type": "NpcTalkAndOrder",	
-            "stage_id": {
-                "id": 377,
-                "group_id": 1,
-                "layer_no": 1
-            },				
-            "npc_id": "Ciaran",
-            "message_id": 10800
-        },
-        {
-            "type": "DeliverItems",
-            "stage_id": {
-                "id": 377,
-                "group_id": 1
-            },
-            "npc_id": "Ciaran",
-            "announce_type": "Accept",
-            "items": [
+            "blocks": [
                 {
-                    "id": 15955,
-                    "amount": 5
+                    "type": "NpcTalkAndOrder",
+                    "stage_id": {
+                        "id": 377
+                    },
+                    "npc_id": "Ciaran",
+                    "message_id": 19694
+                },
+                {
+                    "type": "Raw",
+                    "announce_type": "Accept",
+                    "check_commands": [
+                        {"type": "StageNo", "Param1": 921},
+                        {"type": "WeatherEq", "Param1": 1}
+                    ],
+                    "result_commands": [
+                        {"type": "QstTalkChg", "Param1": 2700, "Param2": 19695}
+                    ]
+                },
+                {
+                    "type": "Raw",
+                    "announce_type": "Update",
+                    "check_commands": [
+                        {"type": "TalkNpc", "Param1": 921, "Param2": 2700},
+                        {"type": "WeatherEq", "Param1": 1}
+                    ],
+                    "result_commands": [
+                        {"type": "QstTalkChg", "Param1": 2700, "Param2": 19696}
+                    ]
+                },
+                {
+                    "type": "Raw",
+                    "announce_type": "Update",
+                    "result_commands": [
+                        {"type": "MyQstFlagOn", "Param1": 0},
+                        {"type": "QstTalkChg", "Param1": 2700, "Param2": 19697}
+                    ],
+                    "check_commands": [
+                        {"type": "HaveItemAllBag", "Param1": 15955, "Param2": 5}
+                    ]
+                },
+                {
+                    "type": "DeliverItems",
+                    "announce_type": "Update",
+                    "stage_id": {
+                        "id": 377
+                    },
+                    "npc_id": "Ciaran",
+                    "items": [
+                        {
+                            "comment": "Kingalite",
+                            "id": 15955,
+                            "amount": 5
+                        }
+                    ],
+                    "message_id": 19698
                 }
-            ],
-            "message_id": 10737
+            ]
         },
         {
-            "type": "TalkToNpc",
-            "stage_id": {
-                "id": 377,
-                "group_id": 1,
-                "layer_no": 1
-            },
-            "announce_type": "Update",
-            "npc_id": "Ciaran",
-            "message_id": 11842			
+            "blocks": [
+                {
+                    "type": "MyQstFlags",
+                    "check_flags": [0]
+                },
+                {
+                    "type": "Raw",
+                    "check_commands": [
+                        {"type": "WeatherEq", "Param1": 1}
+                    ]
+                },
+                {
+                    "type": "Raw",
+                    "result_commands": [
+                        {"type": "QstLayoutFlagOn", "Param1": 4327},
+                        {"type": "CallMessage", "Param1": 1, "Param1": 19942}
+                    ],
+                    "check_commands": [
+                        {"type": "WeatherNotEq", "Param1": 1}
+                    ]
+                },
+                {
+                    "type": "Raw",
+                    "result_commands": [
+                        {"type": "QstLayoutFlagOff", "Param1": 4327},
+                        {"type": "CallMessage", "Param1": 1, "Param1": 19943}
+                    ]
+                }
+            ]
         }
     ]
 }

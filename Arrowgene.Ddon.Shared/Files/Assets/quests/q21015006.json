@@ -6,7 +6,7 @@
     "base_level": 75,
     "minimum_item_rank": 0,
     "discoverable": true,
-	"area_id": "FaranaPlains",
+    "area_id": "FaranaPlains",
     "order_conditions": [{"type": "AreaRank", "Param1": 15, "Param2": 9}],
     "rewards": [
         {
@@ -27,57 +27,112 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "item_id": 15959,
+                    "item_id": "PixieMockWing",
                     "num": 3
                 },
-                {					
-                    "item_id": 9364,
+                {
+                    "item_id": "SuperiorStrongGalaExtract",
                     "num": 3
                 },
-                {				
-                    "item_id": 41,
-                    "num": 3					
+                {
+                    "item_id": "Panacea",
+                    "num": 3
                 }
             ]
         }
     ],
-    "blocks": [
+    "processes": [
         {
-            "type": "NpcTalkAndOrder",	
-            "stage_id": {
-                "id": 341,
-                "group_id": 1,
-                "layer_no": 1
-            },				
-            "npc_id": "Razanailt",
-            "message_id": 10800
-        },
-        {
-            "type": "DeliverItems",
-            "stage_id": {
-                "id": 341,
-                "group_id": 1
-            },
-            "npc_id": "Razanailt",
-            "announce_type": "Accept",
-            "items": [
+            "blocks": [
                 {
-                    "id": 15946,
-                    "amount": 5
+                    "type": "NpcTalkAndOrder",
+                    "stage_id": {
+                        "id": 341
+                    },
+                    "npc_id": "Razanailt",
+                    "message_id": 19674
+                },
+                {
+                    "type": "Raw",
+                    "announce_type": "Accept",
+                    "check_commands": [
+                        {"type": "StageNo", "Param1": 930},
+                        {"type": "WeatherEq", "Param1": 2}
+                    ],
+                    "result_commands": [
+                        {"type": "QstTalkChg", "Param1": 2501, "Param2": 19675}
+                    ]
+                },
+                {
+                    "type": "Raw",
+                    "announce_type": "Update",
+                    "check_commands": [
+                        {"type": "TalkNpc", "Param1": 930, "Param2": 2600},
+                        {"type": "WeatherEq", "Param1": 2}
+                    ],
+                    "result_commands": [
+                        {"type": "QstTalkChg", "Param1": 2501, "Param2": 19676}
+                    ]
+                },
+                {
+                    "type": "Raw",
+                    "announce_type": "Update",
+                    "result_commands": [
+                        {"type": "MyQstFlagOn", "Param1": 0},
+                        {"type": "QstTalkChg", "Param1": 2501, "Param2": 19677}
+                    ],
+                    "check_commands": [
+                        {"type": "HaveItemAllBag", "Param1": 15946, "Param2": 5}
+                    ]
+                },
+                {
+                    "type": "DeliverItems",
+                    "announce_type": "Update",
+                    "stage_id": {
+                        "id": 341
+                    },
+                    "npc_id": "Razanailt",
+                    "items": [
+                        {
+                            "comment": "White Bone Rock",
+                            "id": 15946,
+                            "amount": 5
+                        }
+                    ],
+                    "message_id": 19678
                 }
-            ],
-            "message_id": 10737
+            ]
         },
         {
-            "type": "TalkToNpc",
-            "stage_id": {
-                "id": 341,
-                "group_id": 1,
-                "layer_no": 1
-            },
-            "announce_type": "Update",
-            "npc_id": "Razanailt",
-            "message_id": 11842			
+            "blocks": [
+                {
+                    "type": "MyQstFlags",
+                    "check_flags": [0]
+                },
+                {
+                    "type": "Raw",
+                    "check_commands": [
+                        {"type": "WeatherEq", "Param1": 2}
+                    ]
+                },
+                {
+                    "type": "Raw",
+                    "result_commands": [
+                        {"type": "QstLayoutFlagOn", "Param1": 4322},
+                        {"type": "CallMessage", "Param1": 1, "Param1": 11932}
+                    ],
+                    "check_commands": [
+                        {"type": "WeatherNotEq", "Param1": 2}
+                    ]
+                },
+                {
+                    "type": "Raw",
+                    "result_commands": [
+                        {"type": "QstLayoutFlagOff", "Param1": 4322},
+                        {"type": "CallMessage", "Param1": 1, "Param1": 19933}
+                    ]
+                }
+            ]
         }
     ]
 }
