@@ -68,7 +68,7 @@ public class ScriptedQuest : IQuest
 		var process1 = AddNewProcess(1);
 		process1.AddRawBlock(QuestAnnounceType.None)
 			.AddCheckCommands([
-				QuestManager.CheckCommand.NpcTalkChoice(635, NpcId.Shekel, 0)
+				QuestManager.CheckCommand.TalkNpcChoice(635, NpcId.Shekel, 0)
 			]);
 		process1.AddRawBlock(QuestAnnounceType.None)
 			.AddResultCommands([
@@ -103,7 +103,7 @@ public class ScriptedQuest : IQuest
 		var process2 = AddNewProcess(2);
 		process2.AddRawBlock(QuestAnnounceType.None)
 			.AddCheckCommands([
-				QuestManager.CheckCommand.NpcTalkChoice(635, NpcId.Shekel, 1)
+				QuestManager.CheckCommand.TalkNpcChoice(635, NpcId.Shekel, 1)
 			]);
         process2.AddTalkToNpcBlock(QuestAnnounceType.Update, Stage.AudienceChamber, NpcId.Klaus0, 25694)
 			.AddResultCommands([

@@ -75,7 +75,7 @@ public class ScriptedQuest : IQuest
 				QuestManager.ResultCommand.QstTalkChg(NpcId.Drew, 23869)
 			])
 			.AddCheckCommands([
-				QuestManager.CheckCommand.NpcTalkChoice(132, NpcId.Drew, 0)
+				QuestManager.CheckCommand.TalkNpcChoice(132, NpcId.Drew, 0)
 			]);
 		process1.AddRawBlock(QuestAnnounceType.None)
 			.AddResultCommands([
@@ -139,7 +139,7 @@ public class ScriptedQuest : IQuest
 				QuestManager.ResultCommand.QstTalkChg(NpcId.Anna, 24675)
 			])
 			.AddCheckCommands([
-				QuestManager.CheckCommand.NpcTalkChoice(1001, NpcId.Anna, 0)
+				QuestManager.CheckCommand.TalkNpcChoice(1001, NpcId.Anna, 0)
 			]);
 		process2.AddNewDeliverItemsBlock(QuestAnnounceType.Update, Stage.BerthasBanditGroupHideout, 0, 0, NpcId.Anna, ItemId.AshenGrass, 10, 24679)
 			.AddResultCommands([
