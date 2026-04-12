@@ -20,7 +20,7 @@ namespace Arrowgene.Ddon.Test.Database
             setting.WipeOnStartup = true;
             IDatabase database = DdonDatabaseBuilder.BuildSqLite(setting, true);
 
-            Account account = database.CreateAccount("test", "test", "test");
+            Account account = database.CreateAccount("test", "test", "test", "test");
             Assert.NotNull(account);
 
             Character c = new Character();

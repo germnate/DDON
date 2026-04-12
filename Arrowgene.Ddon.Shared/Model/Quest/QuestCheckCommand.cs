@@ -248,7 +248,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// Validates stageNo == current stage, npcId == current NPC entity, NPC is in talk-active state,
         /// and NPC choice field +0x90 == choice.
         /// </summary>
-        NpcTalkChoice = 214, // 0x00635B10 (cQuestProcess* this, s32 stageNo, s32 npcId, s32 choice, s32 param04_unused)
+        TalkNpcChoice = 214, // 0x00635B10 (cQuestProcess* this, s32 stageNo, s32 npcId, s32 choice, s32 param04_unused)
 
         /// <summary>
         /// Checks if a specific substory enemy's HP% >= hpRatePercent. Calls FUN_00be10d0(substoryId) to get HP ratio,

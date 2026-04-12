@@ -836,7 +836,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
             };
 
             // Does this work?
-            data.Param.DistributionStartDate = DateTimeOffset.FromUnixTimeSeconds(Server.ScheduleManager.TaskExpiry(TaskType.WorldQuestRotation));
+            // data.Param.DistributionStartDate = DateTimeOffset.FromUnixTimeSeconds(Server.ScheduleManager.TaskExpiry(TaskType.WorldQuestRotation));
             data.Param.DistributionEndDate = DateTimeOffset.FromUnixTimeSeconds(Server.ScheduleManager.TaskExpiry(TaskType.WorldQuestRotation));
 
             return data;

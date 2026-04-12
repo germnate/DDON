@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using Arrowgene.Ddon.Shared.Crypto;
 
@@ -10,7 +10,7 @@ namespace Arrowgene.Ddon.Shared.Model
         public const int LoginTokenLength = 20;
         public const int GameTokenLength = 20;
 
-        public static string GenerateLoginToken()
+        public static string GenerateToken()
         {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < LoginTokenLength; i++)

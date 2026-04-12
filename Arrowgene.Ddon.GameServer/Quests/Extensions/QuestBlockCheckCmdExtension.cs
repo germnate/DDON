@@ -1,5 +1,4 @@
 using Arrowgene.Ddon.GameServer.Characters;
-using Arrowgene.Ddon.GameServer.Quests.Work;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.Quest;
@@ -283,9 +282,6 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
             questBlock.CheckCommands[commandListIndex].AddCheckCmdWorldQuestClearNum(areaId, amount);
-
-            questBlock.QuestProgressWork.Add(new WorldQuestClearedProgressWork(questBlock.QuestScheduleId, questBlock.AsQuestProcessState(), areaId, amount));
-
             return questBlock;
         }
 
@@ -702,10 +698,10 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdNpcTalkChoice(this QuestBlock questBlock, StageInfo stageInfo, NpcId npcId, int choice, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdTalkNpcChoice(this QuestBlock questBlock, StageInfo stageInfo, NpcId npcId, int choice, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdNpcTalkChoice(stageInfo, npcId, choice);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdTalkNpcChoice(stageInfo, npcId, choice);
             return questBlock;
         }
 

@@ -348,10 +348,22 @@ HaveMoney(int gold, int type, int param03 = 0, int param04 = 0);
 
 ```
 /**
- * @brief
- * @note might be required when a quest asks you to go complete one world quest to progress?
- * @param clearNum
- * @param areaId
+ * @brief Waits until the player has cleared at least one world quest ("Set Quest") in the given area.
+ *        Client handler: 0x00636B30
+ *
+ * @note "Set Quest" is the internal engine name; "World Quest" is the English localisation.
+ *
+ * @param clearNum  The required clear count. NOTE: NEVER READ by the client handler — the client
+ *                  only checks whether areaId appears in a 4-slot cleared-area byte array at
+ *                  ctx+0x5c+0x25a. The count is advisory for the server-side work item only.
+ * @param areaId    The QuestAreaId to check. Scanned against up to 4 stored area-ID bytes.
+ *
+ * @note The check also requires bit 5 of ctx+0x5c+0x208 to be set. This bit and the area-ID
+ *       slot are written by the S2CQuestQuestProgressWorkSaveNtc carrying
+ *       QuestNotifyCommand.SetQuestClearNum (notify ID 32). The server sends this NTC either:
+ *         (a) When a world quest in the target area completes (WorldQuestClearedProgressWork), or
+ *         (b) Immediately at block dispatch time if a matching world quest was already cleared
+ *             (HandlePreSatisfiedWorldQuestWork in QuestQuestProgressHandler).
  */
 SetQuestClearNum(int clearNum, int areaId, int param03 = 0, int param04 = 0);
 ```
@@ -3084,15 +3096,18 @@ The dispatch function is at `.text:0063E254`. It validates `commandId < 0x87` (1
 |-------|-------|
 | Address | `0x00633730` |
 | Table index | 99 |
+| Key callees | `FUN_00597d20(id1, id2)` — compute progress ratio; `FUN_00597970(id1, id2, delta)` — add delta, clamp to max; `FUN_00bd3390` — send UI packet 0x117 (increase) or 0x118 (decrease); `FUN_00bd3280(id1, id2, old, new)` — send progress-change packet |
+| Key fields | Substory ID pair at ctx+0x5c+0x244 / +0x248 |
 
 ```
 /**
  * @brief Progress a substory objective.
- * @param subCatNo Substory category number
- * @param subObjNo Substory objective number
- * @param value    Value to set/add
+ * @param substoryId Substory category number
+ * @param param02
+ * @param param03
+ * @param param04
  */
-SubstoryProgress(int subCatNo, int subObjNo, int value, int param04 = 0);
+SubstoryProgress(int substoryId, int param02, int param03, int param04 = 0);
 ```
 
 ### AddSubstoryProgress (100)
@@ -3136,6 +3151,7 @@ TriggerSubstoryEvent(int param01 = 0, int param02 = 0, int param03 = 0, int para
 | Address | `0x006339B0` |
 | Table index | 102 |
 | Key callees | `FUN_009cff50` (area context), `FUN_00bdee50(0xb)`, `FUN_005986d0` (sets field +0x44) |
+| Key callees | `FUN_009cff50` - push/get player context; `FUN_00bdee50(0xb)` - look up entry ID 11 in timer/event list at ctx+0xf8/+0x104; `FUN_005986d0` - writes result to substory object +0x44 |
 
 ```
 /**
@@ -3619,7 +3635,7 @@ StoreLinkageEnemyFlagGlobal(int param01_unused = 0, int param02_unused = 0, int 
 SetNpcOrderFlagAndCheckBit18(StageNo stageNo, int npcId_or_obj, int npcLookupId, int storeVal);
 ```
 
-### IsNpcTalkChoice (214)
+### TalkNpcChoice (214)
 
 | Field | Value |
 |-------|-------|
@@ -3638,7 +3654,7 @@ SetNpcOrderFlagAndCheckBit18(StageNo stageNo, int npcId_or_obj, int npcLookupId,
  * @param choice  Expected dialogue choice value (from NPC+0x90)
  * @param param04 Unused
  */
-IsNpcTalkChoice(StageNo stageNo, int npcId, int choice, int param04 = 0);
+TalkNpcChoice(StageNo stageNo, int npcId, int choice, int param04 = 0);
 ```
 
 ### SubstoryEnemyHpNotLess (215)
@@ -4403,49 +4419,4 @@ IsContentsTimerAZero(int timerNo, int param02_unused = 0, int param03_unused = 0
  * @param markerFlag    Passed directly to FUN_00636c20 as its 4th arg (param04)
  */
 IsWildHuntTargetEnemyKilled(int zoneLinkageId, int param02_unused = 0, int param03_unused = 0, int markerFlag = 0);
-```
-
----
-
-## Ghidra-Verified Commands (Result, corrected)
-
-The following result commands were originally added experimentally and have since been verified against Ghidra decompilation.
-
-### SubstoryProgress (99)
-
-| Field | Value |
-|-------|-------|
-| Address | `0x00633730` |
-| Table index | 99 |
-| Key callees | `FUN_00597d20(id1, id2)` — compute progress ratio; `FUN_00597970(id1, id2, delta)` — add delta, clamp to max; `FUN_00bd3390` — send UI packet 0x117 (increase) or 0x118 (decrease); `FUN_00bd3280(id1, id2, old, new)` — send progress-change packet |
-| Key fields | Substory ID pair at ctx+0x5c+0x244 / +0x248 |
-
-```
-/**
- * @brief Adds a signed delta to a substory progress value, clamped to [0, max].
- * Reads substory ID pair from ctx+0x5c+0x244/+0x248. Sends packet 0x117 (increase) or
- * 0x118 (decrease) to the UI, then FUN_00bd3280 to report old/new progress values to the client.
- * @param delta Signed progress change (positive = advance, negative = regress). Params 3-4 unused.
- */
-SubstoryProgress(int delta, int param03_unused = 0, int param04_unused = 0);
-```
-
-### SetSubstoryDisplayValue (102)
-
-| Field | Value |
-|-------|-------|
-| Address | `0x006339B0` |
-| Table index | 102 |
-| Key callees | `FUN_009cff50` — push/get player context; `FUN_00bdee50(0xb)` — look up entry ID 11 in timer/event list at ctx+0xf8/+0x104; `FUN_005986d0` — writes result to substory object +0x44 |
-
-```
-/**
- * @brief Writes a looked-up value into the substory display object at field +0x44.
- * Calls FUN_00bdee50(0xb) to look up entry ID 11 in the ctx event list, then passes
- * the result to FUN_005986d0 which writes it to the substory object's +0x44 field.
- * No parameters used beyond 'this'.
- * @note Formerly named "EnableSubstoryUIElement" — renamed after Ghidra verification showed this
- *       writes a data value, not a boolean enable flag.
- */
-SetSubstoryDisplayValue(void);
 ```

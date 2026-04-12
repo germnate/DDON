@@ -325,10 +325,14 @@ public abstract class SqlDb : IDatabase
     public abstract bool CreateMeta(DatabaseMeta meta);
 
     public abstract DatabaseMeta GetMeta();
-    public abstract Account? CreateAccount(string name, string mail, string hash);
+    public abstract Account? CreateAccount(string name, string mail, string hash, string mailToken);
     public abstract Account SelectAccountById(int accountId);
     public abstract Account? SelectAccountByName(string accountName);
+    public abstract Account? SelectAccountByEmail(string email);
     public abstract Account? SelectAccountByLoginToken(string loginToken);
+    public abstract Account? SelectAccountByPasswordTokenAndName(string accountName, string passwordToken);
+    public abstract Account? SelectAccountByMailTokenAndName(string accountName, string mailToken);
+    public abstract Account? SelectAccountByEmailAndName(string accountName, string email);
     public abstract bool UpdateAccount(Account account);
     public abstract bool DeleteAccount(int accountId);
     public abstract Storages SelectAllStoragesByCharacterId(uint characterId);
