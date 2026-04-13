@@ -13,6 +13,7 @@ using Arrowgene.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Arrowgene.Ddon.GameServer.Quests
 {
@@ -368,6 +369,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
             }
 
             PatchRandomCommands(ref questProcessState, questState);
+            PatchTimerCommands(questProcessState, questState, client);
 
             return new List<CDataQuestProcessState>()
             {
@@ -409,6 +411,57 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 }
 
                 cmd.Param04 = questState.RandomSlots[slot];
+            }
+        }
+
+        // For any StartTimer result commands in the block, record the expiry time and schedule
+        // a one-shot callback that sends S2CQuestQuestProgressWorkSaveNtc so the client
+        // re-evaluates its IsEndTimer check command when the timer elapses.
+        private void PatchTimerCommands(CDataQuestProcessState processState, QuestState questState, GameClient client)
+        {
+            bool hasStartTimer = processState.ResultCommandList
+                .Any(c => c.Command == (ushort)QuestResultCommand.StartTimer);
+            if (!hasStartTimer)
+                return;
+
+            foreach (var cmd in processState.ResultCommandList)
+            {
+                if (cmd.Command != (ushort)QuestResultCommand.StartTimer)
+                    continue;
+
+                int timerNo = cmd.Param01;
+                int sec     = cmd.Param02;
+
+                // Skip if this timer was already started (re-dispatch of same block).
+                if (questState.TimerSlots.ContainsKey(timerNo))
+                    continue;
+
+                var expiry = DateTimeOffset.UtcNow.AddSeconds(sec);
+                questState.TimerSlots[timerNo] = expiry;
+
+                // Capture locals for the closure.
+                uint capturedScheduleId = QuestScheduleId;
+                bool personal = IsPersonal;
+                GameClient capturedClient = client;
+
+                int capturedTimerNo = timerNo;
+                var handle = new Timer(_ =>
+                {
+                    questState.TimerHandles.Remove(capturedTimerNo);
+
+                    var ntc = new S2CQuestTimerNtc()
+                    {
+                        QuestScheduleId = capturedScheduleId,
+                        TimerNo = (byte) capturedTimerNo
+                    };
+
+                    if (personal)
+                        capturedClient.Send(ntc);
+                    else
+                        capturedClient.Party.SendToAll(ntc);
+                }, null, TimeSpan.FromSeconds(sec), Timeout.InfiniteTimeSpan);
+
+                questState.TimerHandles[timerNo] = handle;
             }
         }
 

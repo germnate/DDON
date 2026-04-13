@@ -53,6 +53,20 @@ namespace Arrowgene.Ddon.GameServer.Quests
         // Rolled values for SetRandom result commands, keyed by randomNo. Populated lazily
         // at block dispatch time; persists for the lifetime of this quest instance.
         public Dictionary<int, int> RandomSlots { get; set; } = [];
+        // Expiry times for StartTimer result commands, keyed by timerNo. Set at block dispatch
+        // time; used by the server-side timer callback to skip stale firings.
+        public Dictionary<int, DateTimeOffset> TimerSlots { get; set; } = [];
+        // Live System.Threading.Timer handles for active StartTimer countdowns, keyed by timerNo.
+        // Holding these references here prevents the GC from collecting (and thus cancelling) the
+        // timer before it fires. Disposed when the quest ends via DisposeTimers().
+        public Dictionary<int, System.Threading.Timer> TimerHandles { get; set; } = [];
+
+        public void DisposeTimers()
+        {
+            foreach (var t in TimerHandles.Values)
+                t.Dispose();
+            TimerHandles.Clear();
+        }
 
         public QuestState()
         {
@@ -383,6 +397,9 @@ namespace Arrowgene.Ddon.GameServer.Quests
             var quest = GetQuest(questScheduleId);
             lock (ActiveQuests)
             {
+                if (ActiveQuests.TryGetValue(questScheduleId, out var questState))
+                    questState.DisposeTimers();
+
                 ActiveQuests.Remove(questScheduleId);
                 foreach (var location in quest.Locations)
                 {
