@@ -7,7 +7,7 @@
 public class ScriptedQuest : IQuest
 {
     public override QuestType QuestType => QuestType.Tutorial;
-    public override QuestId QuestId => (QuestId)60319010;
+    public override QuestId QuestId => (QuestId)60319010; // Schedule ID: 1677100288
     public override ushort RecommendedLevel => 88;
     public override byte MinimumItemRank => 0;
     public override bool IsDiscoverable => false;
@@ -58,11 +58,14 @@ public class ScriptedQuest : IQuest
 			.AddCheckCommands([
 				QuestManager.CheckCommand.MyQstFlagOn(1)
 			]);
-        process0.AddTalkToNpcBlock(QuestAnnounceType.Checkpoint, Stage.LookoutCastle1, NpcId.Nayajiku, 25704)
+        process0.AddTalkToNpcBlock(QuestAnnounceType.None, Stage.LookoutCastle1, NpcId.Nayajiku, 25704)
 			.AddResultCommands([
 				QuestManager.ResultCommand.UpdateAnnounceDirect(9, 3)
 			]);
-        process0.AddProcessEndBlock(true);
+        process0.AddProcessEndBlock(true)
+			.AddResultCommands([
+				QuestManager.ResultCommand.WorldManageLayoutFlagOn(1216, 70000001)
+			]);
 
 		// Branch 1 - Gerald
 		var process1 = AddNewProcess(1);
@@ -110,34 +113,45 @@ public class ScriptedQuest : IQuest
 				QuestManager.ResultCommand.MyQstFlagOn(0),
 				QuestManager.ResultCommand.QstTalkChg(NpcId.Shekel, 23896)
 			]);
+        process2.AddDelayBlock(QuestAnnounceType.None, 1, 180)
+			.AddResultCommands([
+				QuestManager.ResultCommand.QstLayoutFlagOn(5612),
+				QuestManager.ResultCommand.UpdateAnnounceDirect(4, 3)
+			]);
 		process2.AddRawBlock(QuestAnnounceType.None)
 			.AddResultCommands([
-				QuestManager.ResultCommand.UpdateAnnounceDirect(5, 3),
-				QuestManager.ResultCommand.WorldManageLayoutFlagOff(1216, 70000001)
+				QuestManager.ResultCommand.UpdateAnnounceDirect(5, 3)
 			])
 			.AddCheckCommands([
 				QuestManager.CheckCommand.StageNo(635)
 			]);
-        process2.AddNewTalkToNpcBlock(QuestAnnounceType.None, Stage.MephiteTravelersInn, 0, 0, NpcId.Klaus0, 60319010) // No timer implementation so just talk to him
+        process2.AddNewTalkToNpcBlock(QuestAnnounceType.None, Stage.MephiteTravelersInn, 0, 0, NpcId.Klaus0, 60319010)
 			.AddResultCommands([
 				QuestManager.ResultCommand.MyQstFlagOn(3366),
-				QuestManager.ResultCommand.QstLayoutFlagOn(5612),
 				QuestManager.ResultCommand.QstTalkChg(NpcId.Klaus0, 25696)
 			]);
 		process2.AddRawBlock(QuestAnnounceType.None)
 			.AddResultCommands([
+				QuestManager.ResultCommand.MyQstFlagOn(3420),
 				QuestManager.ResultCommand.MyQstFlagOn(1),
 				QuestManager.ResultCommand.QstTalkChg(NpcId.Klaus0, 25697)
-			])
+			]);
+
+		var process3 = AddNewProcess(3);
+		process3.AddRawBlock(QuestAnnounceType.None)
 			.AddCheckCommands([
-				QuestManager.CheckCommand.StageNo(451)
+				QuestManager.CheckCommand.IsMyquestLayoutFlagOn(5612)
 			]);
-		process2.AddRawBlock(QuestAnnounceType.None)
+		process3.AddRawBlock(QuestAnnounceType.None)
+			.AddCheckCommands([
+				QuestManager.CheckCommand.StageNoNotEq(201)
+			]);
+		process3.AddRawBlock(QuestAnnounceType.None)
 			.AddResultCommands([
-				QuestManager.ResultCommand.QstLayoutFlagOff(5612),
-				QuestManager.ResultCommand.QstTalkDel(NpcId.Klaus0),
-				QuestManager.ResultCommand.WorldManageLayoutFlagOn(1216, 70000001)
+				QuestManager.ResultCommand.QstTalkChg(NpcId.Klaus0, 25695),
+				QuestManager.ResultCommand.WorldManageLayoutFlagOff(1216, 70000001)
 			]);
+
     }
 }
 return new ScriptedQuest();
