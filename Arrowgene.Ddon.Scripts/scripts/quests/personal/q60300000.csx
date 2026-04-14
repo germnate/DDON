@@ -39,13 +39,13 @@ public class ScriptedQuest : IQuest
             .AddCheckCmdIsTutorialQuestClear(QuestId.LivingWithThePartnerPawn);
         process0.AddNpcTalkAndOrderBlock(Stage.TheWhiteDragonTemple0, NpcId.Barton, 24006);
         process0.AddTalkToNpcBlock(QuestAnnounceType.Accept, Stage.TheWhiteDragonTemple0, NpcId.Barton, 24007);
-        process0.AddDeliverItemsBlock(QuestAnnounceType.CheckpointAndUpdate, Stage.TheWhiteDragonTemple0, NpcId.Barton, ItemId.PineLumber, 15, 25003)
+        process0.AddDeliverItemsBlock(QuestAnnounceType.CheckpointAndUpdate, Stage.TheWhiteDragonTemple0, NpcId.Barton, ItemId.PineLumber, 15, 25004)
             .AddCallback((param) => {
                 LibDdon.ChatMgr.SendMessageToPlayer(param.Client, LobbyChatMsgType.ManagementGuideC, "Quest menu decisions not implemented, selecting first choice");
             });
-        // TODO: Wait 3 minutes...
-        // This announce will misfire if the player logs out here
-        // Should investigate how to resume when updating this way
+        process0.AddDelayBlock(QuestAnnounceType.None, 1, 180)
+            .SetIsCheckpoint(true)
+            .AddResultCmdUpdateAnnounceDirect(7, QuestAnnounceType.Update);
         process0.AddTalkToNpcBlock(QuestAnnounceType.None, Stage.TheWhiteDragonTemple0, NpcId.Barton, 25002)
             .SetIsCheckpoint(true)
             .AddResultCmdUpdateAnnounceDirect(8, QuestAnnounceType.Update);

@@ -781,7 +781,7 @@ namespace Arrowgene.Ddon.Shared.Network
         public static readonly PacketId S2C_QUEST_11_106_16_NTC = new PacketId(11, 106, 16, "S2C_QUEST_11_106_16_NTC", ServerType.Game, PacketSource.Server); // <syslog_wm_statement_gauge_0_defeat>
         public static readonly PacketId S2C_QUEST_PLAY_INTERRUPT_RESULT_NTC = new PacketId(11, 107, 16, "S2C_QUEST_PLAY_INTERRUPT_RESULT_NTC", ServerType.Game, PacketSource.Server, "S2C_QUEST_11_107_16_NTC");
         public static readonly PacketId S2C_QUEST_11_108_16_NTC = new PacketId(11, 108, 16, "S2C_QUEST_11_108_16_NTC", ServerType.Game, PacketSource.Server); // The request to end the mission was successful (S2C_PLAY_FORCE_INTERRUPT_NOTICE?)
-        public static readonly PacketId S2C_QUEST_11_109_16_NTC = new PacketId(11, 109, 16, "S2C_QUEST_11_109_16_NTC", ServerType.Game, PacketSource.Server);
+        public static readonly PacketId S2C_QUEST_TIMER_NTC = new PacketId(11, 109, 16, "S2C_QUEST_TIMER_NTC", ServerType.Game, PacketSource.Server, "S2C_QUEST_11_109_16_NTC");
         public static readonly PacketId S2C_QUEST_11_110_16_NTC = new PacketId(11, 110, 16, "S2C_QUEST_11_110_16_NTC", ServerType.Game, PacketSource.Server); // <syslog_quest_progress_failed> (S2C_FORT_DEFENSE_PLAY_START_NOTICE)
         public static readonly PacketId S2C_QUEST_11_111_16_NTC = new PacketId(11, 111, 16, "S2C_QUEST_11_111_16_NTC", ServerType.Game, PacketSource.Server); // Nothing?
         public static readonly PacketId S2C_QUEST_11_112_16_NTC = new PacketId(11, 112, 16, "S2C_QUEST_11_112_16_NTC", ServerType.Game, PacketSource.Server); // Nothing?
@@ -2713,7 +2713,7 @@ namespace Arrowgene.Ddon.Shared.Network
             AddPacketIdEntry(packetIds, S2C_QUEST_11_106_16_NTC);
             AddPacketIdEntry(packetIds, S2C_QUEST_PLAY_INTERRUPT_RESULT_NTC);
             AddPacketIdEntry(packetIds, S2C_QUEST_11_108_16_NTC);
-            AddPacketIdEntry(packetIds, S2C_QUEST_11_109_16_NTC);
+            AddPacketIdEntry(packetIds, S2C_QUEST_TIMER_NTC);
             AddPacketIdEntry(packetIds, S2C_QUEST_11_110_16_NTC);
             AddPacketIdEntry(packetIds, S2C_QUEST_11_111_16_NTC);
             AddPacketIdEntry(packetIds, S2C_QUEST_11_112_16_NTC);
