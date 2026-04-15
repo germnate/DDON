@@ -7,7 +7,7 @@
 public class ScriptedQuest : IQuest
 {
     public override QuestType QuestType => QuestType.Tutorial;
-    public override QuestId QuestId => (QuestId)60319000;
+    public override QuestId QuestId => (QuestId)60319000; // Schedule ID: 1677099008
     public override ushort RecommendedLevel => 86;
     public override byte MinimumItemRank => 0;
     public override bool IsDiscoverable => false;
@@ -61,7 +61,7 @@ public class ScriptedQuest : IQuest
 			.AddCheckCommands([
 				QuestManager.CheckCommand.MyQstFlagOn(3249)
 			]);
-        process0.AddTalkToNpcBlock(QuestAnnounceType.Checkpoint, Stage.MephiteTravelersInn, NpcId.Nayajiku, 23871);
+        process0.AddTalkToNpcBlock(QuestAnnounceType.None, Stage.MephiteTravelersInn, NpcId.Nayajiku, 23871);
         process0.AddProcessEndBlock(true);
 
 		// Branch 1 - Drew

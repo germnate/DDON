@@ -7,7 +7,7 @@
 public class ScriptedQuest : IQuest
 {
     public override QuestType QuestType => QuestType.Tutorial;
-    public override QuestId QuestId => (QuestId)60319011;
+    public override QuestId QuestId => (QuestId)60319011; // Schedule ID: 1677100416
     public override ushort RecommendedLevel => 88;
     public override byte MinimumItemRank => 0;
     public override bool IsDiscoverable => false;
@@ -289,6 +289,7 @@ public class ScriptedQuest : IQuest
         process0.AddTalkToNpcBlock(QuestAnnounceType.CheckpointAndUpdate, Stage.LookoutCastle1, NpcId.Nayajiku, 25737)
 			.AddResultCommands([
 				QuestManager.ResultCommand.MyQstFlagOn(3377),
+				QuestManager.ResultCommand.QstLayoutFlagOff(6407),
 				QuestManager.ResultCommand.QstTalkChg(NpcId.Guy, 23906)
 			]);
         process0.AddProcessEndBlock(true);
