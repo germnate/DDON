@@ -388,10 +388,20 @@ PlayEmotion(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
 
 ### IsEndTimer
 
+| Field | Value |
+|-------|-------|
+| Address | `0x00636BF0` |
+| Table index | 35 (check) |
+| Key callees | `FUN_0064d130(timerNo)` — Timer List A lookup at ctx+0xf0/0xfc; returns `entry+8` |
+
 ```
 /**
- * @brief
- * @param timerNo
+ * @brief Returns true when a quest instance timer (Timer List A) has expired.
+ * Walks the timer list keyed by timerNo; returns entry+8 == 0.
+ * Returns false (-1 sentinel) if timerNo is not registered.
+ * @note Pair with StartTimer(timerNo, sec). Server must schedule a QuestProgressNtc
+ *       to fire at expiry so the client re-evaluates this check.
+ * @param timerNo Timer slot identifier (set by StartTimer)
  */
 IsEndTimer(int timerNo, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
@@ -723,10 +733,19 @@ KeyItemPoint(int idx, int num, int param03 = 0, int param04 = 0);
 
 ### IsNotEndTimer
 
+| Field | Value |
+|-------|-------|
+| Address | `0x00638520` |
+| Table index | 65 (check) |
+| Key callees | `FUN_0064d130(timerNo)` — Timer List A lookup; returns `entry+8` |
+
 ```
 /**
- * @brief
- * @param timerNo
+ * @brief Returns true while a quest instance timer (Timer List A) is still running.
+ * Walks the timer list keyed by timerNo; returns 1 if entry+8 != 0 AND entry+8 != -1.
+ * Returns false if the timer has expired (entry+8==0) or is not registered (-1 sentinel).
+ * @note Logical inverse of IsEndTimer, but with an additional -1 guard.
+ * @param timerNo Timer slot identifier (set by StartTimer)
  */
 IsNotEndTimer(int timerNo, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
@@ -1078,18 +1097,37 @@ DieRaidBoss(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
 
 ### CycleTimerZero
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00639CD0` |
+| Table index | 99 (check) |
+| Key callees | `FUN_00be2460(this)` — reads byte flag at `this+0x649` |
+
 ```
 /**
- * @brief
+ * @brief Returns the cycle timer "reached zero" flag byte from the world quest manager.
+ * Reads a byte at cWorldQuestManager+0x649. Non-zero means the cycle timer hit zero.
+ * @note All params unused. Server evaluates from its own WorldQuestManager state.
  */
 CycleTimerZero(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
 
 ### CycleTimer
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00639D20` |
+| Table index | 100 (check) |
+| Key callees | `FUN_00bdbbf0(this)` — returns remaining cycle time as float (`deadline - current` via `this+0x1d0`) |
+
 ```
 /**
- * @brief
- * @param timeSec
+ * @brief Returns true if the world quest cycle timer has at least timeSec seconds remaining.
+ * Computes remaining = deadline - current from the cycle timer object at this+0x1d0.
+ * Returns timeSec <= remaining.
+ * @note Server evaluates by reading WorldQuestManager's cycle timer state.
+ * @param timeSec Minimum seconds required to still be remaining
  */
 CycleTimer(int timeSec, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
@@ -1198,10 +1236,20 @@ IsKilledTargetEmSetGrpNoMarker(int flagNo, int param02 = 0, int param03 = 0, int
 ```
 
 ### IsLeftCycleTimer
+
+| Field | Value |
+|-------|-------|
+| Address | `0x0063A6C0` |
+| Table index | 111 (check) |
+| Key callees | `FUN_00be1440(this)` — is timer running; `FUN_00bdc580()` — get elapsed time |
+
 ```
 /**
- * @brief
- * @param timeSec
+ * @brief Returns true if the cycle timer elapsed time is between a lower bound and timeSec.
+ * Guards on FUN_00be1440 (timer active check). Then: lowerBound <= elapsed <= timeSec.
+ * Used as a warning threshold: "the cycle is within timeSec seconds of completion."
+ * @note Server evaluates from WorldQuestManager elapsed state.
+ * @param timeSec Upper bound on elapsed seconds (warning threshold)
  */
 IsLeftCycleTimer(int timeSec, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
@@ -2316,10 +2364,19 @@ EndCycle(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
 
 ### AddCycleTimer
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00638F40` |
+| Table index | 23 (result) |
+| Notes | **Client stub** — body is `return 1` only. Server controls the cycle timer. |
+
 ```
 /**
- * @brief
- * @param sec
+ * @brief Client stub. Intended to add sec seconds to the world quest cycle timer.
+ * The client does not manage the cycle timer; the server is the authority.
+ * @note Server should add sec to its WorldQuestManager cycle timer on execution.
+ * @param sec Seconds to add to the cycle timer
  */
 AddCycleTimer(int sec, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
@@ -2368,11 +2425,32 @@ PushImteToPlBag(int itemId, int itemNum, int param03 = 0, int param04 = 0);
 ```
 
 ### StartTimer
+
+| Field | Value |
+|-------|-------|
+| Address | `0x00639190` |
+| Table index | 28 (result) |
+| Key callees | `FUN_009d0230(timerNo, sec)` — context validation; `FUN_0064de30(timerNo, sec)` — allocates entry in Timer List A (ctx+0xf0/0xfc), sets `entry+4=timerNo, entry+8=sec` |
+
 ```
 /**
- * @brief
- * @param timerNo
- * @param sec
+ * @brief Starts a named countdown timer in the quest instance (Timer List A).
+ * Allocates a new entry keyed by timerNo if not already present; stores sec as initial countdown.
+ * If timerNo already exists, the call is a no-op (timer is NOT reset).
+ * @note Timer List A is a dynamically resized pointer array (ctx+0xf0=count, ctx+0xf4=capacity,
+ *   ctx+0xfc=array ptr). When full it grows by 16 slots at a time (FUN_0064de30).
+ *   timerNo is a byte (u8, range 0–255) — the timer notification packet S2C_QUEST_11_109_16_NTC
+ *   carries it as a single byte, so max 256 distinct timers per quest instance.
+ *   Use small sequential values (0, 1, 2...). Because the no-op guard prevents reuse within the
+ *   same quest run, use a fresh timerNo for each logically distinct timer — there is no command
+ *   to delete or reset an instance timer.
+ * @note Server must:
+ *   1. Store (timerNo, expiryTime = now + sec) in quest state memory.
+ *   2. When the timer expires, send S2C_QUEST_11_109_16_NTC with QuestScheduleId (u32) +
+ *      timerNo (u8). Verified at FUN_007f49b0 / FUN_008185b0.
+ *   Short-lived (seconds to minutes) — memory only, no DB persistence needed.
+ * @param timerNo Timer slot identifier (u8, 0–255), referenced by IsEndTimer / IsNotEndTimer
+ * @param sec     Duration in seconds
  */
 StartTimer(int timerNo, int sec, int param03 = 0, int param04 = 0);
 ```
@@ -2682,9 +2760,20 @@ ResetTutorialFlag(int param01 = 0, int param02 = 0, int param03 = 0, int param04
 ```
 
 ### StartContentsTimer
+
+| Field | Value |
+|-------|-------|
+| Address | `0x0063A760` |
+| Table index | 61 (result) |
+| Key callees | S3 season-phase guard (same as ID 246); `FUN_0064bbe0(&DAT_02189ff8)` — contents check; `FUN_0064b5a0(this)` — stores timer value at `this+8` |
+
 ```
 /**
- * @brief
+ * @brief S3-only: starts the contents-level timer if the season phase guard passes.
+ * All params are unused. The timer value is written via FUN_0064b5a0 to the contents timer object+8.
+ * Guarded by the same S3 season-phase pointer check as IsContentsModeTimerNotLess (246).
+ * @note Server should start its S3 contents timer on execution. This is a longer-lived timer
+ *       than StartTimer — may require SchedulerTask + DB persistence if it survives restarts.
  */
 StartContentsTimer(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
@@ -2748,17 +2837,35 @@ RemoveEndContentsPurpose(int announceNo, int param02 = 0, int param03 = 0, int p
 ```
 
 ### StopCycleTimer
+
+| Field | Value |
+|-------|-------|
+| Address | `0x0063AA70` |
+| Table index | 68 (result) |
+| Notes | **Client stub** — body is `return 1` only. Server controls the cycle timer. |
+
 ```
 /**
- * @brief
+ * @brief Client stub. Intended to stop the world quest cycle timer.
+ * The client does not manage the cycle timer; the server is the authority.
+ * @note Server should pause its WorldQuestManager cycle timer on execution.
  */
 StopCycleTimer(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
 
 ### RestartCycleTimer
+
+| Field | Value |
+|-------|-------|
+| Address | `0x0063ABA0` |
+| Table index | 69 (result) |
+| Notes | **Client stub** — body is `return 1` only. Server controls the cycle timer. |
+
 ```
 /**
- * @brief
+ * @brief Client stub. Intended to restart the world quest cycle timer.
+ * The client does not manage the cycle timer; the server is the authority.
+ * @note Server should reset/restart its WorldQuestManager cycle timer on execution.
  */
 RestartCycleTimer(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
 ```

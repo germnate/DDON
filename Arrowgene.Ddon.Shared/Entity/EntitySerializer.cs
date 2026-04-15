@@ -950,6 +950,7 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new C2SQuestDecideDeliveryItemReq.Serializer());
             Create(new C2SQuestCancelPriorityQuestReq.Serializer());
             Create(new C2SQuestCancelNavigationQuestReq.Serializer());
+            Create(new S2CQuestTimerNtc.Serializer());
 
             Create(new C2SRankingBoardListReq.Serializer());
             Create(new C2SRankingRankListReq.Serializer());
