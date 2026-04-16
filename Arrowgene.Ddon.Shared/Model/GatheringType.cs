@@ -49,6 +49,9 @@ namespace Arrowgene.Ddon.Shared.Model
         Twinkle1 = 522552,
         Twinkle2 = 523240,
         Water = 520090,
+        // Chain Dungeon Sealed Chests
+        BrownSealedChest = 523907, // Chain Dungeon (EXM)
+        TealSealedChest = 523908, // Chain Dungeon (EXM)
         // SetInfoOmTreasureBox
         IronChest = 513050,
         BrownChest = 513051,
@@ -59,6 +62,8 @@ namespace Arrowgene.Ddon.Shared.Model
         PurpleChest = 513056,
         SmallRoundChest0 = 513060, // Usually found on tables in dungeons
         SmallRoundChest1 = 513061,
+        BronzeChest1 = 523241, // Chain Dungeon (EXM)
+        PearlescentChest1 = 523242, // Chain Dungeon (EXM)
         // SetInfoOmTreasureBoxG
         OrangeSealedChest = 513130, // (BBM)
         PurpleSealedChest = 513133, // (BBM)
@@ -146,6 +151,10 @@ namespace Arrowgene.Ddon.Shared.Model
             [OmGatheringPoint.PurpleChest] = GatheringPointType.TreasureChest,
             [OmGatheringPoint.SmallRoundChest0] = GatheringPointType.TreasureChest,
             [OmGatheringPoint.SmallRoundChest1] = GatheringPointType.TreasureChest,
+            [OmGatheringPoint.BrownSealedChest] = GatheringPointType.SealedTreasureChest,
+            [OmGatheringPoint.TealSealedChest] = GatheringPointType.SealedTreasureChest,
+            [OmGatheringPoint.BronzeChest1] = GatheringPointType.TreasureChest,
+            [OmGatheringPoint.PearlescentChest1] = GatheringPointType.TreasureChest,
             // OmTreasureBoxG
             [OmGatheringPoint.OrangeSealedChest] = GatheringPointType.SealedTreasureChest,
             [OmGatheringPoint.PurpleSealedChest] = GatheringPointType.SealedTreasureChest,

@@ -34,7 +34,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             GatheringPoint = new EpitaphGatheringPoint();
         }
 
-        public SoulOrdealOmState State { get; set; }
+        public SeasonDungeonOmState State { get; set; }
         public EpitaphGatheringPoint GatheringPoint { get; set; }
     }
 
@@ -538,7 +538,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             // End Trial
             party.SendToAll(new S2CSeasonDungeonEndSoulOrdealNtc() { EndState = endState,
                     LayoutId = partyState.Trial.StageId.ToCDataStageLayoutId(), PosId = partyState.Trial.PosId,
-                    EpitaphState = ((endState == SoulOrdealEndState.Success) ? SoulOrdealOmState.TrialComplete : SoulOrdealOmState.TrialAvailable)});
+                    EpitaphState = ((endState == SoulOrdealEndState.Success) ? SeasonDungeonOmState.TrialComplete : SeasonDungeonOmState.TrialAvailable)});
 
             if (endState == SoulOrdealEndState.Success)
             {
@@ -552,7 +552,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     {
                         LayoutId = unlock.StageId.ToCDataStageLayoutId(),
                         PosId = unlock.PosId,
-                        State = SoulOrdealOmState.AreaUnlocked
+                        State = SeasonDungeonOmState.AreaUnlocked
                     });
                 }
             }
@@ -781,37 +781,37 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
         }
 
-        public SoulOrdealOmState GetEpitaphState(GameClient client, StageLayoutId stageId, uint posId)
+        public SeasonDungeonOmState GetEpitaphState(GameClient client, StageLayoutId stageId, uint posId)
         {
             lock (_TrialsInProgress)
             {
                 if (!_TrialAssets.Trials.ContainsKey(stageId))
                 {
-                    return SoulOrdealOmState.Locked;
+                    return SeasonDungeonOmState.Locked;
                 }
 
                 var trial = GetTrial(stageId, posId);
                 if (trial == null)
                 {
-                    return SoulOrdealOmState.Locked;
+                    return SeasonDungeonOmState.Locked;
                 }
                 
                 if (!IsTrialUnlocked(client.Party, trial))
                 {
-                    return SoulOrdealOmState.Locked;
+                    return SeasonDungeonOmState.Locked;
                 }
 
                 if (TrialHasRewards(client, stageId, posId))
                 {
-                    return SoulOrdealOmState.RewardAvailable;
+                    return SeasonDungeonOmState.RewardAvailable;
                 }
 
                 if (!TrialCompleted(client.Party, stageId, posId))
                 {
-                    return StageManager.IsLegacyEpitaphRoadStageId(stageId) ? SoulOrdealOmState.LegacyTrialAvailable : SoulOrdealOmState.TrialAvailable;
+                    return StageManager.IsLegacyEpitaphRoadStageId(stageId) ? SeasonDungeonOmState.LegacyTrialAvailable : SeasonDungeonOmState.TrialAvailable;
                 }
 
-                return SoulOrdealOmState.RewardReceived;
+                return SeasonDungeonOmState.RewardReceived;
             }
         }
 
@@ -862,7 +862,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                                     GroupId = omId
                                 },
                                 // TODO: This probably needs a PosId value
-                                State = SoulOrdealOmState.Locked
+                                State = SeasonDungeonOmState.Locked
                             });
                         }
                     }
@@ -876,7 +876,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                         {
                             LayoutId = barrier.StageId.ToCDataStageLayoutId(),
                             PosId = barrier.PosId,
-                            State = SoulOrdealOmState.Locked
+                            State = SeasonDungeonOmState.Locked
                         });
                     }
                 }
@@ -897,7 +897,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                             {
                                 LayoutId = unlock.StageId.ToCDataStageLayoutId(),
                                 PosId = unlock.PosId,
-                                State = SoulOrdealOmState.AreaUnlocked
+                                State = SeasonDungeonOmState.AreaUnlocked
                             });
                         }
                     }
@@ -1068,7 +1068,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             {
                 LayoutId = stageId.ToCDataStageLayoutId(),
                 PosId = posId,
-                State = SoulOrdealOmState.AreaUnlocked
+                State = SeasonDungeonOmState.AreaUnlocked
             });
         }
 
@@ -1101,7 +1101,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     {
                         _DoorState[party.Id][(stageId, posId)] = new EpitaphMysteriousDoorState()
                         {
-                            State = SoulOrdealOmState.DoorLocked
+                            State = SeasonDungeonOmState.DoorLocked
                         };
                     }
                 }
@@ -1109,7 +1109,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
         }
 
-        public void SetMysteriousDoorState(PartyGroup party, StageLayoutId stageId, uint posId, SoulOrdealOmState state)
+        public void SetMysteriousDoorState(PartyGroup party, StageLayoutId stageId, uint posId, SeasonDungeonOmState state)
         {
             lock (_DoorState)
             {
@@ -1166,7 +1166,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 party.SendToAll(new S2CSeasonDungeonSetOmStateNtc()
                 {
                     LayoutId = doorState.GatheringPoint.StageId.ToCDataStageLayoutId(),
-                    State = SoulOrdealOmState.GatheringPointSpawned
+                    State = SeasonDungeonOmState.GatheringPointSpawned
                 });
             }
         }
@@ -1187,7 +1187,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     return;
                 }
 
-                SetMysteriousDoorState(client.Party, gatheringPoint.Door.StageId, gatheringPoint.Door.PosId, SoulOrdealOmState.DoorUnlocked);
+                SetMysteriousDoorState(client.Party, gatheringPoint.Door.StageId, gatheringPoint.Door.PosId, SeasonDungeonOmState.DoorUnlocked);
 
                 client.Party.SendToAll(new S2C_SEASON_62_28_16_NTC()
                 {

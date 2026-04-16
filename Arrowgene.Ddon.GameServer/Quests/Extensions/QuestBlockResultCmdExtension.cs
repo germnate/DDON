@@ -404,15 +404,15 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddResultCmdSetQuestOmMontageFix(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int poseId)
+        public static QuestBlock AddResultCmdSetQuestOmMontageFix(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int montagueNo)
         {
-            questBlock.ResultCommands.AddResultCmdSetQuestOmMontageFix(stageInfo, groupNo, setNo, poseId);
+            questBlock.ResultCommands.AddResultCmdSetQuestOmMontageFix(stageInfo, groupNo, setNo, montagueNo);
             return questBlock;
         }
 
-        public static QuestBlock AddResultCmdSetQuestOmMontageFixEx(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int poseId)
+        public static QuestBlock AddResultCmdSetQuestOmMontageFixEx(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int montagueNo)
         {
-            questBlock.ResultCommands.AddResultCmdSetQuestOmMontageFixEx(stageInfo, groupNo, setNo, poseId);
+            questBlock.ResultCommands.AddResultCmdSetQuestOmMontageFixEx(stageInfo, groupNo, setNo, montagueNo);
             return questBlock;
         }
 
