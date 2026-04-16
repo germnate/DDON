@@ -23,7 +23,7 @@ public class ScriptedQuest : IQuest
 
     protected override void InitializeState()
     {
-        AddQuestOrderCondition(QuestOrderCondition.ExtremeMissionCleared((QuestId)50000003));
+        AddQuestOrderCondition(QuestOrderCondition.ExtremeMissionCleared((QuestId)50103020));
         AddQuestOrderCondition(QuestOrderCondition.SoloWithPawns());
     }
 
