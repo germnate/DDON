@@ -42,7 +42,8 @@ public class ScriptedQuest : IQuest
         process0.AddTalkToNpcBlock(QuestAnnounceType.CheckpointAndUpdate, Stage.TheWhiteDragonTemple0, NpcId.Isaac, 18049)
 			.AddResultCmdQstTalkChg(NpcId.Joseph, 18048)
             .AddQuestFlag(QuestFlagType.QstLayout, QuestFlagAction.Clear, 3751);
-        process0.AddProcessEndBlock(true);
+        process0.AddProcessEndBlock(true)
+            .AddResultCmdTutorialDialog(TutorialId.PhantasmicGreatDragon);
     }
 }
 

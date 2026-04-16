@@ -45,7 +45,8 @@ public class ScriptedQuest : IQuest
 			.AddResultCmdQstTalkChg(NpcId.Joseph, 18045)
             .AddQuestFlag(QuestFlagType.QstLayout, QuestFlagAction.Clear, 3737);
         process0.AddProcessEndBlock(true)
-            .AddResultCmdReleaseAnnounce(ContentsRelease.ExtremeMissions, flagInfo: QuestFlags.NpcFunctions.IsaacExm);
+            .AddResultCmdReleaseAnnounce(ContentsRelease.ExtremeMissions, flagInfo: QuestFlags.NpcFunctions.IsaacExm)
+            .AddResultCmdTutorialDialog(TutorialId.AgentofCorruption);
     }
 }
 
