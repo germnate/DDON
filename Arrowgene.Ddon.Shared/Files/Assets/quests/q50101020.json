@@ -15,7 +15,7 @@
         "phase_groups": []
     },
     "order_conditions": [
-        {"type": "MainQuestCompleted", "Param1": 30}
+        {"type": "ClearPersonalQuest", "Param1": 60000101}
     ],
     "rewards": [
         {
