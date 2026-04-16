@@ -40,7 +40,7 @@ public class ScriptedQuest : IQuest
 		process0.AddStageJumpBlock(QuestAnnounceType.None, Stage.BranchofContemplation, 8)
 			.AddCheckCmdIsStageNo(Stage.BranchofContemplation);
         process0.AddPlayEventBlock(QuestAnnounceType.None, Stage.BranchofContemplation, 0, 6, QuestJumpType.After, Stage.AudienceChamber);
-        process0.AddTalkToNpcBlock(QuestAnnounceType.Update, Stage.TheWhiteDragonTemple0, NpcId.Isaac, 18659)
+        process0.AddTalkToNpcBlock(QuestAnnounceType.CheckpointAndUpdate, Stage.TheWhiteDragonTemple0, NpcId.Isaac, 18659)
             .AddQuestFlag(QuestFlagType.QstLayout, QuestFlagAction.Clear, 4039)
 			.AddResultCmdQstTalkChg(NpcId.Joseph, 18658);
         process0.AddProcessEndBlock(true)
