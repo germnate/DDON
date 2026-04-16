@@ -15,7 +15,7 @@
         "phase_groups": []
     },
     "order_conditions": [
-        {"type": "ClearExtremeMission", "Param1": 50202000}
+        {"type": "ClearPersonalQuest", "Param1": 60200010}
     ],
     "rewards": [
         {
