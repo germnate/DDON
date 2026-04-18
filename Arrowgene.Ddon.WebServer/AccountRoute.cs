@@ -81,7 +81,7 @@ namespace Arrowgene.Ddon.WebServer
                     Message = "Password cannot contain spaces";
                     return;
                 }
-                
+
                 if (Email == null || Email.Trim().Length == 0)
                 {
                     Error = true;
@@ -115,7 +115,19 @@ namespace Arrowgene.Ddon.WebServer
             }
 
             AccountResponse res = new AccountResponse();
-            AccountVerification accountCheck = new(req.Account, req.Password, req.Email);
+
+            if (_database.CheckBannedIp(request.Host))
+            {
+                res.Error = "You have been IP banned.";
+                WebResponse banresponse = new()
+                {
+                    StatusCode = 401
+                };
+                await banresponse.WriteJsonAsync(res);
+                return banresponse;
+            }
+
+            AccountVerification accountCheck = new(req.Account, req.Password, req.Email); 
 
             switch (req.Action)
             {
@@ -124,7 +136,7 @@ namespace Arrowgene.Ddon.WebServer
                     string token = CreateLoginToken(req.Account, req.Password);
                     if (token == null)
                     {
-                        if((bool)_webServerSetting.MailSetting.MailRequired)
+                        if ((bool)_webServerSetting.MailSetting.MailRequired)
                             res.Error = "Either your account or password are incorrect, or your email isn't verified yet";
                         else
                             res.Error = "Account or password wrong";
@@ -150,7 +162,7 @@ namespace Arrowgene.Ddon.WebServer
                         res.Error = "Account or e-mail already in use";
                         break;
                     }
-                    try 
+                    try
                     {
                         if ((bool)_webServerSetting.MailSetting.MailRequired)
                         {
@@ -215,7 +227,7 @@ namespace Arrowgene.Ddon.WebServer
                         res.Error = "Email not found";
                         break;
                     }
-                    
+
                     res.Message = "Email verified";
                     break;
 
@@ -285,7 +297,7 @@ namespace Arrowgene.Ddon.WebServer
                 return null;
             }
 
-            if (!account.MailVerified && (bool)_webServerSetting.MailSetting.MailRequired )
+            if (!account.MailVerified && (bool)_webServerSetting.MailSetting.MailRequired)
             {
                 Logger.Error($"{name} - CreateToken: email not verified yet");
                 return null;
@@ -336,7 +348,7 @@ namespace Arrowgene.Ddon.WebServer
 
         private bool VerifyEmail(string name, string emailToken)
         {
-            
+
             Account account = _database.SelectAccountByMailTokenAndName(name, emailToken);
             if (account == null)
             {

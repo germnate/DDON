@@ -43,6 +43,19 @@ CREATE TABLE IF NOT EXISTS "account"
     CONSTRAINT "uq_account_mail" UNIQUE ("mail")
 );
 
+CREATE TABLE IF NOT EXISTS "account_ip_ban"
+(
+    "addr"                TEXT      PRIMARY KEY NOT NULL,
+    "date"                DATETIME              NOT NULL DEFAULT (CURRENT_TIMESTAMP)
+);
+CREATE INDEX IF NOT EXISTS "idx_account_ip_ban_addr" ON "account_ip_ban" ("addr");
+
+CREATE TABLE IF NOT EXISTS "ddon_schedule_next"
+(
+    "type"      INTEGER PRIMARY KEY NOT NULL,
+    "timestamp" BIGINT  NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS "ddon_character_common"
 (
     "character_common_id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -572,6 +585,19 @@ CREATE TABLE IF NOT EXISTS "ddon_priority_quests"
     CONSTRAINT "uq_character_common_id_quest_schedule_id" UNIQUE ("character_common_id", "quest_schedule_id")
 );
 
+CREATE TABLE IF NOT EXISTS "ddon_mail"
+(
+    "message_id"    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    "character_id"  INTEGER                           NOT NULL,
+    "message_state" INTEGER                           NOT NULL,
+    "sender_id"     INTEGER                           NOT NULL,
+    "message_title" VARCHAR(256)                      NOT NULL DEFAULT '',
+    "message_body"  VARCHAR(2048)                     NOT NULL DEFAULT '',
+    "send_date"     INTEGER                           NOT NULL DEFAULT 0,
+    CONSTRAINT "fk_ddon_mail_character_id" FOREIGN KEY ("character_id") REFERENCES "ddon_character" ("character_id") ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS "idx_ddon_mail_character_id" ON "ddon_mail" ("character_id");
+
 CREATE TABLE IF NOT EXISTS "ddon_system_mail"
 (
     "message_id"    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -599,7 +625,7 @@ CREATE TABLE IF NOT EXISTS "ddon_system_mail_attachment"
 );
 CREATE INDEX IF NOT EXISTS "idx_ddon_system_mail_attachment_message_id" ON "ddon_system_mail_attachment" ("message_id");
 
-CREATE TABLE IF NOT EXISTS ddon_character_playpoint_data
+CREATE TABLE IF NOT EXISTS "ddon_character_playpoint_data"
 (
     "character_id" INTEGER  NOT NULL,
     "job"          SMALLINT NOT NULL,
@@ -612,9 +638,9 @@ CREATE TABLE IF NOT EXISTS ddon_character_playpoint_data
 CREATE TABLE IF NOT EXISTS "ddon_stamp_bonus"
 (
     "character_id"      INTEGER PRIMARY KEY NOT NULL,
-    "last_stamp_time"   DATETIME            NOT NULL,
     "consecutive_stamp" INTEGER             NOT NULL,
     "total_stamp"       INTEGER             NOT NULL,
+    "can_stamp"         BOOLEAN             NOT NULL,
     CONSTRAINT "fk_ddon_stamp_bonus_character_id" FOREIGN KEY ("character_id") REFERENCES "ddon_character" ("character_id") ON DELETE CASCADE
 );
 
@@ -794,15 +820,6 @@ CREATE TABLE IF NOT EXISTS "ddon_epitaph_claimed_weekly_rewards"
     CONSTRAINT "fk_ddon_epitaph_claimed_weekly_rewards_character_id" FOREIGN KEY ("character_id") REFERENCES "ddon_character" ("character_id") ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS "ddon_schedule_next"
-(
-    "type"      INTEGER NOT NULL,
-    "timestamp" BIGINT  NOT NULL,
-    PRIMARY KEY ("type")
-);
-INSERT INTO ddon_schedule_next(type, timestamp)
-VALUES (19, 0);
-
 CREATE TABLE IF NOT EXISTS "ddon_area_rank"
 (
     "character_id"    INTEGER NOT NULL,
@@ -837,8 +854,6 @@ CREATE TABLE IF NOT EXISTS "ddon_rank_record"
     "date"         DATETIME                          NOT NULL,
     CONSTRAINT "fk_ddon_rank_record_character_id" FOREIGN KEY ("character_id") REFERENCES "ddon_character" ("character_id") ON DELETE CASCADE
 );
-INSERT INTO "ddon_schedule_next"(type, timestamp)
-VALUES (23, 0);
 
 CREATE TABLE IF NOT EXISTS "ddon_partner_pawn"
 (
@@ -859,8 +874,6 @@ CREATE TABLE IF NOT EXISTS "ddon_partner_pawn_last_affection_increase"
     CONSTRAINT "pk_ddon_partner_pawn_last_affection_increase" PRIMARY KEY ("character_id", "pawn_id", "action"),
     CONSTRAINT "fk_ddon_partner_pawn_affection_increase_character_id" FOREIGN KEY ("character_id") REFERENCES "ddon_character" ("character_id") ON DELETE CASCADE
 );
-INSERT INTO "ddon_schedule_next"(type, timestamp)
-VALUES (13, 0);
 
 CREATE TABLE IF NOT EXISTS "ddon_partner_pawn_pending_rewards"
 (
@@ -925,8 +938,6 @@ CREATE TABLE IF NOT EXISTS "ddon_recycle_equipment"
     CONSTRAINT "pk_ddon_recycle_equipment" PRIMARY KEY ("character_id"),
     CONSTRAINT "fk_ddon_recycle_equipment_character_id" FOREIGN KEY ("character_id") REFERENCES "ddon_character" ("character_id") ON DELETE CASCADE
 );
-INSERT INTO "ddon_schedule_next"(type, timestamp)
-VALUES (24, 0);
 
 CREATE TABLE IF NOT EXISTS "ddon_equipment_limit_break"
 (
@@ -1032,8 +1043,6 @@ CREATE TABLE IF NOT EXISTS "ddon_light_quests"
     "distribution_end"      DATETIME    NOT NULL,
     CONSTRAINT "pk_ddon_light_quests_variant_id" PRIMARY KEY ("variant_id")
 );
-INSERT INTO "ddon_schedule_next"(type, timestamp)
-VALUES (6, 0);
 
 CREATE TABLE IF NOT EXISTS "ddon_pawn_favorites" (
 	"character_id"	INTEGER NOT NULL,
@@ -1097,11 +1106,62 @@ CREATE TABLE IF NOT EXISTS "ddon_bbm_reset_gg"
     CONSTRAINT "fk_ddon_bbm_reset_gg_ticket_character_id" FOREIGN KEY ("character_id") references "ddon_character" ("character_id") ON DELETE CASCADE
 );
 
-INSERT INTO "ddon_schedule_next"(type, timestamp)
-VALUES (20, 0);
+CREATE TABLE IF NOT EXISTS "ddon_group_chat_groups"
+(
+    "group_id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    "group_name" TEXT NOT NULL,
+    "group_desc" TEXT NOT NULL,
+    "prevent_deletion" BOOLEAN NOT NULL
+);
 
-INSERT INTO "ddon_schedule_next"(type, timestamp)
-VALUES (25, 0);
+CREATE TABLE IF NOT EXISTS "ddon_group_chat"
+(
+    "character_id" INTEGER NOT NULL,
+    "group_id"     BIGINT NOT NULL,
+    CONSTRAINT "pk_ddon_group_chat" PRIMARY KEY ("character_id")
+    CONSTRAINT "fk_ddon_group_chat_character_id" FOREIGN KEY ("character_id") references "ddon_character" ("character_id") ON DELETE CASCADE
+    CONSTRAINT "fk_ddon_group_chat_group_id" FOREIGN KEY ("group_id") references "ddon_group_chat_groups" ("group_id") ON DELETE CASCADE
+);
 
-INSERT INTO "ddon_schedule_next" ("type", "timestamp")
-VALUES (8, 0);
+
+CREATE TABLE IF NOT EXISTS "ddon_black_list"
+(
+    "character_id"  INTEGER NOT NULL,
+    "target_id"     INTEGER NOT NULL,
+    CONSTRAINT "pk_ddon_black_list" PRIMARY KEY ("character_id", "target_id")
+    CONSTRAINT "fk_ddon_black_list_character_id" FOREIGN KEY ("character_id") references "ddon_character" ("character_id") ON DELETE CASCADE
+    CONSTRAINT "fk_ddon_black_list_target_id" FOREIGN KEY ("target_id") references "ddon_character" ("character_id") ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "ddon_communication_message_set"
+(
+    "character_id"  INTEGER NOT NULL,
+    "set_no"        INTEGER NOT NULL,
+    "set_name"      TEXT    NOT NULL,
+    CONSTRAINT "pk_ddon_communication_message_set" PRIMARY KEY ("character_id", "set_no")
+    CONSTRAINT "fk_ddon_communication_message_set_character_id" FOREIGN KEY ("character_id") references "ddon_character" ("character_id") ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "ddon_communication_message"
+(
+    "character_id"  INTEGER NOT NULL,
+    "set_no"        INTEGER NOT NULL,
+    "message_no"    INTEGER NOT NULL,
+    "message"       TEXT NOT NULL,
+    "emotion"       INTEGER NOT NULL,
+    "emotochat"     BOOLEAN NOT NULL,
+    CONSTRAINT "pk_ddon_communication_message" PRIMARY KEY ("character_id", "set_no", "message_no")
+    CONSTRAINT "fk_ddon_communication_message_character_id_set_no" FOREIGN KEY ("character_id", "set_no") references "ddon_communication_message_set" ("character_id", "set_no") ON DELETE CASCADE
+);
+
+INSERT INTO "ddon_schedule_next"(type, timestamp) VALUES 
+(2, 0),
+(6, 0),
+(8, 0),
+(13, 0),
+(19, 0),
+(20, 0),
+(23, 0),
+(24, 0),
+(25, 0),
+(26, 0);
