@@ -1,3 +1,4 @@
+using Arrowgene.Ddon.Shared.Entity.Structure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -280,5 +281,68 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// then calls FUN_005be380(poseId) to set the stance mode.
         /// </summary>
         SetQuestLayoutEnemyBodyPose = 134, // 0x00634820 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 poseId)
+    }
+
+    public static class QuestResultCommandExtension
+    {
+        public static readonly Dictionary<QuestResultCommand, (QuestFlagType Type, QuestFlagAction Action)> gFlagStateChangeCommands = new()
+        {
+            [QuestResultCommand.QstLayoutFlagOn] = (QuestFlagType.QstLayout, QuestFlagAction.Set),
+            [QuestResultCommand.QstLayoutFlagOff] = (QuestFlagType.QstLayout, QuestFlagAction.Clear),
+            [QuestResultCommand.WorldManageLayoutFlagOn] = (QuestFlagType.WorldManageLayout, QuestFlagAction.Set),
+            [QuestResultCommand.WorldManageLayoutFlagOff] = (QuestFlagType.WorldManageLayout, QuestFlagAction.Clear),
+            [QuestResultCommand.WorldManageQuestFlagOn] = (QuestFlagType.WorldManageQuest, QuestFlagAction.Set),
+            [QuestResultCommand.WorldManageQuestFlagOff] = (QuestFlagType.WorldManageQuest, QuestFlagAction.Clear),
+            [QuestResultCommand.MyQstFlagOn] = (QuestFlagType.MyQst, QuestFlagAction.Set),
+            [QuestResultCommand.MyQstFlagOff] = (QuestFlagType.MyQst, QuestFlagAction.Clear),
+            [QuestResultCommand.LotOn] = (QuestFlagType.Lot, QuestFlagAction.Set),
+            [QuestResultCommand.LotOff] = (QuestFlagType.Lot, QuestFlagAction.Clear),
+        };
+
+        public static bool IsFlagStateChangeCommand(this QuestResultCommand commandId)
+        {
+            return gFlagStateChangeCommands.ContainsKey(commandId);
+        }
+
+        public static (QuestFlagType Type, QuestFlagAction Action) GetFlagStateChangeProperties(this QuestResultCommand commandId)
+        {
+            if (!gFlagStateChangeCommands.ContainsKey(commandId))
+            {
+                return (QuestFlagType.None, QuestFlagAction.None);
+            }
+            return gFlagStateChangeCommands[commandId];
+        }
+
+        public static QuestFlag ToQuestFlag(CDataQuestCommand questCommand)
+        {
+            QuestResultCommand cmd = (QuestResultCommand) questCommand.Command;
+            if (!cmd.IsFlagStateChangeCommand())
+            {
+                return null;
+            }
+
+            var props = cmd.GetFlagStateChangeProperties();
+            var questFlag = new QuestFlag()
+            {
+                Type = props.Type,
+                Action = props.Action,
+                Value = questCommand.Param01,
+                PreventReplay = false,
+            };
+
+            switch (props.Type)
+            {
+                case QuestFlagType.WorldManageLayout:
+                case QuestFlagType.WorldManageQuest:
+                    questFlag.QuestId = questCommand.Param02;
+                    break;
+                case QuestFlagType.Lot:
+                    questFlag.stageInfo = Stage.StageInfoFromStageNo((uint)questCommand.Param01);
+                    questFlag.Value = questCommand.Param02;
+                    break;
+            }
+
+            return questFlag;
+        }
     }
 }
