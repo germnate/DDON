@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Arrowgene.Ddon.Shared.Model.EpitaphRoad
 {
-    public enum SoulOrdealOmState : byte
+    public enum SeasonDungeonOmState : byte
     {
         Locked = 0, // White in 3.2 and 3.3 stages
         LegacyTrialAvailable = 0, // Red in 3.0 and 3.1 stages
@@ -23,5 +17,8 @@ namespace Arrowgene.Ddon.Shared.Model.EpitaphRoad
         ScatterPowers = 7,
         DoorUnlocked = 8,
         GatheringPointSpawned = 0, // Spawns green light pillar
+
+        ChestFirmlyShut = 7,
+        ChestUnsealed = 8,
     }
 }

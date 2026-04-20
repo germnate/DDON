@@ -3337,13 +3337,12 @@ SetSubstoryEnemyInvincible(int enemyGroupFlag, int invincible, int param03 = 0, 
 AddFsmTalkNpc(int npcId, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
 
-### SetSubstoryEnemyGroupFlag (108)
+### AchievementAnnounce (108)
 
 | Field | Value |
 |-------|-------|
 | Address | `0x00633B80` |
 | Table index | 108 |
-| Key callees | `FUN_00bd3870(groupId, flagValue-1)`, `FUN_00b68090` (sends opcode 0x21) |
 
 ```
 /**
@@ -3352,7 +3351,7 @@ AddFsmTalkNpc(int npcId, int param02 = 0, int param03 = 0, int param04 = 0);
  * @param groupId   Enemy group identifier
  * @param flagValue Event value; passed as (flagValue - 1) to FUN_00bd3870
  */
-SetSubstoryEnemyGroupFlag(int groupId, int flagValue, int param03 = 0, int param04 = 0);
+AchievementAnnounce(int category, int flagValue, int param03 = 0, int param04 = 0);
 ```
 
 ### EnableSubstoryElementB (109)
@@ -3514,7 +3513,7 @@ SetQuestEnemyTierUp(StageNo stageNo, int groupNo, int setNo, int tier);
 SetQuestEnemyTierUpEx(StageNo stageNo, int groupNo, int setNo, int tier);
 ```
 
-### SetQuestNpcBodyPose (118)
+### SetQuestOmMontagueFix (118)
 
 | Field | Value |
 |-------|-------|
@@ -3524,16 +3523,17 @@ SetQuestEnemyTierUpEx(StageNo stageNo, int groupNo, int setNo, int tier);
 
 ```
 /**
- * @brief Sets a body/stance pose on a quest NPC. Pose IDs 1–6 map to different stances.
- * @param stageNo  Stage number
- * @param groupNo  NPC group number
- * @param setNo    NPC set number
- * @param poseId   Pose/stance index (1–6)
+ * @brief Sets a body/stance pose on a quest NPC or look/state of an object (like a chest).
+ * Montague IDs 1–6 map to different stances.
+ * @param stageNo    Stage number
+ * @param groupNo    Group number
+ * @param setNo      Set number
+ * @param montagueNo Pose/stance index (1–6)
  */
-SetQuestNpcBodyPose(StageNo stageNo, int groupNo, int setNo, int poseId);
+SetQuestOmMontagueFix(StageNo stageNo, int groupNo, int setNo, int montagueNo);
 ```
 
-### SetQuestNpcBodyPoseEx (119)
+### SetQuestOmMontagueFixEx (119)
 
 | Field | Value |
 |-------|-------|
@@ -3543,13 +3543,13 @@ SetQuestNpcBodyPose(StageNo stageNo, int groupNo, int setNo, int poseId);
 
 ```
 /**
- * @brief Area-aware variant of SetQuestNpcBodyPose.
- * @param stageNo  Stage number
- * @param groupNo  NPC group number
- * @param setNo    NPC set number
- * @param poseId   Pose/stance index (1–6)
+ * @brief Area-aware variant of SetQuestOmMontague.
+ * @param stageNo    Stage number
+ * @param groupNo    Group number
+ * @param setNo      Set number
+ * @param montagueNo Pose/stance index (1–6)
  */
-SetQuestNpcBodyPoseEx(StageNo stageNo, int groupNo, int setNo, int poseId);
+SetQuestOmMontagueFixEx(StageNo stageNo, int groupNo, int setNo, int montagueNo);
 ```
 
 ### SetQuestLayoutEnemyLevel (121)
@@ -3608,7 +3608,7 @@ RemoveFsmNpcFromSchedule(int param01, int param02 = 0, int param03 = 0, int para
 SetEnemyExpeditionState(int mode, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
 
-### TriggerSubstoryEndSequence (128)
+### EndContentsPurposePhaseChange (128)
 
 | Field | Value |
 |-------|-------|
@@ -3618,10 +3618,13 @@ SetEnemyExpeditionState(int mode, int param02 = 0, int param03 = 0, int param04 
 
 ```
 /**
- * @brief Fires the substory ending sequence, completing the current substory phase.
+ * @brief Starts the content ending sequence, completing the current phase.
+ * Updates the purpose message of the quest.
+ * @note Seen inside chain dungeon packet capture
  * Sends world-manager NPC messages 0x25f and 0x260.
+ * @param 
  */
-TriggerSubstoryEndSequence(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
+EndContentsPurposePhaseChange(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
 
 ### CheckSubstoryCondition (130)
@@ -3655,7 +3658,7 @@ CheckSubstoryCondition(int param01 = 0, int param02 = 0, int param03 = 0, int pa
 SetPawnExpeditionFlag(int mode, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
 
-### SetQuestLayoutEnemyBodyPose (134)
+### SetQuestLayoutOmMontageFix (134)
 
 | Field | Value |
 |-------|-------|
@@ -3668,12 +3671,13 @@ SetPawnExpeditionFlag(int mode, int param02 = 0, int param03 = 0, int param04 = 
 /**
  * @brief Sets a body/stance mode on a layout enemy (type 2).
  * Verifies the entity's OM is alive before calling FUN_005be380(poseId).
- * @param stageNo  Stage number
- * @param groupNo  Layout enemy group number
- * @param setNo    Layout enemy set number
- * @param poseId   Stance/pose mode value
+ * @montageNo 0 - NO enemy, 1 enemy in EXM (Chain Dungeon)
+ * @param stageNo    Stage number
+ * @param groupNo    Layout enemy group number
+ * @param setNo      Layout enemy set number
+ * @param montagueNo Stance/pose mode value
  */
-SetQuestLayoutEnemyBodyPose(StageNo stageNo, int groupNo, int setNo, int poseId);
+SetQuestLayoutOmMontageFix(StageNo stageNo, int groupNo, int setNo, int montagueNo);
 ```
 
 ---
@@ -4076,25 +4080,20 @@ IsEnemyFoundForOrderRadius(StageNo stageNo, int groupNo, int setNo = -1, int mar
 IsEnemyFoundForOrderRadiusNoMarker(StageNo stageNo, int groupNo, int setNo = -1, int param04 = 0);
 ```
 
-### IsPawnAvailable (233)
+### IsAchievementObtained (233)
 
 | Field | Value |
 |-------|-------|
 | Address | `0x00636900` |
 | Table index | 233 |
-| Key callees | `FUN_00868170()` — pawn list manager from `this+0x29cc+0x45c` |
-| Key fields | List entry `+8` = pawn ID; `+0x18` / `+0x1c` = active state fields |
 
 ```
 /**
- * @brief Checks if a pawn with the given ID is active/available.
- * Retrieves the pawn list manager via FUN_00868170() (accesses this+0x29cc+0x45c),
- * iterates entries matching pawnId at entry+8, returns true if any match has entry+0x18 or +0x1c non-zero.
- * Only pawnId (param01) is used; params 2-4 are ignored.
- * @note Formerly named "IsPawnActionReady" with incorrect "action type 6" description — no such constant exists.
- * @param pawnId  Pawn ID to look up in the pawn list
+ * @brief Checks if an achievement was unlocked.
+ * @param1 category
+ * @param2 achievementId
  */
-IsPawnAvailable(int pawnId, int param02_unused = 0, int param03_unused = 0, int param04_unused = 0);
+IsAchievementObtained(int category, int achievementId, int param03_unused = 0, int param04_unused = 0);
 ```
 
 ### IsOmBrokenInCurrentPhase (229)
@@ -4321,6 +4320,7 @@ IsTriggerFlagSetAndClear(int param01 = 0, int param02 = 0, int param03 = 0, int 
 ```
 /**
  * @brief Checks global story progression level.
+ * @brief Used to check chain # progress.
  * progressLevel == 0: checks if tutorial is complete (fires announce 0x25e if so).
  * progressLevel  > 0: checks if progressLevel <= *(sGame::mpInstance + 0x3a0c).
  * @param progressLevel Story progression threshold (0 = tutorial-complete check)
@@ -4354,14 +4354,15 @@ IsContentsModeStateFlag(int param01 = 0, int param02 = 0, int param03 = 0, int p
 
 ```
 /**
- * @brief Checks if a quest enemy's HP-lost percentage is within [0, hpLostPct].
- * Effectively checks that the enemy's remaining HP >= (100 - hpLostPct)%.
- * @param stageNo   Stage number
- * @param groupNo   Enemy group number
- * @param setNo     Enemy set number
- * @param hpLostPct Maximum HP-lost percentage (0 = full HP required, 100 = any HP)
+ * @brief Checks if a quest enemy's HP-lost percentage is within [0, hpPct].
+ * Effectively checks that the enemy's remaining HP >= (100 - hpPct)%.
+ * @note Works on Layout Enemies in EXM (Chain Dungeon)
+ * @param stageNo Stage number
+ * @param groupNo Enemy group number
+ * @param setNo   Enemy set number
+ * @param hpPct   Hp % to trigger check on (0 = full HP required, 100 = any HP)
  */
-IsQuestEnemyHpNotGreater(StageNo stageNo, int groupNo, int setNo, int hpLostPct);
+IsQuestEnemyHpNotGreater(StageNo stageNo, int groupNo, int setNo, int hpPct);
 ```
 
 ### IsAreaLinkageQuestFlagOn (256)

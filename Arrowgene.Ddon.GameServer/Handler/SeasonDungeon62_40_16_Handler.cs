@@ -41,7 +41,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     {
                         LayoutId = packet.Structure.LayoutId,
                         PosId = packet.Structure.PosId,
-                        State = SoulOrdealOmState.AreaUnlocked
+                        State = SeasonDungeonOmState.AreaUnlocked
                     });
                 }
             }
@@ -52,7 +52,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     LayoutId = packet.Structure.LayoutId,
                     PosId = packet.Structure.PosId,
-                    State = SoulOrdealOmState.Locked
+                    State = SeasonDungeonOmState.Locked
                 });
             }
         }

@@ -369,6 +369,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
             }
 
             PatchRandomCommands(ref questProcessState, questState);
+            PatchRandomLayoutCommands(questProcessState);
             PatchTimerCommands(questProcessState, questState, client);
 
             return new List<CDataQuestProcessState>()
@@ -411,6 +412,29 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 }
 
                 cmd.Param04 = questState.RandomSlots[slot];
+            }
+        }
+
+        private void PatchRandomLayoutCommands(CDataQuestProcessState processState)
+        {
+            bool hasLayoutFlagRandomOn = processState.ResultCommandList
+                .Any(c => c.Command == (ushort)QuestResultCommand.LayoutFlagRandomOn);
+            if (!hasLayoutFlagRandomOn)
+            {
+                return;
+            }
+
+            processState = new CDataQuestProcessState(processState);
+
+            foreach (var cmd in processState.ResultCommandList)
+            {
+                if (cmd.Command != (ushort)QuestResultCommand.LayoutFlagRandomOn)
+                {
+                    continue;
+                }
+
+                List<int> flags = [cmd.Param01, cmd.Param02, cmd.Param03];
+                cmd.Param04 = flags[Random.Shared.Next(0, flags.Count)];
             }
         }
 
@@ -514,10 +538,16 @@ namespace Arrowgene.Ddon.GameServer.Quests
                         resultCommands.Add(QuestManager.ResultCommand.UpdateAnnounce());
                         break;
                     case QuestAnnounceType.Start:
-                        // resultCommands.Add(QuestManager.ResultCommand.SetAnnounce(QuestAnnounceType.Start));
-                        resultCommands.Add(QuestManager.ResultCommand.StartMissionAnnounce());
-                        resultCommands.Add(QuestManager.ResultCommand.Unknown(127));
-                        resultCommands.Add(QuestManager.ResultCommand.StartContentsTimer());
+                        if (quest.QuestType == QuestType.ExtremeMission)
+                        {
+                            resultCommands.Add(QuestManager.ResultCommand.StartMissionAnnounce());
+                            resultCommands.Add(QuestManager.ResultCommand.Unknown(127));
+                            resultCommands.Add(QuestManager.ResultCommand.StartContentsTimer());
+                        }
+                        else
+                        {
+                            resultCommands.Add(QuestManager.ResultCommand.SetAnnounce(QuestAnnounceType.Start));
+                        }
                         break;
                     default:
                         resultCommands.Add(QuestManager.ResultCommand.SetAnnounce(questBlock.AnnounceType));

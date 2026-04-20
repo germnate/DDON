@@ -18,7 +18,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
         public SoulOrdealEndState EndState { get; set; }
         public CDataStageLayoutId LayoutId { get; set; }
         public uint PosId { get; set; }
-        public SoulOrdealOmState EpitaphState { get; set; }
+        public SeasonDungeonOmState EpitaphState { get; set; }
         public uint Unk3 { get; set; }
 
         public class Serializer : PacketEntitySerializer<S2CSeasonDungeonEndSoulOrdealNtc>
@@ -39,7 +39,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
                 obj.EndState = (SoulOrdealEndState) ReadByte(buffer);
                 obj.LayoutId = ReadEntity<CDataStageLayoutId>(buffer);
                 obj.PosId = ReadUInt32(buffer);
-                obj.EpitaphState = (SoulOrdealOmState) ReadByte(buffer);
+                obj.EpitaphState = (SeasonDungeonOmState) ReadByte(buffer);
                 obj.Unk3 = ReadUInt32(buffer);
                 return obj;
             }

@@ -2010,7 +2010,7 @@ namespace Arrowgene.Ddon.Shared.Network
         public static readonly PacketId S2C_63_6_16_NTC = new PacketId(63, 6, 16, "S2C_63_6_16_NTC", ServerType.Game, PacketSource.Server);
         public static readonly PacketId S2C_63_7_16_NTC = new PacketId(63, 7, 16, "S2C_63_7_16_NTC", ServerType.Game, PacketSource.Server);
         public static readonly PacketId S2C_63_10_16_NTC = new PacketId(63, 10, 16, "S2C_63_10_16_NTC", ServerType.Game, PacketSource.Server);
-        public static readonly PacketId S2C_63_11_16_NTC = new PacketId(63, 11, 16, "S2C_63_11_16_NTC", ServerType.Game, PacketSource.Server);
+        public static readonly PacketId C2S_63_11_16_NTC = new PacketId(63, 11, 16, "S2C_63_11_16_NTC", ServerType.Game, PacketSource.Server);
 
         // Group: 64 - (MANDRAGORA)
         public static readonly PacketId C2S_MANDRAGORA_GET_MY_MANDRAGORA_REQ = new PacketId(64, 0, 1, "C2S_MANDRAGORA_GET_MY_MANDRAGORA_REQ", ServerType.Game, PacketSource.Client);
@@ -3942,7 +3942,7 @@ namespace Arrowgene.Ddon.Shared.Network
             AddPacketIdEntry(packetIds, S2C_63_6_16_NTC);
             AddPacketIdEntry(packetIds, S2C_63_7_16_NTC);
             AddPacketIdEntry(packetIds, S2C_63_10_16_NTC);
-            AddPacketIdEntry(packetIds, S2C_63_11_16_NTC);
+            AddPacketIdEntry(packetIds, C2S_63_11_16_NTC);
 
 // Group: 64 - (MANDRAGORA)
             AddPacketIdEntry(packetIds, C2S_MANDRAGORA_GET_MY_MANDRAGORA_REQ);

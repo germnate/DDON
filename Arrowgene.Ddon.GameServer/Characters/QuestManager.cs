@@ -3782,15 +3782,15 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             /** @brief Sets a body/stance pose (1-6) on a quest NPC/enemy via FUN_00bbf670. */
-            public static CDataQuestCommand SetQuestOmMontageFix(uint stageNo, int groupNo, int setNo, int poseId)
+            public static CDataQuestCommand SetQuestOmMontageFix(uint stageNo, int groupNo, int setNo, int montagueNo)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestOmMontageFix, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = poseId };
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestOmMontageFix, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = montagueNo };
             }
 
             /** @brief Area-aware variant of AddResultCmdSetQuestOmMontageFix. */
-            public static CDataQuestCommand SetQuestOmMontageFixEx(uint stageNo, int groupNo, int setNo, int poseId)
+            public static CDataQuestCommand SetQuestOmMontageFixEx(uint stageNo, int groupNo, int setNo, int montagueNo)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestOmMontageFixEx, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = poseId };
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestOmMontageFixEx, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = montagueNo };
             }
 
             /** @brief Sets the level of a layout enemy (type 2) by queuing it into a critical-section-guarded buffer. */

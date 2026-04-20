@@ -407,15 +407,15 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return resultCommands;
         }
 
-        public static List<CDataQuestCommand> AddResultCmdSetQuestOmMontageFix(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, int groupNo, int setNo, int poseId)
+        public static List<CDataQuestCommand> AddResultCmdSetQuestOmMontageFix(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, int groupNo, int setNo, int montagueNo)
         {
-            resultCommands.Add(QuestManager.ResultCommand.SetQuestOmMontageFix(stageInfo.StageNo, groupNo, setNo, poseId));
+            resultCommands.Add(QuestManager.ResultCommand.SetQuestOmMontageFix(stageInfo.StageNo, groupNo, setNo, montagueNo));
             return resultCommands;
         }
 
-        public static List<CDataQuestCommand> AddResultCmdSetQuestOmMontageFixEx(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, int groupNo, int setNo, int poseId)
+        public static List<CDataQuestCommand> AddResultCmdSetQuestOmMontageFixEx(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, int groupNo, int setNo, int montagueNo)
         {
-            resultCommands.Add(QuestManager.ResultCommand.SetQuestOmMontageFixEx(stageInfo.StageNo, groupNo, setNo, poseId));
+            resultCommands.Add(QuestManager.ResultCommand.SetQuestOmMontageFixEx(stageInfo.StageNo, groupNo, setNo, montagueNo));
             return resultCommands;
         }
 
