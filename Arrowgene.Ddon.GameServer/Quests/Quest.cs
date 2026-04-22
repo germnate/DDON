@@ -284,6 +284,21 @@ namespace Arrowgene.Ddon.GameServer.Quests
                     }
                 }
 
+                foreach (var resultCommand in block.ResultCommands)
+                {
+                    var questFlag = QuestResultCommandExtension.ToQuestFlag(resultCommand);
+                    if (questFlag == null)
+                    {
+                        continue;
+                    }
+                    if (!questFlags.ContainsKey(questFlag.Type))
+                    {
+                        questFlags[questFlag.Type] = new Dictionary<int, QuestFlag>();
+                    }
+                    questFlags[questFlag.Type][questFlag.Value] = questFlag;
+                }
+
+
                 if (step == stepsFound)
                 {
                     break;
