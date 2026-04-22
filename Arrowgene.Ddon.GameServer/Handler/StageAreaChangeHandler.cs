@@ -113,12 +113,12 @@ namespace Arrowgene.Ddon.GameServer.Handler
                                     Type = LobbyChatMsgType.ManagementAlertC,
                                     Message = "A quest has been canceled because the\ndelivery time period has ended."
                                 }, queue);
-
-                                if (member.Party.IsSolo || member.Party.Leader?.Client == member)
-                                {
-                                    queue.AddRange(member.Party.QuestState.UpdatePriorityQuestList(member.Party.Leader.Client, connection));
-                                }
                             }
+                        }
+
+                        if (client.Party.IsSolo || client.Party.Leader?.Client == client)
+                        {
+                            queue.AddRange(client.Party.QuestState.UpdatePriorityQuestList(client.Party.Leader.Client, connection));
                         }
                     });
                 }
