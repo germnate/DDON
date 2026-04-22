@@ -369,7 +369,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
             }
 
             PatchRandomCommands(ref questProcessState, questState);
-            PatchRandomLayoutCommands(questProcessState);
+            PatchRandomLayoutCommands(ref questProcessState);
             PatchTimerCommands(questProcessState, questState, client);
 
             return new List<CDataQuestProcessState>()
@@ -415,7 +415,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
             }
         }
 
-        private void PatchRandomLayoutCommands(CDataQuestProcessState processState)
+        private void PatchRandomLayoutCommands(ref CDataQuestProcessState processState)
         {
             bool hasLayoutFlagRandomOn = processState.ResultCommandList
                 .Any(c => c.Command == (ushort)QuestResultCommand.LayoutFlagRandomOn);
@@ -433,8 +433,12 @@ namespace Arrowgene.Ddon.GameServer.Quests
                     continue;
                 }
 
-                List<int> flags = [cmd.Param01, cmd.Param02, cmd.Param03];
-                cmd.Param04 = flags[Random.Shared.Next(0, flags.Count)];
+                List<int> flags = new List<int> { cmd.Param01, cmd.Param02, cmd.Param03 }
+                    .Where(p => p >= 0).ToList();
+                if (flags.Count > 0)
+                {
+                    cmd.Param04 = flags[Random.Shared.Next(0, flags.Count)];
+                }
             }
         }
 
