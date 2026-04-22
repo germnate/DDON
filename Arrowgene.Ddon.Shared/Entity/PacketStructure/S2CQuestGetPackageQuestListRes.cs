@@ -1,11 +1,7 @@
 using Arrowgene.Buffers;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Network;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
 {
@@ -18,7 +14,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
             PackageQuestList = new List<CDataPackageQuestList>();
         }
 
-        public uint Unk0 { get; set; }
+        public uint StageNo { get; set; }
         public List<CDataPackageQuestList> PackageQuestList { get; set; }
 
         public class Serializer : PacketEntitySerializer<S2CQuestGetPackageQuestListRes>
@@ -26,7 +22,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
             public override void Write(IBuffer buffer, S2CQuestGetPackageQuestListRes obj)
             {
                 WriteServerResponse(buffer, obj);
-                WriteUInt32(buffer, obj.Unk0);
+                WriteUInt32(buffer, obj.StageNo);
                 WriteEntityList(buffer, obj.PackageQuestList);
             }
 
@@ -34,7 +30,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
             {
                 S2CQuestGetPackageQuestListRes obj = new S2CQuestGetPackageQuestListRes();
                 ReadServerResponse(buffer, obj);
-                obj.Unk0 = ReadUInt32(buffer);
+                obj.StageNo = ReadUInt32(buffer);
                 obj.PackageQuestList = ReadEntityList<CDataPackageQuestList>(buffer);
                 return obj;
             }

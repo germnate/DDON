@@ -53,6 +53,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
                 character.ContentsReleased = GetContentsReleased(character, connectionIn);
                 character.WorldManageUnlocks = GetWorldManageState(character, connectionIn);
+                character.SubstoryProgress = Server.Database.SelectSubstoryProgress(character.CharacterId, connectionIn);
 
                 character.FavoritedPawnIds = Server.Database.GetPawnFavorites(character.CharacterId, connectionIn);
 

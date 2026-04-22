@@ -600,6 +600,16 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             public static QuestFlagInfo Quintus { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(8166, QuestId.Q70033001, StageInfo);
         }
 
+        public static class FortThinesGreatDiningHall
+        {
+            private static StageInfo StageInfo = Stage.FortThinesGreatDiningHall;
+
+            /// <summary>
+            /// Spawns Carrie, used for the substory quests.
+            /// </summary>
+            public static QuestFlagInfo Carrie { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(6409, QuestId.Q70030001, StageInfo);
+        }
+
         public static class RathniteFoothillsLakeside
         {
             private static StageInfo StageInfo = Stage.RathniteFoothillsLakeside0;

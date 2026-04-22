@@ -8,6 +8,7 @@ using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Characters
@@ -30,10 +31,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
         private static Dictionary<uint, Quest> gQuests = new Dictionary<uint, Quest>();
         private static readonly Dictionary<QuestId, HashSet<uint>> gVariantQuests = new();
 
-        private static Dictionary<uint, HashSet<uint>> gTutorialQuests = new Dictionary<uint, HashSet<uint>>();
+        private static Dictionary<QuestType, Dictionary<uint, HashSet<uint>>> QuestByStageNo = new();
         private static Dictionary<QuestAreaId, HashSet<QuestId>> gWorldQuests = new Dictionary<QuestAreaId, HashSet<QuestId>>();
         private static Dictionary<QuestAdventureGuideCategory, HashSet<uint>> gAdventureGuideCategories = new Dictionary<QuestAdventureGuideCategory, HashSet<uint>>();
         private static Dictionary<QuestAreaId, Dictionary<uint,uint>> gAreaTrialRanks = new Dictionary<QuestAreaId, Dictionary<uint, uint>>();
+
+        private static Dictionary<QuestId, (QuestSubstoryGroupId SubstoryGroupId, uint SeqNo)> gSubstoryLookup = new();
 
         /// <summary>
         /// QuestScheduleIds that are requested as part of World Manage Quests from pcaps.
@@ -53,14 +56,21 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
             gVariantQuests[quest.QuestId].Add(quest.QuestScheduleId);
 
-            if (quest.QuestType == QuestType.Tutorial)
+            if ((quest.QuestType == QuestType.Tutorial) || (quest.QuestType == QuestType.Substory))
             {
                 uint stageNo = (uint)StageManager.ConvertIdToStageNo(quest.StageId);
-                if (!gTutorialQuests.ContainsKey(stageNo))
+
+                if (!QuestByStageNo.ContainsKey(quest.QuestType))
                 {
-                    gTutorialQuests[stageNo] = new HashSet<uint>();
+                    QuestByStageNo[quest.QuestType] = new();
                 }
-                gTutorialQuests[stageNo].Add(quest.QuestScheduleId);
+
+                var questDict = QuestByStageNo[quest.QuestType];
+                if (!questDict.ContainsKey(stageNo))
+                {
+                    questDict[stageNo] = new HashSet<uint>();
+                }
+                questDict[stageNo].Add(quest.QuestScheduleId);
             }
             else if (quest.QuestType == QuestType.World)
             {
@@ -137,6 +147,86 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
         }
 
+        private static void ComputeSubstoryLookups(DdonGameServer server)
+        {
+            var substoryMissionMap = server.GameSettings.Get<Dictionary<QuestSubstoryGroupId, Dictionary<uint, List<QuestId>>>>("substory", "SubstoryMissionMap") ??
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_SERVER_CONFIG_ERROR);
+
+            gSubstoryLookup.Clear();
+            foreach (var (substoryGroupId, data) in substoryMissionMap)
+            {
+                foreach (var (seqNo, questIds) in data)
+                {
+                    foreach (var questId in questIds)
+                    {
+                        gSubstoryLookup[questId] = (substoryGroupId, seqNo);
+                    }
+                }
+            }
+            server.GameSettings.Set<bool>("substory", "RecomputeSubstoryLookups", false);
+        }
+
+        public static (QuestSubstoryGroupId SubstoryGroupId, uint SeqNo) GetSubstoryQuestProperties(DdonGameServer server, QuestId questId)
+        {
+            if (server.GameSettings.Get<bool>("substory", "RecomputeSubstoryLookups"))
+            {
+                ComputeSubstoryLookups(server);
+            }
+
+            if (!gSubstoryLookup.ContainsKey(questId))
+            {
+                return (QuestSubstoryGroupId.Invalid, 0);
+            }
+            return gSubstoryLookup[questId];
+        }
+
+        /// <summary>
+        /// Called after a substory quest completes. If all quests in the current sequence are done,
+        /// advances the sequence step (or marks the group complete). Persists to DB if changed.
+        /// </summary>
+        public static void AdvanceSubstoryProgress(DdonGameServer server, Character character, QuestId completedQuestId, DbConnection? connectionIn = null)
+        {
+            var props = GetSubstoryQuestProperties(server, completedQuestId);
+            if (props.SubstoryGroupId == QuestSubstoryGroupId.Invalid) return;
+
+            var substorySequenceSettings = server.GameSettings.Get<Dictionary<QuestSubstoryGroupId, List<uint>>>("substory", "SubstorySequence");
+            var substoryMissionMap = server.GameSettings.Get<Dictionary<QuestSubstoryGroupId, Dictionary<uint, List<QuestId>>>>("substory", "SubstoryMissionMap");
+            if (substorySequenceSettings == null || substoryMissionMap == null) return;
+            if (!substorySequenceSettings.ContainsKey(props.SubstoryGroupId)) return;
+
+            if (!character.SubstoryProgress.ContainsKey(props.SubstoryGroupId))
+            {
+                character.SubstoryProgress[props.SubstoryGroupId] = new SubstoryProgress
+                {
+                    SubstoryGroupId = props.SubstoryGroupId,
+                    SequenceStep = 0,
+                    IsComplete = false
+                };
+            }
+
+            var progress = character.SubstoryProgress[props.SubstoryGroupId];
+            if (progress.IsComplete) return;
+
+            var sequences = substorySequenceSettings[props.SubstoryGroupId];
+            if (progress.SequenceStep >= sequences.Count) return;
+
+            var currentSeqNo = sequences[progress.SequenceStep];
+            if (!substoryMissionMap[props.SubstoryGroupId].ContainsKey(currentSeqNo)) return;
+
+            // Check if every quest in the current sequence is now completed
+            var sequenceQuests = substoryMissionMap[props.SubstoryGroupId][currentSeqNo];
+            bool allDone = sequenceQuests.TrueForAll(qid => character.CompletedQuests.ContainsKey(qid));
+            if (!allDone) return;
+
+            progress.SequenceStep += 1;
+            if (progress.SequenceStep >= sequences.Count)
+            {
+                progress.IsComplete = true;
+            }
+
+            server.Database.UpsertSubstoryProgress(character.CharacterId, progress, connectionIn);
+        }
+
         public static void LoadQuests(DdonGameServer server)
         {
             // Iterate over quests generated from json
@@ -152,6 +242,8 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             LoadLightQuests(server);
+
+            ComputeSubstoryLookups(server);
         }
 
         public static void LoadLightQuests(DdonGameServer server)
@@ -204,14 +296,18 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return GetQuestByScheduleId(questId);
         }
 
-        public static HashSet<uint> GetTutorialQuestsByStageNo(uint stageNo)
+        public static HashSet<uint> GetQuestByStageNo(QuestType questType, uint stageNo)
         {
-            if (!gTutorialQuests.ContainsKey(stageNo))
+            if (!QuestByStageNo.ContainsKey(questType))
             {
-                return new HashSet<uint>();
+                return new();
             }
 
-            return gTutorialQuests[stageNo];
+            if (!QuestByStageNo[questType].ContainsKey(stageNo))
+            {
+                return new();
+            }
+            return QuestByStageNo[questType][stageNo];
         }
 
         public static bool IsVariantQuest(QuestId baseQuestId)
@@ -2524,9 +2620,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             /** @brief Sets byte +0x11 on an NPC object matching npcLookupId, stores storeVal at ctx+0x5c+0x24c, returns bit 18 of ctx+0x5c+0x220. */
-            public static CDataQuestCommand SetNpcOrderFlagAndCheckBit18(int stageNo, int npcIdOrObjId, int npcLookupId, int storeVal)
+            public static CDataQuestCommand NpcPreTalkAndOrderUi(int stageNo, int npcId, int noOrderGroupSerial, int storeVal)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.SetNpcOrderFlagAndCheckBit18, Param01 = stageNo, Param02 = npcIdOrObjId, Param03 = npcLookupId, Param04 = storeVal };
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.NpcPreTalkAndOrderUi, Param01 = stageNo, Param02 = npcId, Param03 = noOrderGroupSerial, Param04 = storeVal };
             }
 
             /** @brief Checks if substory enemy's HP% >= hpRatePercent. */

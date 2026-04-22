@@ -341,7 +341,9 @@ namespace Arrowgene.Ddon.Shared.Entity
 
             Create(new CDataPackageQuestDetail.Serializer());
             Create(new CDataPackageQuestList.Serializer());
-            
+            Create(new CDataPackageQuestInfoDetail.Serializer());
+            Create(new CDataPackageQuestInfoDetailList.Serializer());
+
             Create(new CDataPartnerPawnData.Serializer());
             Create(new CDataPartnerPawnReward.Serializer());
             Create(new CDataPartnerPawnRewardParam.Serializer());
@@ -402,6 +404,7 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new CDataQuestRecruitListItem.Serializer());
             Create(new CDataQuestSetInfo.Serializer());
             Create(new CDataQuestTalkInfo.Serializer());
+            Create(new CDataQuestPackageQuestEntry.Serializer());
 
             Create(new CDataRaidBossEnemyParam.Serializer());
             Create(new CDataRaidBossPlayStartData.Serializer());
@@ -971,7 +974,9 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new C2SQuestCancelNavigationQuestReq.Serializer());
             Create(new C2SQuestGetWorldManageQuestListReq.Serializer());
             Create(new C2S_QUEST_11_60_16_NTC.Serializer());
-
+            Create(new C2SQuestAddPackageQuestPointReq.Serializer());
+            Create(new C2SQuestGetPackageQuestInfoDetailReq.Serializer());
+            Create(new C2SQuestGetPackageQuestInfoReq.Serializer());
 
             Create(new C2SRankingBoardListReq.Serializer());
             Create(new C2SRankingRankListReq.Serializer());
@@ -1704,6 +1709,9 @@ namespace Arrowgene.Ddon.Shared.Entity
             Create(new S2CQuestSubstoryStartAnnounceNtc.Serializer());
             Create(new S2CQuestTimeGainQuestPlayStartNtc.Serializer());
             Create(new S2CQuestTimerNtc.Serializer());
+            Create(new S2CQuestAddPackageQuestPointRes.Serializer());
+            Create(new S2CQuestGetPackageQuestInfoDetailRes.Serializer());
+            Create(new S2CQuestGetPackageQuestInfoRes.Serializer());
 
             Create(new S2CRankingBoardListRes.Serializer());
             Create(new S2CRankingRankListRes.Serializer());

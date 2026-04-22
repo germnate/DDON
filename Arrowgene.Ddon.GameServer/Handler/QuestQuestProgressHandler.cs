@@ -83,7 +83,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     else if (questProgressState == QuestProgressState.Accepted &&
                              (quest.QuestType == QuestType.Tutorial ||
                               quest.QuestType == QuestType.WildHunt ||
-                              quest.QuestType == QuestType.Light))
+                              quest.QuestType == QuestType.Light ||
+                              quest.QuestType == QuestType.Substory))
                     {
                         // Add a new personal quest record for the player
                         if (!Server.Database.InsertQuestProgress(client.Character.CommonId, questScheduleId, quest.QuestType, 0, connection))

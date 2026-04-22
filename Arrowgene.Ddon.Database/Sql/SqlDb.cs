@@ -596,6 +596,11 @@ public abstract class SqlDb : IDatabase
     public abstract Dictionary<QuestAreaId, List<CDataRewardItemInfo>> SelectAreaRankSupply(uint characterId, DbConnection? connectionIn = null);
     public abstract List<CDataRewardItemInfo> SelectAreaRankSupply(uint characterId, QuestAreaId areaId, DbConnection? connectionIn = null);
     public abstract bool DeleteAreaRankSupply(DbConnection? connectionIn = null);
+
+    // Substory Progress
+    public abstract Dictionary<QuestSubstoryGroupId, SubstoryProgress> SelectSubstoryProgress(uint characterId, DbConnection? connectionIn = null);
+    public abstract bool UpsertSubstoryProgress(uint characterId, SubstoryProgress progress, DbConnection? connectionIn = null);
+
     public abstract bool InsertRankRecord(uint characterId, uint questId, long score, DbConnection? connectionIn = null);
     public abstract List<uint> SelectUsedRankingBoardQuests(DbConnection? connectionIn = null);
     public abstract List<CDataRankingData> SelectRankingDataByCharacterId(uint characterId, uint questId, uint limit = 1000, DbConnection? connectionIn = null);

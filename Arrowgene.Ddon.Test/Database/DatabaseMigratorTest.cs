@@ -476,7 +476,8 @@ namespace Arrowgene.Ddon.Test.Database
         public Dictionary<QuestAreaId, List<CDataRewardItemInfo>> SelectAreaRankSupply(uint characterId, DbConnection? connectionIn = null) { return new(); }
         public List<CDataRewardItemInfo> SelectAreaRankSupply(uint characterId, QuestAreaId areaId, DbConnection? connectionIn = null) { return new(); }
         public bool DeleteAreaRankSupply(DbConnection? connectionIn = null) { return true; }
-
+        public Dictionary<QuestSubstoryGroupId, SubstoryProgress> SelectSubstoryProgress(uint characterId, DbConnection? connectionIn = null) { return new(); }
+        public bool UpsertSubstoryProgress(uint characterId, SubstoryProgress progress, DbConnection? connectionIn = null) { return true; }
 
         public bool InsertRankRecord(uint characterId, uint questId, long score, DbConnection? connectionIn = null) { return true; }
         public List<uint> SelectUsedRankingBoardQuests(DbConnection? connectionIn = null) { return new(); }

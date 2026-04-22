@@ -75,7 +75,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
         public uint QuestOrderBackgroundImage { get; protected set; }
         public bool IsImportant { get; protected set; }
         public QuestAdventureGuideCategory AdventureGuideCategory { get; protected set; }
-        public StageLayoutId StageId {  get; set; }
+        public StageLayoutId StageId { get; set; } = StageLayoutId.Invalid;
         public uint NewsImageId { get; set; }
         public uint BaseLevel { get; set; }
         public ushort MinimumItemRank { get; set; }
@@ -110,7 +110,8 @@ namespace Arrowgene.Ddon.GameServer.Quests
         public bool IsPersonal { get
             {
                 return QuestType == QuestType.Light
-                    || QuestType == QuestType.Tutorial;
+                    || QuestType == QuestType.Tutorial
+                    || QuestType == QuestType.Substory;
             } 
         }
 

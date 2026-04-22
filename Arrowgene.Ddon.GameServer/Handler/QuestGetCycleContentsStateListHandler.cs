@@ -1,6 +1,5 @@
 using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.GameServer.Dump;
-using Arrowgene.Ddon.GameServer.Quests.LightQuests;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
@@ -113,6 +112,43 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         ntc.LightQuestOrderList.Add(lightQuest);
                         break;
                 }
+            }
+
+            Dictionary<QuestSubstoryGroupId, Dictionary<uint, List<CDataQuestOrderList>>> substoryGroups = new();
+            foreach (var questProgress in allQuestsInProgress)
+            {
+                if (questProgress.QuestType != QuestType.Substory) continue;
+
+                var quest = QuestManager.GetQuestByScheduleId(questProgress.QuestScheduleId);
+                if (quest == null || !quest.IsActive(client)) continue;
+
+                var props = QuestManager.GetSubstoryQuestProperties(Server, quest.QuestId);
+                if (props.SubstoryGroupId == QuestSubstoryGroupId.Invalid) continue;
+
+                if (!substoryGroups.ContainsKey(props.SubstoryGroupId))
+                    substoryGroups[props.SubstoryGroupId] = new();
+                if (!substoryGroups[props.SubstoryGroupId].ContainsKey(props.SeqNo))
+                    substoryGroups[props.SubstoryGroupId][props.SeqNo] = new();
+
+                substoryGroups[props.SubstoryGroupId][props.SeqNo].Add(quest.ToCDataQuestOrderList(questProgress.Step));
+            }
+
+            foreach (var (substoryGroupId, seqData) in substoryGroups)
+            {
+                var entry = new CDataSubstoryQuestOrderList() { SubstoryGroupId = substoryGroupId };
+                foreach (var (seqNo, questList) in seqData)
+                {
+                    entry.Details.Add(new CDataS2CQuestJoinLobbyQuestInfoNtcUnk0Unk1()
+                    {
+                        SequenceNo = seqNo,
+                        Unk1 = 0,
+                        Unk2 = 0,
+                        Unk3 = [],
+                        Unk4 = false,
+                        QuestList = questList
+                    });
+                }
+                ntc.SubstoryQuestOrderList.Add(entry);
             }
 
             if (client.Party != null)

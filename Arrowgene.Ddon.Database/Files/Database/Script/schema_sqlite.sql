@@ -1118,8 +1118,8 @@ CREATE TABLE IF NOT EXISTS "ddon_group_chat"
 (
     "character_id" INTEGER NOT NULL,
     "group_id"     BIGINT NOT NULL,
-    CONSTRAINT "pk_ddon_group_chat" PRIMARY KEY ("character_id")
-    CONSTRAINT "fk_ddon_group_chat_character_id" FOREIGN KEY ("character_id") references "ddon_character" ("character_id") ON DELETE CASCADE
+    CONSTRAINT "pk_ddon_group_chat" PRIMARY KEY ("character_id"),
+    CONSTRAINT "fk_ddon_group_chat_character_id" FOREIGN KEY ("character_id") references "ddon_character" ("character_id") ON DELETE CASCADE,
     CONSTRAINT "fk_ddon_group_chat_group_id" FOREIGN KEY ("group_id") references "ddon_group_chat_groups" ("group_id") ON DELETE CASCADE
 );
 
@@ -1128,8 +1128,8 @@ CREATE TABLE IF NOT EXISTS "ddon_black_list"
 (
     "character_id"  INTEGER NOT NULL,
     "target_id"     INTEGER NOT NULL,
-    CONSTRAINT "pk_ddon_black_list" PRIMARY KEY ("character_id", "target_id")
-    CONSTRAINT "fk_ddon_black_list_character_id" FOREIGN KEY ("character_id") references "ddon_character" ("character_id") ON DELETE CASCADE
+    CONSTRAINT "pk_ddon_black_list" PRIMARY KEY ("character_id", "target_id"),
+    CONSTRAINT "fk_ddon_black_list_character_id" FOREIGN KEY ("character_id") references "ddon_character" ("character_id") ON DELETE CASCADE,
     CONSTRAINT "fk_ddon_black_list_target_id" FOREIGN KEY ("target_id") references "ddon_character" ("character_id") ON DELETE CASCADE
 );
 
@@ -1138,7 +1138,7 @@ CREATE TABLE IF NOT EXISTS "ddon_communication_message_set"
     "character_id"  INTEGER NOT NULL,
     "set_no"        INTEGER NOT NULL,
     "set_name"      TEXT    NOT NULL,
-    CONSTRAINT "pk_ddon_communication_message_set" PRIMARY KEY ("character_id", "set_no")
+    CONSTRAINT "pk_ddon_communication_message_set" PRIMARY KEY ("character_id", "set_no"),
     CONSTRAINT "fk_ddon_communication_message_set_character_id" FOREIGN KEY ("character_id") references "ddon_character" ("character_id") ON DELETE CASCADE
 );
 
@@ -1150,8 +1150,18 @@ CREATE TABLE IF NOT EXISTS "ddon_communication_message"
     "message"       TEXT NOT NULL,
     "emotion"       INTEGER NOT NULL,
     "emotochat"     BOOLEAN NOT NULL,
-    CONSTRAINT "pk_ddon_communication_message" PRIMARY KEY ("character_id", "set_no", "message_no")
+    CONSTRAINT "pk_ddon_communication_message" PRIMARY KEY ("character_id", "set_no", "message_no"),
     CONSTRAINT "fk_ddon_communication_message_character_id_set_no" FOREIGN KEY ("character_id", "set_no") references "ddon_communication_message_set" ("character_id", "set_no") ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "ddon_substory_progress"
+(
+    "character_id"       INTEGER NOT NULL,
+    "substory_group_id"  INTEGER NOT NULL,
+    "sequence_step"      INTEGER NOT NULL DEFAULT 0,
+    "is_complete"        INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT "pk_ddon_substory_progress" PRIMARY KEY ("character_id", "substory_group_id"),
+    CONSTRAINT "fk_ddon_substory_progress_character_id" FOREIGN KEY ("character_id") REFERENCES "ddon_character"("character_id") ON DELETE CASCADE
 );
 
 INSERT INTO "ddon_schedule_next"(type, timestamp) VALUES 
