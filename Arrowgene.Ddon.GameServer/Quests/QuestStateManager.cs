@@ -443,6 +443,15 @@ namespace Arrowgene.Ddon.GameServer.Quests
         {
             var quest = GetQuest(questScheduleId);
             RemoveQuest(questScheduleId);
+
+            if (QuestManager.IsWorldQuest(quest))
+            {
+                lock (ActiveQuests)
+                {
+                    CompletedWorldQuests.Add(quest.QuestId);
+                    RolledInstanceWorldQuests[quest.QuestAreaId].Remove(questScheduleId);
+                }
+            }
         }
 
         public void CompleteQuest(uint questScheduleId)
@@ -1119,12 +1128,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
         {
             PacketQueue packets = new();
 
-            if (Party.Leader is null || requestingClient != Party.Leader.Client)
+            var leaderClient = Party.Leader?.Client ?? (Party.IsSolo ? requestingClient : null);
+            if (leaderClient is null || requestingClient != leaderClient)
             {
                 return packets;
             }
-
-            var leaderClient = Party.Leader.Client;
 
             S2CQuestSetPriorityQuestNtc prioNtc = new S2CQuestSetPriorityQuestNtc()
             {
