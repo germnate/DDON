@@ -1,4 +1,5 @@
 using Arrowgene.Ddon.Shared.Model.Scheduler;
+using System;
 
 namespace Arrowgene.Ddon.GameServer.Tasks
 {
@@ -8,8 +9,18 @@ namespace Arrowgene.Ddon.GameServer.Tasks
         public ScheduleInterval Interval { get; }
 
         /// <summary>
-        /// Constructor for SchedulerTask.
+        /// Returns the UTC offset to use when computing the next fire time. Evaluated fresh on
+        /// every NextTimestamp() call so DST transitions are picked up automatically when a
+        /// ServerTimeZoneId is configured.
         /// </summary>
+        public TimeSpan Offset => GetOffset();
+
+        /// <summary>
+        /// Delegate that produces the current UTC offset. Set by ScheduleManager using the
+        /// server's ServerTimeZoneId / ServerUtcOffset settings.
+        /// </summary>
+        public Func<TimeSpan> GetOffset { get; set; } = () => TimeSpan.Zero;
+
         /// <param name="interval">Hint for the type of interval this task is expected to occur at.</param>
         /// <param name="type">
         ///     The task type which is stored in the DB and used to resume the scheduler

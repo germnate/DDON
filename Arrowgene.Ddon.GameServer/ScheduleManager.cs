@@ -47,6 +47,10 @@ namespace Arrowgene.Ddon.GameServer
                 new GroupChatPruningTask(0, 0),
                 new StampResetTask(5, 0),
             ];
+
+            var settings = server.GameSettings.GameServerSettings;
+            foreach (var task in Tasks)
+                task.GetOffset = () => settings.GetEffectiveUtcOffset();
         }
 
         private int GetTimerTick(ScheduleInterval interval)

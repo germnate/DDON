@@ -38,8 +38,9 @@ namespace Arrowgene.Ddon.GameServer
                 return;
 
             var settings = _server.GameSettings.GameServerSettings;
-            long seed = ComputeCurrentPeriodSeed(settings.WorldQuestResetDay, settings.WorldQuestResetHour, settings.WorldQuestResetMinute);
-            Logger.Info($"WorldQuestManager initializing with seed {seed} (period starting {DateTimeOffset.FromUnixTimeSeconds(seed):u})");
+            long seed = ComputeCurrentPeriodSeed(settings.WorldQuestResetDay, settings.WorldQuestResetHour, settings.WorldQuestResetMinute, settings.GetEffectiveUtcOffset());
+            var periodStart = TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeSeconds(seed), settings.ServerTimeZone);
+            Logger.Info($"WorldQuestManager initializing with seed {seed} (period starting {periodStart:yyyy-MM-dd HH:mm:ss zzz})");
             RollPool(seed);
         }
 
@@ -87,17 +88,19 @@ namespace Arrowgene.Ddon.GameServer
 
         /// <summary>
         /// Computes the Unix timestamp of the most recent past occurrence of the configured
-        /// reset day and hour (UTC). All server instances independently arrive at the same seed,
-        /// making the pool deterministic without a DB round-trip.
+        /// reset day and hour. All server instances independently arrive at the same seed as long
+        /// as they are configured with the same utcOffset, making the pool deterministic
+        /// without a DB round-trip.
         /// </summary>
-        public static long ComputeCurrentPeriodSeed(DayOfWeek resetDay, uint resetHour, uint resetMinute = 0)
+        public static long ComputeCurrentPeriodSeed(DayOfWeek resetDay, uint resetHour, uint resetMinute = 0, TimeSpan? utcOffset = null)
         {
-            var now = DateTimeOffset.UtcNow;
+            var offset = utcOffset ?? TimeSpan.Zero;
+            var now = DateTimeOffset.UtcNow.ToOffset(offset);
             int dayDiff = ((int)now.DayOfWeek - (int)resetDay + 7) % 7;
-            var resetDate = now.UtcDateTime.Date.AddDays(-dayDiff);
+            var resetDate = now.AddDays(-dayDiff);
             var resetTime = new DateTimeOffset(
                 resetDate.Year, resetDate.Month, resetDate.Day,
-                (int)resetHour, (int)resetMinute, 0, TimeSpan.Zero);
+                (int)resetHour, (int)resetMinute, 0, offset);
 
             // If the reset time for today hasn't happened yet, go back one full week
             if (resetTime > now)

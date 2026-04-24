@@ -1806,7 +1806,8 @@ namespace Arrowgene.Ddon.Server.Settings
         private const WorldQuestSystemMode _WorldQuestSystem = WorldQuestSystemMode.ServerReset;
 
         /// <summary>
-        /// Day of the week (UTC) on which the server-wide world quest pool resets.
+        /// Day of the week (in the timezone defined by ServerTimeZone) on which the
+        /// server-wide world quest pool resets.
         /// Only used when WorldQuestSystem = WorldQuestSystemMode.ServerReset.
         /// </summary>
         [DefaultValue("DayOfWeek.Thursday")]
@@ -1824,7 +1825,8 @@ namespace Arrowgene.Ddon.Server.Settings
         private const DayOfWeek _WorldQuestResetDay = DayOfWeek.Thursday;
 
         /// <summary>
-        /// Hour of the day (0-23, UTC) at which the server-wide world quest pool resets.
+        /// Hour of the day (0-23, in the timezone defined by ServerTimeZone) at which
+        /// the server-wide world quest pool resets.
         /// Only used when WorldQuestSystem = WorldQuestSystemMode.ServerReset.
         /// </summary>
         [DefaultValue(_WorldQuestResetHour)]
@@ -1842,7 +1844,8 @@ namespace Arrowgene.Ddon.Server.Settings
         private const uint _WorldQuestResetHour = 10;
 
         /// <summary>
-        /// Minute of the hour (0-59, UTC) at which the server-wide world quest pool resets.
+        /// Minute of the hour (0-59, in the timezone defined by ServerTimeZone) at which
+        /// the server-wide world quest pool resets.
         /// Only used when WorldQuestSystem = WorldQuestSystemMode.ServerReset.
         /// </summary>
         [DefaultValue(_WorldQuestResetMinute)]
@@ -1858,6 +1861,48 @@ namespace Arrowgene.Ddon.Server.Settings
             }
         }
         private const uint _WorldQuestResetMinute = 0;
+
+        /// <summary>
+        /// Timezone used for all calendar-aligned task scheduler resets (daily, weekly) and world
+        /// quest seed computation. Set this to the same value on every shard.
+        ///
+        /// Use the named constants in <see cref="TimeZoneId"/> - they cover both DST-observing and fixed-offset
+        /// timezones, so no manual update is ever needed when clocks change:
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneId.Japan;          // Japan (JST) - original game timezone
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneId.CentralEurope;  // Germany, France, Spain, etc. (CET/CEST auto)
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneId.EasternEurope;  // Finland, Greece, Romania, etc. (EET/EEST auto)
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneId.UKIreland;      // UK/Ireland (GMT/BST auto)
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneId.Eastern;        // US/Canada Eastern (EST/EDT auto)
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneId.UTC;            // UTC
+        ///
+        /// For a timezone not listed in <see cref="TimeZoneId"/>, use FindSystemTimeZoneById with any IANA ID:
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Indiana/Knox");
+        ///
+        /// Full list of IANA timezone IDs:
+        ///   https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+        ///
+        /// For a fully custom fixed offset with no IANA ID:
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneInfo.CreateCustomTimeZone("custom", TimeSpan.FromHours(5.5), "UTC+5:30", "UTC+5:30");
+        /// </summary>
+        [DefaultValue("TimeZoneId.Japan")]
+        public TimeZoneInfo ServerTimeZone
+        {
+            set
+            {
+                SetSetting("ServerTimeZone", value);
+            }
+            get
+            {
+                return TryGetSetting("ServerTimeZone", _ServerTimeZone);
+            }
+        }
+        private static readonly TimeZoneInfo _ServerTimeZone =
+            TimeZoneInfo.TryFindSystemTimeZoneById("Asia/Tokyo", out var _jst) ? _jst : TimeZoneInfo.Utc;
+
+        /// <summary>
+        /// Returns the UTC offset for the configured ServerTimeZone at the current moment.
+        /// </summary>
+        public TimeSpan GetEffectiveUtcOffset() => ServerTimeZone.GetUtcOffset(DateTimeOffset.UtcNow);
 
         /// <summary>
         /// When true, world quests that the party leader does not meet the area rank requirement for

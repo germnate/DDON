@@ -23,7 +23,7 @@ namespace Arrowgene.Ddon.GameServer.Tasks.Implementations
         public override void RunTask(DdonGameServer server)
         {
             var settings = server.GameSettings.GameServerSettings;
-            long seed = WorldQuestManager.ComputeCurrentPeriodSeed(settings.WorldQuestResetDay, settings.WorldQuestResetHour, settings.WorldQuestResetMinute);
+            long seed = WorldQuestManager.ComputeCurrentPeriodSeed(settings.WorldQuestResetDay, settings.WorldQuestResetHour, settings.WorldQuestResetMinute, settings.GetEffectiveUtcOffset());
             Logger.Info($"Triggering server-wide world quest reset with seed {seed}");
             server.RpcManager.AnnounceAll("internal/command", RpcInternalCommand.WorldQuestReset, seed);
         }
