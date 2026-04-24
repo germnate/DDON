@@ -2,7 +2,7 @@
  * @brief The Great Dragon Crystal War: The Resisting Land
  */
 
-#load "C:\Users\Paul\Git\Arrowgene.DragonsDogmaOnline\Arrowgene.Ddon.Cli\bin\Debug\net10.0\Files\Assets\scripts\libs.csx"
+#load "libs.csx"
 
 public class ScriptedQuest : IQuest
 {
