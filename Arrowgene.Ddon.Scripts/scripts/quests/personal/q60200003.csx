@@ -32,7 +32,8 @@ public class ScriptedQuest : IQuest
     {
         var process0 = AddNewProcess(0);
 		process0.AddRawBlock(QuestAnnounceType.None)
-            .AddCheckCmdIsMainQuestClear(QuestId.TheEntrustedOne);
+            .AddCheckCmdIsMainQuestClear(QuestId.TheEntrustedOne)
+            .AddCheckCmdIsTutorialQuestClear((QuestId)60200002);
         process0.AddNpcTalkAndOrderBlock(Stage.AudienceChamber, NpcId.Joseph, 18047)
             .AddQuestFlag(QuestFlagType.QstLayout, QuestFlagAction.Set, 3751);
         process0.AddRawBlock(QuestAnnounceType.Accept)
