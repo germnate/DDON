@@ -16,8 +16,9 @@ namespace Arrowgene.Ddon.GameServer.Tasks
 
         public override long NextTimestamp()
         {
-            var tomorrow = DateTime.Today.AddDays(1);
-            return new DateTimeOffset(new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, (int)Hour, (int)Minute, 0)).ToUnixTimeSeconds();
+            var now = DateTimeOffset.UtcNow.ToOffset(Offset);
+            var tomorrow = now.AddDays(1).Date;
+            return new DateTimeOffset(tomorrow.Year, tomorrow.Month, tomorrow.Day, (int)Hour, (int)Minute, 0, Offset).ToUnixTimeSeconds();
         }
 
         public override string TaskTypeName()

@@ -76,6 +76,7 @@ namespace Arrowgene.Ddon.Server.Scripting.modules
                 .AddReferences(MetadataReference.CreateFromFile(typeof(LibUtils).Assembly.Location))
                 .AddImports("System", "System.Collections", "System.Collections.Generic")
                 .AddImports("Arrowgene.Ddon.Server.Scripting")
+                .AddImports("Arrowgene.Ddon.Server.Settings")
                 .AddImports("Arrowgene.Ddon.Shared.Model")
                 .AddImports("Arrowgene.Ddon.Shared.Model.Quest");
         }
