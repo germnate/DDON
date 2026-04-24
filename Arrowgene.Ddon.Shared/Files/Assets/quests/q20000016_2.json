@@ -7,8 +7,8 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "HidellPlains",
-  "news_image": 14,
-  "order_conditions": [{"type": "AreaRank", "Param1": 5, "Param2": 8}],
+  "news_image": 42,
+  "order_conditions": [{"type": "AreaRank", "Param1": 1, "Param2": 8}],
   "variant_index": 2,
   "rewards": [
     {
@@ -124,7 +124,7 @@
         "id": 2
       },
       "npc_id": "Heinz2",
-      "message_id": 11372
+      "message_id": 11840
     },
     {
       "type": "DiscoverEnemy",
@@ -177,7 +177,7 @@
       ],
       "announce_type": "Update",
       "npc_id": "Heinz2",
-      "message_id": 11842
+      "message_id": 11843
     }
   ]
 }

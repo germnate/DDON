@@ -84,7 +84,6 @@
           "stage_id": {
             "id": 2
           },
-          "flags": [{"type": "QstLayout", "action": "Clear", "value": 1133}],
           "npc_id": "Vicelot",
           "message_id": 10931
 		},

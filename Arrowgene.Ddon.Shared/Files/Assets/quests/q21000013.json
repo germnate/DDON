@@ -7,7 +7,8 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "HidellPlains",
-  "order_conditions": [ { "type": "AreaRank", "Param1": 1, "Param2": 13 } ],
+  "news_image": 541,
+  "order_conditions": [{"type": "AreaRank", "Param1": 1, "Param2": 13}],
   "rewards": [
     {
       "type": "exp",
@@ -107,24 +108,24 @@
         {
           "comment": "This dungeon is unlocked early, so a check is necessary",
           "type": "Raw",
-          "check_commands": [ { "type": "CheckAreaRank", "Param1": 1, "Param1": 13 } ]
+          "check_commands": [{"type": "CheckAreaRank", "Param1": 1, "Param1": 13}]
         },
         {
           "type": "DiscoverEnemy",
           "groups": [0],
-          "result_commands": [ { "type": "QstLayoutFlagOn", "Param1": 2995 } ]
+          "result_commands": [{"type": "QstLayoutFlagOn", "Param1": 2995}]
         },
         {
           "type": "KillGroup",
           "reset_group": false,
           "announce_type": "Accept",
           "groups": [0],
-          "result_commands": [ { "type": "MyQstFlagOn", "Param1": 2 } ]
+          "result_commands": [{"type": "MyQstFlagOn", "Param1": 0}]
         },
         {
-          "type": "KillGroup",
-          "reset_group": false,
-          "groups": [1]
+          "type": "Raw",
+          "result_commands": [{"type": "MyQstFlagOff", "Param1": 0}],
+          "check_commands": [{"type": "MyQstFlagOff", "Param1": 1}]
         }
       ]
     },
@@ -132,26 +133,28 @@
       "blocks": [
         {
           "type": "Raw",
-          "check_commands": [ { "type": "MyQstFlagOn", "Param1": 2 } ]
+          "check_commands": [{"type": "MyQstFlagOn", "Param1": 0}]
         },
         {
           "comment": "Group 0 boss HP check",
           "type": "Raw",
-          "check_commands": [ { "type": "EmHpLess", "Param1": 502, "Param2": 1, "Param3": 9, "Param4": 40 } ]
+          "check_commands": [{"type": "EmHpLess", "Param1": 502, "Param2": 1, "Param3": 9, "Param4": 40}]
         },
         {
-          "type": "SpawnGroup",
+          "type": "KillGroup",
           "announce_type": "Update",
           "groups": [1],
-          "check_commands": [
-            { "type": "MyQstFlagOff", "Param1": 0 },
-            { "type": "MyQstFlagOn",  "Param1": 1 }
-          ]
+          "result_commands": [{"type": "MyQstFlagOn", "Param1": 1}, {"type": "StartTimer", "Param1": 1, "Param2": 30}]
         },
         {
-          "comment": "Group 1 is dead and group 0 is still alive, update announcement",
           "type": "Raw",
-          "result_commands":  [ { "type": "UpdateAnnounce", "Param1": 3 } ]
+          "result_commands": [{"type": "MyQstFlagOff", "Param1": 1}],
+          "check_commands": [{"type": "IsMyquestLayoutFlagOff", "Param1": 2997}, {"type": "MyQstFlagOn", "Param1": 0}]
+        },
+        {
+          "type": "Raw",
+          "announce_type": "Update",
+          "result_commands": [{"type": "CallGeneralAnnounce", "Param1": 1, "Param2": 565}]
         }
       ]
     },
@@ -159,39 +162,17 @@
       "blocks": [
         {
           "type": "Raw",
-          "check_commands": [ { "type": "MyQstFlagOn", "Param1": 2 } ]
+          "check_commands": [{"type": "IsEndTimer", "Param1": 1}, {"type": "MyQstFlagOn", "Param1": 1}]
         },
-        {
-          "comment": "Is group 0 dead",
-          "type": "Raw",
-          "check_commands": [ { "type": "DieEnemy", "Param1": 502, "Param2": 1, "Param3": 9 } ]
-        },
-        {
-          "type": "MyQstFlags",
-          "set_flags": [0]
-        }
-      ]
-    },
-    {
-      "blocks": [
         {
           "type": "Raw",
-          "check_commands": [ { "type": "MyQstFlagOn",  "Param1": 2 } ]
+          "result_commands": [{"type": "CallGeneralAnnounce", "Param1": 1, "Param2": 567}, {"type": "StartTimer", "Param1": 2, "Param2": 15}],
+          "check_commands": [{"type": "IsEndTimer", "Param1": 2}, {"type": "MyQstFlagOn", "Param1": 1}]
         },
         {
-          "comment": "Is group 1 dead",
           "type": "Raw",
-          "check_commands": [
-              { "type": "DieEnemy", "Param1": 502, "Param2": 7, "Param3": 0 } ,
-              { "type": "DieEnemy", "Param1": 502, "Param2": 7, "Param3": 1 } ,
-              { "type": "DieEnemy", "Param1": 502, "Param2": 7, "Param3": 2 } ,
-              { "type": "DieEnemy", "Param1": 502, "Param2": 7, "Param3": 3 } ,
-              { "type": "DieEnemy", "Param1": 502, "Param2": 7, "Param3": 4 }
-          ]
-        },
-        {
-          "type": "MyQstFlags",
-          "set_flags": [1]
+          "announce_type": "Update",
+          "result_commands": [{"type": "CallGeneralAnnounce", "Param1": 1, "Param2": 566}, {"type": "QstLayoutFlagOn", "Param1": 2997}]
         }
       ]
     }
