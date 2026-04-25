@@ -32,7 +32,8 @@ public class ScriptedQuest : IQuest
     {
         var process0 = AddNewProcess(0);
 		process0.AddRawBlock(QuestAnnounceType.None)
-            .AddCheckCmdIsMainQuestClear(QuestId.TheDarknessOfTheHeart);
+            .AddCheckCmdIsMainQuestClear(QuestId.TheDarknessOfTheHeart)
+            .AddCheckCmdIsTutorialQuestClear((QuestId)60200003);
         process0.AddNpcTalkAndOrderBlock(Stage.AudienceChamber, NpcId.Joseph, 18651)
             .AddQuestFlag(QuestFlagType.QstLayout, QuestFlagAction.Set, 4038);
         process0.AddRawBlock(QuestAnnounceType.Accept)

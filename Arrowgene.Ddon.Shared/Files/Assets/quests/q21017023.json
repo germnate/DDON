@@ -7,6 +7,7 @@
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "KingalCanyon",
+    "news_image": 303,
     "order_conditions": [{"type": "AreaRank", "Param1": 17, "Param2": 11}],
     "rewards": [
         {
@@ -112,7 +113,8 @@
                 {
                     "type": "Raw",
                     "check_commands": [
-                        {"type": "WeatherEq", "Param1": 2}
+                        {"type": "WeatherEq", "Param1": 2},
+                        {"type": "StageNoWithoutMarker", "Param1": 122}
                     ]
                 },
                 {
