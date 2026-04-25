@@ -135,6 +135,7 @@ namespace Arrowgene.Ddon.Shared.Model
         public uint NextBBMStageId {  get; set; }
         public uint MaxBazaarExhibits { get; set; }
         public Dictionary<QuestId, CompletedQuest> CompletedQuests { get; set; }
+        public HashSet<uint> WorldQuestPeriodFirstClears { get; set; } = new();
         public uint LastSafeStageId { get; set; }
         public uint ClanId { get; set; }
         public ClanName ClanName { get; set; }

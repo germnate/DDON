@@ -340,6 +340,20 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                 var rewardType = reward.GetProperty("type").GetString();
                 switch (rewardType)
                 {
+                    case "repeat":
+                    {
+                        var repeatItem = new QuestRandomFixedRewardItem();
+                        foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
+                        {
+                            repeatItem.LootPool.Add(new FixedLootPoolItem()
+                            {
+                                ItemId = AssetCommonDeserializer.ParseItemId(item.GetProperty("item_id")),
+                                Num = item.GetProperty("num").GetUInt16(),
+                            });
+                        }
+                        assetData.RepeatClearRewardItems.Add(repeatItem);
+                        break;
+                    }
                     case "fixed":
                     case "random":
                     case "select":

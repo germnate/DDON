@@ -9,7 +9,7 @@ public partial class DdonSqlDb : SqlDb
     protected static readonly string[] RewardBoxFields = new[]
     {
         /* uniq_reward_id */ "character_common_id", "quest_schedule_id", "num_random_rewards", "random_reward0_index", "random_reward1_index", "random_reward2_index",
-        "random_reward3_index"
+        "random_reward3_index", "is_repeat_reward"
     };
 
     private readonly int MAX_RANDOM_REWARDS = 4;
@@ -36,6 +36,8 @@ public partial class DdonSqlDb : SqlDb
                 for (i = 0; i < rewards.NumRandomRewards; i++) AddParameter(command, $"random_reward{i}_index", rewards.RandomRewardIndices[i]);
 
                 for (; i < MAX_RANDOM_REWARDS; i++) AddParameter(command, $"random_reward{i}_index", 0);
+
+                AddParameter(command, "is_repeat_reward", rewards.IsRepeatReward ? 1 : 0);
             }) == 1;
         });
     }
@@ -79,6 +81,7 @@ public partial class DdonSqlDb : SqlDb
         obj.QuestScheduleId = GetUInt32(reader, "quest_schedule_id");
 
         for (int i = 0; i < obj.NumRandomRewards; i++) obj.RandomRewardIndices.Add(GetInt32(reader, $"random_reward{i}_index"));
+        obj.IsRepeatReward = GetInt32(reader, "is_repeat_reward") != 0;
 
         return obj;
     }

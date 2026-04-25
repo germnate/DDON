@@ -199,6 +199,7 @@ namespace Arrowgene.Ddon.Test.Database
         public bool DeleteAccount(int accountId) { return true; }
         public int DeleteBazaarExhibition(ulong bazaarId) { return 1; }
         public bool DeleteBoxRewardItem(uint commonId, uint uniqId, DbConnection? connectionIn = null) { return true; }
+        public bool DeleteAllWorldQuestFirstClears(DbConnection? connectionIn = null) { return true; }
         public bool DeleteCharacter(uint characterId) { return true; }
         public bool DeleteCommunicationShortcut(uint characterId, uint pageNo, uint buttonNo) { return true; }
         public bool DeleteConnection(int serverId, int accountId) { return true; }
@@ -238,6 +239,9 @@ namespace Arrowgene.Ddon.Test.Database
         public List<QuestProgress> GetQuestProgressByType(uint characterCommonId, QuestType questType, DbConnection? connectionIn = null) { return new List<QuestProgress>(); }
         public ulong InsertBazaarExhibition(BazaarExhibition exhibition) { return 1; }
         public bool InsertBoxRewardItems(uint commonId, QuestBoxRewards rewards, DbConnection? connectionIn = null) { return true; }
+        public bool InsertWorldQuestFirstClear(uint commonId, uint questId, DbConnection? connectionIn = null) { return true; }
+        public bool HasWorldQuestFirstClear(uint commonId, uint questId, DbConnection? connectionIn = null) { return false; }
+        public HashSet<uint> SelectWorldQuestFirstClears(uint commonId, DbConnection? connectionIn = null) { return new(); }
         public bool InsertCommunicationShortcut(uint characterId, CDataCommunicationShortCut communicationShortcut, DbConnection? connectionIn = null) { return true; }
         public bool InsertConnection(Connection connection) { return true; }
         public int InsertContact(uint requestingCharacterId, uint requestedCharacterId, ContactListStatus status, ContactListType type, bool requesterFavorite, bool requestedFavorite) { return 1; }
@@ -463,7 +467,7 @@ namespace Arrowgene.Ddon.Test.Database
         public HashSet<uint> GetEpitaphClaimedWeeklyRewards(uint characterId, DbConnection? connectionIn = null) { return new(); }
 
         public Dictionary<TaskType, SchedulerTaskEntry> SelectAllTaskEntries() { return new(); }
-        public bool UpdateScheduleInfo(TaskType type, long timestamp) { return true; }
+        public bool UpsertScheduleInfo(TaskType type, long timestamp) { return true; }
         public List<CDataRegisterdPawnList> SelectRegisteredPawns(Character searchingCharacter, CDataPawnSearchParameter searchParams, DbConnection? connectionIn = null) { return new List<CDataRegisterdPawnList>(); }
         public void DeleteWeeklyEpitaphClaimedRewards(DbConnection? connectionIn = null) { }
         public bool InsertAreaRank(uint characterId, AreaRank areaRank, DbConnection? connectionIn = null) { return true; }

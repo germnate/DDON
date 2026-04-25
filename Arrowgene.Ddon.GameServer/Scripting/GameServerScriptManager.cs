@@ -34,7 +34,7 @@ namespace Arrowgene.Ddon.GameServer.Scripting
         public JobOrbTreeSpecialConditionModule JobOrbSpecialConditionModule { get; private set; } = new();
         public JobEmblemStatModule JobEmblemStatModule { get; private set; } = new JobEmblemStatModule();
         public InstanceEnemyDropModule InstanceEnemyDropModule { get; private set; } = new();
-
+        public SchedulerTaskModule SchedulerTaskModule { get; private set; } = new SchedulerTaskModule();
 
         public GameServerScriptManager(DdonGameServer server) : base(server.AssetRepository.AssetsPath, ".")
         {
@@ -57,6 +57,7 @@ namespace Arrowgene.Ddon.GameServer.Scripting
             AddModule(JobOrbSpecialConditionModule);
             AddModule(MonsterCautionSpotModule);
             AddModule(InstanceEnemyDropModule);
+            AddModule(SchedulerTaskModule);
         }
 
         public override void Initialize()

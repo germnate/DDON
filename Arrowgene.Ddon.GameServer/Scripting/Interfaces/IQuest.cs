@@ -17,6 +17,9 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
             RewardItems = new List<QuestRewardItem>();
             WalletRewards = new List<QuestWalletReward>();
             PointRewards = new List<QuestPointReward>();
+            RepeatClearRewardItems = new List<QuestRewardItem>();
+            RepeatClearWalletRewards = new List<QuestWalletReward>();
+            RepeatClearPointRewards = new List<QuestPointReward>();
             EnemyGroups = new Dictionary<uint, QuestEnemyGroup>();
             MissionParams = new QuestMissionParams();
             QuestLayoutSetInfoSetList = new List<QuestLayoutFlagSetInfo>();
@@ -76,6 +79,9 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
         protected List<QuestRewardItem> RewardItems { get; set; }
         protected List<QuestWalletReward> WalletRewards { get; set; }
         protected List<QuestPointReward> PointRewards { get; set; }
+        protected List<QuestRewardItem> RepeatClearRewardItems { get; set; }
+        protected List<QuestWalletReward> RepeatClearWalletRewards { get; set; }
+        protected List<QuestPointReward> RepeatClearPointRewards { get; set; }
         protected Dictionary<uint, QuestEnemyGroup> EnemyGroups { get; set; }
         protected List<QuestLayoutFlagSetInfo> QuestLayoutSetInfoSetList { get; set; }
         protected QuestMissionParams MissionParams { get; set; }
@@ -166,6 +172,38 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
         public void AddWalletReward(WalletType walletType, uint amount)
         {
             WalletRewards.Add(QuestWalletReward.Create(walletType, amount));
+        }
+
+        // Repeat-clear reward helpers: call these from InitializeRewards()
+        public void AddRepeatClearItemReward(QuestRewardItem reward)
+        {
+            if (reward != null)
+                RepeatClearRewardItems.Add(reward);
+        }
+
+        public void AddRepeatClearFixedItemReward(ItemId itemId, ushort amount, bool isHidden = false)
+        {
+            AddRepeatClearItemReward(QuestFixedRewardItem.Create(itemId, amount, isHidden));
+        }
+
+        public void AddRepeatClearRandomFixedItemReward(List<(ItemId ItemId, ushort Amount)> items, bool isHidden = false)
+        {
+            AddRepeatClearItemReward(QuestRandomFixedRewardItem.Create(items, isHidden));
+        }
+
+        public void AddRepeatClearRandomChanceItemReward(List<(ItemId ItemId, ushort Amount, double Chance)> items, bool isHidden = false)
+        {
+            AddRepeatClearItemReward(QuestRandomChanceRewardItem.Create(items, isHidden));
+        }
+
+        public void AddRepeatClearPointReward(PointType pointType, uint amount)
+        {
+            RepeatClearPointRewards.Add(QuestPointReward.Create(pointType, amount));
+        }
+
+        public void AddRepeatClearWalletReward(WalletType walletType, uint amount)
+        {
+            RepeatClearWalletRewards.Add(QuestWalletReward.Create(walletType, amount));
         }
 
         public void AddQuestOrderCondition(QuestOrderConditionType type, int param01 = 0, int param02 = 0)
@@ -328,6 +366,9 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
                 Processes = Processes.Values.ToList(),
                 RewardItems = RewardItems,
                 RewardCurrency = WalletRewards,
+                RepeatClearRewardItems = RepeatClearRewardItems,
+                RepeatClearRewardCurrency = RepeatClearWalletRewards,
+                RepeatClearPointRewards = RepeatClearPointRewards,
                 StageLayoutId = StageInfo.AsStageLayoutId(0, 0),
                 ResetPlayerAfterQuest = ResetPlayerAfterQuest,
                 MissionParams = MissionParams,

@@ -90,6 +90,16 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 }
             }
 
+            // Repeat-clear rewards from script
+            foreach (var pointReward in questAsset.RepeatClearPointRewards)
+                quest.AddRepeatClearExpReward(pointReward.PointType, pointReward.Amount);
+
+            foreach (var walletReward in questAsset.RepeatClearRewardCurrency)
+                quest.AddRepeatClearWalletReward(walletReward.WalletType, walletReward.Amount);
+
+            foreach (var rewardItem in questAsset.RepeatClearRewardItems)
+                quest.AddRepeatClearItemReward(rewardItem);
+
             foreach (var (_, enemyGroup) in questAsset.EnemyGroups)
             {
                 quest.UniqueEnemyGroups.Add(enemyGroup.StageLayoutId);

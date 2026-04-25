@@ -10,7 +10,7 @@ public partial class DdonSqlDb : SqlDb
         "type", "timestamp"
     };
 
-    private static readonly string SqlUpdateScheduleNext = "UPDATE \"ddon_schedule_next\" SET \"timestamp\"=@timestamp WHERE \"type\"=@type;";
+    private static readonly string SqlUpsertScheduleNext = $"INSERT INTO \"ddon_schedule_next\" ({BuildQueryField(ScheduleNextFields)}) VALUES ({BuildQueryInsert(ScheduleNextFields)}) ON CONFLICT(\"type\") DO UPDATE SET \"timestamp\"=EXCLUDED.\"timestamp\";";
     private static readonly string SqlSelectScheduleNext = $"SELECT {BuildQueryField(ScheduleNextFields)} FROM \"ddon_schedule_next\";";
 
 
@@ -32,9 +32,9 @@ public partial class DdonSqlDb : SqlDb
         return results;
     }
 
-    public override bool UpdateScheduleInfo(TaskType type, long timestamp)
+    public override bool UpsertScheduleInfo(TaskType type, long timestamp)
     {
-        return ExecuteNonQuery(SqlUpdateScheduleNext, command =>
+        return ExecuteNonQuery(SqlUpsertScheduleNext, command =>
         {
             AddParameter(command, "@type", (uint)type);
             AddParameter(command, "@timestamp", timestamp);

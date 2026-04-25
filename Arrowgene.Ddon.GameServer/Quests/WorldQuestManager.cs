@@ -1,8 +1,10 @@
 using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.GameServer.Quests;
+using Arrowgene.Ddon.GameServer.Tasks;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.Quest;
+using Arrowgene.Ddon.Shared.Model.Scheduler;
 using Arrowgene.Logging;
 using System;
 using System.Collections.Generic;
@@ -38,7 +40,13 @@ namespace Arrowgene.Ddon.GameServer
                 return;
 
             var settings = _server.GameSettings.GameServerSettings;
-            long seed = ComputeCurrentPeriodSeed(settings.WorldQuestResetDay, settings.WorldQuestResetHour, settings.WorldQuestResetMinute, settings.GetEffectiveUtcOffset());
+            var resetTask = _server.ScriptManager.SchedulerTaskModule.GetTask<WeeklyTask>(TaskType.WorldQuestRotation);
+            if (resetTask == null)
+            {
+                Logger.Error("WorldQuestManager: no WorldQuestRotation task found in scripts; skipping pool initialization.");
+                return;
+            }
+            long seed = ComputeCurrentPeriodSeed(resetTask.Day, resetTask.Hour, resetTask.Minute, settings.GetEffectiveUtcOffset());
             var periodStart = TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeSeconds(seed), settings.ServerTimeZone);
             Logger.Info($"WorldQuestManager initializing with seed {seed} (period starting {periodStart:yyyy-MM-dd HH:mm:ss zzz})");
             RollPool(seed);
@@ -60,30 +68,55 @@ namespace Arrowgene.Ddon.GameServer
         }
 
         /// <summary>
-        /// Performs a server-wide reset using the given seed. Called via RPC on every game server
-        /// instance (including the originating head server) when the weekly task fires.
+        /// Performs a world quest reset triggered by the weekly task.
+        /// In ServerReset mode: rotates the server-wide pool, notifies all online parties, and purges stale DB progress.
+        /// In InstanceReset mode (when WorldQuestFirstClearRewards is enabled): skips pool rotation but still resets
+        /// per-character first-clear records so the new period's rewards are available.
         /// </summary>
         public void PerformReset(long seed)
         {
-            Logger.Info($"WorldQuestManager performing reset with seed {seed}");
-            RollPool(seed);
+            var settings = _server.GameSettings.GameServerSettings;
+            bool isServerReset = settings.WorldQuestSystem == WorldQuestSystemMode.ServerReset;
 
-            foreach (var party in _server.PartyManager.GetAllParties())
+            if (isServerReset)
             {
-                if (party.QuestState is SharedQuestStateManager shared)
+                Logger.Info($"WorldQuestManager performing pool reset with seed {seed}");
+                RollPool(seed);
+
+                foreach (var party in _server.PartyManager.GetAllParties())
                 {
-                    shared.OnServerWorldQuestReset(GetCurrentPool());
+                    if (party.QuestState is SharedQuestStateManager shared)
+                    {
+                        shared.OnServerWorldQuestReset(GetCurrentPool());
+                    }
                 }
+
+                // Purge all persisted world quest progress so offline players don't reload
+                // stale quests on next login. Online players already had their in-memory
+                // state cleared above before this runs.
+                _server.Database.RemoveAllQuestProgressByType(QuestType.World);
+
+                _server.ChatManager.BroadcastMessage(
+                    LobbyChatMsgType.ManagementAlertN,
+                    "World quest pool has been refreshed for the new period.");
             }
 
-            // Purge all persisted world quest progress so offline players don't reload
-            // stale quests on next login. Online players already had their in-memory
-            // state cleared above before this runs.
-            _server.Database.RemoveAllQuestProgressByType(QuestType.World);
+            if (settings.WorldQuestFirstClearRewards)
+            {
+                Logger.Info($"WorldQuestManager clearing period first-clear reward records");
+                _server.Database.DeleteAllWorldQuestFirstClears();
 
-            _server.ChatManager.BroadcastMessage(
-                LobbyChatMsgType.ManagementAlertN,
-                "World quest pool has been refreshed for the new period.");
+                foreach (var party in _server.PartyManager.GetAllParties())
+                    foreach (var client in party.Clients)
+                        client.Character.WorldQuestPeriodFirstClears.Clear();
+
+                if (!isServerReset)
+                {
+                    _server.ChatManager.BroadcastMessage(
+                        LobbyChatMsgType.ManagementAlertN,
+                        "World quest rewards have been reset for the new period.");
+                }
+            }
         }
 
         /// <summary>
