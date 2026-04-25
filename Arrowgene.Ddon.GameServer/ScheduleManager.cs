@@ -1,5 +1,4 @@
 using Arrowgene.Ddon.GameServer.Tasks;
-using Arrowgene.Ddon.GameServer.Tasks.Implementations;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Model.Scheduler;
 using Arrowgene.Logging;
@@ -27,30 +26,8 @@ namespace Arrowgene.Ddon.GameServer
         public ScheduleManager(DdonGameServer server)
         {
             Server = server;
+            Tasks = new List<SchedulerTask>();
             Timers = new List<Timer>();
-
-            // TODO: Load from server config
-            Tasks =
-            [
-                new EpitaphSchedulerTask(DayOfWeek.Monday, 5, 0),
-                new AreaPointResetTask(DayOfWeek.Monday, 5, 0),
-                new RankingBoardResetTask(DayOfWeek.Monday, 5, 0),
-                new BBMResetTicketTask(DayOfWeek.Monday, 5, 0),
-                new CraftingSchedulerTask(),
-                new PawnLikabilityIncreaseResetTask(5, 0),
-                new EquipmentRecycleResetTask(5, 0),
-                new BoardQuestRotationTask(5, 0),
-                new WorldQuestResetTask(
-                    server.GameSettings.GameServerSettings.WorldQuestResetDay,
-                    server.GameSettings.GameServerSettings.WorldQuestResetHour,
-                    server.GameSettings.GameServerSettings.WorldQuestResetMinute),
-                new GroupChatPruningTask(0, 0),
-                new StampResetTask(5, 0),
-            ];
-
-            var settings = server.GameSettings.GameServerSettings;
-            foreach (var task in Tasks)
-                task.GetOffset = () => settings.GetEffectiveUtcOffset();
         }
 
         private int GetTimerTick(ScheduleInterval interval)
@@ -72,6 +49,12 @@ namespace Arrowgene.Ddon.GameServer
 
         public void StartServerTasks()
         {
+            Tasks = Server.ScriptManager.SchedulerTaskModule.Tasks;
+
+            var settings = Server.GameSettings.GameServerSettings;
+            foreach (var task in Tasks)
+                task.GetOffset = () => settings.GetEffectiveUtcOffset();
+
             TaskEntries = Server.Database.SelectAllTaskEntries();
 
             var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -79,8 +62,8 @@ namespace Arrowgene.Ddon.GameServer
             {
                 if (!TaskEntries.ContainsKey(task.Type))
                 {
-                    Logger.Error($"Task '{task.Type}' has no record in the database. Skipping.");
-                    continue;
+                    Logger.Info($"Task '{task.Type}' has no database record. Creating entry.");
+                    TaskEntries[task.Type] = new SchedulerTaskEntry { Type = task.Type, Timestamp = 0 };
                 }
 
                 if (!task.IsEnabled(Server))
@@ -94,7 +77,7 @@ namespace Arrowgene.Ddon.GameServer
                 {
                     task.RunTask(Server);
                     TaskEntries[task.Type].Timestamp = task.NextTimestamp();
-                    Server.Database.UpdateScheduleInfo(task.Type, TaskEntries[task.Type].Timestamp);
+                    Server.Database.UpsertScheduleInfo(task.Type, TaskEntries[task.Type].Timestamp);
                 }
 
                 var timerTick = GetTimerTick(task.Interval);
@@ -107,7 +90,7 @@ namespace Arrowgene.Ddon.GameServer
                         TaskEntries[task.Type].Timestamp = task.NextTimestamp();
                         if (task.Interval != ScheduleInterval.Secondly)
                         {
-                            Server.Database.UpdateScheduleInfo(task.Type, TaskEntries[task.Type].Timestamp);
+                            Server.Database.UpsertScheduleInfo(task.Type, TaskEntries[task.Type].Timestamp);
                         }
                     }
                 }, null, timerTick, timerTick);

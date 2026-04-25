@@ -1,8 +1,10 @@
 using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.GameServer.Quests;
+using Arrowgene.Ddon.GameServer.Tasks;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.Quest;
+using Arrowgene.Ddon.Shared.Model.Scheduler;
 using Arrowgene.Logging;
 using System;
 using System.Collections.Generic;
@@ -38,7 +40,13 @@ namespace Arrowgene.Ddon.GameServer
                 return;
 
             var settings = _server.GameSettings.GameServerSettings;
-            long seed = ComputeCurrentPeriodSeed(settings.WorldQuestResetDay, settings.WorldQuestResetHour, settings.WorldQuestResetMinute, settings.GetEffectiveUtcOffset());
+            var resetTask = _server.ScriptManager.SchedulerTaskModule.GetTask<WeeklyTask>(TaskType.WorldQuestRotation);
+            if (resetTask == null)
+            {
+                Logger.Error("WorldQuestManager: no WorldQuestRotation task found in scripts; skipping pool initialization.");
+                return;
+            }
+            long seed = ComputeCurrentPeriodSeed(resetTask.Day, resetTask.Hour, resetTask.Minute, settings.GetEffectiveUtcOffset());
             var periodStart = TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeSeconds(seed), settings.ServerTimeZone);
             Logger.Info($"WorldQuestManager initializing with seed {seed} (period starting {periodStart:yyyy-MM-dd HH:mm:ss zzz})");
             RollPool(seed);

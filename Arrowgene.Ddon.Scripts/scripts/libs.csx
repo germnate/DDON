@@ -45,3 +45,6 @@ global using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 global using Arrowgene.Ddon.Shared.Entity.Structure;
 global using Arrowgene.Ddon.Shared.Model;
 global using Arrowgene.Ddon.Shared.Model.Quest;
+global using Arrowgene.Ddon.Shared.Model.Rpc;
+global using Arrowgene.Ddon.Shared.Model.Scheduler;
+global using Arrowgene.Ddon.GameServer.Tasks;

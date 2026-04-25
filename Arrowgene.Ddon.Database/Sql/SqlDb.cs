@@ -589,7 +589,7 @@ public abstract class SqlDb : IDatabase
     public abstract HashSet<uint> GetEpitaphClaimedWeeklyRewards(uint characterId, DbConnection? connectionIn = null);
     public abstract void DeleteWeeklyEpitaphClaimedRewards(DbConnection? connectionIn = null);
     public abstract Dictionary<TaskType, SchedulerTaskEntry> SelectAllTaskEntries();
-    public abstract bool UpdateScheduleInfo(TaskType type, long timestamp);
+    public abstract bool UpsertScheduleInfo(TaskType type, long timestamp);
     public abstract bool InsertAreaRank(uint characterId, AreaRank areaRank, DbConnection? connectionIn = null);
     public abstract bool UpdateAreaRank(uint characterId, AreaRank areaRank, DbConnection? connectionIn = null);
     public abstract Dictionary<QuestAreaId, AreaRank> SelectAreaRank(uint characterId, DbConnection? connectionIn = null);
