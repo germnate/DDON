@@ -1805,62 +1805,6 @@ namespace Arrowgene.Ddon.Server.Settings
         }
         private const WorldQuestSystemMode _WorldQuestSystem = WorldQuestSystemMode.ServerReset;
 
-        /// <summary>
-        /// Day of the week (in the timezone defined by ServerTimeZone) on which the
-        /// server-wide world quest pool resets.
-        /// Only used when WorldQuestSystem = WorldQuestSystemMode.ServerReset.
-        /// </summary>
-        [DefaultValue("DayOfWeek.Thursday")]
-        public DayOfWeek WorldQuestResetDay
-        {
-            set
-            {
-                SetSetting("WorldQuestResetDay", value);
-            }
-            get
-            {
-                return TryGetSetting("WorldQuestResetDay", _WorldQuestResetDay);
-            }
-        }
-        private const DayOfWeek _WorldQuestResetDay = DayOfWeek.Thursday;
-
-        /// <summary>
-        /// Hour of the day (0-23, in the timezone defined by ServerTimeZone) at which
-        /// the server-wide world quest pool resets.
-        /// Only used when WorldQuestSystem = WorldQuestSystemMode.ServerReset.
-        /// </summary>
-        [DefaultValue(_WorldQuestResetHour)]
-        public uint WorldQuestResetHour
-        {
-            set
-            {
-                SetSetting("WorldQuestResetHour", value);
-            }
-            get
-            {
-                return TryGetSetting("WorldQuestResetHour", _WorldQuestResetHour);
-            }
-        }
-        private const uint _WorldQuestResetHour = 10;
-
-        /// <summary>
-        /// Minute of the hour (0-59, in the timezone defined by ServerTimeZone) at which
-        /// the server-wide world quest pool resets.
-        /// Only used when WorldQuestSystem = WorldQuestSystemMode.ServerReset.
-        /// </summary>
-        [DefaultValue(_WorldQuestResetMinute)]
-        public uint WorldQuestResetMinute
-        {
-            set
-            {
-                SetSetting("WorldQuestResetMinute", value);
-            }
-            get
-            {
-                return TryGetSetting("WorldQuestResetMinute", _WorldQuestResetMinute);
-            }
-        }
-        private const uint _WorldQuestResetMinute = 0;
 
         /// <summary>
         /// Timezone used for all calendar-aligned task scheduler resets (daily, weekly) and world

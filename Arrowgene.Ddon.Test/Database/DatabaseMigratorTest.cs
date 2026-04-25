@@ -467,7 +467,7 @@ namespace Arrowgene.Ddon.Test.Database
         public HashSet<uint> GetEpitaphClaimedWeeklyRewards(uint characterId, DbConnection? connectionIn = null) { return new(); }
 
         public Dictionary<TaskType, SchedulerTaskEntry> SelectAllTaskEntries() { return new(); }
-        public bool UpdateScheduleInfo(TaskType type, long timestamp) { return true; }
+        public bool UpsertScheduleInfo(TaskType type, long timestamp) { return true; }
         public List<CDataRegisterdPawnList> SelectRegisteredPawns(Character searchingCharacter, CDataPawnSearchParameter searchParams, DbConnection? connectionIn = null) { return new List<CDataRegisterdPawnList>(); }
         public void DeleteWeeklyEpitaphClaimedRewards(DbConnection? connectionIn = null) { }
         public bool InsertAreaRank(uint characterId, AreaRank areaRank, DbConnection? connectionIn = null) { return true; }

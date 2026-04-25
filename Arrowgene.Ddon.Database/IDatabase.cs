@@ -492,7 +492,7 @@ public interface IDatabase
 
     // Scheduler
     Dictionary<TaskType, SchedulerTaskEntry> SelectAllTaskEntries();
-    bool UpdateScheduleInfo(TaskType type, long timestamp);
+    bool UpsertScheduleInfo(TaskType type, long timestamp);
 
     // Area Rank
     bool InsertAreaRank(uint characterId, AreaRank areaRank, DbConnection? connectionIn = null);
