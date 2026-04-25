@@ -4,6 +4,7 @@ using Arrowgene.Ddon.GameServer.Quests.LightQuests;
 using Arrowgene.Ddon.GameServer.Scripting.Interfaces;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
+using Arrowgene.Ddon.Server.Settings;
 using Arrowgene.Ddon.Shared.Asset;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
@@ -88,6 +89,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
         protected List<CDataQuestExp> ExpRewards { get; set; }
         protected List<QuestRewardItem> ItemRewards { get; set; }
         protected List<QuestRewardItem> SelectableRewards { get; set; }
+        // Repeat-clear reward lists: populated from InitializeRewards().
+        // When empty and WorldQuestFirstClearRewards is enabled, wallet rewards are auto-nerfed from base values.
+        protected List<CDataWalletPoint> RepeatClearWalletRewards { get; set; }
+        protected List<CDataQuestExp> RepeatClearExpRewards { get; set; }
+        protected List<QuestRewardItem> RepeatClearItemRewards { get; set; }
         public List<QuestLocation> Locations { get; protected set; }
         public List<QuestDeliveryItem> DeliveryItems { get; protected set; }
         public List<QuestEnemyHunt> EnemyHunts { get; protected set; }
@@ -171,6 +177,9 @@ namespace Arrowgene.Ddon.GameServer.Quests
             ExpRewards = new List<CDataQuestExp>();
             ItemRewards = new List<QuestRewardItem>();
             SelectableRewards = new List<QuestRewardItem>();
+            RepeatClearWalletRewards = new List<CDataWalletPoint>();
+            RepeatClearExpRewards = new List<CDataQuestExp>();
+            RepeatClearItemRewards = new List<QuestRewardItem>();
             Locations = new List<QuestLocation>();
             DeliveryItems = new List<QuestDeliveryItem>();
             EnemyHunts = new List<QuestEnemyHunt>();
@@ -1106,6 +1115,27 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 return new List<CDataRewardBoxItem>();
             }
 
+            // Auto-repeat: one item was picked from the combined first-clear pool at completion time.
+            // The stored index is into GetAutoRepeatPool(), not into a specific random slot.
+            if (rewards.IsRepeatReward && !quest.HasRepeatClearItemRewards()
+                && rewards.NumRandomRewards > 0 && rewards.RandomRewardIndices.Count > 0)
+            {
+                var pool = quest.GetAutoRepeatPool();
+                var idx = rewards.RandomRewardIndices[0];
+                if (idx < pool.Count)
+                {
+                    var item = pool[idx];
+                    results.Add(new CDataRewardBoxItem()
+                    {
+                        ItemId = item.ItemId,
+                        Num = item.Num,
+                        Type = (byte)QuestRewardType.Repeat,
+                        UID = item.GetUID()
+                    });
+                }
+                return results;
+            }
+
             foreach (var reward in quest.SelectableRewards)
             {
                 results.AddRange(reward.AsCDataRewardBoxItems());
@@ -1191,6 +1221,160 @@ namespace Arrowgene.Ddon.GameServer.Quests
         public bool HasRewards()
         {
             return (ItemRewards.Count > 0) || (SelectableRewards.Count > 0);
+        }
+
+        public bool HasRepeatClearItemRewards()
+        {
+            return RepeatClearItemRewards.Count > 0;
+        }
+
+        public byte RepeatClearRandomRewardNum()
+        {
+            byte count = 0;
+            foreach (var reward in RepeatClearItemRewards)
+            {
+                if (reward.RewardType == QuestRewardType.Random)
+                    count++;
+            }
+            return count;
+        }
+
+        public void AddRepeatClearItemReward(QuestRewardItem reward)
+        {
+            if (reward == null) return;
+            switch (reward.RewardType)
+            {
+                case QuestRewardType.Fixed:
+                case QuestRewardType.Random:
+                    RepeatClearItemRewards.Add(reward);
+                    break;
+            }
+        }
+
+        public void AddRepeatClearWalletReward(WalletType walletType, uint amount)
+        {
+            RepeatClearWalletRewards.Add(new CDataWalletPoint() { Type = walletType, Value = amount });
+        }
+
+        public void AddRepeatClearExpReward(PointType pointType, uint amount)
+        {
+            RepeatClearExpRewards.Add(new CDataQuestExp() { Type = pointType, Reward = amount });
+        }
+
+        /// <summary>
+        /// Returns the wallet rewards to give on a repeat clear, applying server-level nerf percentages
+        /// when no custom repeat clear wallet rewards are explicitly defined.
+        /// </summary>
+        public List<CDataWalletPoint> GetRepeatClearScaledWalletRewards(GameServerSettings settings)
+        {
+            if (RepeatClearWalletRewards.Count > 0)
+            {
+                // Explicit rewards defined in the quest script, scale normally
+                var custom = new List<CDataWalletPoint>();
+                foreach (var wp in RepeatClearWalletRewards)
+                    custom.Add(new CDataWalletPoint() { Type = wp.Type, Value = Server.WalletManager.GetScaledWalletAmount(wp.Type, wp.Value) });
+                return custom;
+            }
+
+            // Auto-nerf the base wallet rewards
+            var result = new List<CDataWalletPoint>();
+            foreach (var wp in WalletRewards)
+            {
+                uint scaled = Server.WalletManager.GetScaledWalletAmount(wp.Type, wp.Value);
+                uint finalValue = wp.Type switch
+                {
+                    WalletType.Gold => (uint)(scaled * settings.WorldQuestRepeatClearGoldPct),
+                    WalletType.RiftPoints => (uint)(scaled * settings.WorldQuestRepeatClearRpPct),
+                    _ => scaled
+                };
+                result.Add(new CDataWalletPoint() { Type = wp.Type, Value = finalValue });
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the EXP rewards to give on a repeat clear, applying server-level nerf percentages
+        /// when no custom repeat clear exp rewards are explicitly defined.
+        /// </summary>
+        public List<CDataQuestExp> GetRepeatClearScaledExpRewards(GameServerSettings settings)
+        {
+            if (RepeatClearExpRewards.Count > 0)
+                return RepeatClearExpRewards;
+
+            // Auto-nerf the base exp/JP rewards
+            var result = new List<CDataQuestExp>();
+            foreach (var exp in ExpRewards)
+            {
+                uint finalValue = exp.Type switch
+                {
+                    PointType.ExperiencePoints => (uint)(exp.Reward * settings.WorldQuestRepeatClearExpPct),
+                    PointType.JobPoints => (uint)(exp.Reward * settings.WorldQuestRepeatClearJpPct),
+                    _ => exp.Reward
+                };
+                result.Add(new CDataQuestExp() { Type = exp.Type, Reward = finalValue });
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Rolls random reward indices from the repeat-clear item pool.
+        /// </summary>
+        public QuestBoxRewards GenerateRepeatClearBoxRewards()
+        {
+            QuestBoxRewards obj = new QuestBoxRewards()
+            {
+                QuestScheduleId = QuestScheduleId,
+                IsRepeatReward = true,
+            };
+
+            foreach (var reward in RepeatClearItemRewards)
+            {
+                if (reward.RewardType == QuestRewardType.Random)
+                {
+                    var randomReward = (QuestRandomRewardItem)reward;
+                    obj.RandomRewardIndices.Add(randomReward.Roll());
+                }
+            }
+            obj.NumRandomRewards = obj.RandomRewardIndices.Count;
+
+            return obj;
+        }
+
+        /// <summary>
+        /// Flat pool of all items from first-clear selectable and random reward pools.
+        /// Index into this is what gets stored as the auto-repeat reward.
+        /// </summary>
+        public List<LootPoolItem> GetAutoRepeatPool()
+        {
+            var pool = new List<LootPoolItem>();
+            foreach (var reward in SelectableRewards)
+                pool.AddRange(reward.LootPool);
+            foreach (var reward in ItemRewards)
+                if (reward.RewardType == QuestRewardType.Random)
+                    pool.AddRange(reward.LootPool);
+            return pool;
+        }
+
+        /// <summary>
+        /// Picks one item at random from the combined first-clear pool (selectable + random).
+        /// The stored index references GetAutoRepeatPool(), not any individual slot.
+        /// </summary>
+        public QuestBoxRewards GenerateAutoRepeatClearBoxRewards()
+        {
+            QuestBoxRewards obj = new QuestBoxRewards()
+            {
+                QuestScheduleId = QuestScheduleId,
+                IsRepeatReward = true,
+            };
+
+            var pool = GetAutoRepeatPool();
+            if (pool.Count > 0)
+            {
+                obj.RandomRewardIndices.Add(Random.Shared.Next(pool.Count));
+                obj.NumRandomRewards = 1;
+            }
+
+            return obj;
         }
 
         public List<CDataCharacterReleaseElement> GetContentReleaseRewards()

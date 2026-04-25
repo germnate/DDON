@@ -319,6 +319,12 @@ public interface IDatabase
     bool DeleteBoxRewardItem(uint commonId, uint uniqId, DbConnection? connectionIn = null);
     List<QuestBoxRewards> SelectBoxRewardItems(uint commonId, DbConnection? connectionIn = null);
 
+    // World Quest Period First Clear
+    bool InsertWorldQuestFirstClear(uint commonId, uint questScheduleId, DbConnection? connectionIn = null);
+    bool HasWorldQuestFirstClear(uint commonId, uint questScheduleId, DbConnection? connectionIn = null);
+    bool DeleteAllWorldQuestFirstClears(DbConnection? connectionIn = null);
+    HashSet<uint> SelectWorldQuestFirstClears(uint commonId, DbConnection? connectionIn = null);
+
     // Completed Quests
     List<CompletedQuest> GetCompletedQuestsByType(uint characterCommonId, QuestType questType, DbConnection? connectionIn = null);
     CompletedQuest GetCompletedQuestsById(uint characterCommonId, QuestId questId, DbConnection? connectionIn = null);

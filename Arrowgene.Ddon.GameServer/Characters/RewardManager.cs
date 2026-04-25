@@ -35,6 +35,36 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return Server.Database.InsertBoxRewardItems(client.Character.CommonId, rewards, connectionIn);
         }
 
+        public bool AddRepeatClearQuestRewards(GameClient client, Quest quest, DbConnection? connectionIn = null)
+        {
+            var rewards = quest.GenerateRepeatClearBoxRewards();
+
+            var currentRewards = GetQuestBoxRewards(client, connectionIn);
+            if (currentRewards.Count >= Server.GameSettings.GameServerSettings.RewardBoxMax)
+            {
+                return false;
+            }
+
+            return Server.Database.InsertBoxRewardItems(client.Character.CommonId, rewards, connectionIn);
+        }
+
+        public bool AddAutoRepeatClearQuestRewards(GameClient client, Quest quest, DbConnection? connectionIn = null)
+        {
+            var rewards = quest.GenerateAutoRepeatClearBoxRewards();
+            if (rewards.NumRandomRewards == 0)
+            {
+                return true;
+            }
+
+            var currentRewards = GetQuestBoxRewards(client, connectionIn);
+            if (currentRewards.Count >= Server.GameSettings.GameServerSettings.RewardBoxMax)
+            {
+                return false;
+            }
+
+            return Server.Database.InsertBoxRewardItems(client.Character.CommonId, rewards, connectionIn);
+        }
+
         public List<QuestBoxRewards> GetQuestBoxRewards(GameClient client, DbConnection? connectionIn = null)
         {
             return Server.Database.SelectBoxRewardItems(client.Character.CommonId, connectionIn);

@@ -67,6 +67,11 @@ namespace Arrowgene.Ddon.Shared.Asset
         public bool Discoverable { get; set; }
         public List<QuestRewardItem> RewardItems;
         public List<QuestWalletReward> RewardCurrency;
+
+        // Repeat-clear rewards (used when WorldQuestFirstClearRewards is enabled and player has already cleared this period)
+        public List<QuestRewardItem> RepeatClearRewardItems;
+        public List<QuestWalletReward> RepeatClearRewardCurrency;
+        public List<QuestPointReward> RepeatClearPointRewards;
         public List<QuestOrderCondition> OrderConditions;
         public bool ResetPlayerAfterQuest { get; set; }
         public List<QuestLayoutFlag> QuestLayoutFlags { get; set; }
@@ -88,6 +93,9 @@ namespace Arrowgene.Ddon.Shared.Asset
             PointRewards = new List<QuestPointReward>();
             RewardItems = new List<QuestRewardItem>();
             RewardCurrency = new List<QuestWalletReward>();
+            RepeatClearRewardItems = new List<QuestRewardItem>();
+            RepeatClearRewardCurrency = new List<QuestWalletReward>();
+            RepeatClearPointRewards = new List<QuestPointReward>();
             QuestLayoutFlags = new List<QuestLayoutFlag>();
             QuestLayoutSetInfoFlags = new List<QuestLayoutFlagSetInfo>();
             EnemyGroups = new Dictionary<uint, QuestEnemyGroup>();

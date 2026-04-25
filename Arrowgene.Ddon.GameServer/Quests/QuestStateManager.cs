@@ -754,6 +754,69 @@ namespace Arrowgene.Ddon.GameServer.Quests
             return packets;
         }
 
+        /// <summary>
+        /// Sends reduced wallet and EXP rewards for a repeat world quest clear.
+        /// Uses quest-specific repeat rewards if defined; otherwise auto-nerfs the base rewards
+        /// per the WorldQuestRepeatClear* server settings.
+        /// </summary>
+        protected PacketQueue SendRepeatClearWalletRewards(DdonGameServer server, GameClient client, Quest quest, DbConnection? connectionIn = null)
+        {
+            PacketQueue packets = new();
+            var settings = server.GameSettings.GameServerSettings;
+
+            S2CItemUpdateCharacterItemNtc updateCharacterItemNtc = new S2CItemUpdateCharacterItemNtc()
+            {
+                UpdateType = ItemNoticeType.Quest
+            };
+
+            foreach (var walletReward in quest.GetRepeatClearScaledWalletRewards(settings))
+            {
+                updateCharacterItemNtc.UpdateWalletList.Add(server.WalletManager.AddToWallet(
+                    client.Character,
+                    walletReward.Type,
+                    walletReward.Value,
+                    connectionIn: connectionIn
+                ));
+            }
+
+            if (updateCharacterItemNtc.UpdateWalletList.Count > 0)
+            {
+                client.Enqueue(updateCharacterItemNtc, packets);
+            }
+
+            var scaledExpRewards = quest.GetRepeatClearScaledExpRewards(settings);
+            foreach (var pointReward in scaledExpRewards)
+            {
+                if (pointReward.Reward == 0)
+                    continue;
+
+                (uint BasePoints, uint BonusPoints) amount = server.ExpManager.GetAdjustedPointsForQuest(pointReward.Type, pointReward.Reward, quest.QuestType, client, client.Character);
+                switch (pointReward.Type)
+                {
+                    case PointType.ExperiencePoints:
+                        packets.AddRange(server.ExpManager.AddExp(client, client.Character, amount, RewardSource.Quest, quest.QuestType, connectionIn));
+                        break;
+                    case PointType.JobPoints:
+                        packets.AddRange(server.ExpManager.AddJp(client, client.Character, amount.BasePoints, RewardSource.Quest, quest.QuestType, connectionIn));
+                        break;
+                    case PointType.AreaPoints:
+                        var areaId = quest.QuestAreaId > 0 ? quest.QuestAreaId : (QuestAreaId)quest.LightQuestDetail.AreaId;
+                        packets.AddRange(server.AreaRankManager.AddAreaPoint(client, areaId, amount, connectionIn));
+                        break;
+                }
+            }
+
+            // Fallback AP for world quests that don't define their own AreaPoints reward on repeat clear
+            if (!scaledExpRewards.Exists(x => x.Type == PointType.AreaPoints) && QuestManager.IsWorldQuest(quest))
+            {
+                var areaId = quest.QuestAreaId;
+                var amount = server.ExpManager.GetAdjustedPointsForQuest(PointType.AreaPoints, AreaRankManager.GetAreaPointReward(quest), quest.QuestType);
+                packets.AddRange(server.AreaRankManager.AddAreaPoint(client, areaId, amount, connectionIn));
+            }
+
+            return packets;
+        }
+
         public virtual void EnforceInitialPoolEligibility() { }
 
         protected virtual Quest RollQuestVariant(QuestId questId)
@@ -975,8 +1038,8 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 if (quest == null || IsQuestActive(scheduleId) || IsCompletedWorldQuest(scheduleId))
                     continue;
 
-                CompletedQuest questStats = leaderCharacter.CompletedQuests.GetValueOrDefault(quest.QuestId);
-                questList.Add(quest.ToCDataSetQuestList(0, questStats?.ClearCount ?? 0));
+                uint clearCount = leaderCharacter.WorldQuestPeriodFirstClears.Contains(quest.QuestScheduleId) ? 1u : 0u;
+                questList.Add(quest.ToCDataSetQuestList(0, clearCount));
             }
 
             Party.SendToAll(new S2CQuestGetSetQuestListNtc
@@ -995,6 +1058,17 @@ namespace Arrowgene.Ddon.GameServer.Quests
 
         protected override Quest RollQuestVariant(QuestId questId)
         {
+            if (Server.GameSettings.GameServerSettings.WorldQuestSystem == WorldQuestSystemMode.ServerReset)
+            {
+                var pool = Server.WorldQuestManager.GetCurrentPool();
+                foreach (var scheduleId in QuestManager.GetQuestScheduleIdsForQuestId(questId))
+                {
+                    var quest = QuestManager.GetQuestByScheduleId(scheduleId);
+                    if (quest != null && pool.TryGetValue(quest.QuestAreaId, out var poolSet) && poolSet.Contains(scheduleId))
+                        return quest;
+                }
+                return null;
+            }
             return RollEligibleQuestVariant(questId, Party.Leader?.Client.Character);
         }
 
@@ -1082,6 +1156,9 @@ namespace Arrowgene.Ddon.GameServer.Quests
             PacketQueue packets = new();
             Quest quest = GetQuest(questScheduleId);
 
+            bool isWorldQuest = QuestManager.IsWorldQuest(quest);
+            bool rewardSystemEnabled = Server.GameSettings.GameServerSettings.WorldQuestFirstClearRewards;
+
             var questState = GetQuestState(quest);
             foreach (var memberClient in Party.Clients)
             {
@@ -1103,22 +1180,47 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 // Distribute any released content from the quest to the player
                 packets.AddRange(RewardReleasedContent(memberClient, quest, connectionIn));
 
-                // Check for Item Rewards
-                if (quest.HasRewards())
+                bool isFirstClear = !isWorldQuest
+                    || !rewardSystemEnabled
+                    || !Server.Database.HasWorldQuestFirstClear(memberClient.Character.CommonId, quest.QuestScheduleId, connectionIn);
+
+                if (isWorldQuest && rewardSystemEnabled && isFirstClear)
                 {
-                    Server.RewardManager.AddQuestRewards(memberClient, quest, connectionIn);
+                    Server.Database.InsertWorldQuestFirstClear(memberClient.Character.CommonId, quest.QuestScheduleId, connectionIn);
+                    memberClient.Character.WorldQuestPeriodFirstClears.Add(quest.QuestScheduleId);
                 }
+
+                if (isFirstClear)
+                {
+                    // Full first-clear rewards: fixed items, random items, and selectables
+                    if (quest.HasRewards())
+                    {
+                        Server.RewardManager.AddQuestRewards(memberClient, quest, connectionIn);
+                    }
 
 #if false
-                if (quest.QuestId == QuestId.TheShiningGate && !memberClient.Character.HasQuestCompleted(QuestId.TheShiningGate))
-                {
-                    packets.AddRange(Server.RewardManager.UnlockEM4Skills(memberClient, connectionIn));
-                }
+                    if (quest.QuestId == QuestId.TheShiningGate && !memberClient.Character.HasQuestCompleted(QuestId.TheShiningGate))
+                    {
+                        packets.AddRange(Server.RewardManager.UnlockEM4Skills(memberClient, connectionIn));
+                    }
 #endif
 
-                // Check for Exp, Rift and Gold Rewards
-                var ntcs = SendWalletRewards(Server, memberClient, quest, connectionIn);
-                packets.AddRange(ntcs);
+                    packets.AddRange(SendWalletRewards(Server, memberClient, quest, connectionIn));
+                }
+                else
+                {
+                    // Repeat-clear: diluted item pool (if defined) and nerfed wallet rewards
+                    if (quest.HasRepeatClearItemRewards())
+                    {
+                        Server.RewardManager.AddRepeatClearQuestRewards(memberClient, quest, connectionIn);
+                    }
+                    else if (rewardSystemEnabled && quest.HasRewards())
+                    {
+                        Server.RewardManager.AddAutoRepeatClearQuestRewards(memberClient, quest, connectionIn);
+                    }
+
+                    packets.AddRange(SendRepeatClearWalletRewards(Server, memberClient, quest, connectionIn));
+                }
             }
 
             return packets;

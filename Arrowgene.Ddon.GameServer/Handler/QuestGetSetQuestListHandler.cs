@@ -83,9 +83,9 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         continue;
                     }
 
-                    CompletedQuest questStats = leaderCharacter?.CompletedQuests.GetValueOrDefault(quest.QuestId);
                     QuestState questState = client.Party.QuestState.GetQuestState(quest);
-                    ntc.SetQuestList.Add(quest.ToCDataSetQuestList(questState?.Step ?? 0, questStats?.ClearCount ?? 0));
+                    uint clearCount = leaderCharacter?.WorldQuestPeriodFirstClears.Contains(quest.QuestScheduleId) == true ? 1u : 0u;
+                    ntc.SetQuestList.Add(quest.ToCDataSetQuestList(questState?.Step ?? 0, clearCount));
                 }
 
                 foreach (var questScheduleId in client.Party.QuestState.AreaQuests(areaId))
@@ -99,8 +99,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         continue;
                     }
 
-                    CompletedQuest questStats = leaderCharacter?.CompletedQuests.GetValueOrDefault(quest.QuestId);
-                    ntc.SetQuestList.Add(quest.ToCDataSetQuestList(0, questStats?.ClearCount ?? 0));
+                    uint clearCount = leaderCharacter?.WorldQuestPeriodFirstClears.Contains(quest.QuestScheduleId) == true ? 1u : 0u;
+                    ntc.SetQuestList.Add(quest.ToCDataSetQuestList(0, clearCount));
 
                     if (mutating)
                     {

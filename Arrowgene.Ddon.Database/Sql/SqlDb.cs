@@ -495,6 +495,10 @@ public abstract class SqlDb : IDatabase
     public abstract bool InsertBoxRewardItems(uint commonId, QuestBoxRewards rewards, DbConnection? connectionIn = null);
     public abstract bool DeleteBoxRewardItem(uint commonId, uint uniqId, DbConnection? connectionIn = null);
     public abstract List<QuestBoxRewards> SelectBoxRewardItems(uint commonId, DbConnection? connectionIn = null);
+    public abstract bool InsertWorldQuestFirstClear(uint commonId, uint questScheduleId, DbConnection? connectionIn = null);
+    public abstract bool HasWorldQuestFirstClear(uint commonId, uint questScheduleId, DbConnection? connectionIn = null);
+    public abstract bool DeleteAllWorldQuestFirstClears(DbConnection? connectionIn = null);
+    public abstract HashSet<uint> SelectWorldQuestFirstClears(uint commonId, DbConnection? connectionIn = null);
     public abstract List<CompletedQuest> GetCompletedQuestsByType(uint characterCommonId, QuestType questType, DbConnection? connectionIn = null);
     public abstract CompletedQuest GetCompletedQuestsById(uint characterCommonId, QuestId questId, DbConnection? connectionIn = null);
     public abstract bool InsertCompletedQuest(uint characterCommonId, QuestId questId, QuestType questType, DbConnection? connectionIn = null);

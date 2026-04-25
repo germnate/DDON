@@ -17,7 +17,10 @@ namespace Arrowgene.Ddon.GameServer.Tasks.Implementations
 
         public override bool IsEnabled(DdonGameServer server)
         {
-            return server.GameSettings.GameServerSettings.WorldQuestSystem == WorldQuestSystemMode.ServerReset;
+            var settings = server.GameSettings.GameServerSettings;
+            // Run if server-side pool rotation is needed OR if first-clear reward tracking needs periodic resets.
+            return settings.WorldQuestSystem == WorldQuestSystemMode.ServerReset
+                || settings.WorldQuestFirstClearRewards;
         }
 
         public override void RunTask(DdonGameServer server)
