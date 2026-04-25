@@ -7,6 +7,7 @@
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "KingalCanyon",
+    "news_image": 301,
     "rewards": [
         {
             "type": "wallet",
@@ -111,7 +112,8 @@
                 {
                     "type": "Raw",
                     "check_commands": [
-                        {"type": "IngameTimeRangeEq", "Param1": 5, "Param2": 10}
+                        {"type": "IngameTimeRangeEq", "Param1": 5, "Param2": 10},
+                        {"type": "StageNoWithoutMarker", "Param1": 122}
                     ]
                 },
                 {

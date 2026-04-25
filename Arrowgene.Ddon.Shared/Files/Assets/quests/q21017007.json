@@ -7,6 +7,7 @@
     "minimum_item_rank": 0,
     "discoverable": true,
 	"area_id": "KingalCanyon",
+    "news_image": 613,
     "order_conditions": [{"type": "AreaRank", "Param1": 17, "Param2": 7}],
     "rewards": [
         {
@@ -27,15 +28,15 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "item_id": 13484,
+                    "item_id": "UnappraisedFlowerTrinketGeneral",
                     "num": 3
                 },
                 {					
-                    "item_id": 11805,
+                    "item_id": "ManticoresScorpionTail",
                     "num": 1
                 },
                 {				
-                    "item_id": 13224,
+                    "item_id": "MedusasSerpentHair",
                     "num": 1					
                 }
             ]
@@ -45,54 +46,71 @@
         {
             "stage_id": {
                 "id": 429,
-                "group_id": 5
+                "group_id": 7
             },
+			"placement_type": "manual",
             "enemies": [
                 {
+                    "comment": "Jewelry-Bearing Manticore",
                     "enemy_id": "0x015210",
+                    "named_enemy_params_id": 1587,
                     "level": 73,
-                    "exp": 87000,				
-                    "is_boss": true
-    },
-    {
+                    "exp": 9800,				
+                    "is_boss": true,
+					"index": 0
+                },
+                {
+                    "comment": "Jewelry-Bearing Medusa",
                     "enemy_id": "0x015610",
+                    "named_enemy_params_id": 1587,
                     "level": 73,
-                    "exp": 87000,				
-                    "is_boss": true	
-    },
-    {
+                    "exp": 5880,				
+                    "is_boss": true,
+					"index": 2
+                },
+                {
+                    "comment": "Jewelry-Bearing Gargoyle",
                     "enemy_id": "0x010603",
+                    "named_enemy_params_id": 1587,
                     "level": 73,
-                    "exp": 3500,				
-                    "is_boss": false		
-    },
-    {
+                    "exp": 509,
+					"index": 4
+                },
+                {
+                    "comment": "Jewelry-Bearing Gargoyle",
                     "enemy_id": "0x010603",
+                    "named_enemy_params_id": 1587,
                     "level": 73,
-                    "exp": 3500,				
-                    "is_boss": false
-    },
-    {
+                    "exp": 509,
+					"index": 5
+                },
+                {
+                    "comment": "Jewelry-Bearing Gargoyle",
                     "enemy_id": "0x010603",
+                    "named_enemy_params_id": 1587,
                     "level": 73,
-                    "exp": 3500,				
-                    "is_boss": false
-    },
-    {
+                    "exp": 509,
+					"index": 6
+                },
+                {
+                    "comment": "Jewelry-Bearing Gargoyle",
                     "enemy_id": "0x010603",
+                    "named_enemy_params_id": 1587,
                     "level": 73,
-                    "exp": 3500,				
-                    "is_boss": false
-    },
-    {
+                    "exp": 509,
+					"index": 7
+                },
+                {
+                    "comment": "Jewelry-Bearing Gargoyle",
                     "enemy_id": "0x010603",
+                    "named_enemy_params_id": 1587,
                     "level": 73,
-                    "exp": 3500,				
-                    "is_boss": false					
+                    "exp": 509,
+					"index": 8
                 }
             ]
         }
-    ],		
+    ],
     "blocks": [
         {
             "type": "DiscoverEnemy",
