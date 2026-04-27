@@ -6,7 +6,8 @@
     "base_level": 65,
     "minimum_item_rank": 0,
     "discoverable": true,
-	"area_id": "BloodbaneIsle",
+    "area_id": "BloodbaneIsle",
+    "news_image": 249,
     "order_conditions": [{"type": "MainQuestCompleted", "Param1": 20140}, {"type": "AreaRank", "Param1": 13, "Param2": 11}],
     "rewards": [
         {
@@ -27,16 +28,16 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "item_id": 7743,
+                    "item_id": "GoldThread",
                     "num": 1
                 },
-                {					
-                    "item_id": 7555,
+                {
+                    "item_id": "SuperiorHealingRemedy",
                     "num": 3
                 },
-                {				
-                    "item_id": 9364,
-                    "num": 3					
+                {
+                    "item_id": "SuperiorStrongGalaExtract",
+                    "num": 3
                 }
             ]
         }
@@ -44,48 +45,73 @@
     "enemy_groups" : [
         {
             "stage_id": {
-                "id": 335,
+                "id": 336,
                 "group_id": 5
             },
+            "starting_index": 6,
             "enemies": [
                 {
+                    "comment": "Ghoul",
                     "enemy_id": "0x015503",
                     "level": 65,
-                    "exp": 4000,
-                    "is_boss": false
-        },
-        {
+                    "exp": 4900,
+                    "is_boss": true
+                },
+                {
+                    "comment": "Ghoul",
                     "enemy_id": "0x015503",
                     "level": 65,
-                    "exp": 4000,
-                    "is_boss": false
-        },
-        {
-                    "enemy_id": "0x010512",
+                    "exp": 4900,
+                    "is_boss": true
+                },
+                {
+                    "comment": "Dark Corpse Torturer",
+                    "enemy_id": "0x010520",
                     "level": 65,
-                    "exp": 4000,
-                    "is_boss": false					
+                    "exp": 468
+                },
+                {
+                    "comment": "Dark Corpse Torturer",
+                    "enemy_id": "0x010520",
+                    "level": 65,
+                    "exp": 468
+                },
+                {
+                    "comment": "Dark Corpse Torturer",
+                    "enemy_id": "0x010520",
+                    "level": 65,
+                    "exp": 468
+                },
+                {
+                    "comment": "Dark Corpse Torturer",
+                    "enemy_id": "0x010520",
+                    "level": 65,
+                    "exp": 468
+                },
+                {
+                    "comment": "Dark Corpse Torturer",
+                    "enemy_id": "0x010520",
+                    "level": 65,
+                    "exp": 468
                 }
             ]
         }
-    ],		
+    ],
     "blocks": [
-    {
-      "type": "NpcTalkAndOrder",
-            "flags": [
-                {"type": "QstLayout", "action": "Set", "value": 3757, "comment": "Spawns Something??"}				
-            ],	  
-      "stage_id": {
-        "id": 317,
-		"group_id": 1,
-		"layer_no": 1	
-      },
-      "npc_id": "Clarissa",
-      "message_id": 10800
+        {
+            "type": "NpcTalkAndOrder",
+            "stage_id": {
+                "id": 317
+            },
+            "npc_id": "Clarissa",
+            "message_id": 17461
         },
         {
             "type": "SeekOutEnemiesAtMarkedLocation",
             "announce_type": "Accept",
+            "result_commands": [
+                {"type": "QstTalkChg", "Param1": 2400, "Param2": 17462, "comment": "Extra dialogue - Clarissa"}
+            ],
             "groups": [0]
         },
         {
@@ -94,16 +120,14 @@
             "reset_group": false,
             "groups": [0]
         },
-        {		
+        {
             "type": "TalkToNpc",
             "stage_id": {
-                "id": 317,
-                "group_id": 1,
-                "layer_no": 1
+                "id": 317
             },
             "announce_type": "Update",
             "npc_id": "Clarissa",
-            "message_id": 11842	
-    }
-  ]
+            "message_id": 17463
+        }
+    ]
 }

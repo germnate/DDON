@@ -8,6 +8,7 @@
     "discoverable": true,
     "area_id": "BloodbaneIsle",
     "order_conditions": [{"type": "AreaRank", "Param1": 13, "Param2": 2}],
+    "news_image": 521,
     "rewards": [
         {
             "type": "wallet",

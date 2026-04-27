@@ -7,7 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "BreyaCoast",
-  "news_image": 526,
+  "news_image": 592,
   "order_conditions": [{"type": "AreaRank", "Param1": 2, "Param2": 13}],
   "rewards": [
     {
