@@ -7,6 +7,7 @@
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "ElanWaterGrove",
+    "news_image": 283,
     "order_conditions": [{"type": "AreaRank", "Param1": 14, "Param2": 11}],
     "rewards": [
         {
@@ -112,7 +113,8 @@
                 {
                     "type": "Raw",
                     "check_commands": [
-                        {"type": "IngameTimeRangeEq", "Param1": 4, "Param2": 7}
+                        {"type": "IngameTimeRangeEq", "Param1": 4, "Param2": 7},
+                        {"type": "StageNo", "Param1": 121}
                     ]
                 },
                 {

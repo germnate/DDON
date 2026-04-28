@@ -1,42 +1,42 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "Water Grove Wayfarers",
-    "quest_id": 21014014,
-    "base_level": 73,
+    "comment": "The Arisen Corps' Blunder",
+    "quest_id": 21014013,
+    "base_level": 70,
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "ElanWaterGrove",
-    "news_image": 623,
-    "order_conditions": [{"type": "AreaRank", "Param1": 14, "Param2": 7}],
+    "news_image": 583,
+    "order_conditions": [{"type": "AreaRank", "Param1": 14, "Param2": 4}],
     "rewards": [
         {
             "type": "wallet",
             "wallet_type": "Gold",
-            "amount": 4408
+            "amount": 2309
         },
         {
             "type": "wallet",
             "wallet_type": "RiftPoints",
-            "amount": 555
+            "amount": 300
         },
         {
             "type": "exp",
-            "amount": 19665
+            "amount": 13814
         },
         {
             "type": "select",
             "loot_pool": [
                 {
-                    "item_id": "ShriekingMushroom",
-                    "num": 3
-                },
-                {
-                    "item_id": "BronzeTailFeather",
+                    "item_id": "PurplePetals",
                     "num": 3
                 },
                 {
                     "item_id": "SuperiorStrongGalaExtract",
+                    "num": 3
+                },
+                {
+                    "item_id": "Panacea",
                     "num": 3
                 }
             ]
@@ -45,41 +45,42 @@
     "enemy_groups" : [
         {
             "stage_id": {
-                "id": 425,
-                "group_id": 3
+                "id": 415,
+                "group_id": 2
             },
             "enemies": []
         },
         {
             "stage_id": {
-                "id": 425,
-                "group_id": 3
+                "id": 415,
+                "group_id": 2
             },
+            "starting_index": 4,
             "enemies": [
                 {
-                    "comment": "Silver Roar",
-                    "enemy_id": "0x015505",
-                    "level": 73,
-                    "exp": 10925,
+                    "comment": "Troll",
+                    "enemy_id": "0x015040",
+                    "level": 70,
+                    "exp": 7675,
                     "is_boss": true
                 },
                 {
-                    "comment": "Stymphalides",
-                    "enemy_id": "0x010611",
-                    "level": 73,
-                    "exp": 2185
+                    "comment": "Saurian Sage",
+                    "enemy_id": "0x010430",
+                    "level": 70,
+                    "exp": 1535
                 },
                 {
-                    "comment": "Stymphalides",
-                    "enemy_id": "0x010611",
-                    "level": 73,
-                    "exp": 2185
+                    "comment": "Saurian Sage",
+                    "enemy_id": "0x010430",
+                    "level": 70,
+                    "exp": 1535
                 },
                 {
-                    "comment": "Stymphalides",
-                    "enemy_id": "0x010611",
-                    "level": 73,
-                    "exp": 2185
+                    "comment": "Saurian Sage",
+                    "enemy_id": "0x010430",
+                    "level": 70,
+                    "exp": 1535
                 }
             ]
         }
@@ -92,10 +93,10 @@
                 "group_id": 0,
                 "layer_no": 0
             },
-            "npc_id": "Nora",
-            "message_id": 19519,
+            "npc_id": "ArisenCorpsRegimentalSoldier7",
+            "message_id": 19511,
             "result_commands": [
-                {"type": "QstLayoutFlagOn", "Param1": 4486, "comment": "Spawns Nora NPC"}
+                {"type": "QstLayoutFlagOn", "Param1": 4480, "comment": "Spawns Regimental Soldier NPC"}
             ]
         },
         {
@@ -103,23 +104,23 @@
             "announce_type": "Accept",
             "groups": [0],
             "result_commands": [
-                {"type": "QstTalkChg", "Param1": 4753, "Param2": 19520, "comment": "Extra dialogue - Nora"}
+                {"type": "QstTalkChg", "Param1": 530, "Param2": 19512, "comment": "Extra dialogue - Regimental Soldier 7"}
             ],
             "check_commands": [
-                {"type": "StageNo", "Param1": 844}
+                {"type": "StageNo", "Param1": 814}
             ]
         },
         {
             "type": "NewTalkToNpc",
             "stage_id": {
-                "id": 425,
+                "id": 415,
                 "group_id": 0,
                 "layer_no": 0
             },
-            "npc_id": "Ifa",
-            "message_id": 21097,
+            "npc_id": "ArisenCorpsRegimentalSoldier6",
+            "message_id": 21096,
             "result_commands": [
-                {"type": "QstLayoutFlagOn", "Param1": 4483, "comment": "Spawns Aoife NPC"}
+                {"type": "QstLayoutFlagOn", "Param1": 4477, "comment": "Spawns Regimental Soldier 6 NPC"}
             ]
         },
         {
@@ -127,23 +128,23 @@
             "announce_type": "Update",
             "groups": [1],
             "result_commands": [
-                {"type": "CallMessage", "Param1": 563, "Param1": 19522},
-                {"type": "MyQstFlagOn", "Param1": 2102, "comment": "Aoife FSM"}
+                {"type": "CallMessage", "Param1": 529, "Param1": 19514},
+                {"type": "MyQstFlagOn", "Param1": 2098, "comment": "Regimental Soldier 6 FSM"}
             ]
         },
         {
             "type": "NewTalkToNpc",
             "announce_type": "Update",
             "stage_id": {
-                "id": 425,
+                "id": 415,
                 "group_id": 2,
                 "layer_no": 0
             },
-            "npc_id": "Ifa",
-            "message_id": 19565,
+            "npc_id": "ArisenCorpsRegimentalSoldier6",
+            "message_id": 19563,
             "result_commands": [
-                {"type": "QstLayoutFlagOff", "Param1": 4483, "comment": "Clears Aoife NPC"},
-                {"type": "QstLayoutFlagOn", "Param1": 4488, "comment": "Spawns Aoife (Alive) NPC"}
+                {"type": "QstLayoutFlagOff", "Param1": 4477, "comment": "Clears Regimental Soldier 6 NPC"},
+                {"type": "QstLayoutFlagOn", "Param1": 4482, "comment": "Spawns Regimental Soldier 6 (Alive) NPC"}
             ]
         },
         {
@@ -154,8 +155,8 @@
                 "group_id": 0,
                 "layer_no": 0
             },
-            "npc_id": "Nora",
-            "message_id": 19517
+            "npc_id": "ArisenCorpsRegimentalSoldier7",
+            "message_id": 19509
         }
     ]
 }
