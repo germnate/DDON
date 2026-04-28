@@ -113,7 +113,8 @@
                 {
                     "type": "Raw",
                     "check_commands": [
-                        {"type": "WeatherEq", "Param1": 1}
+                        {"type": "WeatherEq", "Param1": 1},
+                        {"type": "StageNoWithoutMarker", "Param1": 123}
                     ]
                 },
                 {
