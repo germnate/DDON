@@ -7,6 +7,7 @@
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "BloodbaneIsle",
+    "news_image": 247,
     "order_conditions": [{"type": "MainQuestCompleted", "Param1": 20100}],
     "rewards": [
         {

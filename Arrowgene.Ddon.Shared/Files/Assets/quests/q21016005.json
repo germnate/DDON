@@ -108,7 +108,8 @@
                 {
                     "type": "Raw",
                     "check_commands": [
-                        {"type": "IngameTimeRangeEq", "Param1": 16, "Param2": 20}
+                        {"type": "IngameTimeRangeEq", "Param1": 16, "Param2": 20},
+                        {"type": "StageNoWithoutMarker", "Param1": 123}
                     ]
                 },
                 {

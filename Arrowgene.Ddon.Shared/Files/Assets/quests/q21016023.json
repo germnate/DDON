@@ -7,6 +7,7 @@
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "MorrowForest",
+    "news_image": 322,
     "order_conditions": [{"type": "AreaRank", "Param1": 16, "Param2": 11}],
     "rewards": [
         {
@@ -112,7 +113,8 @@
                 {
                     "type": "Raw",
                     "check_commands": [
-                        {"type": "WeatherEq", "Param1": 3}
+                        {"type": "WeatherEq", "Param1": 3},
+                        {"type": "StageNoWithoutMarker", "Param1": 123}
                     ]
                 },
                 {

@@ -7,7 +7,8 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "HidellPlains",
-  "order_conditions": [ { "type": "AreaRank", "Param1": 1, "Param2": 11 } ],
+  "news_image": 9,
+  "order_conditions": [{"type": "AreaRank", "Param1": 1, "Param2": 11}],
   "rewards": [
     {
       "type": "exp",

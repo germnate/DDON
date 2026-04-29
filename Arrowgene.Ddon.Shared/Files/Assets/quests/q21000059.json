@@ -6,8 +6,9 @@
     "base_level": 65,
     "minimum_item_rank": 0,
     "discoverable": true,
+    "area_id": "BloodbaneIsle",
+    "news_image": 148,
     "order_conditions": [{"type": "MainQuestCompleted", "Param1": 20140}, {"type": "AreaRank", "Param1": 13, "Param2": 11}],
-	"area_id": "BloodbaneIsle",	
     "rewards": [
         {
             "type": "wallet",
@@ -27,16 +28,16 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "item_id": 11789,
+                    "item_id": "PebbleBud",
                     "num": 3
                 },
-                {					
-                    "item_id": 7555,
+                {
+                    "item_id": "SuperiorHealingRemedy",
                     "num": 3
                 },
-                {				
-                    "item_id": 41,
-                    "num": 3					
+                {
+                    "item_id": "Panacea",
+                    "num": 3
                 }
             ]
         }
@@ -48,23 +49,23 @@
                 "id": 317
             },
             "npc_id": "Rolf",
-            "message_id": 10800
+            "message_id": 17445
         },
         {
             "type": "DeliverItems",
             "stage_id": {
-                "id": 317,
-                "group_id": 1
+                "id": 53
             },
-            "npc_id": "Rolf",
+            "npc_id": "Augusto",
             "announce_type": "Accept",
-            "items": [
-                {
-                    "id": 11793,
-                    "amount": 6
-                }
+            "result_commands": [
+                {"type": "QstTalkChg", "Param1": 2402, "Param2": 17446, "comment": "Extra dialogue - Rolf"},
+                {"type": "QstTalkChg", "Param1": 1708, "Param2": 17447, "comment": "Extra dialogue - Augusto"}
             ],
-            "message_id": 10737
+            "items": [
+                {"id": 11793, "amount": 6, "comment": "Ancient Beast Pelt"}
+            ],
+            "message_id": 17448
         }
     ]
 }

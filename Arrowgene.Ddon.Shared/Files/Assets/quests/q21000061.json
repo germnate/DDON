@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "BloodbaneIsle",
+  "news_image": 902,
   "order_conditions": [{"type": "AreaRank", "Param1": 13, "Param2": 11}],
   "rewards": [
     {
@@ -57,7 +58,7 @@
           "enemy_id": "0x015851",
           "named_enemy_params_id": 458,
           "level": 65,
-          "exp": 55167,
+          "exp": 27584,
           "is_boss": true
         },
         {
@@ -66,7 +67,7 @@
           "named_enemy_params_id": 458,
           "infection_type": 2,
           "level": 65,
-          "exp": 720
+          "exp": 360
         },
         {
           "comment": "Bounty Infected Direwolf (Severe)",
@@ -74,7 +75,7 @@
           "named_enemy_params_id": 458,
           "infection_type": 2,
           "level": 65,
-          "exp": 720
+          "exp": 360
         }
       ]
     },
@@ -90,7 +91,7 @@
           "named_enemy_params_id": 458,
           "start_think_tbl_no": 2,
           "level": 65,
-          "exp": 792
+          "exp": 396
         },
         {
           "comment": "Bounty Flame Skeleton",
@@ -98,7 +99,7 @@
           "named_enemy_params_id": 458,
           "start_think_tbl_no": 2,
           "level": 65,
-          "exp": 792
+          "exp": 396
         },
         {
           "comment": "Bounty Flame Skeleton",
@@ -106,7 +107,7 @@
           "named_enemy_params_id": 458,
           "start_think_tbl_no": 2,
           "level": 65,
-          "exp": 792
+          "exp": 396
         },
         {
           "comment": "Bounty Flame Skeleton",
@@ -114,7 +115,7 @@
           "named_enemy_params_id": 458,
           "start_think_tbl_no": 2,
           "level": 65,
-          "exp": 792
+          "exp": 396
         },
         {
           "comment": "Bounty Flame Skeleton",
@@ -122,7 +123,7 @@
           "named_enemy_params_id": 458,
           "start_think_tbl_no": 2,
           "level": 65,
-          "exp": 792
+          "exp": 396
         }
       ]
     }

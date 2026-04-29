@@ -7,6 +7,7 @@
     "minimum_item_rank": 0,
     "discoverable": true,
 	"area_id": "ElanWaterGrove",
+    "news_image": 531,
     "order_conditions": [{"type": "AreaRank", "Param1": 14, "Param2": 10}],
     "rewards": [
         {
@@ -27,15 +28,15 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "item_id": 15928,
+                    "item_id": "RainbowColoredClaw",
                     "num": 1
                 },
                 {					
-                    "item_id": 15960,
+                    "item_id": "DemonWolfsSinewyMeat",
                     "num": 3
                 },
                 {				
-                    "item_id": 7555,
+                    "item_id": "SuperiorHealingRemedy",
                     "num": 3					
                 }
             ]
@@ -45,14 +46,64 @@
         {
             "stage_id": {
                 "id": 372,
-                "group_id": 4
+                "group_id": 35
             },
+			"starting_index": 1,
             "enemies": [
                 {
+					"comment": "Bifröst",
                     "enemy_id": "0x015321",
                     "level": 75,
-                    "exp": 88000,
+                    "exp": 12175,
                     "is_boss": true			
+                },
+                {
+					"comment": "Warg",
+                    "enemy_id": "0x010203",
+                    "level": 75,
+                    "exp": 2435		
+                },
+                {
+					"comment": "Saurian Sage",
+                    "enemy_id": "0x010430",
+                    "level": 75,
+                    "exp": 2435		
+                },
+                {
+					"comment": "Saurian Sage",
+                    "enemy_id": "0x010430",
+                    "level": 75,
+                    "exp": 2435		
+                },
+                {
+					"comment": "Saurian Sage",
+                    "enemy_id": "0x010430",
+                    "level": 75,
+                    "exp": 2435		
+                },
+                {
+					"comment": "Saurian Sage",
+                    "enemy_id": "0x010430",
+                    "level": 75,
+                    "exp": 2435		
+                },
+                {
+					"comment": "Warg",
+                    "enemy_id": "0x010203",
+                    "level": 75,
+                    "exp": 2435		
+                },
+                {
+					"comment": "Warg",
+                    "enemy_id": "0x010203",
+                    "level": 75,
+                    "exp": 2435		
+                },
+                {
+					"comment": "Warg",
+                    "enemy_id": "0x010203",
+                    "level": 75,
+                    "exp": 2435		
                 }
             ]
         }
@@ -69,11 +120,14 @@
                 "layer_no": 0
             },
             "npc_id": "Fabio0",
-            "message_id": 10800
+            "message_id": 19389
         },
         {
             "type": "SeekOutEnemiesAtMarkedLocation",
             "announce_type": "Accept",
+            "result_commands": [
+                {"type": "QstTalkChg", "Param1": 12, "Param2": 19390}
+            ],
             "groups": [0]
         },
         {
@@ -91,7 +145,7 @@
             },
             "announce_type": "Update",
             "npc_id": "Fabio0",
-            "message_id": 11842
+            "message_id": 19391
         }
     ]
 }

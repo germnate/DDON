@@ -7,6 +7,7 @@
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "FaranaPlains",
+    "news_image": 264,
     "order_conditions": [{"type": "AreaRank", "Param1": 15, "Param2": 9}],
     "rewards": [
         {
@@ -112,7 +113,8 @@
                 {
                     "type": "Raw",
                     "check_commands": [
-                        {"type": "WeatherEq", "Param1": 2}
+                        {"type": "WeatherEq", "Param1": 2},
+                        {"type": "StageNoWithoutMarker", "Param1": 120}
                     ]
                 },
                 {

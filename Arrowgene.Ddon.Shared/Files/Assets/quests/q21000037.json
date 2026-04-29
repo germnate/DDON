@@ -7,6 +7,7 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "BloodbaneIsle",
+  "news_image": 242,
   "order_conditions": [{"type": "AreaRank", "Param1": 13, "Param2": 4}],
   "rewards": [
     {
@@ -50,12 +51,13 @@
         "id": 335,
         "group_id": 1
       },
-      "starting_index": 2,
+      "starting_index": 1,
       "enemies": [
         {
           "comment": "Infected Griffin (Slight)",
           "enemy_id": "0x015306",
           "infection_type": 1,
+		  "set_type": 3,
           "level": 63,
           "exp": 8800,
           "is_boss": true
@@ -67,6 +69,12 @@
           "exp": 352,
           "repop_count": 1,
           "repop_wait_second": 10
+        },
+        {
+          "comment": "Infected Hobgoblin Fighter",
+          "enemy_id": "0x010161",
+          "level": 63,
+          "exp": 352
         },
         {
           "comment": "Infected Hobgoblin Fighter",
@@ -161,7 +169,7 @@
         {
           "comment": "Group 0 boss HP check",
           "type": "Raw",
-          "check_commands": [{"type": "EmHpLess", "Param1": 110, "Param2": 1, "Param3": 2, "Param4": 40}]
+          "check_commands": [{"type": "EmHpLess", "Param1": 110, "Param2": 1, "Param3": 1, "Param4": 40}]
         },
         {
           "type": "KillGroup",
