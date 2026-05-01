@@ -1,9 +1,5 @@
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
 using Arrowgene.Ddon.Database.Model;
 using Arrowgene.Ddon.Database.Sql.Core.Migration;
 using Arrowgene.Ddon.Shared.Entity;
@@ -12,7 +8,12 @@ using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.BattleContent;
 using Arrowgene.Ddon.Shared.Model.Clan;
 using Arrowgene.Ddon.Shared.Model.Quest;
+using Arrowgene.Ddon.Shared.Model.Rpc;
 using Arrowgene.Ddon.Shared.Model.Scheduler;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 
 namespace Arrowgene.Ddon.Database.Sql;
 
@@ -199,6 +200,11 @@ public abstract class SqlDb : IDatabase
         AddParameter(command, name, (int)value, DbType.Int32);
     }
 
+    public virtual void AddParameter(DbCommand command, string name, uint? value)
+    {
+        AddParameter(command, name, value, DbType.Int32);
+    }
+
     public virtual void AddParameter(DbCommand command, string name, byte[] value)
     {
         AddParameter(command, name, value, DbType.Binary);
@@ -354,6 +360,7 @@ public abstract class SqlDb : IDatabase
     public abstract bool UpdateMyPawnSlot(uint characterId, uint num, DbConnection? connectionIn = null);
     public abstract bool UpdateRentalPawnSlot(uint characterId, uint num, DbConnection? connectionIn = null);
     public abstract bool UpdateCharacterBinaryData(uint characterId, byte[] data);
+    public abstract Dictionary<ushort, List<RpcCharacterData>> SelectCharacterTrackingList(DbConnection? connectionIn = null);
     public abstract void CreateItems(DbConnection conn, Character character);
     public abstract void CreateListItems(DbConnection conn, Character character, StorageType storageType, List<(uint ItemId, uint Amount)> itemList);
     public abstract CDataCharacterSearchParam SelectCharacterNameById(uint characterId);
@@ -485,11 +492,11 @@ public abstract class SqlDb : IDatabase
     public abstract bool InsertGainExtendParam(uint commonId, CDataOrbGainExtendParam Param);
     public abstract bool UpdateOrbGainExtendParam(uint commonId, CDataOrbGainExtendParam param, DbConnection? connectionIn = null);
     public abstract CDataOrbGainExtendParam SelectOrbGainExtendParam(uint commonId, DbConnection? connectionIn = null);
-    public abstract ulong InsertBazaarExhibition(BazaarExhibition exhibition);
-    public abstract int UpdateBazaarExhibiton(BazaarExhibition exhibition);
-    public abstract int DeleteBazaarExhibition(ulong bazaarId);
-    public abstract BazaarExhibition SelectBazaarExhibitionByBazaarId(ulong bazaarId);
-    public abstract List<BazaarExhibition> FetchCharacterBazaarExhibitions(uint characterId);
+    public abstract ulong InsertBazaarExhibition(BazaarExhibition exhibition, DbConnection? connectionIn = null);
+    public abstract int UpdateBazaarExhibiton(BazaarExhibition exhibition, DbConnection? connectionIn = null);
+    public abstract int DeleteBazaarExhibition(ulong bazaarId, DbConnection? connectionIn = null);
+    public abstract BazaarExhibition SelectBazaarExhibitionByBazaarId(ulong bazaarId, DbConnection? connectionIn = null);
+    public abstract List<BazaarExhibition> FetchCharacterBazaarExhibitions(uint characterId, DbConnection? connectionIn = null);
     public abstract List<BazaarExhibition> SelectActiveBazaarExhibitionsByItemIdExcludingOwn(uint itemId, uint excludedCharacterId, DbConnection? connectionIn = null);
     public abstract List<BazaarExhibition> SelectActiveBazaarExhibitionsByItemIdsExcludingOwn(List<uint> itemIds, uint excludedCharacterId, DbConnection? connectionIn = null);
     public abstract bool InsertBoxRewardItems(uint commonId, QuestBoxRewards rewards, DbConnection? connectionIn = null);
@@ -673,6 +680,8 @@ public abstract class SqlDb : IDatabase
     public abstract bool InsertLightQuestRecord(LightQuestRecord lightQuestRecord, DbConnection? connectionIn = null);
     public abstract List<LightQuestRecord> SelectLightQuestRecords(DbConnection? connectionIn = null);
     public abstract bool DeleteLightQuestRecord(uint scheduleId, DbConnection? connectionIn = null);
+    public abstract int DeleteLightQuestCompletion(DbConnection? connectionIn = null);
+
 
     public abstract bool SetMeta(DatabaseMeta meta);
 

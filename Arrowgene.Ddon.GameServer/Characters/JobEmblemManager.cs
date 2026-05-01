@@ -23,7 +23,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
         {
             var results = new Dictionary<JobId, JobEmblem>();
 
-            foreach (var jobId in Enum.GetValues(typeof(JobId)).Cast<JobId>())
+            foreach (var jobId in Enum.GetValues<JobId>())
             {
                 if (jobId == JobId.None)
                 {
@@ -40,12 +40,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
                         EmblemPointsUsed = 0,
                     };
 
-                    foreach (var equipStat in Enum.GetValues(typeof(EquipStatId)).Cast<EquipStatId>())
+                    for (byte i = (byte)EquipStatId.PhysicalAttack; i <= (byte)EquipStatId.DarkResist; i++)
                     {
-                        if (equipStat == EquipStatId.EmblemLevel)
-                        {
-                            continue;
-                        }
+                        var equipStat = (EquipStatId)i;
                         results[jobId].StatLevels[equipStat] = 0;
                     }
                 }
@@ -173,6 +170,31 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             return GetEquipStatParamList(emblemData);
+        }
+
+        public List<CDataEquipElementParam> GetEmblemCrestsForCurrentJob(Character character, JobId jobId)
+        {
+            if (jobId == JobId.None)
+            {
+                Logger.Error($"The character {character.CharacterId} attempted to calculate emblem crests for JobId.None");
+                return [];
+            }
+
+            var emblemData = character.JobEmblems[jobId];
+            if (emblemData.UIDs.Count == 0)
+            {
+                return [];
+            }
+
+            var uid = emblemData.UIDs.First();
+            var itemT = character.Storage.FindItemByUIdInStorage(ItemManager.AllItemStorages, uid);
+            
+            if (itemT is null)
+            {
+                return [];
+            }
+
+            return itemT.Item2.Item2.EquipElementParamList;
         }
 
         public List<CDataEquipStatParam> GetEmblemStatsForCurrentJob(Character character)

@@ -1,18 +1,17 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
 using Arrowgene.Ddon.Database.Model;
 using Arrowgene.Ddon.Database.Sql.Core.Migration;
 using Arrowgene.Ddon.Shared.Entity;
-using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.BattleContent;
 using Arrowgene.Ddon.Shared.Model.Clan;
 using Arrowgene.Ddon.Shared.Model.Quest;
+using Arrowgene.Ddon.Shared.Model.Rpc;
 using Arrowgene.Ddon.Shared.Model.Scheduler;
+using System;
+using System.Collections.Generic;
+using System.Data.Common;
 
 namespace Arrowgene.Ddon.Database;
 
@@ -102,6 +101,7 @@ public interface IDatabase
     bool UpdateCharacterBinaryData(uint characterId, byte[] data);
     void CreateItems(DbConnection conn, Character character);
     void CreateListItems(DbConnection conn, Character character, StorageType storageType, List<(uint ItemId, uint Amount)> itemList);
+    Dictionary<ushort, List<RpcCharacterData>> SelectCharacterTrackingList(DbConnection? connectionIn = null);
 
     CDataCharacterSearchParam SelectCharacterNameById(uint characterId);
 
@@ -304,11 +304,11 @@ public interface IDatabase
     CDataOrbGainExtendParam SelectOrbGainExtendParam(uint commonId, DbConnection? connectionIn = null);
 
     // Bazaar
-    ulong InsertBazaarExhibition(BazaarExhibition exhibition);
-    int UpdateBazaarExhibiton(BazaarExhibition exhibition);
-    int DeleteBazaarExhibition(ulong bazaarId);
-    BazaarExhibition SelectBazaarExhibitionByBazaarId(ulong bazaarId);
-    List<BazaarExhibition> FetchCharacterBazaarExhibitions(uint characterId);
+    ulong InsertBazaarExhibition(BazaarExhibition exhibition, DbConnection? connectionIn = null);
+    int UpdateBazaarExhibiton(BazaarExhibition exhibition, DbConnection? connectionIn = null);
+    int DeleteBazaarExhibition(ulong bazaarId, DbConnection? connectionIn = null);
+    BazaarExhibition SelectBazaarExhibitionByBazaarId(ulong bazaarId, DbConnection? connectionIn = null);
+    List<BazaarExhibition> FetchCharacterBazaarExhibitions(uint characterId, DbConnection? connectionIn = null);
 
     List<BazaarExhibition> SelectActiveBazaarExhibitionsByItemIdExcludingOwn(uint itemId, uint excludedCharacterId, DbConnection? connectionIn = null);
 
@@ -599,6 +599,8 @@ public interface IDatabase
     bool InsertLightQuestRecord(LightQuestRecord lightQuestRecord, DbConnection? connectionIn = null);
     List<LightQuestRecord> SelectLightQuestRecords(DbConnection? connectionIn = null);
     bool DeleteLightQuestRecord(uint scheduleId, DbConnection? connectionIn = null);
+    int DeleteLightQuestCompletion(DbConnection? connectionIn = null);
+
 
     // Pawn Favorites
     bool InsertPawnFavorite(uint characterId, uint pawnId, DbConnection? connectionIn = null);
