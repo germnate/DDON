@@ -30,6 +30,7 @@
             "type": "fixed",
             "loot_pool": [
                 {
+                    "comment": "Unappraised Flower Trinket (King)",
                     "item_id": 13485,
                     "num": 1
                 }
@@ -42,12 +43,13 @@
                 "id": 371,
                 "group_id": 19
             },
+            "starting_index": 9,
             "enemies": [
                 {
                     "comment": "Severely Infected Behemoth",
                     "enemy_id": "0x015717",
                     "level": 71,
-                    "exp": 387000,
+                    "exp": 43375,
                     "named_enemy_params_id": 1235,
                     "infection_type": 1,
                     "is_boss": true
@@ -70,7 +72,6 @@
             },
             "enemies": []
         }
-
     ],
     "processes": [
         {
@@ -85,13 +86,19 @@
                     "message_id": 15723,
                     "flags": [
                         {"type": "WorldManageLayout", "action": "Clear", "value": 8630, "quest_id": 70034001, "comment": "Spawns Gurdolin, Lise and Elliot"},
-                        {"type": "WorldManageLayout", "action": "Clear", "value": 4053, "quest_id": 70022001, "comment": "Spawns Geroid"},
-                        {"type": "WorldManageLayout", "action": "Clear", "value": 4066, "quest_id": 70023001, "comment": "Spawns Geroid"}
+                        {"type": "WorldManageLayout", "action": "Clear", "value": 4053, "quest_id": 70022001, "comment": "Spawns Gearóid"},
+                        {"type": "WorldManageLayout", "action": "Clear", "value": 4066, "quest_id": 70023001, "comment": "Spawns Gearóid"}
                     ]
                 },
                 {
                     "type": "PartyGather",
                     "announce_type": "Accept",
+                    "result_commands": [
+                        {"type": "QstTalkChg", "Param1": 4, "Param2": 17282, "comment": "Joseph extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 3, "Param2": 17283, "comment": "Klaus extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 23, "Param2": 17284, "comment": "Gearóid extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 20, "Param2": 17285, "comment": "Cecily extra dialogue"}
+                    ],
                     "stage_id": {
                         "id": 435
                     },
@@ -114,6 +121,13 @@
                 {
                     "type": "PartyGather",
                     "announce_type": "Update",
+                    "result_commands": [
+                        {"type": "QstTalkChg", "Param1": 23, "Param2": 17286, "comment": "Gearóid extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 20, "Param2": 17287, "comment": "Cecily extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 501, "Param2": 17288, "comment": "Gurdolin extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 13, "Param2": 17289, "comment": "Lise extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 21, "Param2": 17290, "comment": "Elliot extra dialogue"}
+                    ],
                     "checkpoint": true,
                     "stage_id": {
                         "id": 371
@@ -134,6 +148,32 @@
                 {
                     "type": "KillGroup",
                     "announce_type": "Update",
+                    "result_commands": [
+                        {"type": "PlayMessage", "Param1": 15767, "Param2": 10, "comment": "Cecily: Loeg! Stop these monsters!"},
+                        {"type": "PlayMessage", "Param1": 15768, "Param2": 10, "comment": "Cecily: Shall we talk? Loeg, let's discuss this?"},
+                        {"type": "PlayMessage", "Param1": 15779, "Param2": 10, "comment": "Loeg: Cecily, you have become fully stained by those filthy Lestanians now."},
+                        {"type": "PlayMessage", "Param1": 15780, "Param2": 10, "comment": "Loeg: Suffer... like my parents, just like me!"},
+                        {"type": "PlayMessage", "Param1": 15769, "Param2": 10, "comment": "Cecily: Not like this, Loeg!"},
+                        {"type": "PlayMessage", "Param1": 15770, "Param2": 10, "comment": "Cecily: Return the Primeval Drops!"},
+                        {"type": "PlayMessage", "Param1": 15781, "Param2": 10, "comment": "Loeg: Cry out - I'm not going to make it easy on you."},
+                        {"type": "PlayMessage", "Param1": 15771, "Param2": 10, "comment": "Cecily: Nothing will change by doing this!"},
+                        {"type": "PlayMessage", "Param1": 15782, "Param2": 10, "comment": "Loeg: Do it! Defeat them!"},
+                        {"type": "PlayMessage", "Param1": 15783, "Param2": 10, "comment": "Loeg: Father, Mother, I know you're watching, right?"},
+                        {"type": "PlayMessage", "Param1": 15772, "Param2": 10, "comment": "Cecily: Even now, it's not too late!"},
+                        {"type": "PlayMessage", "Param1": 15773, "Param2": 10, "comment": "Cecily: Let's change Phindym together, okay?"},
+                        {"type": "PlayMessage", "Param1": 15784, "Param2": 10, "comment": "Loeg: Fight as hard as you can - and despair!"},
+                        {"type": "PlayMessage", "Param1": 15774, "Param2": 10, "comment": "Cecily: Loeg, flee! Leave the droplets behind, run!"},
+                        {"type": "PlayMessage", "Param1": 15785, "Param2": 10, "comment": "Loeg: Are you aware of my benefactor?"},
+                        {"type": "PlayMessage", "Param1": 15786, "Param2": 10, "comment": "Loeg: I suppose you have an inkling, right?"},
+                        {"type": "PlayMessage", "Param1": 15787, "Param2": 10, "comment": "Loeg: Hehehe... how delightful."},
+                        {"type": "PlayMessage", "Param1": 15775, "Param2": 10, "comment": "Cecily: There will be no mercy from now on."},
+                        {"type": "PlayMessage", "Param1": 15788, "Param2": 10, "comment": "Loeg: The resentment engraved in my heart won't go away!"},
+                        {"type": "PlayMessage", "Param1": 15776, "Param2": 10, "comment": "Cecily: Just a few more steps!"},
+                        {"type": "PlayMessage", "Param1": 15789, "Param2": 10, "comment": "Loeg: Hehehe... even now, the land is crumbling into decay!"},
+                        {"type": "PlayMessage", "Param1": 15777, "Param2": 10, "comment": "Cecily: Loeg, this is not it; it's a mistake!"},
+                        {"type": "PlayMessage", "Param1": 15778, "Param2": 10, "comment": "Cecily: Loeg! Please reconsider!"},
+                        {"type": "PlayMessage", "Param1": 15790, "Param2": 10, "comment": "Loeg: Your deaths herald the onset of ruin!"}
+                    ],
                     "groups": [ 0 ],
                     "flags": [
                         {"type": "QstLayout", "action": "Clear", "value": 3966, "comment": "Gearóid, Gearóid's Escort Guard, Cecily, Gurdolin, Elliot, Lise"},
@@ -143,6 +183,9 @@
                 },
                 {
                     "type": "PlayEvent",
+                    "result_commands": [
+                        {"type": "StopMessage", "comment": "Stops Cecily and Loeg's shouts"}
+                    ],
                     "stage_id": {
                         "id": 371
                     },
@@ -156,6 +199,11 @@
                         "layer_no": 0
                     },
                     "announce_type": "Update",
+                    "result_commands": [
+                        {"type": "QstTalkChg", "Param1": 501, "Param2": 17291, "comment": "Gurdolin extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 13, "Param2": 17292, "comment": "Lise extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 21, "Param2": 17293, "comment": "Elliot extra dialogue"}
+                    ],
                     "checkpoint": true,
                     "npc_id": "Cecily0",
                     "message_id": 15799,
@@ -166,13 +214,20 @@
                     ]
                 },
                 {
-                    "comment": "There is supposed to be an NPC here, but I can't figure out how to spawn him",
-                    "type": "IsStageNo",
+                    "type": "TalkToNpc",
                     "stage_id": {
                         "id": 435
                     },
                     "announce_type": "Update",
-                    "checkpoint": true
+                    "result_commands": [
+                        {"type": "QstTalkChg", "Param1": 20, "Param2": 17294, "comment": "Cecily extra dialogue"}
+                    ],
+                    "checkpoint": true,
+                    "npc_id": "Mordred0",
+                    "message_id": 15800,
+                    "flags": [
+                        {"type": "WorldManageLayout", "action": "Set", "value": 4806, "quest_id": 70022001, "comment": "Mordred"}
+                    ]
                 },
                 {
                     "type": "PartyGather",
@@ -200,9 +255,40 @@
                         "id": 3
                     },
                     "announce_type": "Update",
+                    "flags": [
+                        {"type": "WorldManageLayout", "action": "Clear", "value": 4806, "quest_id": 70022001, "comment": "Mordred"},
+                        {"type": "QstLayout", "action": "Set", "value": 4797, "comment": "Gearóid, Cecily, Gurdolin, Elliot, Lise"},
+                        {"type": "QstLayout", "action": "Set", "value": 4774, "comment": "Gerd, Knight 1 and Knight 2"}
+                    ],
+                    "result_commands": [
+                        {"type": "QstTalkChg", "Param1": 3, "Param2": 17295, "comment": "Klaus extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 7, "Param2": 19981, "comment": "Gerd extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 504, "Param2": 19982, "comment": "Knight 1 extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 505, "Param2": 19983, "comment": "Knight 2 extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 23, "Param2": 20118, "comment": "Gearóid extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 20, "Param2": 20119, "comment": "Cecily extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 501, "Param2": 20120, "comment": "Gurdolin extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 13, "Param2": 20121, "comment": "Lise extra dialogue"},
+                        {"type": "QstTalkChg", "Param1": 21, "Param2": 20122, "comment": "Elliot extra dialogue"}
+                    ],
                     "checkpoint": true,
                     "npc_id": "Joseph",
                     "message_id": 15819
+                },
+                {
+                    "type": "IsStageNo",
+                    "flags": [
+                        {"type": "QstLayout", "action": "Clear", "value": 4797, "comment": "Gearóid, Cecily, Gurdolin, Elliot, Lise"},
+                        {"type": "QstLayout", "action": "Clear", "value": 4774, "comment": "Gerd, Knight 1 and Knight 2"}
+                    ],
+                    "stage_id": {
+                        "id": 3
+                    },
+                    "result_commands": [
+                        {"type": "TutorialDialog", "Param1": 299, "comment": "Pawn Expeditions"},
+                        {"type": "TutorialDialog", "Param1": 321, "comment": "Requests from Pawn"},
+                        {"type": "TutorialDialog", "Param1": 326, "comment": "The Infection - Section III"}
+                    ]
                 }
             ]
         }
