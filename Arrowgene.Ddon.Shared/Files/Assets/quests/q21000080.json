@@ -7,7 +7,8 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "MergodaRuins",
-  "order_conditions": [ { "type": "AreaRank", "Param1": 12, "Param2": 11 } ],
+  "news_image": 15,
+  "order_conditions": [{"type": "AreaRank", "Param1": 12, "Param2": 11}],
   "rewards": [
     {
       "type": "exp",

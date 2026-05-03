@@ -66,6 +66,13 @@
   ],
   "blocks": [
     {
+      "type": "Raw",
+      "check_commands": [
+        {"type": "IngameTimeRangeNotEq", "Param1": 6, "Param2": 18},
+        {"type": "StageNo", "Param1": 100}
+      ]  
+    },
+    {
       "type": "DiscoverEnemy",
       "groups": [ 0 ]
     },

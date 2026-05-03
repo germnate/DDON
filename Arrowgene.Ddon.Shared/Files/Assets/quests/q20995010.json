@@ -7,6 +7,7 @@
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "MergodaRuins",
+    "news_image": 234,
     "order_conditions": [{"type": "MainQuestCompleted", "Param1": 23}],
     "rewards": [
         {
@@ -114,6 +115,13 @@
         }
     ],
     "blocks": [
+        {
+            "type": "Raw",
+            "check_commands": [
+                {"type": "IngameTimeRangeNotEq", "Param1": 6, "Param2": 18},
+                {"type": "StageNo", "Param1": 418}
+            ]
+        },
         {
             "type": "DiscoverEnemy",
             "groups": [0]

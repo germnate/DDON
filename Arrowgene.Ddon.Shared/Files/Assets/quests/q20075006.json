@@ -114,9 +114,14 @@
   ],
   "blocks": [
     {
+      "type": "Raw",
+      "check_commands": [
+        {"type": "IngameTimeRangeNotEq", "Param1": 6, "Param2": 18},
+        {"type": "StageNo", "Param1": 100}
+      ]
+    },
+    {
       "type": "DiscoverEnemy",
-      "spawn_time_start": "(18 * 3600000) + (0 * 60000)",
-      "spawn_time_end": "(6 * 3600000) + (59 * 60000)",
       "groups": [ 0 ]
     },
     { "type": "KillGroup",
