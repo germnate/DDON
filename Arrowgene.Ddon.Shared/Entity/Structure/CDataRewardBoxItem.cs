@@ -17,6 +17,7 @@ public class CDataRewardBoxItem
     public byte Type { get; set; }
     public bool IsCharge {  get; set; }
     public bool IsHelp { get; set; }
+    public uint SelectGroupId { get; set; }
 
     public class Serializer : EntitySerializer<CDataRewardBoxItem>
     {

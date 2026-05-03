@@ -817,6 +817,62 @@ namespace Arrowgene.Ddon.GameServer.Quests
             return packets;
         }
 
+        protected PacketQueue SendWalletRewards(DdonGameServer server, GameClient client, Quest quest, QuestBoxRewardFlags rewardFlags, DbConnection? connectionIn = null)
+        {
+            if (rewardFlags == QuestBoxRewardFlags.None)
+                return SendWalletRewards(server, client, quest, connectionIn);
+
+            PacketQueue packets = new();
+            var settings = server.GameSettings.GameServerSettings;
+
+            S2CItemUpdateCharacterItemNtc updateCharacterItemNtc = new S2CItemUpdateCharacterItemNtc()
+            {
+                UpdateType = ItemNoticeType.Quest
+            };
+
+            foreach (var walletReward in quest.GetScaledWalletRewards(rewardFlags, settings))
+            {
+                updateCharacterItemNtc.UpdateWalletList.Add(server.WalletManager.AddToWallet(
+                    client.Character,
+                    walletReward.Type,
+                    walletReward.Value,
+                    connectionIn: connectionIn
+                ));
+            }
+
+            if (updateCharacterItemNtc.UpdateWalletList.Count > 0)
+            {
+                client.Enqueue(updateCharacterItemNtc, packets);
+            }
+
+            foreach (var pointReward in quest.GetScaledExpRewards(rewardFlags, settings))
+            {
+                if (pointReward.Reward == 0)
+                    continue;
+
+                (uint BasePoints, uint BonusPoints) amount = server.ExpManager.GetAdjustedPointsForQuest(pointReward.Type, pointReward.Reward, quest.QuestType, client, client.Character);
+                switch (pointReward.Type)
+                {
+                    case PointType.ExperiencePoints:
+                        packets.AddRange(server.ExpManager.AddExp(client, client.Character, amount, RewardSource.Quest, quest.QuestType, connectionIn));
+                        break;
+                    case PointType.JobPoints:
+                        packets.AddRange(server.ExpManager.AddJp(client, client.Character, amount.BasePoints, RewardSource.Quest, quest.QuestType, connectionIn));
+                        break;
+                    case PointType.PlayPoints:
+                        var ntc = server.PPManager.AddPlayPoint(client, amount, type: 1, connectionIn: connectionIn);
+                        client.Enqueue(ntc, packets);
+                        break;
+                    case PointType.AreaPoints:
+                        var areaId = quest.QuestAreaId > 0 ? quest.QuestAreaId : (QuestAreaId)quest.LightQuestDetail.AreaId;
+                        packets.AddRange(server.AreaRankManager.AddAreaPoint(client, areaId, amount, connectionIn));
+                        break;
+                }
+            }
+
+            return packets;
+        }
+
         public virtual void EnforceInitialPoolEligibility() { }
 
         protected virtual Quest RollQuestVariant(QuestId questId)
@@ -1038,7 +1094,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 if (quest == null || IsQuestActive(scheduleId) || IsCompletedWorldQuest(scheduleId))
                     continue;
 
-                uint clearCount = leaderCharacter.WorldQuestPeriodFirstClears.Contains(quest.QuestScheduleId) ? 1u : 0u;
+                uint clearCount = leaderCharacter.GetQuestPeriodFirstClears(quest.QuestType).Contains(quest.QuestScheduleId) ? 1u : 0u;
                 questList.Add(quest.ToCDataSetQuestList(0, clearCount));
             }
 
@@ -1158,6 +1214,10 @@ namespace Arrowgene.Ddon.GameServer.Quests
 
             bool isWorldQuest = QuestManager.IsWorldQuest(quest);
             bool rewardSystemEnabled = Server.GameSettings.GameServerSettings.WorldQuestFirstClearRewards;
+            bool isExtremeMission = quest.QuestType == QuestType.ExtremeMission;
+            bool useExtremeMissionRewardBuckets = isExtremeMission && quest.HasCategorizedRewards();
+            bool partyHasFirstEverClear = useExtremeMissionRewardBuckets
+                && Party.Clients.Any(x => !x.Character.CompletedQuests.ContainsKey(quest.QuestId));
 
             var questState = GetQuestState(quest);
             foreach (var memberClient in Party.Clients)
@@ -1180,14 +1240,26 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 // Distribute any released content from the quest to the player
                 packets.AddRange(RewardReleasedContent(memberClient, quest, connectionIn));
 
+                if (useExtremeMissionRewardBuckets)
+                {
+                    QuestBoxRewardFlags rewardFlags = GetExtremeMissionRewardFlags(memberClient, quest, partyHasFirstEverClear, connectionIn);
+                    if (quest.HasItemRewards(rewardFlags))
+                    {
+                        Server.RewardManager.AddQuestRewards(memberClient, quest, rewardFlags, connectionIn);
+                    }
+
+                    packets.AddRange(SendWalletRewards(Server, memberClient, quest, rewardFlags, connectionIn));
+                    continue;
+                }
+
                 bool isFirstClear = !isWorldQuest
                     || !rewardSystemEnabled
-                    || !Server.Database.HasWorldQuestFirstClear(memberClient.Character.CommonId, quest.QuestScheduleId, connectionIn);
+                    || !Server.Database.HasQuestPeriodFirstClear(memberClient.Character.CommonId, quest.QuestType, quest.QuestScheduleId, connectionIn);
 
                 if (isWorldQuest && rewardSystemEnabled && isFirstClear)
                 {
-                    Server.Database.InsertWorldQuestFirstClear(memberClient.Character.CommonId, quest.QuestScheduleId, connectionIn);
-                    memberClient.Character.WorldQuestPeriodFirstClears.Add(quest.QuestScheduleId);
+                    Server.Database.InsertQuestPeriodFirstClear(memberClient.Character.CommonId, quest.QuestType, quest.QuestScheduleId, connectionIn);
+                    memberClient.Character.GetQuestPeriodFirstClears(quest.QuestType).Add(quest.QuestScheduleId);
                 }
 
                 if (isFirstClear)
@@ -1224,6 +1296,37 @@ namespace Arrowgene.Ddon.GameServer.Quests
             }
 
             return packets;
+        }
+
+        private QuestBoxRewardFlags GetExtremeMissionRewardFlags(GameClient client, Quest quest, bool partyHasFirstEverClear, DbConnection? connectionIn = null)
+        {
+            bool hasEverCleared = client.Character.CompletedQuests.ContainsKey(quest.QuestId);
+            bool hasPeriodClear = client.Character.GetQuestPeriodFirstClears(quest.QuestType).Contains(quest.QuestScheduleId)
+                || Server.Database.HasQuestPeriodFirstClear(client.Character.CommonId, quest.QuestType, quest.QuestScheduleId, connectionIn);
+
+            QuestBoxRewardFlags rewardFlags = QuestBoxRewardFlags.None;
+            if (!hasEverCleared)
+            {
+                rewardFlags |= QuestBoxRewardFlags.FirstClear;
+            }
+
+            if (!hasPeriodClear)
+            {
+                rewardFlags |= QuestBoxRewardFlags.PeriodFirstClear;
+                Server.Database.InsertQuestPeriodFirstClear(client.Character.CommonId, quest.QuestType, quest.QuestScheduleId, connectionIn);
+                client.Character.GetQuestPeriodFirstClears(quest.QuestType).Add(quest.QuestScheduleId);
+            }
+            else
+            {
+                rewardFlags |= QuestBoxRewardFlags.RepeatClear;
+            }
+
+            if (hasEverCleared && partyHasFirstEverClear)
+            {
+                rewardFlags |= QuestBoxRewardFlags.HelperBonus;
+            }
+
+            return rewardFlags;
         }
 
         public override PacketQueue UpdatePriorityQuestList(GameClient requestingClient, DbConnection? connectionIn = null)

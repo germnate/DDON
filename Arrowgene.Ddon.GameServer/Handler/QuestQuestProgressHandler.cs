@@ -8,6 +8,7 @@ using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 
@@ -166,11 +167,15 @@ namespace Arrowgene.Ddon.GameServer.Handler
         {
             PacketQueue packets = new();
 
-            // Snapshot repeat-clear state before DistributeQuestRewards mutates WorldQuestPeriodFirstClears.
+            // Snapshot repeat-clear state before DistributeQuestRewards mutates period first-clear state.
             bool isWorldQuest = QuestManager.IsWorldQuest(quest);
             bool rewardSystemEnabled = Server.GameSettings.GameServerSettings.WorldQuestFirstClearRewards;
             bool isRepeatClear = isWorldQuest && rewardSystemEnabled
-                && client.Character.WorldQuestPeriodFirstClears.Contains(quest.QuestScheduleId);
+                && client.Character.GetQuestPeriodFirstClears(quest.QuestType).Contains(quest.QuestScheduleId);
+            bool useExtremeMissionRewardBuckets = quest.QuestType == QuestType.ExtremeMission && quest.HasCategorizedRewards();
+            Dictionary<uint, QuestBoxRewardFlags> exmRewardFlags = useExtremeMissionRewardBuckets
+                ? GetExtremeMissionRewardFlags(quest, client)
+                : new Dictionary<uint, QuestBoxRewardFlags>();
 
             packets.AddRange(questState.DistributeQuestRewards(quest.QuestScheduleId, connectionIn));
             packets.AddRange(Server.AreaRankManager.NotifyAreaRankUpOnQuestComplete(client, quest));
@@ -178,7 +183,12 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             byte randomRewardNum;
             bool isRepeatRewardFlag;
-            if (isRepeatClear)
+            if (useExtremeMissionRewardBuckets && exmRewardFlags.TryGetValue(client.Character.CharacterId, out var clientRewardFlags))
+            {
+                isRepeatRewardFlag = clientRewardFlags.HasFlag(QuestBoxRewardFlags.RepeatClear);
+                randomRewardNum = quest.RandomRewardNum(clientRewardFlags);
+            }
+            else if (isRepeatClear)
             {
                 isRepeatRewardFlag = true;
                 if (quest.HasRepeatClearItemRewards())
@@ -218,6 +228,29 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
                 packets.AddRange(Server.AchievementManager.HandleClearQuest(client, quest, connectionIn));
             }
+            else if (useExtremeMissionRewardBuckets)
+            {
+                foreach (var memberClient in client.Party.Clients)
+                {
+                    var memberFlags = exmRewardFlags.GetValueOrDefault(memberClient.Character.CharacterId);
+                    memberClient.Enqueue(new S2CQuestCompleteNtc()
+                    {
+                        QuestScheduleId = quest.QuestScheduleId,
+                        RandomRewardNum = quest.RandomRewardNum(memberFlags),
+                        ChargeRewardNum = quest.RewardParams.ChargeRewardNum,
+                        ProgressBonusNum = quest.RewardParams.ProgressBonusNum,
+                        IsRepeatReward = memberFlags.HasFlag(QuestBoxRewardFlags.RepeatClear),
+                        IsUndiscoveredReward = quest.RewardParams.IsUndiscoveredReward,
+                        IsHelpReward = memberFlags.HasFlag(QuestBoxRewardFlags.HelperBonus),
+                        IsPartyBonus = quest.RewardParams.IsPartyBonus,
+                    }, packets);
+                }
+                packets.AddRange(client.Party.QuestState.UpdatePriorityQuestList(client.Party.Leader.Client, connectionIn));
+                foreach (var memberClient in client.Party.Clients)
+                {
+                    packets.AddRange(Server.AchievementManager.HandleClearQuest(memberClient, quest, connectionIn));
+                }
+            }
             else
             {
                 client.Party.EnqueueToAll(completeNtc, packets);
@@ -248,6 +281,32 @@ namespace Arrowgene.Ddon.GameServer.Handler
             }
 
             return packets;
+        }
+
+        private Dictionary<uint, QuestBoxRewardFlags> GetExtremeMissionRewardFlags(Quest quest, GameClient completingClient)
+        {
+            var result = new Dictionary<uint, QuestBoxRewardFlags>();
+            bool partyHasFirstEverClear = completingClient.Party.Clients.Any(x => !x.Character.CompletedQuests.ContainsKey(quest.QuestId));
+
+            foreach (var memberClient in completingClient.Party.Clients)
+            {
+                bool hasEverCleared = memberClient.Character.CompletedQuests.ContainsKey(quest.QuestId);
+                bool hasPeriodClear = memberClient.Character.GetQuestPeriodFirstClears(quest.QuestType).Contains(quest.QuestScheduleId);
+
+                QuestBoxRewardFlags rewardFlags = QuestBoxRewardFlags.None;
+                if (!hasEverCleared)
+                    rewardFlags |= QuestBoxRewardFlags.FirstClear;
+                if (!hasPeriodClear)
+                    rewardFlags |= QuestBoxRewardFlags.PeriodFirstClear;
+                else
+                    rewardFlags |= QuestBoxRewardFlags.RepeatClear;
+                if (hasEverCleared && partyHasFirstEverClear)
+                    rewardFlags |= QuestBoxRewardFlags.HelperBonus;
+
+                result[memberClient.Character.CharacterId] = rewardFlags;
+            }
+
+            return result;
         }
     }
 }

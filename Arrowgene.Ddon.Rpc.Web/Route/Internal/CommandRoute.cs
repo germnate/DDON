@@ -40,6 +40,7 @@ namespace Arrowgene.Ddon.Rpc.Web.Route.Internal
                     RpcInternalCommand.StampReset => HandleStampReset(gameServer),
                     RpcInternalCommand.UpdateCrafting => HandleUpdateCrafting(gameServer),
                     RpcInternalCommand.WorldQuestReset => HandleWorldQuestReset(gameServer),
+                    RpcInternalCommand.ExtremeMissionRewardReset => HandleExtremeMissionRewardReset(gameServer),
                     _ => new RpcCommandResult(this, false),
                 };
             }
@@ -190,6 +191,20 @@ namespace Arrowgene.Ddon.Rpc.Web.Route.Internal
                 return new RpcCommandResult(this, true)
                 {
                     Message = $"WorldQuestReset with seed {seed}"
+                };
+            }
+
+            private RpcCommandResult HandleExtremeMissionRewardReset(DdonGameServer gameServer)
+            {
+                gameServer.Database.DeleteQuestPeriodFirstClears(QuestType.ExtremeMission);
+                foreach (var character in gameServer.ClientLookup.GetAllCharacter())
+                {
+                    character.GetQuestPeriodFirstClears(QuestType.ExtremeMission).Clear();
+                }
+
+                return new RpcCommandResult(this, true)
+                {
+                    Message = _entry.Command.ToString()
                 };
             }
         }

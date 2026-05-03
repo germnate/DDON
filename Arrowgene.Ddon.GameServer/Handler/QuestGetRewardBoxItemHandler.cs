@@ -5,6 +5,7 @@ using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
+using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,6 +57,24 @@ namespace Arrowgene.Ddon.GameServer.Handler
             }
 
             var distinctRewards = packet.GetRewardBoxItemList.Select(x => x.UID).Distinct().ToList();
+            var selectedRewards = new List<CDataRewardBoxItem>();
+            foreach (var rewardUID in distinctRewards)
+            {
+                if (!coalescedRewards.TryGetValue(rewardUID, out var reward))
+                {
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_QUEST_NOT_EXIST_REWARD_BOX_LIST_NO, $"Illegal reward UID sent to server.");
+                }
+
+                selectedRewards.Add(reward);
+            }
+
+            if (selectedRewards
+                .Where(x => x.SelectGroupId != 0 && x.Type == (byte)QuestRewardType.Select)
+                .GroupBy(x => x.SelectGroupId)
+                .Any(x => x.Count() > 1))
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_QUEST_NOT_EXIST_REWARD_BOX_LIST_NO, $"Multiple select rewards were requested from the same select group.");
+            }
 
             var slotCount = coalescedRewards.Sum(x => distinctRewards.Contains(x.Key) ? Server.ItemManager.PredictAddItemSlots(client.Character, StorageType.StorageBoxNormal, (uint) x.Value.ItemId, x.Value.Num) : 0);
             if (slotCount > client.Character.Storage.GetStorage(StorageType.StorageBoxNormal).EmptySlots())

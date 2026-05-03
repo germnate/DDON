@@ -316,14 +316,16 @@ public interface IDatabase
 
     // Rewards
     bool InsertBoxRewardItems(uint commonId, QuestBoxRewards rewards, DbConnection? connectionIn = null);
+    bool InsertBoxRewardItem(uint uniqRewardId, CDataRewardBoxItem reward, DbConnection? connectionIn = null);
     bool DeleteBoxRewardItem(uint commonId, uint uniqId, DbConnection? connectionIn = null);
     List<QuestBoxRewards> SelectBoxRewardItems(uint commonId, DbConnection? connectionIn = null);
 
-    // World Quest Period First Clear
-    bool InsertWorldQuestFirstClear(uint commonId, uint questScheduleId, DbConnection? connectionIn = null);
-    bool HasWorldQuestFirstClear(uint commonId, uint questScheduleId, DbConnection? connectionIn = null);
-    bool DeleteAllWorldQuestFirstClears(DbConnection? connectionIn = null);
-    HashSet<uint> SelectWorldQuestFirstClears(uint commonId, DbConnection? connectionIn = null);
+    // Quest Period First Clear
+    bool InsertQuestPeriodFirstClear(uint commonId, QuestType questType, uint questScheduleId, DbConnection? connectionIn = null);
+    bool HasQuestPeriodFirstClear(uint commonId, QuestType questType, uint questScheduleId, DbConnection? connectionIn = null);
+    bool DeleteQuestPeriodFirstClears(QuestType questType, DbConnection? connectionIn = null);
+    Dictionary<QuestType, HashSet<uint>> SelectQuestPeriodFirstClears(uint commonId, DbConnection? connectionIn = null);
+    HashSet<uint> SelectQuestPeriodFirstClears(uint commonId, QuestType questType, DbConnection? connectionIn = null);
 
     // Completed Quests
     List<CompletedQuest> GetCompletedQuestsByType(uint characterCommonId, QuestType questType, DbConnection? connectionIn = null);

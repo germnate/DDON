@@ -341,6 +341,7 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                 switch (rewardType)
                 {
                     case "repeat":
+                    case "Repeat":
                     {
                         var repeatItem = new QuestRandomFixedRewardItem();
                         foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
@@ -352,6 +353,30 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                             });
                         }
                         assetData.RepeatClearRewardItems.Add(repeatItem);
+                        break;
+                    }
+                    case "FixedFirst":
+                    case "fixed_first":
+                    case "first":
+                    case "first_clear":
+                    {
+                        assetData.FirstClearRewardItems.Add(ParseFixedRewardItem(reward));
+                        break;
+                    }
+                    case "FixedSecond":
+                    case "fixed_second":
+                    case "period_first":
+                    case "period_first_clear":
+                    {
+                        assetData.PeriodFirstClearRewardItems.Add(ParseFixedRewardItem(reward));
+                        break;
+                    }
+                    case "FixedMemberFirst":
+                    case "fixed_member_first":
+                    case "helper":
+                    case "help":
+                    {
+                        assetData.HelperRewardItems.Add(ParseFixedRewardItem(reward));
                         break;
                     }
                     case "fixed":
@@ -465,6 +490,20 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                         break;
                 }
             }
+        }
+
+        private QuestRewardItem ParseFixedRewardItem(JsonElement reward)
+        {
+            var rewardItem = new QuestFixedRewardItem();
+            foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
+            {
+                rewardItem.LootPool.Add(new FixedLootPoolItem()
+                {
+                    ItemId = AssetCommonDeserializer.ParseItemId(item.GetProperty("item_id")),
+                    Num = item.GetProperty("num").GetUInt16(),
+                });
+            }
+            return rewardItem;
         }
 
         private bool ParseBlocks(QuestProcess questProcess, JsonElement jBlocks)

@@ -104,11 +104,11 @@ namespace Arrowgene.Ddon.GameServer
             if (settings.WorldQuestFirstClearRewards)
             {
                 Logger.Info($"WorldQuestManager clearing period first-clear reward records");
-                _server.Database.DeleteAllWorldQuestFirstClears();
+                _server.Database.DeleteQuestPeriodFirstClears(QuestType.World);
 
                 foreach (var party in _server.PartyManager.GetAllParties())
                     foreach (var client in party.Clients)
-                        client.Character.WorldQuestPeriodFirstClears.Clear();
+                        client.Character.GetQuestPeriodFirstClears(QuestType.World).Clear();
 
                 if (!isServerReset)
                 {
