@@ -249,6 +249,7 @@
                 {
                     "type": "TalkToNpc",
                     "announce_type": "Update",
+                    "checkpoint": true,
                     "stage_id": {
                         "id": 3,
                         "group_id": 1
