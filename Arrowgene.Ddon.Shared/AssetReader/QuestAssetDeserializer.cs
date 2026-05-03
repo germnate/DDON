@@ -445,6 +445,26 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                             assetData.RewardItems.Add(rewardItem);
                         }
                         break;
+                    case "instanced_fixed":
+                    {
+                        var instancedFixed = new QuestInstancedFixedRewardItem();
+                        foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
+                        {
+                            instancedFixed.LootPool.Add(ParseInstancedLootPoolItem(item));
+                        }
+                        assetData.RewardItems.Add(instancedFixed);
+                        break;
+                    }
+                    case "instanced_select":
+                    {
+                        var instancedSelect = new QuestInstancedSelectRewardItem();
+                        foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
+                        {
+                            instancedSelect.LootPool.Add(ParseInstancedLootPoolItem(item));
+                        }
+                        assetData.RewardItems.Add(instancedSelect);
+                        break;
+                    }
                     case "exp":
                         assetData.PointRewards.Add(new QuestPointReward()
                         {
@@ -504,6 +524,34 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                 });
             }
             return rewardItem;
+        }
+
+        private InstancedLootPoolItem ParseInstancedLootPoolItem(JsonElement item)
+        {
+            var poolItem = new InstancedLootPoolItem
+            {
+                ItemId = AssetCommonDeserializer.ParseItemId(item.GetProperty("item_id")),
+                Num = item.GetProperty("num").GetUInt16(),
+            };
+
+            if (item.TryGetProperty("color", out var colorProp)) poolItem.Color = colorProp.GetUInt32();
+            if (item.TryGetProperty("plus_value", out var plusProp)) poolItem.PlusValue = plusProp.GetUInt32();
+            if (item.TryGetProperty("safety_setting", out var safetyProp)) poolItem.SafetySetting = safetyProp.GetUInt32();
+
+            if (item.TryGetProperty("crests", out var crestsProp))
+            {
+                foreach (var crest in crestsProp.EnumerateArray())
+                {
+                    poolItem.Crests.Add(new StagedRewardItemCrest
+                    {
+                        Slot = crest.GetProperty("slot").GetUInt32(),
+                        CrestId = crest.GetProperty("crest_id").GetUInt32(),
+                        Level = crest.TryGetProperty("level", out var lvl) ? lvl.GetUInt32() : 0u,
+                    });
+                }
+            }
+
+            return poolItem;
         }
 
         private bool ParseBlocks(QuestProcess questProcess, JsonElement jBlocks)

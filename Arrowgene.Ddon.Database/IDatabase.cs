@@ -319,6 +319,10 @@ public interface IDatabase
     bool InsertBoxRewardItem(uint uniqRewardId, CDataRewardBoxItem reward, DbConnection? connectionIn = null);
     bool DeleteBoxRewardItem(uint commonId, uint uniqId, DbConnection? connectionIn = null);
     List<QuestBoxRewards> SelectBoxRewardItems(uint commonId, DbConnection? connectionIn = null);
+    bool InsertStagedItem(StagedRewardItem item, DbConnection? connectionIn = null);
+    bool InsertStagedItemCrest(StagedRewardItemCrest crest, DbConnection? connectionIn = null);
+    StagedRewardItem? SelectStagedItem(string uid, DbConnection? connectionIn = null);
+    bool DeleteStagedItem(string uid, DbConnection? connectionIn = null);
 
     // Quest Period First Clear
     bool InsertQuestPeriodFirstClear(uint commonId, QuestType questType, uint questScheduleId, DbConnection? connectionIn = null);

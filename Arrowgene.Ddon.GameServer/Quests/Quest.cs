@@ -1581,6 +1581,26 @@ namespace Arrowgene.Ddon.GameServer.Quests
             HelperExpRewards.Add(new CDataQuestExp() { Type = pointType, Reward = amount });
         }
 
+        public void AddFixedInstancedItemReward(ItemId itemId, ushort num, uint color = 0, uint plusValue = 0, uint safetySetting = 0)
+        {
+            AddItemReward(QuestInstancedFixedRewardItem.Create(itemId, num, color, plusValue, safetySetting));
+        }
+
+        public void AddRepeatClearFixedInstancedItemReward(ItemId itemId, ushort num, uint color = 0, uint plusValue = 0, uint safetySetting = 0)
+        {
+            AddRepeatClearItemReward(QuestInstancedFixedRewardItem.Create(itemId, num, color, plusValue, safetySetting));
+        }
+
+        public void AddFirstClearFixedInstancedItemReward(ItemId itemId, ushort num, uint color = 0, uint plusValue = 0, uint safetySetting = 0)
+        {
+            AddFirstClearItemReward(QuestInstancedFixedRewardItem.Create(itemId, num, color, plusValue, safetySetting));
+        }
+
+        public void AddPeriodFirstClearFixedInstancedItemReward(ItemId itemId, ushort num, uint color = 0, uint plusValue = 0, uint safetySetting = 0)
+        {
+            AddPeriodFirstClearItemReward(QuestInstancedFixedRewardItem.Create(itemId, num, color, plusValue, safetySetting));
+        }
+
         private void AddCategorizedItemReward(List<QuestRewardItem> rewardList, QuestRewardItem reward)
         {
             if (reward == null) return;

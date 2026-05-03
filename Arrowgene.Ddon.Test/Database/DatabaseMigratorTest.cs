@@ -199,6 +199,7 @@ namespace Arrowgene.Ddon.Test.Database
         public bool DeleteAccount(int accountId) { return true; }
         public int DeleteBazaarExhibition(ulong bazaarId, DbConnection? connectionIn = null) { return 1; }
         public bool DeleteBoxRewardItem(uint commonId, uint uniqId, DbConnection? connectionIn = null) { return true; }
+        public bool DeleteStagedItem(string uid, DbConnection? connectionIn = null) { return true; }
         public bool DeleteCharacter(uint characterId) { return true; }
         public bool DeleteCommunicationShortcut(uint characterId, uint pageNo, uint buttonNo) { return true; }
         public bool DeleteConnection(int serverId, int accountId) { return true; }
@@ -239,6 +240,9 @@ namespace Arrowgene.Ddon.Test.Database
         public ulong InsertBazaarExhibition(BazaarExhibition exhibition, DbConnection? connectionIn = null) { return 1; }
         public bool InsertBoxRewardItems(uint commonId, QuestBoxRewards rewards, DbConnection? connectionIn = null) { return true; }
         public bool InsertBoxRewardItem(uint uniqRewardId, CDataRewardBoxItem reward, DbConnection? connectionIn = null) { return true; }
+        public bool InsertStagedItem(StagedRewardItem item, DbConnection? connectionIn = null) { return true; }
+        public bool InsertStagedItemCrest(StagedRewardItemCrest crest, DbConnection? connectionIn = null) { return true; }
+        public StagedRewardItem? SelectStagedItem(string uid, DbConnection? connectionIn = null) { return null; }
         public bool InsertQuestPeriodFirstClear(uint commonId, QuestType questType, uint questScheduleId, DbConnection? connectionIn = null) { return true; }
         public bool HasQuestPeriodFirstClear(uint commonId, QuestType questType, uint questScheduleId, DbConnection? connectionIn = null) { return false; }
         public bool DeleteQuestPeriodFirstClears(QuestType questType, DbConnection? connectionIn = null) { return true; }

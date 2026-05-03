@@ -707,6 +707,60 @@ namespace Arrowgene.Ddon.GameServer.Characters
             server.Database.UpdateStorageItem(character.ContentCharacterId, storage.Type, slotNo, num, item, connectionIn);
         }
 
+        public CDataItemUpdateResult? MaterializeStagedItem(DdonServer<GameClient> server, Character character, string uid, StorageType destinationStorage, DbConnection? connectionIn = null)
+        {
+            var staged = server.Database.SelectStagedItem(uid, connectionIn);
+            if (staged == null) return null;
+
+            var item = new Item
+            {
+                UId = staged.Uid,
+                ItemId = staged.ItemId,
+                Color = (byte)staged.Color,
+                PlusValue = (byte)staged.PlusValue,
+                SafetySetting = (byte)staged.SafetySetting,
+                EquipPoints = 0,
+                EquipElementParamList = new List<CDataEquipElementParam>(),
+                AddStatusParamList = new List<CDataAddStatusParam>(),
+                EquipStatParamList = new List<CDataEquipStatParam>(),
+            };
+
+            Storage storage = character.Storage.GetStorage(destinationStorage);
+            ushort slotNo = storage.AddItem(item, staged.Num);
+
+            server.Database.InsertStorageItem(character.ContentCharacterId, destinationStorage, slotNo, staged.Num, item, connectionIn);
+
+            foreach (var crest in staged.Crests)
+            {
+                server.Database.InsertCrest(character.CommonId, item.UId, crest.Slot, crest.CrestId, crest.Level, connectionIn);
+                item.EquipElementParamList.Add(new CDataEquipElementParam
+                {
+                    SlotNo = (byte)crest.Slot,
+                    CrestId = crest.CrestId,
+                    Add = (ushort) crest.Level,
+                });
+            }
+
+            var result = new CDataItemUpdateResult();
+            result.ItemList.ItemUId = item.UId;
+            result.ItemList.ItemId = item.ItemId;
+            result.ItemList.ItemNum = staged.Num;
+            result.ItemList.SafetySetting = item.SafetySetting;
+            result.ItemList.StorageType = destinationStorage;
+            result.ItemList.SlotNo = slotNo;
+            result.ItemList.Color = item.Color;
+            result.ItemList.PlusValue = item.PlusValue;
+            result.ItemList.Bind = false;
+            result.ItemList.EquipPoint = item.EquipPoints;
+            result.ItemList.EquipCharacterID = 0;
+            result.ItemList.EquipPawnID = 0;
+            result.ItemList.EquipElementParamList = item.EquipElementParamList;
+            result.ItemList.AddStatusParamList = item.AddStatusParamList;
+            result.ItemList.EquipStatParamList = item.EquipStatParamList;
+            result.UpdateItemNum = (int)staged.Num;
+            return result;
+        }
+
         private void InsertItem(DdonServer<GameClient> server, Character character, Item item, Storage storage, ushort slotNo, uint num, DbConnection? connectionIn = null)
         {
             storage.SetItem(item, num, slotNo);

@@ -89,15 +89,23 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     var reward = coalescedRewards[rewardUID];
 
-                    var (specialQueue, isSpecial) = Server.ItemManager.HandleSpecialItem(client, updateCharacterItemNtc, reward.ItemId, reward.Num, SpecialItemMode.OnAcquire, connection);
-                    if (isSpecial)
+                    if (reward.IsInstance)
                     {
-                        queue.AddRange(specialQueue);
+                        var result = Server.ItemManager.MaterializeStagedItem(Server, client.Character, reward.UID, StorageType.StorageBoxNormal, connection);
+                        if (result != null) updateCharacterItemNtc.UpdateItemList.Add(result);
                     }
-                    else if (reward.Num > 0)
+                    else
                     {
-                        var result = Server.ItemManager.AddItem(Server, client.Character, false, (uint) reward.ItemId, reward.Num, connectionIn: connection);
-                        updateCharacterItemNtc.UpdateItemList.AddRange(result);
+                        var (specialQueue, isSpecial) = Server.ItemManager.HandleSpecialItem(client, updateCharacterItemNtc, reward.ItemId, reward.Num, SpecialItemMode.OnAcquire, connection);
+                        if (isSpecial)
+                        {
+                            queue.AddRange(specialQueue);
+                        }
+                        else if (reward.Num > 0)
+                        {
+                            var result = Server.ItemManager.AddItem(Server, client.Character, false, (uint) reward.ItemId, reward.Num, connectionIn: connection);
+                            updateCharacterItemNtc.UpdateItemList.AddRange(result);
+                        }
                     }
                 }
                 Server.RewardManager.DeleteQuestBoxReward(client, questBoxReward.UniqRewardId, connectionIn: connection);

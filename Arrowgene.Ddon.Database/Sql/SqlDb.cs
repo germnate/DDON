@@ -503,6 +503,10 @@ public abstract class SqlDb : IDatabase
     public abstract bool InsertBoxRewardItem(uint uniqRewardId, CDataRewardBoxItem reward, DbConnection? connectionIn = null);
     public abstract bool DeleteBoxRewardItem(uint commonId, uint uniqId, DbConnection? connectionIn = null);
     public abstract List<QuestBoxRewards> SelectBoxRewardItems(uint commonId, DbConnection? connectionIn = null);
+    public abstract bool InsertStagedItem(StagedRewardItem item, DbConnection? connectionIn = null);
+    public abstract bool InsertStagedItemCrest(StagedRewardItemCrest crest, DbConnection? connectionIn = null);
+    public abstract StagedRewardItem? SelectStagedItem(string uid, DbConnection? connectionIn = null);
+    public abstract bool DeleteStagedItem(string uid, DbConnection? connectionIn = null);
     public abstract bool InsertQuestPeriodFirstClear(uint commonId, QuestType questType, uint questScheduleId, DbConnection? connectionIn = null);
     public abstract bool HasQuestPeriodFirstClear(uint commonId, QuestType questType, uint questScheduleId, DbConnection? connectionIn = null);
     public abstract bool DeleteQuestPeriodFirstClears(QuestType questType, DbConnection? connectionIn = null);

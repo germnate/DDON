@@ -16,7 +16,7 @@ public partial class DdonSqlDb : SqlDb
 
     protected static readonly string[] RewardBoxItemFields = new[]
     {
-        /* reward_box_item_id */ "uniq_reward_id", "item_id", "num", "uid", "type", "is_charge", "is_help", "select_group_id"
+        /* reward_box_item_id */ "uniq_reward_id", "item_id", "num", "uid", "type", "is_charge", "is_help", "select_group_id", "is_instance"
     };
 
     private readonly int MAX_RANDOM_REWARDS = 4;
@@ -61,9 +61,19 @@ public partial class DdonSqlDb : SqlDb
             uint uniqRewardId = (uint)autoIncrement;
             foreach (var reward in rewards.RewardItemList)
             {
-                if (!InsertBoxRewardItem(uniqRewardId, reward, connection))
+                long rewardBoxItemId = InsertBoxRewardItemInternal(uniqRewardId, reward, connection);
+                if (rewardBoxItemId < 0)
                 {
                     return false;
+                }
+
+                if (reward.IsInstance && reward.StagedItem != null)
+                {
+                    reward.StagedItem.RewardBoxItemId = rewardBoxItemId;
+                    if (!InsertStagedItem(reward.StagedItem, connection))
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -75,11 +85,17 @@ public partial class DdonSqlDb : SqlDb
     {
         return ExecuteQuerySafe(connectionIn, connection =>
         {
-            return ExecuteNonQuery(connection, SqlInsertRewardBoxItem, command =>
-            {
-                AddRewardBoxItemParameters(command, uniqRewardId, reward);
-            }) == 1;
+            return InsertBoxRewardItemInternal(uniqRewardId, reward, connection) >= 0;
         });
+    }
+
+    private long InsertBoxRewardItemInternal(uint uniqRewardId, CDataRewardBoxItem reward, DbConnection connection)
+    {
+        int rows = ExecuteNonQuery(connection, SqlInsertRewardBoxItem, command =>
+        {
+            AddRewardBoxItemParameters(command, uniqRewardId, reward);
+        }, out long autoIncrement);
+        return rows == 1 ? autoIncrement : -1;
     }
 
     public override List<QuestBoxRewards> SelectBoxRewardItems(uint commonId, DbConnection? connectionIn = null)
@@ -147,6 +163,7 @@ public partial class DdonSqlDb : SqlDb
                 {
                     results.Add(new CDataRewardBoxItem()
                     {
+                        RewardBoxItemId = GetInt64(reader, "reward_box_item_id"),
                         ItemId = (ItemId)GetUInt32(reader, "item_id"),
                         Num = GetUInt16(reader, "num"),
                         UID = GetString(reader, "uid"),
@@ -154,6 +171,7 @@ public partial class DdonSqlDb : SqlDb
                         IsCharge = GetInt32(reader, "is_charge") != 0,
                         IsHelp = GetInt32(reader, "is_help") != 0,
                         SelectGroupId = GetUInt32(reader, "select_group_id"),
+                        IsInstance = GetInt32(reader, "is_instance") != 0,
                     });
                 }
             });
@@ -170,5 +188,6 @@ public partial class DdonSqlDb : SqlDb
         AddParameter(command, "is_charge", reward.IsCharge ? 1 : 0);
         AddParameter(command, "is_help", reward.IsHelp ? 1 : 0);
         AddParameter(command, "select_group_id", reward.SelectGroupId);
+        AddParameter(command, "is_instance", reward.IsInstance ? 1 : 0);
     }
 }
