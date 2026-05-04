@@ -522,6 +522,9 @@ public abstract class SqlDb : IDatabase
     public abstract bool RemoveAllQuestProgressByType(QuestType questType, DbConnection? connectionIn = null);
     public abstract List<QuestProgress> GetQuestProgressByType(uint characterCommonId, QuestType questType, DbConnection? connectionIn = null);
     public abstract QuestProgress GetQuestProgressByScheduleId(uint characterCommonId, uint questScheduleId, DbConnection? connectionIn = null);
+    public abstract bool UpsertQuestDeliveryProgress(uint characterCommonId, uint questScheduleId, uint itemId, uint amountDelivered, DbConnection? connectionIn = null);
+    public abstract bool DeleteQuestDeliveryProgress(uint characterCommonId, uint questScheduleId, DbConnection? connectionIn = null);
+    public abstract List<QuestDeliveryProgress> GetAllQuestDeliveryProgress(uint characterCommonId, DbConnection? connectionIn = null);
     public abstract bool InsertPriorityQuest(uint characterCommonId, uint questScheduleId, DbConnection? connectionIn = null);
     public abstract List<uint> GetPriorityQuestScheduleIds(uint characterCommonId, DbConnection? connectionIn = null);
     public abstract bool DeletePriorityQuest(uint characterCommonId, uint questScheduleId, DbConnection? connectionIn = null);

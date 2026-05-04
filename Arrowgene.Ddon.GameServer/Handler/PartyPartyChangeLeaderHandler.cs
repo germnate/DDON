@@ -76,12 +76,21 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 }
 
                 var progress = Server.Database.GetQuestProgressByType(currentLeader.Client.Character.CommonId, QuestType.All);
+                var deliveryProgressByQuest = Server.Database.GetAllQuestDeliveryProgress(currentLeader.Client.Character.CommonId)
+                    .GroupBy(x => x.QuestScheduleId)
+                    .ToDictionary(g => g.Key, g => g.ToList());
                 foreach (var questProgress in progress)
                 {
                     var quest = QuestManager.GetQuestByScheduleId(questProgress.QuestScheduleId);
                     if (quest is null) continue;
                     QuestStateManager questStateManager = QuestManager.GetQuestStateManager(currentLeader.Client, quest);
                     questStateManager.AddNewQuest(questProgress.QuestScheduleId, questProgress.Step);
+
+                    if (deliveryProgressByQuest.TryGetValue(questProgress.QuestScheduleId, out var deliveryItems))
+                    {
+                        foreach (var dp in deliveryItems)
+                            questStateManager.RestoreDeliveryProgress(questProgress.QuestScheduleId, (ItemId)dp.ItemId, dp.AmountDelivered);
+                    }
                 }
 
                 party.SendToAll(new S2CQuestGetMainQuestNtc());

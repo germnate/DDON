@@ -31,6 +31,9 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             Dictionary<uint, CDataDeliveredItem> deliveredItems = new Dictionary<uint, CDataDeliveredItem>();
             List<CDataItemUpdateResult> itemUpdateResults = new List<CDataItemUpdateResult>();
+            // Holds validated (remaining, newTotal) per item, populated inside the transaction,
+            // applied to in-memory state only after the transaction commits successfully.
+            Dictionary<uint, (uint Remaining, uint NewTotal)> deliveryCommits = new Dictionary<uint, (uint, uint)>();
             Server.Database.ExecuteInTransaction(connection =>
             {
                 foreach (var item in request.ItemUIDList)
@@ -57,10 +60,21 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
                 foreach (var deliveredItem in deliveredItems.Values)
                 {
-                    // Do this check in the transaction so the DB rolls back if something goes wrong.
-                    deliveredItem.NeedNum = (ushort)questState.UpdateDeliveryRequest((ItemId)deliveredItem.ItemId, deliveredItem.ItemNum);
+                    // Validate and compute without mutating in-memory state; if the DB upsert
+                    // below throws the transaction rolls back cleanly with no state left behind.
+                    var result = questState.ValidateDeliveryRequest((ItemId)deliveredItem.ItemId, deliveredItem.ItemNum);
+                    deliveryCommits[deliveredItem.ItemId] = result;
+                    Server.Database.UpsertQuestDeliveryProgress(client.Character.CommonId, request.QuestScheduleId, deliveredItem.ItemId, result.NewTotal, connection);
                 }
             });
+
+            // Transaction committed, now safe to apply in-memory mutations.
+            foreach (var deliveredItem in deliveredItems.Values)
+            {
+                var (remaining, newTotal) = deliveryCommits[deliveredItem.ItemId];
+                deliveredItem.NeedNum = (ushort)remaining;
+                questState.RestoreDeliveryAmount((ItemId)deliveredItem.ItemId, newTotal);
+            }
 
             client.Send(new S2CItemUpdateCharacterItemNtc()
             {

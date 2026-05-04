@@ -252,7 +252,7 @@ public partial class DdonSqlDb : SqlDb
                 }
                 if (!equipItemMap.TryGetValue(uid, out Item? item))
                 {
-                    // No storage row found — leave slot as null, same as vanilla silent failure
+                    // No storage row found - leave slot as null, same as vanilla silent failure
                     continue;
                 }
                 if (crestMap.TryGetValue(uid, out var crests))
@@ -310,7 +310,7 @@ public partial class DdonSqlDb : SqlDb
                 }
                 if (!jobItemMap.TryGetValue(uid, out Item? item))
                 {
-                    // No storage row found — leave slot as null, same as vanilla silent failure
+                    // No storage row found - leave slot as null, same as vanilla silent failure
                     continue;
                 }
                 common.EquipmentTemplate.SetJobItem(item, job, equipSlot);

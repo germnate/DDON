@@ -97,7 +97,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 }
 
                 // Search all process states for a CheckAreaRank command rather than assuming
-                // it is always the very first command — JSON quests and scripted .csx quests
+                // it is always the very first command - JSON quests and scripted .csx quests
                 // serialize their process state lists differently, so .First() is unreliable.
                 var questData = quest.ToCDataQuestList(0);
                 uint requiredRank = 0;

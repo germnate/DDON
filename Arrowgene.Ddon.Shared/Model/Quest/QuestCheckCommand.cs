@@ -231,7 +231,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
 
         /// <summary>
         /// Reads bit 17 (0x20000) of *(ctx+0x5c)+0x20c, inverts it, and stores the boolean result into the global
-        /// side-effect slot at DAT_021c06b8+0x263. Does NOT return a check result — only writes global state.
+        /// side-effect slot at DAT_021c06b8+0x263. Does NOT return a check result - only writes global state.
         /// Takes no quest parameters; the function signature is effectively void(cQuestProcess* this).
         /// </summary>
         StoreLinkageEnemyFlagGlobal = 212, // 0x00635A30 (cQuestProcess* this, s32 param01_unused, s32 param02_unused, s32 param03_unused, s32 param04_unused)
@@ -322,7 +322,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// <summary>
         /// Displays a radius marker around an OM object and progresses when a player exits its radius.
         /// Thunks to FUN_00638ab0 which calls FUN_00638150; same structure as OmSetTouchRadius but checks
-        /// bit 4 of ctx+0x208 (touch-exit flag) instead of bit 3. Complementary to OmSetTouchRadius — NOT identical.
+        /// bit 4 of ctx+0x208 (touch-exit flag) instead of bit 3. Complementary to OmSetTouchRadius - NOT identical.
         /// </summary>
         OmReleaseTouchRadius = 227, // 0x00636450 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
 
@@ -367,7 +367,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// FUN_00868170() (accesses this+0x29cc+0x45c), iterates entries matching pawnId against entry+8,
         /// and returns true if a match is found with entry+0x18 or entry+0x1c non-zero (active state).
         /// Only two parameters are used (this, pawnId); params 3 and 4 are ignored.
-        /// @note Previous description "action type 6" was incorrect — no such constant exists in the decompilation.
+        /// @note Previous description "action type 6" was incorrect - no such constant exists in the decompilation.
         /// </summary>
         IsPawnAvailable = 233, // 0x00636900 (cQuestProcess* this, s32 pawnId, s32 param02_unused, s32 param03_unused, s32 param04_unused)
 
@@ -417,7 +417,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
 
         /// <summary>
         /// Kill-group completion check gated on content mode. Checks ctx+0x4654 == ctx+0x45cc (content mode counter);
-        /// if not in content mode, also checks FUN_009d07f0() and *(this+0x82) byte — if that byte is non-zero,
+        /// if not in content mode, also checks FUN_009d07f0() and *(this+0x82) byte - if that byte is non-zero,
         /// returns early. Forwards all four params to FUN_0063a5e0(param01, param02, param03, param04) which iterates
         /// the kill-group list, matches param01 against entry+0x14, checks entry+0x18 (valid) and entry+4 == 0 (done).
         /// The marker/no-marker distinction vs ID 243 is a runtime property of the this+0x82 byte.
@@ -437,7 +437,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// Reads the boundary from DAT_0220456c+0xb28/+0xb2c. Calls FUN_0064d170(timerNo) which searches
         /// Timer List B at offset +0x104 for an entry with +4 == timerNo and returns its +8 field (elapsed value).
         /// Returns 1 if the elapsed value is within the boundary. Params 2-4 are unused.
-        /// @note Previous description "evaluates bit-flag, not elapsed time" was incorrect — this IS a time comparison.
+        /// @note Previous description "evaluates bit-flag, not elapsed time" was incorrect - this IS a time comparison.
         /// </summary>
         IsContentsTimerBElapsed = 244, // 0x00637180 (cQuestProcess* this, s32 timerNo, s32 param02_unused, s32 param03_unused, s32 param04_unused)
 
@@ -463,7 +463,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// Direct thunk to FUN_0063a5e0 with no content-mode guard (unlike IDs 242/243).
         /// Iterates the kill-group list on this, finds entry matching flagNo by entry+0x14,
         /// checks entry+0x18 (valid) and entry+4 == 0 (kill complete). Only two parameters are used (this, flagNo).
-        /// @note Previous description "shape type 4 radius" was incorrect — no shape-type filtering in this function.
+        /// @note Previous description "shape type 4 radius" was incorrect - no shape-type filtering in this function.
         /// The "radius" framing comes from the kill zone's visual representation, not the code.
         /// </summary>
         IsKillGroupCompleteInRadius = 248, // 0x00637430 (cQuestProcess* this, s32 flagNo, s32 param02_unused, s32 param03_unused, s32 param04_unused)
@@ -473,7 +473,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// Calls FUN_0064d130(timerNo) which searches Timer List A at offset +0xf0 for entry with +4 == timerNo,
         /// returns its +8 field (state value). Returns true if that state value == 0.
         /// Only two parameters used (this, timerNo); params 3-4 ignored.
-        /// @note Previous description "byte-flag at +0x1e95" was incorrect — offset +0x1e95 does not appear in decompilation.
+        /// @note Previous description "byte-flag at +0x1e95" was incorrect - offset +0x1e95 does not appear in decompilation.
         /// </summary>
         IsContentsTimerAZero = 251, // 0x006375E0 (cQuestProcess* this, s32 timerNo, s32 param02_unused, s32 param03_unused, s32 param04_unused)
 
@@ -481,7 +481,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// Checks if a player has entered a proximity zone associated with a wild hunt target set.
         /// Iterates the Wild Hunt check-command object's zone-entry list (count at this[2], array at this[5]).
         /// For each entry where entry+0x14 == param01 (zone/linkage ID), walks sub-entries and calls
-        /// FUN_00636c20(em_id_field1, em_id_field2, -1, param04) — a generic OM enemy killed-state checker.
+        /// FUN_00636c20(em_id_field1, em_id_field2, -1, param04) - a generic OM enemy killed-state checker.
         /// Kill state is confirmed via vtable+0x2ec returning 0xc, or via FUN_00c82ac0 (alternate path).
         /// @note "MobHunt" is the internal engine name for the Wild Hunt system (cMobHuntQuestManager).
         /// @note param02 and param03 are unused. param01 = zone/linkage ID filter, param04 = markerFlag passed to FUN_00636c20.
@@ -494,7 +494,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// </summary>
         IsContentsModeStateFlag = 253, // 0x00637820 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04)
 
-        Padding254 = 254, // 0x00637860 stub/nop — always returns 0
+        Padding254 = 254, // 0x00637860 stub/nop - always returns 0
 
         /// <summary>
         /// Checks if a quest enemy's HP-lost percentage &lt;= hpLostPct. Looks up enemy (type 3) via FUN_00a41780,
