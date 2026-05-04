@@ -100,6 +100,33 @@ namespace Arrowgene.Ddon.GameServer.Quests
             foreach (var rewardItem in questAsset.RepeatClearRewardItems)
                 quest.AddRepeatClearItemReward(rewardItem);
 
+            foreach (var pointReward in questAsset.FirstClearPointRewards)
+                quest.AddFirstClearExpReward(pointReward.PointType, pointReward.Amount);
+
+            foreach (var walletReward in questAsset.FirstClearRewardCurrency)
+                quest.AddFirstClearWalletReward(walletReward.WalletType, walletReward.Amount);
+
+            foreach (var rewardItem in questAsset.FirstClearRewardItems)
+                quest.AddFirstClearItemReward(rewardItem);
+
+            foreach (var pointReward in questAsset.PeriodFirstClearPointRewards)
+                quest.AddPeriodFirstClearExpReward(pointReward.PointType, pointReward.Amount);
+
+            foreach (var walletReward in questAsset.PeriodFirstClearRewardCurrency)
+                quest.AddPeriodFirstClearWalletReward(walletReward.WalletType, walletReward.Amount);
+
+            foreach (var rewardItem in questAsset.PeriodFirstClearRewardItems)
+                quest.AddPeriodFirstClearItemReward(rewardItem);
+
+            foreach (var pointReward in questAsset.HelperPointRewards)
+                quest.AddHelperExpReward(pointReward.PointType, pointReward.Amount);
+
+            foreach (var walletReward in questAsset.HelperRewardCurrency)
+                quest.AddHelperWalletReward(walletReward.WalletType, walletReward.Amount);
+
+            foreach (var rewardItem in questAsset.HelperRewardItems)
+                quest.AddHelperItemReward(rewardItem);
+
             foreach (var (_, enemyGroup) in questAsset.EnemyGroups)
             {
                 quest.UniqueEnemyGroups.Add(enemyGroup.StageLayoutId);

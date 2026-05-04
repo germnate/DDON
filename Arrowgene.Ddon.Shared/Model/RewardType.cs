@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Arrowgene.Ddon.Shared.Model
 {
     public enum RewardType : uint
@@ -18,6 +12,6 @@ namespace Arrowgene.Ddon.Shared.Model
         BloodOrb = 7,
         Ability = 8,
         ExtraJobPoints = 9,
-        ExtreaExp = 10,
+        ExtraExp = 10,
     }
 }

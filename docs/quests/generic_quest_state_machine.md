@@ -221,32 +221,94 @@ The `area_id` field controls what category the quest appears under for Lestania 
 | 900   | 902   | Text Banners: Disaster/Rare Species/Bounty
 
 
-#### Adding Rewards
+#### Adding Mission Params
 
-Next we can define the rewards. The rewards have a variable format depending on the `type` field.
+Extreme missions require a `mission_params` object. Other quest types do not need this block.
 
 ```json
 {
-    "type": string
+    "type": "ExtremeMission",
+    "mission_params": {
+        "group": 9,
+        "minimum_members": 1,
+        "maximum_members": 8,
+        "playtime": 900,
+        "solo_only": false,
+        "max_pawns": 7,
+        "loot_distribution": "TimeBased",
+        "phase_groups": []
+    }
 }
 ```
+
+The `group` and `phase_groups` fields are required. All other fields are optional and use server defaults when omitted.
+
+| Field | Required | Default | Description |
+|:------|:--------:|:--------|:------------|
+| `group` | Yes | | Extreme mission group id sent to the client. |
+| `phase_groups` | Yes | | List of quest phase group ids. Use an empty array when the mission has no phase groups. |
+| `start_pos` | No | `0` | Start position index. |
+| `minimum_members` | No | `4` | Minimum party size shown/required for the mission. |
+| `maximum_members` | No | `4` | Maximum party size for the mission. Grand mission style content commonly uses `8`. |
+| `playtime` | No | `1200` | Time limit in seconds. |
+| `solo_only` | No | `false` | Whether the mission can only be entered solo. |
+| `max_pawns` | No | `3` | Maximum number of pawns allowed in the party. |
+| `loot_distribution` | No | `Normal` | Reward distribution mode. Supported values are `Normal` and `TimeBased`. |
+| `restrictions` | No | armor and jewelry allowed | Optional equipment restrictions. |
+
+The `restrictions` object can disable armor and/or jewelry for the mission.
+
+```json
+{
+    "restrictions": {
+        "armor": false,
+        "jewelry": true
+    }
+}
+```
+
+> [!NOTE]
+> Time-based extreme missions should use `"loot_distribution": "TimeBased"` in `mission_params`, while their reward entries should still use normal reward types such as `fixed` or `random`.
+
+#### Adding Rewards
+
+Next we can define the rewards. The rewards have a variable format depending on the `type` field. Rewards can also include an optional `bucket` field to describe when that reward is granted.
+
+```json
+{
+    "type": string,
+    "bucket": string
+}
+```
+
+If `bucket` is omitted, it defaults to `normal`, preserving the behavior of existing quest files.
 
 - If the type is `wallet`, then it will contain the fields `wallet_type` and `amount`.
 - If the type is `exp`, then it will contain the field `amount`.
 - If the type is `select` it will describe a reward where 1 item can be selected.
 - If the type is `random` it will describe a reward where 1 random item will be selected.
 - If the type is `fixed` it will always reward the fixed item.
-- If the type is `repeat` it defines the item pool given to players on repeat clears of the quest within the same period.
+
+The supported reward buckets are:
+
+| Bucket | Meaning |
+|:-------|:--------|
+| `normal` | Default quest reward. This is used when `bucket` is omitted. |
+| `repeat` | Reward granted on repeat clears of the quest within the same period. |
+| `first_clear` | Extra reward granted the first time the character ever clears the quest. |
+| `period_first_clear` | Extra reward granted the first time the character clears the quest in the current reset period. |
+| `helper` | Extra reward granted when helping another player with their first clear. |
 
 When a player completes a world quest for the first time in a period, they receive the normal first-clear rewards. On every subsequent clear within that same period, they receive one item drawn at random from the `repeat` pool instead.
 
 If no `repeat` reward is defined on the quest, the server automatically constructs one by combining all items from the `select` and `random` reward pools into a single flat pool and drawing one item at random. This means most quests do not need an explicit `repeat` reward unless the designer wants a different pool from the first-clear rewards.
 
-The `repeat` reward accepts a `loot_pool` array with the same format as `fixed` and `select`. One item is chosen at random from the pool each time the reward is granted.
+The repeat reward uses `type: "random"` with `bucket: "repeat"`. If no `chance` fields are provided, one item is chosen from the pool with equal weighting.
 
 ```json
 {
-    "type": "repeat",
+    "type": "random",
+    "bucket": "repeat",
     "loot_pool": [
         {
             "item_id": 95,
@@ -258,6 +320,95 @@ The `repeat` reward accepts a `loot_pool` array with the same format as `fixed` 
         }
     ]
 }
+```
+
+Extreme missions and other quest types can also define separate reward buckets for first-ever clears, first-in-period clears, repeat clears in a period, and helper bonuses. These reward buckets use the same reward type syntax as normal quest rewards.
+
+```json
+{
+    "type": "fixed",
+    "bucket": "first_clear",
+    "loot_pool": [
+        {
+            "item_id": 95,
+            "num": 1
+        }
+    ]
+},
+{
+    "type": "fixed",
+    "bucket": "period_first_clear",
+    "loot_pool": [
+        {
+            "item_id": 58,
+            "num": 3
+        }
+    ]
+},
+{
+    "type": "fixed",
+    "bucket": "helper",
+    "loot_pool": [
+        {
+            "item_id": 10047,
+            "num": 1
+        }
+    ]
+}
+```
+
+Item rewards can include optional `instance` data. If `instance` is omitted, the reward is treated as a normal stackable item. If a crest omits `level`, it defaults to `0`, which means the crest's base value.
+
+```json
+{
+    "type": "fixed",
+    "bucket": "period_first_clear",
+    "loot_pool": [
+        {
+            "item_id": 10047,
+            "num": 1,
+            "instance": {
+                "color": 0,
+                "plus_value": 3,
+                "safety_setting": 0,
+                "crests": [
+                    {
+                        "slot": 0,
+                        "crest_id": 1234
+                    },
+                    {
+                        "slot": 1,
+                        "crest_id": 5678,
+                        "level": 2
+                    }
+                ]
+            }
+        }
+    ]
+}
+```
+
+Existing quest files that use legacy reward types such as `repeat`, `first_clear`, `period_first_clear`, `helper`, `instanced_fixed`, or `instanced_period_first_clear` still load. New quest files should prefer the separate `type`, `bucket`, and `instance` fields shown above.
+
+Scripted quests can use the same bucket model without calling a separate method for every reward bucket. Existing helpers such as `AddFirstClearFixedItemReward` still work, but new scripted quests should prefer the overloads that accept `QuestRewardBucket`.
+
+```csharp
+AddFixedItemReward(ItemId.KeystoneToRuin, 2);
+AddFixedItemReward(ItemId.KeystoneToRuin, 2, QuestRewardBucket.FirstClear);
+AddRandomFixedItemReward(new()
+{
+    (ItemId.KeystoneToRuin, 1),
+    (ItemId.BlackKnightsThoughts, 2),
+}, QuestRewardBucket.RepeatClear);
+
+AddFixedItemReward(ItemId.SomeWeapon0, 1, QuestRewardBucket.PeriodFirstClear, new QuestItemInstance
+{
+    PlusValue = 3,
+    Crests = new()
+    {
+        new StagedRewardItemCrest { Slot = 0, CrestId = 1234 },
+    },
+});
 ```
 
 Putting this all together, we will get a reward list which looks like

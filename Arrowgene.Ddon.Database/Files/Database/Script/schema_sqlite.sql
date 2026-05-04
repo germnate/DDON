@@ -551,9 +551,55 @@ CREATE TABLE IF NOT EXISTS "ddon_reward_box"
     "random_reward2_index" INTEGER                           NOT NULL,
     "random_reward3_index" INTEGER                           NOT NULL,
     "is_repeat_reward"     INTEGER                           NOT NULL DEFAULT 0,
+    "reward_flags"         INTEGER                           NOT NULL DEFAULT 0,
     CONSTRAINT "fk_ddon_reward_box_character_common_id" FOREIGN KEY ("character_common_id") REFERENCES "ddon_character_common" ("character_common_id") ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS "idx_ddon_reward_box_character_common_id" ON "ddon_reward_box" ("character_common_id");
+
+CREATE TABLE IF NOT EXISTS "ddon_reward_box_item"
+(
+    "reward_box_item_id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    "uniq_reward_id"     INTEGER                           NOT NULL,
+    "item_id"            INTEGER                           NOT NULL,
+    "num"                INTEGER                           NOT NULL,
+    "uid"                TEXT                              NOT NULL,
+    "type"               INTEGER                           NOT NULL,
+    "is_charge"          INTEGER                           NOT NULL DEFAULT 0,
+    "is_help"            INTEGER                           NOT NULL DEFAULT 0,
+    "select_group_id"    INTEGER                           NOT NULL DEFAULT 0,
+    "is_instance"        INTEGER                           NOT NULL DEFAULT 0,
+    CONSTRAINT "fk_ddon_reward_box_item_uniq_reward_id" FOREIGN KEY ("uniq_reward_id") REFERENCES "ddon_reward_box" ("uniq_reward_id") ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS "idx_ddon_reward_box_item_uniq_reward_id" ON "ddon_reward_box_item" ("uniq_reward_id");
+
+CREATE TABLE IF NOT EXISTS "ddon_reward_staged_item"
+(
+    "uid"                TEXT    PRIMARY KEY NOT NULL,
+    "reward_box_item_id" INTEGER NOT NULL,
+    "item_id"            INTEGER NOT NULL,
+    "num"                INTEGER NOT NULL DEFAULT 1,
+    "color"              INTEGER NOT NULL DEFAULT 0,
+    "plus_value"         INTEGER NOT NULL DEFAULT 0,
+    "safety_setting"     INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT "fk_reward_staged_item_reward_box_item_id"
+        FOREIGN KEY ("reward_box_item_id")
+        REFERENCES "ddon_reward_box_item" ("reward_box_item_id")
+        ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS "idx_reward_staged_item_reward_box_item_id" ON "ddon_reward_staged_item" ("reward_box_item_id");
+
+CREATE TABLE IF NOT EXISTS "ddon_reward_staged_item_crest"
+(
+    "uid"      TEXT    NOT NULL,
+    "slot"     INTEGER NOT NULL,
+    "crest_id" INTEGER NOT NULL,
+    "level"    INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT "pk_reward_staged_item_crest" PRIMARY KEY ("uid", "slot"),
+    CONSTRAINT "fk_reward_staged_item_crest_uid"
+        FOREIGN KEY ("uid")
+        REFERENCES "ddon_reward_staged_item" ("uid")
+        ON DELETE CASCADE
+);
 
 CREATE TABLE IF NOT EXISTS "ddon_quest_progress"
 (
@@ -600,13 +646,15 @@ CREATE TABLE IF NOT EXISTS "ddon_mail"
 );
 CREATE INDEX IF NOT EXISTS "idx_ddon_mail_character_id" ON "ddon_mail" ("character_id");
 
-CREATE TABLE IF NOT EXISTS "ddon_world_quest_period_first_clear"
+CREATE TABLE IF NOT EXISTS "ddon_quest_period_first_clear"
 (
     "character_common_id" INTEGER NOT NULL,
+    "quest_type"          INTEGER NOT NULL,
     "quest_schedule_id"   INTEGER NOT NULL,
-    CONSTRAINT "pk_ddon_world_quest_period_first_clear" PRIMARY KEY ("character_common_id", "quest_schedule_id"),
-    CONSTRAINT "fk_ddon_world_quest_period_first_clear_character_common_id" FOREIGN KEY ("character_common_id") REFERENCES "ddon_character_common" ("character_common_id") ON DELETE CASCADE
+    CONSTRAINT "pk_ddon_quest_period_first_clear" PRIMARY KEY ("character_common_id", "quest_type", "quest_schedule_id"),
+    CONSTRAINT "fk_ddon_quest_period_first_clear_character_common_id" FOREIGN KEY ("character_common_id") REFERENCES "ddon_character_common" ("character_common_id") ON DELETE CASCADE
 );
+CREATE INDEX IF NOT EXISTS "idx_ddon_quest_period_first_clear_quest_type" ON "ddon_quest_period_first_clear" ("quest_type");
 
 CREATE TABLE IF NOT EXISTS "ddon_system_mail"
 (

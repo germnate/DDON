@@ -20,6 +20,15 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
             RepeatClearRewardItems = new List<QuestRewardItem>();
             RepeatClearWalletRewards = new List<QuestWalletReward>();
             RepeatClearPointRewards = new List<QuestPointReward>();
+            FirstClearRewardItems = new List<QuestRewardItem>();
+            FirstClearWalletRewards = new List<QuestWalletReward>();
+            FirstClearPointRewards = new List<QuestPointReward>();
+            PeriodFirstClearRewardItems = new List<QuestRewardItem>();
+            PeriodFirstClearWalletRewards = new List<QuestWalletReward>();
+            PeriodFirstClearPointRewards = new List<QuestPointReward>();
+            HelperRewardItems = new List<QuestRewardItem>();
+            HelperWalletRewards = new List<QuestWalletReward>();
+            HelperPointRewards = new List<QuestPointReward>();
             EnemyGroups = new Dictionary<uint, QuestEnemyGroup>();
             MissionParams = new QuestMissionParams();
             QuestLayoutSetInfoSetList = new List<QuestLayoutFlagSetInfo>();
@@ -82,6 +91,15 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
         protected List<QuestRewardItem> RepeatClearRewardItems { get; set; }
         protected List<QuestWalletReward> RepeatClearWalletRewards { get; set; }
         protected List<QuestPointReward> RepeatClearPointRewards { get; set; }
+        protected List<QuestRewardItem> FirstClearRewardItems { get; set; }
+        protected List<QuestWalletReward> FirstClearWalletRewards { get; set; }
+        protected List<QuestPointReward> FirstClearPointRewards { get; set; }
+        protected List<QuestRewardItem> PeriodFirstClearRewardItems { get; set; }
+        protected List<QuestWalletReward> PeriodFirstClearWalletRewards { get; set; }
+        protected List<QuestPointReward> PeriodFirstClearPointRewards { get; set; }
+        protected List<QuestRewardItem> HelperRewardItems { get; set; }
+        protected List<QuestWalletReward> HelperWalletRewards { get; set; }
+        protected List<QuestPointReward> HelperPointRewards { get; set; }
         protected Dictionary<uint, QuestEnemyGroup> EnemyGroups { get; set; }
         protected List<QuestLayoutFlagSetInfo> QuestLayoutSetInfoSetList { get; set; }
         protected QuestMissionParams MissionParams { get; set; }
@@ -139,6 +157,33 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
             }
         }
 
+        public void AddItemReward(QuestRewardBucket bucket, QuestRewardItem reward)
+        {
+            if (reward == null)
+            {
+                return;
+            }
+
+            switch (bucket)
+            {
+                case QuestRewardBucket.Normal:
+                    RewardItems.Add(reward);
+                    break;
+                case QuestRewardBucket.RepeatClear:
+                    RepeatClearRewardItems.Add(reward);
+                    break;
+                case QuestRewardBucket.FirstClear:
+                    FirstClearRewardItems.Add(reward);
+                    break;
+                case QuestRewardBucket.PeriodFirstClear:
+                    PeriodFirstClearRewardItems.Add(reward);
+                    break;
+                case QuestRewardBucket.Helper:
+                    HelperRewardItems.Add(reward);
+                    break;
+            }
+        }
+
         public void AddFixedItemReward(ItemId itemId, ushort amount, bool isHidden = false)
         {
             AddItemReward(QuestFixedRewardItem.Create(itemId, amount, isHidden));
@@ -149,9 +194,37 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
             AddFixedItemReward((ItemId) itemId, amount);
         }
 
+        public void AddFixedItemReward(ItemId itemId, ushort amount, QuestRewardBucket bucket, QuestItemInstance instance = null, bool isHidden = false)
+        {
+            if (instance == null)
+            {
+                AddItemReward(bucket, QuestFixedRewardItem.Create(itemId, amount, isHidden));
+                return;
+            }
+
+            var reward = new QuestInstancedFixedRewardItem(isHidden);
+            reward.LootPool.Add(instance.ToLootPoolItem(itemId, amount));
+            AddItemReward(bucket, reward);
+        }
+
+        public void AddFixedItemReward(uint itemId, ushort amount, QuestRewardBucket bucket, QuestItemInstance instance = null, bool isHidden = false)
+        {
+            AddFixedItemReward((ItemId)itemId, amount, bucket, instance, isHidden);
+        }
+
+        public void AddFixedInstancedItemReward(ItemId itemId, ushort amount, uint color = 0, uint plusValue = 0, uint safetySetting = 0, bool isHidden = false)
+        {
+            AddItemReward(QuestInstancedFixedRewardItem.Create(itemId, amount, color, plusValue, safetySetting, isHidden));
+        }
+
         public void AddRandomChanceItemReward(List<(ItemId ItemId, ushort Amount, double Chance)> items, bool isHidden = false)
         {
             AddItemReward(QuestRandomChanceRewardItem.Create(items, isHidden));
+        }
+
+        public void AddRandomChanceItemReward(List<(ItemId ItemId, ushort Amount, double Chance)> items, QuestRewardBucket bucket, bool isHidden = false)
+        {
+            AddItemReward(bucket, QuestRandomChanceRewardItem.Create(items, isHidden));
         }
 
         public void AddRandomFixedItemReward(List<(ItemId ItemId, ushort Amount)> items, bool isHidden = false)
@@ -159,9 +232,19 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
             AddItemReward(QuestRandomFixedRewardItem.Create(items, isHidden));
         }
 
+        public void AddRandomFixedItemReward(List<(ItemId ItemId, ushort Amount)> items, QuestRewardBucket bucket, bool isHidden = false)
+        {
+            AddItemReward(bucket, QuestRandomFixedRewardItem.Create(items, isHidden));
+        }
+
         public void AddSelectItemReward(List<(ItemId ItemId, ushort Amount)> items, bool isHidden = false)
         {
             AddItemReward(QuestSelectRewardItem.Create(items, isHidden));
+        }
+
+        public void AddSelectItemReward(List<(ItemId ItemId, ushort Amount)> items, QuestRewardBucket bucket, bool isHidden = false)
+        {
+            AddItemReward(bucket, QuestSelectRewardItem.Create(items, isHidden));
         }
 
         public void AddPointReward(PointType pointType, uint amount)
@@ -169,9 +252,55 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
             PointRewards.Add(QuestPointReward.Create(pointType, amount));
         }
 
+        public void AddPointReward(PointType pointType, uint amount, QuestRewardBucket bucket)
+        {
+            var reward = QuestPointReward.Create(pointType, amount);
+            switch (bucket)
+            {
+                case QuestRewardBucket.Normal:
+                    PointRewards.Add(reward);
+                    break;
+                case QuestRewardBucket.RepeatClear:
+                    RepeatClearPointRewards.Add(reward);
+                    break;
+                case QuestRewardBucket.FirstClear:
+                    FirstClearPointRewards.Add(reward);
+                    break;
+                case QuestRewardBucket.PeriodFirstClear:
+                    PeriodFirstClearPointRewards.Add(reward);
+                    break;
+                case QuestRewardBucket.Helper:
+                    HelperPointRewards.Add(reward);
+                    break;
+            }
+        }
+
         public void AddWalletReward(WalletType walletType, uint amount)
         {
             WalletRewards.Add(QuestWalletReward.Create(walletType, amount));
+        }
+
+        public void AddWalletReward(WalletType walletType, uint amount, QuestRewardBucket bucket)
+        {
+            var reward = QuestWalletReward.Create(walletType, amount);
+            switch (bucket)
+            {
+                case QuestRewardBucket.Normal:
+                    WalletRewards.Add(reward);
+                    break;
+                case QuestRewardBucket.RepeatClear:
+                    RepeatClearWalletRewards.Add(reward);
+                    break;
+                case QuestRewardBucket.FirstClear:
+                    FirstClearWalletRewards.Add(reward);
+                    break;
+                case QuestRewardBucket.PeriodFirstClear:
+                    PeriodFirstClearWalletRewards.Add(reward);
+                    break;
+                case QuestRewardBucket.Helper:
+                    HelperWalletRewards.Add(reward);
+                    break;
+            }
         }
 
         // Repeat-clear reward helpers: call these from InitializeRewards()
@@ -184,6 +313,11 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
         public void AddRepeatClearFixedItemReward(ItemId itemId, ushort amount, bool isHidden = false)
         {
             AddRepeatClearItemReward(QuestFixedRewardItem.Create(itemId, amount, isHidden));
+        }
+
+        public void AddRepeatClearFixedInstancedItemReward(ItemId itemId, ushort amount, uint color = 0, uint plusValue = 0, uint safetySetting = 0, bool isHidden = false)
+        {
+            AddRepeatClearItemReward(QuestInstancedFixedRewardItem.Create(itemId, amount, color, plusValue, safetySetting, isHidden));
         }
 
         public void AddRepeatClearRandomFixedItemReward(List<(ItemId ItemId, ushort Amount)> items, bool isHidden = false)
@@ -204,6 +338,114 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
         public void AddRepeatClearWalletReward(WalletType walletType, uint amount)
         {
             RepeatClearWalletRewards.Add(QuestWalletReward.Create(walletType, amount));
+        }
+
+        public void AddFirstClearItemReward(QuestRewardItem reward)
+        {
+            if (reward != null)
+                FirstClearRewardItems.Add(reward);
+        }
+
+        public void AddFirstClearFixedItemReward(ItemId itemId, ushort amount, bool isHidden = false)
+        {
+            AddFirstClearItemReward(QuestFixedRewardItem.Create(itemId, amount, isHidden));
+        }
+
+        public void AddFirstClearFixedInstancedItemReward(ItemId itemId, ushort amount, uint color = 0, uint plusValue = 0, uint safetySetting = 0, bool isHidden = false)
+        {
+            AddFirstClearItemReward(QuestInstancedFixedRewardItem.Create(itemId, amount, color, plusValue, safetySetting, isHidden));
+        }
+
+        public void AddFirstClearRandomFixedItemReward(List<(ItemId ItemId, ushort Amount)> items, bool isHidden = false)
+        {
+            AddFirstClearItemReward(QuestRandomFixedRewardItem.Create(items, isHidden));
+        }
+
+        public void AddFirstClearRandomChanceItemReward(List<(ItemId ItemId, ushort Amount, double Chance)> items, bool isHidden = false)
+        {
+            AddFirstClearItemReward(QuestRandomChanceRewardItem.Create(items, isHidden));
+        }
+
+        public void AddFirstClearPointReward(PointType pointType, uint amount)
+        {
+            FirstClearPointRewards.Add(QuestPointReward.Create(pointType, amount));
+        }
+
+        public void AddFirstClearWalletReward(WalletType walletType, uint amount)
+        {
+            FirstClearWalletRewards.Add(QuestWalletReward.Create(walletType, amount));
+        }
+
+        public void AddPeriodFirstClearItemReward(QuestRewardItem reward)
+        {
+            if (reward != null)
+                PeriodFirstClearRewardItems.Add(reward);
+        }
+
+        public void AddPeriodFirstClearFixedItemReward(ItemId itemId, ushort amount, bool isHidden = false)
+        {
+            AddPeriodFirstClearItemReward(QuestFixedRewardItem.Create(itemId, amount, isHidden));
+        }
+
+        public void AddPeriodFirstClearFixedInstancedItemReward(ItemId itemId, ushort amount, uint color = 0, uint plusValue = 0, uint safetySetting = 0, bool isHidden = false)
+        {
+            AddPeriodFirstClearItemReward(QuestInstancedFixedRewardItem.Create(itemId, amount, color, plusValue, safetySetting, isHidden));
+        }
+
+        public void AddPeriodFirstClearRandomFixedItemReward(List<(ItemId ItemId, ushort Amount)> items, bool isHidden = false)
+        {
+            AddPeriodFirstClearItemReward(QuestRandomFixedRewardItem.Create(items, isHidden));
+        }
+
+        public void AddPeriodFirstClearRandomChanceItemReward(List<(ItemId ItemId, ushort Amount, double Chance)> items, bool isHidden = false)
+        {
+            AddPeriodFirstClearItemReward(QuestRandomChanceRewardItem.Create(items, isHidden));
+        }
+
+        public void AddPeriodFirstClearPointReward(PointType pointType, uint amount)
+        {
+            PeriodFirstClearPointRewards.Add(QuestPointReward.Create(pointType, amount));
+        }
+
+        public void AddPeriodFirstClearWalletReward(WalletType walletType, uint amount)
+        {
+            PeriodFirstClearWalletRewards.Add(QuestWalletReward.Create(walletType, amount));
+        }
+
+        public void AddHelperItemReward(QuestRewardItem reward)
+        {
+            if (reward != null)
+                HelperRewardItems.Add(reward);
+        }
+
+        public void AddHelperFixedItemReward(ItemId itemId, ushort amount, bool isHidden = false)
+        {
+            AddHelperItemReward(QuestFixedRewardItem.Create(itemId, amount, isHidden));
+        }
+
+        public void AddHelperFixedInstancedItemReward(ItemId itemId, ushort amount, uint color = 0, uint plusValue = 0, uint safetySetting = 0, bool isHidden = false)
+        {
+            AddHelperItemReward(QuestInstancedFixedRewardItem.Create(itemId, amount, color, plusValue, safetySetting, isHidden));
+        }
+
+        public void AddHelperRandomFixedItemReward(List<(ItemId ItemId, ushort Amount)> items, bool isHidden = false)
+        {
+            AddHelperItemReward(QuestRandomFixedRewardItem.Create(items, isHidden));
+        }
+
+        public void AddHelperRandomChanceItemReward(List<(ItemId ItemId, ushort Amount, double Chance)> items, bool isHidden = false)
+        {
+            AddHelperItemReward(QuestRandomChanceRewardItem.Create(items, isHidden));
+        }
+
+        public void AddHelperPointReward(PointType pointType, uint amount)
+        {
+            HelperPointRewards.Add(QuestPointReward.Create(pointType, amount));
+        }
+
+        public void AddHelperWalletReward(WalletType walletType, uint amount)
+        {
+            HelperWalletRewards.Add(QuestWalletReward.Create(walletType, amount));
         }
 
         public void AddQuestOrderCondition(QuestOrderConditionType type, int param01 = 0, int param02 = 0)
@@ -369,6 +611,15 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
                 RepeatClearRewardItems = RepeatClearRewardItems,
                 RepeatClearRewardCurrency = RepeatClearWalletRewards,
                 RepeatClearPointRewards = RepeatClearPointRewards,
+                FirstClearRewardItems = FirstClearRewardItems,
+                FirstClearRewardCurrency = FirstClearWalletRewards,
+                FirstClearPointRewards = FirstClearPointRewards,
+                PeriodFirstClearRewardItems = PeriodFirstClearRewardItems,
+                PeriodFirstClearRewardCurrency = PeriodFirstClearWalletRewards,
+                PeriodFirstClearPointRewards = PeriodFirstClearPointRewards,
+                HelperRewardItems = HelperRewardItems,
+                HelperRewardCurrency = HelperWalletRewards,
+                HelperPointRewards = HelperPointRewards,
                 StageLayoutId = StageInfo.AsStageLayoutId(0, 0),
                 ResetPlayerAfterQuest = ResetPlayerAfterQuest,
                 MissionParams = MissionParams,

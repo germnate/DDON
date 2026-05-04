@@ -17,6 +17,7 @@ namespace Arrowgene.Ddon.Shared.Model.Rpc
         
         UpdateCrafting, // RpcCraftingTimerData
         WorldQuestReset, // long (seed)
+        ExtremeMissionRewardReset, // null
 
         StampReset, //null
 

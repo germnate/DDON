@@ -12,7 +12,7 @@ public class ChatCommand : IChatCommand
         lines.Add("# Task Cadence, Task Type, Next Update");
         foreach (var task in server.ScheduleManager.GetTasks())
         {
-            if (!task.IsEnabled(server))
+            if (!task.IsEnabled(server) || task.Interval == ScheduleInterval.Secondly)
             {
                 continue;
             }

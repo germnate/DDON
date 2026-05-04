@@ -94,6 +94,15 @@ namespace Arrowgene.Ddon.GameServer.Quests
         protected List<CDataWalletPoint> RepeatClearWalletRewards { get; set; }
         protected List<CDataQuestExp> RepeatClearExpRewards { get; set; }
         protected List<QuestRewardItem> RepeatClearItemRewards { get; set; }
+        protected List<CDataWalletPoint> FirstClearWalletRewards { get; set; }
+        protected List<CDataQuestExp> FirstClearExpRewards { get; set; }
+        protected List<QuestRewardItem> FirstClearItemRewards { get; set; }
+        protected List<CDataWalletPoint> PeriodFirstClearWalletRewards { get; set; }
+        protected List<CDataQuestExp> PeriodFirstClearExpRewards { get; set; }
+        protected List<QuestRewardItem> PeriodFirstClearItemRewards { get; set; }
+        protected List<CDataWalletPoint> HelperWalletRewards { get; set; }
+        protected List<CDataQuestExp> HelperExpRewards { get; set; }
+        protected List<QuestRewardItem> HelperItemRewards { get; set; }
         public List<QuestLocation> Locations { get; protected set; }
         public List<QuestDeliveryItem> DeliveryItems { get; protected set; }
         public List<QuestEnemyHunt> EnemyHunts { get; protected set; }
@@ -142,6 +151,20 @@ namespace Arrowgene.Ddon.GameServer.Quests
             return result;
         }
 
+        public List<CDataWalletPoint> ScaledRepeatClearWalletRewards()
+        {
+            var result = new List<CDataWalletPoint>();
+            foreach (var walletPoint in RepeatClearWalletRewards)
+            {
+                result.Add(new CDataWalletPoint()
+                {
+                    Type = walletPoint.Type,
+                    Value = Server.WalletManager.GetScaledWalletAmount(walletPoint.Type, walletPoint.Value)
+                });
+            }
+            return result;
+        }
+
         public List<CDataQuestExp> GetExpRewards()
         {
             return ExpRewards;
@@ -163,6 +186,21 @@ namespace Arrowgene.Ddon.GameServer.Quests
             return result;
         }
 
+        public List<CDataQuestExp> ScaledRepeatClearExpRewards()
+        {
+            var result = new List<CDataQuestExp>();
+            foreach (var pointReward in RepeatClearExpRewards)
+            {
+                var amount = Server.ExpManager.GetAdjustedPointsForQuest(pointReward.Type, pointReward.Reward, this.QuestType);
+                result.Add(new CDataQuestExp()
+                {
+                    Type = pointReward.Type,
+                    Reward = amount.BasePoints,
+                });
+            }
+            return result;
+        }
+
         public Quest(DdonGameServer server, QuestId questId, uint variantIndex, QuestType questType, bool isDiscoverable = false)
         {
             Server = server;
@@ -180,6 +218,15 @@ namespace Arrowgene.Ddon.GameServer.Quests
             RepeatClearWalletRewards = new List<CDataWalletPoint>();
             RepeatClearExpRewards = new List<CDataQuestExp>();
             RepeatClearItemRewards = new List<QuestRewardItem>();
+            FirstClearWalletRewards = new List<CDataWalletPoint>();
+            FirstClearExpRewards = new List<CDataQuestExp>();
+            FirstClearItemRewards = new List<QuestRewardItem>();
+            PeriodFirstClearWalletRewards = new List<CDataWalletPoint>();
+            PeriodFirstClearExpRewards = new List<CDataQuestExp>();
+            PeriodFirstClearItemRewards = new List<QuestRewardItem>();
+            HelperWalletRewards = new List<CDataWalletPoint>();
+            HelperExpRewards = new List<CDataQuestExp>();
+            HelperItemRewards = new List<QuestRewardItem>();
             Locations = new List<QuestLocation>();
             DeliveryItems = new List<QuestDeliveryItem>();
             EnemyHunts = new List<QuestEnemyHunt>();
@@ -394,7 +441,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
             return process.Blocks[blockNo];
         }
 
-        public virtual CDataQuestList ToCDataQuestList(uint step)
+        public virtual CDataQuestList ToCDataQuestList(uint step, bool isRepeatClear = false)
         {
             var quest = new CDataQuestList()
             {
@@ -403,10 +450,10 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 BaseLevel = BaseLevel,
                 ContentJoinItemRank = MinimumItemRank,
                 IsClientOrder = step > 0,
-                BaseExp = ScaledExpRewards(),
-                BaseWalletPoints = ScaledWalletRewards(),
-                FixedRewardItemList = GetQuestFixedRewards(),
-                FixedRewardSelectItemList = GetQuestSelectableRewards(),
+                BaseExp = isRepeatClear && RepeatClearExpRewards.Count > 0 ? ScaledRepeatClearExpRewards() : ScaledExpRewards(),
+                BaseWalletPoints = isRepeatClear && RepeatClearWalletRewards.Count > 0 ? ScaledRepeatClearWalletRewards() : ScaledWalletRewards(),
+                FixedRewardItemList = isRepeatClear ? GetRepeatClearFixedRewards() : GetQuestFixedRewards(),
+                FixedRewardSelectItemList = isRepeatClear ? new List<CDataRewardItem>() : GetQuestSelectableRewards(),
                 QuestOrderConditionParamList = GetQuestOrderConditions(),
                 QuestEnemyInfoList = EnemyGroups.Values.SelectMany(group => group.Enemies.Select(enemy => new CDataQuestEnemyInfo()
                 {
@@ -851,7 +898,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
         {
             var data = new CDataSetQuestList()
             {
-                Param = ToCDataQuestList(step),
+                Param = ToCDataQuestList(step, isRepeatClear: clearCount > 0),
                 Detail = new CDataSetQuestDetail()
                 {
                     IsDiscovery = IsDiscoverable,
@@ -1107,6 +1154,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
 
         public static List<CDataRewardBoxItem> AsCDataRewardBoxItems(QuestBoxRewards rewards)
         {
+            if (rewards.RewardItemList.Count > 0)
+            {
+                return rewards.RewardItemList.Select(CloneRewardBoxItem).ToList();
+            }
+
             List<CDataRewardBoxItem> results = new List<CDataRewardBoxItem>();
 
             Quest quest = QuestManager.GetQuestByScheduleId(rewards.QuestScheduleId);
@@ -1115,30 +1167,16 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 return new List<CDataRewardBoxItem>();
             }
 
-            // Auto-repeat: one item was picked from the combined first-clear pool at completion time.
-            // The stored index is into GetAutoRepeatPool(), not into a specific random slot.
-            if (rewards.IsRepeatReward && !quest.HasRepeatClearItemRewards()
-                && rewards.NumRandomRewards > 0 && rewards.RandomRewardIndices.Count > 0)
+            if (rewards.RewardFlags != QuestBoxRewardFlags.None)
             {
-                var pool = quest.GetAutoRepeatPool();
-                var idx = rewards.RandomRewardIndices[0];
-                if (idx < pool.Count)
-                {
-                    var item = pool[idx];
-                    results.Add(new CDataRewardBoxItem()
-                    {
-                        ItemId = item.ItemId,
-                        Num = item.Num,
-                        Type = (byte)QuestRewardType.Repeat,
-                        UID = item.GetUID()
-                    });
-                }
+                quest.AppendCategorizedRewardBoxItems(results, rewards);
                 return results;
             }
 
+            uint legacySelectGroupId = 1;
             foreach (var reward in quest.SelectableRewards)
             {
-                results.AddRange(reward.AsCDataRewardBoxItems());
+                results.AddRange(reward.AsCDataRewardBoxItems(selectGroupId: legacySelectGroupId++));
             }
 
             var randomRewards = new List<QuestRandomRewardItem>();
@@ -1156,10 +1194,159 @@ namespace Arrowgene.Ddon.GameServer.Quests
 
             foreach (var randomReward in rewards.RandomRewardIndices.Zip(randomRewards, Tuple.Create))
             {
-                results.Add(randomReward.Item2.AsCDataRewardBoxItem(randomReward.Item1));
+                if (randomReward.Item1 >= 0 && randomReward.Item1 < randomReward.Item2.LootPool.Count)
+                {
+                    results.Add(randomReward.Item2.AsCDataRewardBoxItem(randomReward.Item1));
+                }
             }
 
             return results;
+        }
+
+        private static CDataRewardBoxItem CloneRewardBoxItem(CDataRewardBoxItem reward)
+        {
+            return new CDataRewardBoxItem()
+            {
+                RewardBoxItemId = reward.RewardBoxItemId,
+                ItemId = reward.ItemId,
+                Num = reward.Num,
+                UID = reward.UID,
+                Type = reward.Type,
+                IsCharge = reward.IsCharge,
+                IsHelp = reward.IsHelp,
+                SelectGroupId = reward.SelectGroupId,
+                IsInstance = reward.IsInstance,
+                StagedItem = CloneStagedRewardItem(reward.StagedItem),
+            };
+        }
+
+        private static StagedRewardItem? CloneStagedRewardItem(StagedRewardItem? item)
+        {
+            if (item == null)
+            {
+                return null;
+            }
+
+            var clone = new StagedRewardItem()
+            {
+                Uid = item.Uid,
+                RewardBoxItemId = item.RewardBoxItemId,
+                ItemId = item.ItemId,
+                Num = item.Num,
+                Color = item.Color,
+                PlusValue = item.PlusValue,
+                SafetySetting = item.SafetySetting,
+            };
+
+            foreach (var crest in item.Crests)
+            {
+                clone.Crests.Add(new StagedRewardItemCrest()
+                {
+                    Uid = crest.Uid,
+                    Slot = crest.Slot,
+                    CrestId = crest.CrestId,
+                    Level = crest.Level,
+                });
+            }
+
+            return clone;
+        }
+
+        private static CDataRewardBoxItem CreateRewardBoxItem(LootPoolItem item, QuestRewardType rewardType, bool isHelp = false, uint selectGroupId = 0)
+        {
+            if (item is InstancedLootPoolItem instanced)
+            {
+                var staged = instanced.ToStagedRewardItem();
+                return new CDataRewardBoxItem()
+                {
+                    ItemId = instanced.ItemId,
+                    Num = instanced.Num,
+                    Type = (byte)rewardType,
+                    UID = staged.Uid,
+                    IsHelp = isHelp,
+                    SelectGroupId = selectGroupId,
+                    IsInstance = true,
+                    StagedItem = staged,
+                };
+            }
+
+            return new CDataRewardBoxItem()
+            {
+                ItemId = item.ItemId,
+                Num = item.Num,
+                Type = (byte)rewardType,
+                UID = item.GetUID(),
+                IsHelp = isHelp,
+                SelectGroupId = selectGroupId,
+            };
+        }
+
+        private void AppendCategorizedRewardBoxItems(List<CDataRewardBoxItem> results, QuestBoxRewards rewards)
+        {
+            int randomRewardOffset = 0;
+            uint selectGroupId = 1;
+
+            if (rewards.RewardFlags.HasFlag(QuestBoxRewardFlags.FirstClear))
+                AppendRewardBoxItems(results, FirstClearItemRewards, rewards.RandomRewardIndices, ref randomRewardOffset, QuestRewardType.FixedFirst, ref selectGroupId);
+
+            if (rewards.RewardFlags.HasFlag(QuestBoxRewardFlags.PeriodFirstClear))
+                AppendRewardBoxItems(results, PeriodFirstClearItemRewards, rewards.RandomRewardIndices, ref randomRewardOffset, QuestRewardType.FixedSecond, ref selectGroupId);
+
+            if (rewards.RewardFlags.HasFlag(QuestBoxRewardFlags.RepeatClear))
+            {
+                if (HasRepeatClearItemRewards())
+                {
+                    AppendRewardBoxItems(results, RepeatClearItemRewards, rewards.RandomRewardIndices, ref randomRewardOffset, QuestRewardType.Repeat, ref selectGroupId);
+                }
+                else if (randomRewardOffset < rewards.RandomRewardIndices.Count)
+                {
+                    var pool = GetAutoRepeatPool();
+                    var idx = rewards.RandomRewardIndices[randomRewardOffset++];
+                    if (idx < pool.Count)
+                    {
+                        var item = pool[idx];
+                        results.Add(CreateRewardBoxItem(item, QuestRewardType.Repeat));
+                    }
+                }
+            }
+
+            if (rewards.RewardFlags.HasFlag(QuestBoxRewardFlags.HelperBonus))
+                AppendRewardBoxItems(results, HelperItemRewards, rewards.RandomRewardIndices, ref randomRewardOffset, QuestRewardType.FixedMemberFirst, ref selectGroupId, true);
+        }
+
+        private void AppendRewardBoxItems(
+            List<CDataRewardBoxItem> results,
+            List<QuestRewardItem> rewardItems,
+            List<int> randomRewardIndices,
+            ref int randomRewardOffset,
+            QuestRewardType rewardType,
+            ref uint selectGroupId,
+            bool isHelp = false)
+        {
+            foreach (var reward in rewardItems)
+            {
+                if (reward.RewardType == QuestRewardType.Random)
+                {
+                    if (randomRewardOffset >= randomRewardIndices.Count)
+                        continue;
+                    int randomRewardIndex = randomRewardIndices[randomRewardOffset++];
+                    if (randomRewardIndex >= 0 && randomRewardIndex < reward.LootPool.Count)
+                    {
+                        results.Add(((QuestRandomRewardItem)reward).AsCDataRewardBoxItem(randomRewardIndex, rewardType, isHelp));
+                    }
+                }
+                else
+                {
+                    if (reward.RewardType == QuestRewardType.Select)
+                    {
+                        results.AddRange(reward.AsCDataRewardBoxItems(rewardType, isHelp, selectGroupId++));
+                    }
+                    else
+                    {
+                        results.AddRange(reward.AsCDataRewardBoxItems(rewardType, isHelp));
+                    }
+                }
+            }
         }
 
         public QuestBoxRewards GenerateBoxRewards()
@@ -1169,17 +1356,89 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 QuestScheduleId = QuestScheduleId
             };
 
+            uint selectGroupId = 1;
+            foreach (var reward in SelectableRewards)
+            {
+                obj.RewardItemList.AddRange(reward.AsCDataRewardBoxItems(selectGroupId: selectGroupId++));
+            }
+
             foreach (var reward in ItemRewards)
             {
                 if (reward.RewardType == QuestRewardType.Random)
                 {
                     var randomReward = (QuestRandomRewardItem)reward;
-                    obj.RandomRewardIndices.Add(randomReward.Roll());
+                    var randomRewardIndex = randomReward.Roll();
+                    obj.RandomRewardIndices.Add(randomRewardIndex);
+                    obj.RewardItemList.Add(randomReward.AsCDataRewardBoxItem(randomRewardIndex));
+                }
+                else
+                {
+                    obj.RewardItemList.AddRange(reward.AsCDataRewardBoxItems());
                 }
             }
+
             obj.NumRandomRewards = obj.RandomRewardIndices.Count;
 
             return obj;
+        }
+
+        public QuestBoxRewards GenerateBoxRewards(QuestBoxRewardFlags rewardFlags)
+        {
+            if (rewardFlags == QuestBoxRewardFlags.None)
+                return GenerateBoxRewards();
+
+            QuestBoxRewards obj = new QuestBoxRewards()
+            {
+                QuestScheduleId = QuestScheduleId,
+                RewardFlags = rewardFlags,
+                IsRepeatReward = rewardFlags.HasFlag(QuestBoxRewardFlags.RepeatClear),
+            };
+
+            uint selectGroupId = 1;
+
+            if (rewardFlags.HasFlag(QuestBoxRewardFlags.FirstClear))
+                RollRewardBoxItems(obj, FirstClearItemRewards, QuestRewardType.FixedFirst, ref selectGroupId);
+            if (rewardFlags.HasFlag(QuestBoxRewardFlags.PeriodFirstClear))
+                RollRewardBoxItems(obj, PeriodFirstClearItemRewards, QuestRewardType.FixedSecond, ref selectGroupId);
+            if (rewardFlags.HasFlag(QuestBoxRewardFlags.RepeatClear))
+            {
+                if (HasRepeatClearItemRewards())
+                    RollRewardBoxItems(obj, RepeatClearItemRewards, QuestRewardType.Repeat, ref selectGroupId);
+                else
+                    RollAutoRepeatRewardBoxItem(obj);
+            }
+            if (rewardFlags.HasFlag(QuestBoxRewardFlags.HelperBonus))
+                RollRewardBoxItems(obj, HelperItemRewards, QuestRewardType.FixedMemberFirst, ref selectGroupId, true);
+
+            obj.NumRandomRewards = obj.RandomRewardIndices.Count;
+            return obj;
+        }
+
+        private static void RollRewardBoxItems(
+            QuestBoxRewards boxRewards,
+            List<QuestRewardItem> rewardItems,
+            QuestRewardType rewardType,
+            ref uint selectGroupId,
+            bool isHelp = false)
+        {
+            foreach (var reward in rewardItems)
+            {
+                if (reward.RewardType == QuestRewardType.Random)
+                {
+                    var randomReward = (QuestRandomRewardItem)reward;
+                    var randomRewardIndex = randomReward.Roll();
+                    boxRewards.RandomRewardIndices.Add(randomRewardIndex);
+                    boxRewards.RewardItemList.Add(randomReward.AsCDataRewardBoxItem(randomRewardIndex, rewardType, isHelp));
+                }
+                else if (reward.RewardType == QuestRewardType.Select)
+                {
+                    boxRewards.RewardItemList.AddRange(reward.AsCDataRewardBoxItems(rewardType, isHelp, selectGroupId++));
+                }
+                else
+                {
+                    boxRewards.RewardItemList.AddRange(reward.AsCDataRewardBoxItems(rewardType, isHelp));
+                }
+            }
         }
 
         public List<CDataRewardItem> GetQuestFixedRewards()
@@ -1187,6 +1446,18 @@ namespace Arrowgene.Ddon.GameServer.Quests
             List<CDataRewardItem> rewards = new List<CDataRewardItem>();
 
             foreach (var reward in ItemRewards)
+            {
+                rewards.AddRange(reward.AsCDataRewardItems());
+            }
+
+            return rewards;
+        }
+
+        public List<CDataRewardItem> GetRepeatClearFixedRewards()
+        {
+            List<CDataRewardItem> rewards = new List<CDataRewardItem>();
+
+            foreach (var reward in RepeatClearItemRewards)
             {
                 rewards.AddRange(reward.AsCDataRewardItems());
             }
@@ -1228,14 +1499,76 @@ namespace Arrowgene.Ddon.GameServer.Quests
             return RepeatClearItemRewards.Count > 0;
         }
 
+        public bool HasFirstClearItemRewards()
+        {
+            return FirstClearItemRewards.Count > 0;
+        }
+
+        public bool HasPeriodFirstClearItemRewards()
+        {
+            return PeriodFirstClearItemRewards.Count > 0;
+        }
+
+        public bool HasHelperItemRewards()
+        {
+            return HelperItemRewards.Count > 0;
+        }
+
+        public bool HasItemRewards(QuestBoxRewardFlags flags)
+        {
+            if (flags == QuestBoxRewardFlags.None)
+                return HasRewards();
+
+            return (flags.HasFlag(QuestBoxRewardFlags.FirstClear) && HasFirstClearItemRewards())
+                || (flags.HasFlag(QuestBoxRewardFlags.PeriodFirstClear) && HasPeriodFirstClearItemRewards())
+                || (flags.HasFlag(QuestBoxRewardFlags.RepeatClear) && HasRepeatClearItemRewards())
+                || (flags.HasFlag(QuestBoxRewardFlags.HelperBonus) && HasHelperItemRewards());
+        }
+
+        public bool HasCategorizedRewards()
+        {
+            return FirstClearItemRewards.Count > 0
+                || FirstClearWalletRewards.Count > 0
+                || FirstClearExpRewards.Count > 0
+                || PeriodFirstClearItemRewards.Count > 0
+                || PeriodFirstClearWalletRewards.Count > 0
+                || PeriodFirstClearExpRewards.Count > 0
+                || RepeatClearItemRewards.Count > 0
+                || RepeatClearWalletRewards.Count > 0
+                || RepeatClearExpRewards.Count > 0
+                || HelperItemRewards.Count > 0
+                || HelperWalletRewards.Count > 0
+                || HelperExpRewards.Count > 0;
+        }
+
         public byte RepeatClearRandomRewardNum()
         {
+            return RandomRewardNum(RepeatClearItemRewards);
+        }
+
+        public byte RandomRewardNum(QuestBoxRewardFlags flags)
+        {
+            if (flags == QuestBoxRewardFlags.None)
+                return RandomRewardNum();
+
             byte count = 0;
-            foreach (var reward in RepeatClearItemRewards)
-            {
+            if (flags.HasFlag(QuestBoxRewardFlags.FirstClear))
+                count += RandomRewardNum(FirstClearItemRewards);
+            if (flags.HasFlag(QuestBoxRewardFlags.PeriodFirstClear))
+                count += RandomRewardNum(PeriodFirstClearItemRewards);
+            if (flags.HasFlag(QuestBoxRewardFlags.RepeatClear))
+                count += RandomRewardNum(RepeatClearItemRewards);
+            if (flags.HasFlag(QuestBoxRewardFlags.HelperBonus))
+                count += RandomRewardNum(HelperItemRewards);
+            return count;
+        }
+
+        private byte RandomRewardNum(List<QuestRewardItem> rewardItems)
+        {
+            byte count = 0;
+            foreach (var reward in rewardItems)
                 if (reward.RewardType == QuestRewardType.Random)
                     count++;
-            }
             return count;
         }
 
@@ -1246,6 +1579,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
             {
                 case QuestRewardType.Fixed:
                 case QuestRewardType.Random:
+                case QuestRewardType.Select:
                     RepeatClearItemRewards.Add(reward);
                     break;
             }
@@ -1259,6 +1593,89 @@ namespace Arrowgene.Ddon.GameServer.Quests
         public void AddRepeatClearExpReward(PointType pointType, uint amount)
         {
             RepeatClearExpRewards.Add(new CDataQuestExp() { Type = pointType, Reward = amount });
+        }
+
+        public void AddFirstClearItemReward(QuestRewardItem reward)
+        {
+            AddCategorizedItemReward(FirstClearItemRewards, reward);
+        }
+
+        public void AddFirstClearWalletReward(WalletType walletType, uint amount)
+        {
+            FirstClearWalletRewards.Add(new CDataWalletPoint() { Type = walletType, Value = amount });
+        }
+
+        public void AddFirstClearExpReward(PointType pointType, uint amount)
+        {
+            FirstClearExpRewards.Add(new CDataQuestExp() { Type = pointType, Reward = amount });
+        }
+
+        public void AddPeriodFirstClearItemReward(QuestRewardItem reward)
+        {
+            AddCategorizedItemReward(PeriodFirstClearItemRewards, reward);
+        }
+
+        public void AddPeriodFirstClearWalletReward(WalletType walletType, uint amount)
+        {
+            PeriodFirstClearWalletRewards.Add(new CDataWalletPoint() { Type = walletType, Value = amount });
+        }
+
+        public void AddPeriodFirstClearExpReward(PointType pointType, uint amount)
+        {
+            PeriodFirstClearExpRewards.Add(new CDataQuestExp() { Type = pointType, Reward = amount });
+        }
+
+        public void AddHelperItemReward(QuestRewardItem reward)
+        {
+            AddCategorizedItemReward(HelperItemRewards, reward);
+        }
+
+        public void AddHelperWalletReward(WalletType walletType, uint amount)
+        {
+            HelperWalletRewards.Add(new CDataWalletPoint() { Type = walletType, Value = amount });
+        }
+
+        public void AddHelperExpReward(PointType pointType, uint amount)
+        {
+            HelperExpRewards.Add(new CDataQuestExp() { Type = pointType, Reward = amount });
+        }
+
+        public void AddFixedInstancedItemReward(ItemId itemId, ushort num, uint color = 0, uint plusValue = 0, uint safetySetting = 0)
+        {
+            AddItemReward(QuestInstancedFixedRewardItem.Create(itemId, num, color, plusValue, safetySetting));
+        }
+
+        public void AddRepeatClearFixedInstancedItemReward(ItemId itemId, ushort num, uint color = 0, uint plusValue = 0, uint safetySetting = 0)
+        {
+            AddRepeatClearItemReward(QuestInstancedFixedRewardItem.Create(itemId, num, color, plusValue, safetySetting));
+        }
+
+        public void AddFirstClearFixedInstancedItemReward(ItemId itemId, ushort num, uint color = 0, uint plusValue = 0, uint safetySetting = 0)
+        {
+            AddFirstClearItemReward(QuestInstancedFixedRewardItem.Create(itemId, num, color, plusValue, safetySetting));
+        }
+
+        public void AddPeriodFirstClearFixedInstancedItemReward(ItemId itemId, ushort num, uint color = 0, uint plusValue = 0, uint safetySetting = 0)
+        {
+            AddPeriodFirstClearItemReward(QuestInstancedFixedRewardItem.Create(itemId, num, color, plusValue, safetySetting));
+        }
+
+        public void AddHelperFixedInstancedItemReward(ItemId itemId, ushort num, uint color = 0, uint plusValue = 0, uint safetySetting = 0)
+        {
+            AddHelperItemReward(QuestInstancedFixedRewardItem.Create(itemId, num, color, plusValue, safetySetting));
+        }
+
+        private void AddCategorizedItemReward(List<QuestRewardItem> rewardList, QuestRewardItem reward)
+        {
+            if (reward == null) return;
+            switch (reward.RewardType)
+            {
+                case QuestRewardType.Fixed:
+                case QuestRewardType.Random:
+                case QuestRewardType.Select:
+                    rewardList.Add(reward);
+                    break;
+            }
         }
 
         /// <summary>
@@ -1316,6 +1733,54 @@ namespace Arrowgene.Ddon.GameServer.Quests
             return result;
         }
 
+        public List<CDataWalletPoint> GetScaledWalletRewards(QuestBoxRewardFlags flags, GameServerSettings settings)
+        {
+            if (flags == QuestBoxRewardFlags.None)
+                return ScaledWalletRewards();
+
+            var result = new List<CDataWalletPoint>();
+            if (flags.HasFlag(QuestBoxRewardFlags.FirstClear))
+                result.AddRange(GetScaledWalletRewards(FirstClearWalletRewards));
+            if (flags.HasFlag(QuestBoxRewardFlags.PeriodFirstClear))
+                result.AddRange(GetScaledWalletRewards(PeriodFirstClearWalletRewards));
+            if (flags.HasFlag(QuestBoxRewardFlags.RepeatClear))
+                result.AddRange(GetScaledWalletRewards(RepeatClearWalletRewards));
+            if (flags.HasFlag(QuestBoxRewardFlags.HelperBonus))
+                result.AddRange(GetScaledWalletRewards(HelperWalletRewards));
+            return result;
+        }
+
+        public List<CDataQuestExp> GetScaledExpRewards(QuestBoxRewardFlags flags, GameServerSettings settings)
+        {
+            if (flags == QuestBoxRewardFlags.None)
+                return ScaledExpRewards();
+
+            var result = new List<CDataQuestExp>();
+            if (flags.HasFlag(QuestBoxRewardFlags.FirstClear))
+                result.AddRange(FirstClearExpRewards);
+            if (flags.HasFlag(QuestBoxRewardFlags.PeriodFirstClear))
+                result.AddRange(PeriodFirstClearExpRewards);
+            if (flags.HasFlag(QuestBoxRewardFlags.RepeatClear))
+                result.AddRange(RepeatClearExpRewards);
+            if (flags.HasFlag(QuestBoxRewardFlags.HelperBonus))
+                result.AddRange(HelperExpRewards);
+            return result;
+        }
+
+        private List<CDataWalletPoint> GetScaledWalletRewards(List<CDataWalletPoint> rewards)
+        {
+            var result = new List<CDataWalletPoint>();
+            foreach (var walletPoint in rewards)
+            {
+                result.Add(new CDataWalletPoint()
+                {
+                    Type = walletPoint.Type,
+                    Value = Server.WalletManager.GetScaledWalletAmount(walletPoint.Type, walletPoint.Value)
+                });
+            }
+            return result;
+        }
+
         /// <summary>
         /// Rolls random reward indices from the repeat-clear item pool.
         /// </summary>
@@ -1325,16 +1790,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
             {
                 QuestScheduleId = QuestScheduleId,
                 IsRepeatReward = true,
+                RewardFlags = QuestBoxRewardFlags.RepeatClear,
             };
 
-            foreach (var reward in RepeatClearItemRewards)
-            {
-                if (reward.RewardType == QuestRewardType.Random)
-                {
-                    var randomReward = (QuestRandomRewardItem)reward;
-                    obj.RandomRewardIndices.Add(randomReward.Roll());
-                }
-            }
+            uint selectGroupId = 1;
+            RollRewardBoxItems(obj, RepeatClearItemRewards, QuestRewardType.Repeat, ref selectGroupId);
             obj.NumRandomRewards = obj.RandomRewardIndices.Count;
 
             return obj;
@@ -1365,16 +1825,33 @@ namespace Arrowgene.Ddon.GameServer.Quests
             {
                 QuestScheduleId = QuestScheduleId,
                 IsRepeatReward = true,
+                RewardFlags = QuestBoxRewardFlags.RepeatClear,
             };
 
             var pool = GetAutoRepeatPool();
             if (pool.Count > 0)
             {
-                obj.RandomRewardIndices.Add(Random.Shared.Next(pool.Count));
-                obj.NumRandomRewards = 1;
+                RollAutoRepeatRewardBoxItem(obj, pool);
             }
 
             return obj;
+        }
+
+        private void RollAutoRepeatRewardBoxItem(QuestBoxRewards boxRewards)
+        {
+            RollAutoRepeatRewardBoxItem(boxRewards, GetAutoRepeatPool());
+        }
+
+        private static void RollAutoRepeatRewardBoxItem(QuestBoxRewards boxRewards, List<LootPoolItem> pool)
+        {
+            if (pool.Count == 0)
+                return;
+
+            int randomRewardIndex = Random.Shared.Next(pool.Count);
+            var item = pool[randomRewardIndex];
+            boxRewards.RandomRewardIndices.Add(randomRewardIndex);
+            boxRewards.NumRandomRewards = boxRewards.RandomRewardIndices.Count;
+            boxRewards.RewardItemList.Add(CreateRewardBoxItem(item, QuestRewardType.Repeat));
         }
 
         public List<CDataCharacterReleaseElement> GetContentReleaseRewards()

@@ -338,123 +338,72 @@ namespace Arrowgene.Ddon.Shared.AssetReader
             foreach (var reward in quest.GetProperty("rewards").EnumerateArray())
             {
                 var rewardType = reward.GetProperty("type").GetString();
-                switch (rewardType)
+                var rewardBucket = ParseRewardBucket(reward, rewardType);
+                var normalizedRewardType = NormalizeRewardType(rewardType);
+                var forceInstanced = rewardType.StartsWith("instanced_");
+
+                switch (normalizedRewardType)
                 {
-                    case "repeat":
-                    {
-                        var repeatItem = new QuestRandomFixedRewardItem();
-                        foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
-                        {
-                            repeatItem.LootPool.Add(new FixedLootPoolItem()
-                            {
-                                ItemId = AssetCommonDeserializer.ParseItemId(item.GetProperty("item_id")),
-                                Num = item.GetProperty("num").GetUInt16(),
-                            });
-                        }
-                        assetData.RepeatClearRewardItems.Add(repeatItem);
-                        break;
-                    }
                     case "fixed":
+                        AddItemRewardToBucket(assetData, rewardBucket, ParseFixedRewardItem(reward, forceInstanced));
+                        break;
                     case "random":
-                    case "select":
-                    case "TimeBased":
-                        if (!Enum.TryParse(reward.GetProperty("type").GetString(), true, out QuestRewardType questRewardType))
+                    {
+                        if (rewardBucket == QuestRewardBucket.Normal && randomRewards >= 4)
                         {
+                            Logger.Error("Client only supports a maximum of 4 random rewards per quest. Skipping.");
                             continue;
                         }
 
-                        QuestRewardItem rewardItem = null;
-                        if (questRewardType == QuestRewardType.Random)
+                        if (rewardBucket == QuestRewardBucket.Normal)
                         {
-                            if (randomRewards >= 4)
-                            {
-                                Logger.Error("Client only supports a maximum of 4 random rewards per quest. Skipping.");
-                                continue;
-                            }
-
-                            // Keep track of random rewards for the quest
                             randomRewards += 1;
-
-                            rewardItem = new QuestRandomChanceRewardItem();
-                            foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
-                            {
-                                rewardItem.LootPool.Add(new ChanceLootPoolItem()
-                                {
-                                    ItemId = AssetCommonDeserializer.ParseItemId(item.GetProperty("item_id")),
-                                    Num = item.GetProperty("num").GetUInt16(),
-                                    Chance = item.GetProperty("chance").GetDouble()
-                                });
-                            }
-                        }
-                        else if (questRewardType == QuestRewardType.Select)
-                        {
-                            rewardItem = new QuestSelectRewardItem();
-                            foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
-                            {
-                                rewardItem.LootPool.Add(new SelectLootPoolItem()
-                                {
-                                    ItemId = AssetCommonDeserializer.ParseItemId(item.GetProperty("item_id")),
-                                    Num = item.GetProperty("num").GetUInt16(),
-                                });
-                            }
-                        }
-                        else if (questRewardType == QuestRewardType.Fixed)
-                        {
-                            rewardItem = new QuestFixedRewardItem();
-                            foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
-                            {
-                                rewardItem.LootPool.Add(new FixedLootPoolItem()
-                                {
-                                    ItemId = AssetCommonDeserializer.ParseItemId(item.GetProperty("item_id")),
-                                    Num = item.GetProperty("num").GetUInt16(),
-                                });
-                            };
-                        }
-                        else
-                        {
-                            Logger.Error($"The reward type '{rewardType}' is not implemented. Skipping.");
                         }
 
-                        if (rewardItem != null)
-                        {
-                            assetData.RewardItems.Add(rewardItem);
-                        }
+                        AddItemRewardToBucket(assetData, rewardBucket, ParseRandomRewardItem(reward, forceInstanced));
+                        break;
+                    }
+                    case "select":
+                        AddItemRewardToBucket(assetData, rewardBucket, ParseSelectRewardItem(reward, forceInstanced));
                         break;
                     case "exp":
-                        assetData.PointRewards.Add(new QuestPointReward()
+                        AddPointRewardToBucket(assetData, rewardBucket, new QuestPointReward()
                         {
                             PointType = PointType.ExperiencePoints,
                             Amount = reward.GetProperty("amount").GetUInt32()
                         });
                         break;
                     case "pp":
-                        assetData.PointRewards.Add(new QuestPointReward()
+                        AddPointRewardToBucket(assetData, rewardBucket, new QuestPointReward()
                         {
                             PointType = PointType.PlayPoints,
                             Amount = reward.GetProperty("amount").GetUInt32()
                         });
                         break;
                     case "jp":
-                        assetData.PointRewards.Add(new QuestPointReward()
+                        AddPointRewardToBucket(assetData, rewardBucket, new QuestPointReward()
                         {
                             PointType = PointType.JobPoints,
                             Amount = reward.GetProperty("amount").GetUInt32()
                         });
                         break;
                     case "ap":
-                        assetData.PointRewards.Add(new QuestPointReward()
+                        AddPointRewardToBucket(assetData, rewardBucket, new QuestPointReward()
                         {
                             PointType = PointType.AreaPoints,
                             Amount = reward.GetProperty("amount").GetUInt32()
                         });
-                        assetData.LightQuestDetail.GetAp = reward.GetProperty("amount").GetUInt32();
+                        if (rewardBucket == QuestRewardBucket.Normal)
+                        {
+                            assetData.LightQuestDetail.GetAp = reward.GetProperty("amount").GetUInt32();
+                        }
                         break;
                     case "wallet":
                         if (!Enum.TryParse(reward.GetProperty("wallet_type").GetString(), true, out WalletType walletType))
                         {
                             continue;
                         }
-                        assetData.RewardCurrency.Add(new QuestWalletReward()
+                        AddWalletRewardToBucket(assetData, rewardBucket, new QuestWalletReward()
                         {
                             WalletType = walletType,
                             Amount = reward.GetProperty("amount").GetUInt32()
@@ -465,6 +414,283 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                         break;
                 }
             }
+        }
+
+        private static string NormalizeRewardType(string rewardType)
+        {
+            return rewardType switch
+            {
+                "repeat" => "random",
+                "instanced_repeat" => "random",
+                "first_clear" => "fixed",
+                "instanced_first_clear" => "fixed",
+                "period_first_clear" => "fixed",
+                "instanced_period_first_clear" => "fixed",
+                "helper" => "fixed",
+                "instanced_helper" => "fixed",
+                "instanced_fixed" => "fixed",
+                "instanced_select" => "select",
+                _ => rewardType,
+            };
+        }
+
+        private static QuestRewardBucket ParseRewardBucket(JsonElement reward, string rewardType)
+        {
+            if (reward.TryGetProperty("bucket", out var bucket))
+            {
+                return bucket.GetString() switch
+                {
+                    "normal" => QuestRewardBucket.Normal,
+                    "repeat" => QuestRewardBucket.RepeatClear,
+                    "first_clear" => QuestRewardBucket.FirstClear,
+                    "period_first_clear" => QuestRewardBucket.PeriodFirstClear,
+                    "helper" => QuestRewardBucket.Helper,
+                    var value => throw new JsonException($"Unknown quest reward bucket '{value}'."),
+                };
+            }
+
+            return rewardType switch
+            {
+                "repeat" => QuestRewardBucket.RepeatClear,
+                "instanced_repeat" => QuestRewardBucket.RepeatClear,
+                "first_clear" => QuestRewardBucket.FirstClear,
+                "instanced_first_clear" => QuestRewardBucket.FirstClear,
+                "period_first_clear" => QuestRewardBucket.PeriodFirstClear,
+                "instanced_period_first_clear" => QuestRewardBucket.PeriodFirstClear,
+                "helper" => QuestRewardBucket.Helper,
+                "instanced_helper" => QuestRewardBucket.Helper,
+                _ => QuestRewardBucket.Normal,
+            };
+        }
+
+        private static void AddItemRewardToBucket(QuestAssetData assetData, QuestRewardBucket bucket, QuestRewardItem rewardItem)
+        {
+            switch (bucket)
+            {
+                case QuestRewardBucket.Normal:
+                    assetData.RewardItems.Add(rewardItem);
+                    break;
+                case QuestRewardBucket.RepeatClear:
+                    assetData.RepeatClearRewardItems.Add(rewardItem);
+                    break;
+                case QuestRewardBucket.FirstClear:
+                    assetData.FirstClearRewardItems.Add(rewardItem);
+                    break;
+                case QuestRewardBucket.PeriodFirstClear:
+                    assetData.PeriodFirstClearRewardItems.Add(rewardItem);
+                    break;
+                case QuestRewardBucket.Helper:
+                    assetData.HelperRewardItems.Add(rewardItem);
+                    break;
+            }
+        }
+
+        private static void AddPointRewardToBucket(QuestAssetData assetData, QuestRewardBucket bucket, QuestPointReward reward)
+        {
+            switch (bucket)
+            {
+                case QuestRewardBucket.Normal:
+                    assetData.PointRewards.Add(reward);
+                    break;
+                case QuestRewardBucket.RepeatClear:
+                    assetData.RepeatClearPointRewards.Add(reward);
+                    break;
+                case QuestRewardBucket.FirstClear:
+                    assetData.FirstClearPointRewards.Add(reward);
+                    break;
+                case QuestRewardBucket.PeriodFirstClear:
+                    assetData.PeriodFirstClearPointRewards.Add(reward);
+                    break;
+                case QuestRewardBucket.Helper:
+                    assetData.HelperPointRewards.Add(reward);
+                    break;
+            }
+        }
+
+        private static void AddWalletRewardToBucket(QuestAssetData assetData, QuestRewardBucket bucket, QuestWalletReward reward)
+        {
+            switch (bucket)
+            {
+                case QuestRewardBucket.Normal:
+                    assetData.RewardCurrency.Add(reward);
+                    break;
+                case QuestRewardBucket.RepeatClear:
+                    assetData.RepeatClearRewardCurrency.Add(reward);
+                    break;
+                case QuestRewardBucket.FirstClear:
+                    assetData.FirstClearRewardCurrency.Add(reward);
+                    break;
+                case QuestRewardBucket.PeriodFirstClear:
+                    assetData.PeriodFirstClearRewardCurrency.Add(reward);
+                    break;
+                case QuestRewardBucket.Helper:
+                    assetData.HelperRewardCurrency.Add(reward);
+                    break;
+            }
+        }
+
+        private QuestRewardItem ParseFixedRewardItem(JsonElement reward, bool forceInstanced = false)
+        {
+            if (forceInstanced || HasInstancedLootPoolItems(reward))
+            {
+                return ParseInstancedFixedRewardItem(reward);
+            }
+
+            var rewardItem = new QuestFixedRewardItem();
+            foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
+            {
+                rewardItem.LootPool.Add(new FixedLootPoolItem()
+                {
+                    ItemId = AssetCommonDeserializer.ParseItemId(item.GetProperty("item_id")),
+                    Num = item.GetProperty("num").GetUInt16(),
+                });
+            }
+            return rewardItem;
+        }
+
+        private QuestRewardItem ParseRandomRewardItem(JsonElement reward, bool forceInstanced = false)
+        {
+            var hasInstancedItems = forceInstanced || HasInstancedLootPoolItems(reward);
+            var hasChanceItems = HasChanceLootPoolItems(reward);
+            QuestRandomRewardItem rewardItem;
+
+            if (hasInstancedItems)
+            {
+                rewardItem = hasChanceItems
+                    ? new QuestInstancedRandomChanceRewardItem()
+                    : new QuestInstancedRandomFixedRewardItem();
+
+                foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
+                {
+                    var poolItem = ParseInstancedLootPoolItem(item, hasChanceItems);
+                    rewardItem.LootPool.Add(poolItem);
+                }
+
+                return rewardItem;
+            }
+
+            if (hasChanceItems)
+            {
+                rewardItem = new QuestRandomChanceRewardItem();
+                foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
+                {
+                    rewardItem.LootPool.Add(new ChanceLootPoolItem()
+                    {
+                        ItemId = AssetCommonDeserializer.ParseItemId(item.GetProperty("item_id")),
+                        Num = item.GetProperty("num").GetUInt16(),
+                        Chance = item.TryGetProperty("chance", out var chance) ? chance.GetDouble() : 0.0
+                    });
+                }
+                return rewardItem;
+            }
+
+            rewardItem = new QuestRandomFixedRewardItem();
+            foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
+            {
+                rewardItem.LootPool.Add(new FixedLootPoolItem()
+                {
+                    ItemId = AssetCommonDeserializer.ParseItemId(item.GetProperty("item_id")),
+                    Num = item.GetProperty("num").GetUInt16(),
+                });
+            }
+            return rewardItem;
+        }
+
+        private QuestRewardItem ParseSelectRewardItem(JsonElement reward, bool forceInstanced = false)
+        {
+            if (forceInstanced || HasInstancedLootPoolItems(reward))
+            {
+                return ParseInstancedSelectRewardItem(reward);
+            }
+
+            var rewardItem = new QuestSelectRewardItem();
+            foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
+            {
+                rewardItem.LootPool.Add(new SelectLootPoolItem()
+                {
+                    ItemId = AssetCommonDeserializer.ParseItemId(item.GetProperty("item_id")),
+                    Num = item.GetProperty("num").GetUInt16(),
+                });
+            }
+            return rewardItem;
+        }
+
+        private QuestInstancedFixedRewardItem ParseInstancedFixedRewardItem(JsonElement reward)
+        {
+            var rewardItem = new QuestInstancedFixedRewardItem();
+            foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
+            {
+                rewardItem.LootPool.Add(ParseInstancedLootPoolItem(item));
+            }
+            return rewardItem;
+        }
+
+        private QuestInstancedSelectRewardItem ParseInstancedSelectRewardItem(JsonElement reward)
+        {
+            var rewardItem = new QuestInstancedSelectRewardItem();
+            foreach (var item in reward.GetProperty("loot_pool").EnumerateArray())
+            {
+                rewardItem.LootPool.Add(ParseInstancedLootPoolItem(item));
+            }
+            return rewardItem;
+        }
+
+        private static bool HasInstancedLootPoolItems(JsonElement reward)
+        {
+            return reward.GetProperty("loot_pool").EnumerateArray().Any(HasInstanceData);
+        }
+
+        private static bool HasChanceLootPoolItems(JsonElement reward)
+        {
+            return reward.GetProperty("loot_pool").EnumerateArray().Any(item => item.TryGetProperty("chance", out _));
+        }
+
+        private static bool HasInstanceData(JsonElement item)
+        {
+            return item.TryGetProperty("instance", out _)
+                || item.TryGetProperty("color", out _)
+                || item.TryGetProperty("plus_value", out _)
+                || item.TryGetProperty("safety_setting", out _)
+                || item.TryGetProperty("crests", out _);
+        }
+
+        private InstancedLootPoolItem ParseInstancedLootPoolItem(JsonElement item, bool parseChance = false)
+        {
+            InstancedLootPoolItem poolItem = parseChance
+                ? new InstancedChanceLootPoolItem()
+                : new InstancedLootPoolItem();
+
+            poolItem.ItemId = AssetCommonDeserializer.ParseItemId(item.GetProperty("item_id"));
+            poolItem.Num = item.GetProperty("num").GetUInt16();
+
+            var instance = item;
+            if (item.TryGetProperty("instance", out var instanceProp))
+            {
+                instance = instanceProp;
+            }
+
+            if (instance.TryGetProperty("color", out var colorProp)) poolItem.Color = colorProp.GetUInt32();
+            if (instance.TryGetProperty("plus_value", out var plusProp)) poolItem.PlusValue = plusProp.GetUInt32();
+            if (instance.TryGetProperty("safety_setting", out var safetyProp)) poolItem.SafetySetting = safetyProp.GetUInt32();
+            if (parseChance && item.TryGetProperty("chance", out var chanceProp))
+            {
+                ((InstancedChanceLootPoolItem)poolItem).Chance = chanceProp.GetDouble();
+            }
+
+            if (instance.TryGetProperty("crests", out var crestsProp))
+            {
+                foreach (var crest in crestsProp.EnumerateArray())
+                {
+                    poolItem.Crests.Add(new StagedRewardItemCrest
+                    {
+                        Slot = crest.GetProperty("slot").GetUInt32(),
+                        CrestId = crest.GetProperty("crest_id").GetUInt32(),
+                        Level = crest.TryGetProperty("level", out var lvl) ? lvl.GetUInt32() : 0u,
+                    });
+                }
+            }
+
+            return poolItem;
         }
 
         private bool ParseBlocks(QuestProcess questProcess, JsonElement jBlocks)
