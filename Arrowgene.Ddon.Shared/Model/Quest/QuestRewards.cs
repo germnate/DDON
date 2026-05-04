@@ -15,6 +15,15 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         HelperBonus = 1 << 3,
     }
 
+    public enum QuestRewardBucket
+    {
+        Normal,
+        RepeatClear,
+        FirstClear,
+        PeriodFirstClear,
+        Helper,
+    }
+
     public abstract class LootPoolItem
     {
         public ushort Num { get; set; }
@@ -156,7 +165,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             };
         }
 
-        public CDataRewardBoxItem AsCDataRewardBoxItem(QuestRewardType? rewardTypeOverride = null, bool isHelp = false, uint selectGroupId = 0)
+        public virtual CDataRewardBoxItem AsCDataRewardBoxItem(QuestRewardType? rewardTypeOverride = null, bool isHelp = false, uint selectGroupId = 0)
         {
 
             var item = LootPool[ItemIndex];
@@ -171,7 +180,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             };
         }
 
-        public CDataRewardBoxItem AsCDataRewardBoxItem(int index, QuestRewardType? rewardTypeOverride = null, bool isHelp = false, uint selectGroupId = 0)
+        public virtual CDataRewardBoxItem AsCDataRewardBoxItem(int index, QuestRewardType? rewardTypeOverride = null, bool isHelp = false, uint selectGroupId = 0)
         {
             var item = LootPool[index];
             return new CDataRewardBoxItem()

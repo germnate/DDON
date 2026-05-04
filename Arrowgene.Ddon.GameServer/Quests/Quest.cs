@@ -1207,6 +1207,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
         {
             return new CDataRewardBoxItem()
             {
+                RewardBoxItemId = reward.RewardBoxItemId,
                 ItemId = reward.ItemId,
                 Num = reward.Num,
                 UID = reward.UID,
@@ -1214,6 +1215,69 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 IsCharge = reward.IsCharge,
                 IsHelp = reward.IsHelp,
                 SelectGroupId = reward.SelectGroupId,
+                IsInstance = reward.IsInstance,
+                StagedItem = CloneStagedRewardItem(reward.StagedItem),
+            };
+        }
+
+        private static StagedRewardItem? CloneStagedRewardItem(StagedRewardItem? item)
+        {
+            if (item == null)
+            {
+                return null;
+            }
+
+            var clone = new StagedRewardItem()
+            {
+                Uid = item.Uid,
+                RewardBoxItemId = item.RewardBoxItemId,
+                ItemId = item.ItemId,
+                Num = item.Num,
+                Color = item.Color,
+                PlusValue = item.PlusValue,
+                SafetySetting = item.SafetySetting,
+            };
+
+            foreach (var crest in item.Crests)
+            {
+                clone.Crests.Add(new StagedRewardItemCrest()
+                {
+                    Uid = crest.Uid,
+                    Slot = crest.Slot,
+                    CrestId = crest.CrestId,
+                    Level = crest.Level,
+                });
+            }
+
+            return clone;
+        }
+
+        private static CDataRewardBoxItem CreateRewardBoxItem(LootPoolItem item, QuestRewardType rewardType, bool isHelp = false, uint selectGroupId = 0)
+        {
+            if (item is InstancedLootPoolItem instanced)
+            {
+                var staged = instanced.ToStagedRewardItem();
+                return new CDataRewardBoxItem()
+                {
+                    ItemId = instanced.ItemId,
+                    Num = instanced.Num,
+                    Type = (byte)rewardType,
+                    UID = staged.Uid,
+                    IsHelp = isHelp,
+                    SelectGroupId = selectGroupId,
+                    IsInstance = true,
+                    StagedItem = staged,
+                };
+            }
+
+            return new CDataRewardBoxItem()
+            {
+                ItemId = item.ItemId,
+                Num = item.Num,
+                Type = (byte)rewardType,
+                UID = item.GetUID(),
+                IsHelp = isHelp,
+                SelectGroupId = selectGroupId,
             };
         }
 
@@ -1241,13 +1305,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
                     if (idx < pool.Count)
                     {
                         var item = pool[idx];
-                        results.Add(new CDataRewardBoxItem()
-                        {
-                            ItemId = item.ItemId,
-                            Num = item.Num,
-                            Type = (byte)QuestRewardType.Repeat,
-                            UID = item.GetUID()
-                        });
+                        results.Add(CreateRewardBoxItem(item, QuestRewardType.Repeat));
                     }
                 }
             }
@@ -1521,6 +1579,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
             {
                 case QuestRewardType.Fixed:
                 case QuestRewardType.Random:
+                case QuestRewardType.Select:
                     RepeatClearItemRewards.Add(reward);
                     break;
             }
@@ -1601,6 +1660,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
             AddPeriodFirstClearItemReward(QuestInstancedFixedRewardItem.Create(itemId, num, color, plusValue, safetySetting));
         }
 
+        public void AddHelperFixedInstancedItemReward(ItemId itemId, ushort num, uint color = 0, uint plusValue = 0, uint safetySetting = 0)
+        {
+            AddHelperItemReward(QuestInstancedFixedRewardItem.Create(itemId, num, color, plusValue, safetySetting));
+        }
+
         private void AddCategorizedItemReward(List<QuestRewardItem> rewardList, QuestRewardItem reward)
         {
             if (reward == null) return;
@@ -1608,6 +1672,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
             {
                 case QuestRewardType.Fixed:
                 case QuestRewardType.Random:
+                case QuestRewardType.Select:
                     rewardList.Add(reward);
                     break;
             }
@@ -1786,13 +1851,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
             var item = pool[randomRewardIndex];
             boxRewards.RandomRewardIndices.Add(randomRewardIndex);
             boxRewards.NumRandomRewards = boxRewards.RandomRewardIndices.Count;
-            boxRewards.RewardItemList.Add(new CDataRewardBoxItem()
-            {
-                ItemId = item.ItemId,
-                Num = item.Num,
-                Type = (byte)QuestRewardType.Repeat,
-                UID = item.GetUID()
-            });
+            boxRewards.RewardItemList.Add(CreateRewardBoxItem(item, QuestRewardType.Repeat));
         }
 
         public List<CDataCharacterReleaseElement> GetContentReleaseRewards()

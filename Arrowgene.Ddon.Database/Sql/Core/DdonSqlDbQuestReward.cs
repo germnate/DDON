@@ -38,6 +38,14 @@ public partial class DdonSqlDb : SqlDb
     {
         return ExecuteQuerySafe(connectionIn, connection =>
         {
+            foreach (var reward in rewards.RewardItemList)
+            {
+                if (reward.IsInstance && reward.StagedItem == null)
+                {
+                    return false;
+                }
+            }
+
             int rowsAffected = ExecuteNonQuery(connection, SqlInsertRewardBoxItems, command =>
             {
                 AddParameter(command, "character_common_id", commonId);
@@ -61,19 +69,9 @@ public partial class DdonSqlDb : SqlDb
             uint uniqRewardId = (uint)autoIncrement;
             foreach (var reward in rewards.RewardItemList)
             {
-                long rewardBoxItemId = InsertBoxRewardItemInternal(uniqRewardId, reward, connection);
-                if (rewardBoxItemId < 0)
+                if (!InsertBoxRewardItemWithStagedItem(uniqRewardId, reward, connection))
                 {
                     return false;
-                }
-
-                if (reward.IsInstance && reward.StagedItem != null)
-                {
-                    reward.StagedItem.RewardBoxItemId = rewardBoxItemId;
-                    if (!InsertStagedItem(reward.StagedItem, connection))
-                    {
-                        return false;
-                    }
                 }
             }
 
@@ -85,8 +83,30 @@ public partial class DdonSqlDb : SqlDb
     {
         return ExecuteQuerySafe(connectionIn, connection =>
         {
-            return InsertBoxRewardItemInternal(uniqRewardId, reward, connection) >= 0;
+            return InsertBoxRewardItemWithStagedItem(uniqRewardId, reward, connection);
         });
+    }
+
+    private bool InsertBoxRewardItemWithStagedItem(uint uniqRewardId, CDataRewardBoxItem reward, DbConnection connection)
+    {
+        if (reward.IsInstance && reward.StagedItem == null)
+        {
+            return false;
+        }
+
+        long rewardBoxItemId = InsertBoxRewardItemInternal(uniqRewardId, reward, connection);
+        if (rewardBoxItemId < 0)
+        {
+            return false;
+        }
+
+        if (!reward.IsInstance)
+        {
+            return true;
+        }
+
+        reward.StagedItem.RewardBoxItemId = rewardBoxItemId;
+        return InsertStagedItem(reward.StagedItem, connection);
     }
 
     private long InsertBoxRewardItemInternal(uint uniqRewardId, CDataRewardBoxItem reward, DbConnection connection)

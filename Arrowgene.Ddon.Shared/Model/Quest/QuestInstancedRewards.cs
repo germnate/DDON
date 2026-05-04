@@ -6,8 +6,6 @@ namespace Arrowgene.Ddon.Shared.Model.Quest;
 
 public class InstancedLootPoolItem : LootPoolItem
 {
-    private string? _uid;
-
     public uint Color { get; set; }
     public uint PlusValue { get; set; }
     public uint SafetySetting { get; set; }
@@ -15,8 +13,7 @@ public class InstancedLootPoolItem : LootPoolItem
 
     public override string GetUID()
     {
-        _uid ??= Guid.CreateVersion7(DateTimeOffset.UtcNow).ToString();
-        return _uid;
+        return Guid.CreateVersion7(DateTimeOffset.UtcNow).ToString();
     }
 
     public StagedRewardItem ToStagedRewardItem()
@@ -58,6 +55,32 @@ public class InstancedLootPoolItem : LootPoolItem
     }
 }
 
+public class InstancedChanceLootPoolItem : InstancedLootPoolItem
+{
+    public double Chance { get; set; }
+}
+
+public class QuestItemInstance
+{
+    public uint Color { get; set; }
+    public uint PlusValue { get; set; }
+    public uint SafetySetting { get; set; }
+    public List<StagedRewardItemCrest> Crests { get; set; } = new();
+
+    public InstancedLootPoolItem ToLootPoolItem(ItemId itemId, ushort num)
+    {
+        return new InstancedLootPoolItem
+        {
+            ItemId = itemId,
+            Num = num,
+            Color = Color,
+            PlusValue = PlusValue,
+            SafetySetting = SafetySetting,
+            Crests = new List<StagedRewardItemCrest>(Crests),
+        };
+    }
+}
+
 public class QuestInstancedFixedRewardItem : QuestRewardItem
 {
     public QuestInstancedFixedRewardItem(bool isHidden = false) : base(QuestRewardType.Fixed, isHidden)
@@ -91,6 +114,80 @@ public class QuestInstancedFixedRewardItem : QuestRewardItem
         var reward = new QuestInstancedFixedRewardItem(isHidden);
         reward.LootPool.Add(InstancedLootPoolItem.Create(itemId, num, color, plusValue, safetySetting));
         return reward;
+    }
+}
+
+public class QuestInstancedRandomFixedRewardItem : QuestRandomRewardItem
+{
+    public QuestInstancedRandomFixedRewardItem(bool isHidden = false) : base(isHidden)
+    {
+    }
+
+    public QuestInstancedRandomFixedRewardItem(int itemIndex, bool isHidden = false) : base(itemIndex, isHidden)
+    {
+    }
+
+    public override CDataRewardBoxItem AsCDataRewardBoxItem(int index, QuestRewardType? rewardTypeOverride = null, bool isHelp = false, uint selectGroupId = 0)
+    {
+        var instanced = (InstancedLootPoolItem)LootPool[index];
+        var staged = instanced.ToStagedRewardItem();
+        return new CDataRewardBoxItem
+        {
+            ItemId = instanced.ItemId,
+            Num = instanced.Num,
+            UID = staged.Uid,
+            Type = (byte)(rewardTypeOverride ?? RewardType),
+            IsHelp = isHelp,
+            SelectGroupId = selectGroupId,
+            IsInstance = true,
+            StagedItem = staged,
+        };
+    }
+
+    public override CDataRewardBoxItem AsCDataRewardBoxItem(QuestRewardType? rewardTypeOverride = null, bool isHelp = false, uint selectGroupId = 0)
+    {
+        return AsCDataRewardBoxItem(ItemIndex, rewardTypeOverride, isHelp, selectGroupId);
+    }
+
+    public override int Roll()
+    {
+        ItemIndex = Random.Shared.Next(0, LootPool.Count);
+        return ItemIndex;
+    }
+}
+
+public class QuestInstancedRandomChanceRewardItem : QuestInstancedRandomFixedRewardItem
+{
+    public QuestInstancedRandomChanceRewardItem(bool isHidden = false) : base(isHidden)
+    {
+    }
+
+    public QuestInstancedRandomChanceRewardItem(int itemIndex, bool isHidden = false) : base(itemIndex, isHidden)
+    {
+    }
+
+    public override int Roll()
+    {
+        ItemIndex = RollInternal();
+        return ItemIndex;
+    }
+
+    private int RollInternal()
+    {
+        var target = Random.Shared.NextDouble();
+
+        double sum = 0.0;
+        for (int i = 0; i < LootPool.Count; i++)
+        {
+            var item = (InstancedChanceLootPoolItem)LootPool[i];
+            sum += item.Chance;
+            if (target <= sum)
+            {
+                return i;
+            }
+        }
+
+        return 0;
     }
 }
 

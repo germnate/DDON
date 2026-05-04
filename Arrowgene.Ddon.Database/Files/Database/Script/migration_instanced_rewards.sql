@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS "ddon_reward_staged_item_crest"
     "uid"      TEXT    NOT NULL,
     "slot"     INTEGER NOT NULL,
     "crest_id" INTEGER NOT NULL,
-    "level"    INTEGER NOT NULL DEFAULT 1,
+    "level"    INTEGER NOT NULL DEFAULT 0,
     CONSTRAINT "pk_reward_staged_item_crest" PRIMARY KEY ("uid", "slot"),
     CONSTRAINT "fk_reward_staged_item_crest_uid"
         FOREIGN KEY ("uid")
