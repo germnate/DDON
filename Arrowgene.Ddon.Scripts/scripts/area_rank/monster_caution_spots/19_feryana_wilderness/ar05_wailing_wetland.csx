@@ -12,24 +12,23 @@ public class MonsterSpotInfo : IMonsterSpotInfo
     {
         var enemies = new List<InstancedEnemy>()
         {
-            LibDdon.Enemy.CreateAuto(EnemyId.Lindwurm0, 88, 0, isBoss: true),
-            LibDdon.Enemy.CreateAuto(EnemyId.WarReadySaurianLightArmor, 88, 1),
-            LibDdon.Enemy.CreateAuto(EnemyId.WarReadySaurianLightArmor, 88, 2),
-            LibDdon.Enemy.CreateAuto(EnemyId.WarReadySaurianLightArmor, 88, 3),
-            LibDdon.Enemy.CreateAuto(EnemyId.WarReadySaurianLightArmor, 88, 4),
-            LibDdon.Enemy.CreateAuto(EnemyId.WarReadySaurianLightArmor, 88, 5),
-            LibDdon.Enemy.CreateAuto(EnemyId.WarReadySaurianLightArmor, 88, 6),
-            LibDdon.Enemy.CreateAuto(EnemyId.WarReadySaurianLightArmor, 88, 7),
-            LibDdon.Enemy.CreateAuto(EnemyId.WarReadySaurianLightArmor, 88, 8),
+            LibDdon.Enemy.Create(EnemyId.WarReadySaurianLightArmor, 88, 4200, 0)
+				.SetInfectionType(3),
+            LibDdon.Enemy.Create(EnemyId.WarReadySaurianLightArmor, 88, 4200, 1)
+				.SetInfectionType(3),
+            LibDdon.Enemy.Create(EnemyId.Lindwurm0, 88, 105000, 2)
+				.SetIsBoss(true),
+            LibDdon.Enemy.Create(EnemyId.WarReadySaurianLightArmor, 88, 4200, 3)
+				.SetInfectionType(3),
         };
 
         // Available Items (5): FeryanaSweetMushroom, ScarredLizardscalePelt, UnrefinedAlloyLump, UndeadDestroyerStoneShard, UndeadDestroyerStone
         var dropsTable = LibDdon.Enemy.GetDropsTable(enemies[0]).Clone()
-            .AddDrop(ItemId.FeryanaSweetMushroom, 1, 1, DropRate.UNCOMMON)
-            .AddDrop(ItemId.ScarredLizardscalePelt, 1, 1, DropRate.UNCOMMON)
-            .AddDrop(ItemId.UnrefinedAlloyLump, 1, 1, DropRate.UNCOMMON)
-            .AddDrop(ItemId.UndeadDestroyerStoneShard, 1, 1, DropRate.UNCOMMON)
-            .AddDrop(ItemId.UndeadDestroyerStone, 1, 1, DropRate.RARE);
+            .AddDrop(ItemId.FeryanaSweetMushroom, 1, 1, DropRate.RARE)
+            .AddDrop(ItemId.ScarredLizardscalePelt, 1, 1, DropRate.RARE)
+            .AddDrop(ItemId.UnrefinedAlloyLump, 1, 1, DropRate.RARE)
+            .AddDrop(ItemId.UndeadDestroyerStoneShard, 1, 1, DropRate.RARE)
+            .AddDrop(ItemId.UndeadDestroyerStone, 1, 1, DropRate.VERY_RARE);
         enemies[0].SetDropsTable(dropsTable);
 
         dropsTable = LibDdon.Enemy.GetDropsTable(enemies[1]).Clone()
@@ -41,11 +40,11 @@ public class MonsterSpotInfo : IMonsterSpotInfo
         enemies[1].SetDropsTable(dropsTable);
 
         dropsTable = LibDdon.Enemy.GetDropsTable(enemies[2]).Clone()
-            .AddDrop(ItemId.FeryanaSweetMushroom, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.ScarredLizardscalePelt, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UnrefinedAlloyLump, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UndeadDestroyerStoneShard, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UndeadDestroyerStone, 1, 1, DropRate.VERY_RARE);
+            .AddDrop(ItemId.FeryanaSweetMushroom, 1, 1, DropRate.UNCOMMON)
+            .AddDrop(ItemId.ScarredLizardscalePelt, 1, 1, DropRate.UNCOMMON)
+            .AddDrop(ItemId.UnrefinedAlloyLump, 1, 1, DropRate.UNCOMMON)
+            .AddDrop(ItemId.UndeadDestroyerStoneShard, 1, 1, DropRate.UNCOMMON)
+            .AddDrop(ItemId.UndeadDestroyerStone, 1, 1, DropRate.RARE);
         enemies[2].SetDropsTable(dropsTable);
 
         dropsTable = LibDdon.Enemy.GetDropsTable(enemies[3]).Clone()
@@ -55,46 +54,6 @@ public class MonsterSpotInfo : IMonsterSpotInfo
             .AddDrop(ItemId.UndeadDestroyerStoneShard, 1, 1, DropRate.RARE)
             .AddDrop(ItemId.UndeadDestroyerStone, 1, 1, DropRate.VERY_RARE);
         enemies[3].SetDropsTable(dropsTable);
-
-        dropsTable = LibDdon.Enemy.GetDropsTable(enemies[4]).Clone()
-            .AddDrop(ItemId.FeryanaSweetMushroom, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.ScarredLizardscalePelt, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UnrefinedAlloyLump, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UndeadDestroyerStoneShard, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UndeadDestroyerStone, 1, 1, DropRate.VERY_RARE);
-        enemies[4].SetDropsTable(dropsTable);
-
-        dropsTable = LibDdon.Enemy.GetDropsTable(enemies[5]).Clone()
-            .AddDrop(ItemId.FeryanaSweetMushroom, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.ScarredLizardscalePelt, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UnrefinedAlloyLump, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UndeadDestroyerStoneShard, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UndeadDestroyerStone, 1, 1, DropRate.VERY_RARE);
-        enemies[5].SetDropsTable(dropsTable);
-
-        dropsTable = LibDdon.Enemy.GetDropsTable(enemies[6]).Clone()
-            .AddDrop(ItemId.FeryanaSweetMushroom, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.ScarredLizardscalePelt, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UnrefinedAlloyLump, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UndeadDestroyerStoneShard, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UndeadDestroyerStone, 1, 1, DropRate.VERY_RARE);
-        enemies[6].SetDropsTable(dropsTable);
-
-        dropsTable = LibDdon.Enemy.GetDropsTable(enemies[7]).Clone()
-            .AddDrop(ItemId.FeryanaSweetMushroom, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.ScarredLizardscalePelt, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UnrefinedAlloyLump, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UndeadDestroyerStoneShard, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UndeadDestroyerStone, 1, 1, DropRate.VERY_RARE);
-        enemies[7].SetDropsTable(dropsTable);
-
-        dropsTable = LibDdon.Enemy.GetDropsTable(enemies[8]).Clone()
-            .AddDrop(ItemId.FeryanaSweetMushroom, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.ScarredLizardscalePelt, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UnrefinedAlloyLump, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UndeadDestroyerStoneShard, 1, 1, DropRate.RARE)
-            .AddDrop(ItemId.UndeadDestroyerStone, 1, 1, DropRate.VERY_RARE);
-        enemies[8].SetDropsTable(dropsTable);
 
         AddEnemies(enemies);
     }
