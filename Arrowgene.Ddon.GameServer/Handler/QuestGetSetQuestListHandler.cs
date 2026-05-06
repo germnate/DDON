@@ -84,7 +84,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     }
 
                     QuestState questState = client.Party.QuestState.GetQuestState(quest);
-                    uint clearCount = leaderCharacter?.WorldQuestPeriodFirstClears.Contains(quest.QuestScheduleId) == true ? 1u : 0u;
+                    uint clearCount = leaderCharacter?.GetQuestPeriodFirstClears(quest.QuestType).Contains(quest.QuestScheduleId) == true ? 1u : 0u;
                     ntc.SetQuestList.Add(quest.ToCDataSetQuestList(questState?.Step ?? 0, clearCount));
                 }
 
@@ -99,7 +99,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         continue;
                     }
 
-                    uint clearCount = leaderCharacter?.WorldQuestPeriodFirstClears.Contains(quest.QuestScheduleId) == true ? 1u : 0u;
+                    uint clearCount = leaderCharacter?.GetQuestPeriodFirstClears(quest.QuestType).Contains(quest.QuestScheduleId) == true ? 1u : 0u;
                     ntc.SetQuestList.Add(quest.ToCDataSetQuestList(0, clearCount));
 
                     if (mutating)

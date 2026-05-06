@@ -135,7 +135,9 @@ namespace Arrowgene.Ddon.Shared.Model
         public uint NextBBMStageId {  get; set; }
         public uint MaxBazaarExhibits { get; set; }
         public Dictionary<QuestId, CompletedQuest> CompletedQuests { get; set; }
-        public HashSet<uint> WorldQuestPeriodFirstClears { get; set; } = new();
+        public Dictionary<QuestType, HashSet<uint>> QuestPeriodFirstClears { get; set; } = new();
+        public HashSet<uint> WorldQuestPeriodFirstClears => GetQuestPeriodFirstClears(QuestType.World);
+        public HashSet<uint> ExtremeMissionPeriodFirstClears => GetQuestPeriodFirstClears(QuestType.ExtremeMission);
         public uint LastSafeStageId { get; set; }
         public uint ClanId { get; set; }
         public ClanName ClanName { get; set; }
@@ -242,6 +244,17 @@ namespace Arrowgene.Ddon.Shared.Model
         public bool HasContentReleased(ContentsRelease releaseId)
         {
             return ContentsReleased.Contains(releaseId);
+        }
+
+        public HashSet<uint> GetQuestPeriodFirstClears(QuestType questType)
+        {
+            if (!QuestPeriodFirstClears.TryGetValue(questType, out var periodFirstClears))
+            {
+                periodFirstClears = new HashSet<uint>();
+                QuestPeriodFirstClears[questType] = periodFirstClears;
+            }
+
+            return periodFirstClears;
         }
 
         public List<CDataQuestFlag> GetWorldManageQuestUnlocks(QuestId questId)
