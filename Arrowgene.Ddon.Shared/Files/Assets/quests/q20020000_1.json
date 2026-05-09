@@ -86,7 +86,7 @@
         "group_id": 1
       },
       "npc_id": "Vanessa0",
-      "announce_type": "Update",
+      "announce_type": "CheckpointAndUpdate",
       "result_commands": [
         {
           "type": "QstTalkChg",

@@ -118,7 +118,7 @@
         "layer_no": 1
       },
       "npc_id": "WearyHarpy",
-      "announce_type": "Update",
+      "announce_type": "CheckpointAndUpdate",
       "result_commands": [
         {
           "type": "QstTalkChg",
@@ -138,7 +138,7 @@
     },
     {
       "type": "SeekOutEnemiesAtMarkedLocation",
-      "announce_type": "Update",
+      "announce_type": "CheckpointAndUpdate",
       "groups": [ 0 ]
     },
     {
