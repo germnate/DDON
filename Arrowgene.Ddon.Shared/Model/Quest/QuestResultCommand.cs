@@ -114,7 +114,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// <summary>
         /// Adds a signed delta to a substory progress value, clamped to [0, max].
         /// The substory category key and objective key are read from stored quest-state fields at
-        /// ctx+0x5c+0x244 and ctx+0x5c+0x248 — they are baked into the quest context, not passed as params.
+        /// ctx+0x5c+0x244 and ctx+0x5c+0x248 - they are baked into the quest context, not passed as params.
         /// Only param01 (delta) is used: positive advances progress, negative regresses it, zero is a no-op.
         /// Sends packet 0x117 (increase) or 0x118 (decrease) to update the UI, then FUN_00bd3280 to
         /// report old and new progress ratios to the client.
@@ -158,7 +158,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// </summary>
         SetSubstoryEnemyInvincible = 105, // 0x00633A80 (cQuestProcess* this, s32 enemyGroupFlag, s32 invincible, s32 param03, s32 param04)
 
-        Padding106 = 106, // 0x00633B00 stub/nop — always returns 0
+        Padding106 = 106, // 0x00633B00 stub/nop - always returns 0
 
         /// <summary>
         /// Adds an NPC to the FSM talk NPC list at this+0x94/0xa0. Validates FSM mode via FUN_009d07f0 first.
@@ -228,7 +228,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// </summary>
         SetQuestOmMontageFixEx = 119, // 0x006341F0 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 poseId)
 
-        Padding120 = 120, // 0x006342D0 stub/nop — always returns 0
+        Padding120 = 120, // 0x006342D0 stub/nop - always returns 0
 
         /// <summary>
         /// Sets the level of a layout enemy (type 2) by queuing it into a critical-section-guarded buffer via FUN_00b55e70.
@@ -236,15 +236,15 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// </summary>
         SetQuestLayoutEnemyLevel = 121, // 0x00634300 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 level)
 
-        Padding122 = 122, // 0x00634390 stub/nop — always returns 0
-        Padding123 = 123, // 0x006343C0 stub/nop — always returns 0
+        Padding122 = 122, // 0x00634390 stub/nop - always returns 0
+        Padding123 = 123, // 0x006343C0 stub/nop - always returns 0
 
         /// <summary>
         /// Removes an FSM NPC entry from the process list at this+0x28/0x1c, freeing its children. Calls FUN_0063dda0(param01).
         /// </summary>
         RemoveFsmNpcFromSchedule = 124, // 0x006343F0 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04)
 
-        Padding125 = 125, // 0x00634410 stub/nop — always returns 0
+        Padding125 = 125, // 0x00634410 stub/nop - always returns 0
 
         /// <summary>
         /// Controls enemy expedition state. mode=2: FUN_00bc6ff0(9) sets global to 10 and signals start.
@@ -252,7 +252,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// </summary>
         SetEnemyExpeditionState = 126, // 0x00634450 (cQuestProcess* this, s32 mode, s32 param02, s32 param03, s32 param04)
 
-        Padding127 = 127, // 0x006344B0 stub/nop — always returns 0
+        Padding127 = 127, // 0x006344B0 stub/nop - always returns 0
 
         /// <summary>
         /// Fires a substory ending sequence. Calls FUN_00be9960, FUN_00b85670, then sends messages 0x25f and 0x260
@@ -260,15 +260,15 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// </summary>
         TriggerSubstoryEndSequence = 128, // 0x006345D0 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04)
 
-        Padding129 = 129, // 0x00634690 stub/nop — always returns 0
+        Padding129 = 129, // 0x00634690 stub/nop - always returns 0
 
         /// <summary>
         /// Checks if a pawn has OM state == 4 and a specific animation condition via FUN_0087dc50.
         /// </summary>
         CheckSubstoryCondition = 130, // 0x006346B0 (cQuestProcess* this, s32 param01, s32 param02, s32 param03, s32 param04)
 
-        Padding131 = 131, // 0x00634720 stub/nop — always returns 0
-        Padding132 = 132, // 0x00634750 stub/nop — always returns 0
+        Padding131 = 131, // 0x00634720 stub/nop - always returns 0
+        Padding132 = 132, // 0x00634750 stub/nop - always returns 0
 
         /// <summary>
         /// Controls pawn expedition. mode=1: FUN_00b6ce30() starts expedition (writes action DAT_01d4db50).

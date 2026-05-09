@@ -75,7 +75,9 @@ namespace Arrowgene.Ddon.GameServer.Quests
             InstanceVars = new QuestInstanceVars();
         }
 
-        public uint UpdateDeliveryRequest(ItemId itemId, uint amount)
+        // Validates the delivery and returns (remaining, newTotal) without mutating state.
+        // Call RestoreDeliveryAmount with newTotal after all side-effects (DB writes) succeed.
+        public (uint Remaining, uint NewTotal) ValidateDeliveryRequest(ItemId itemId, uint amount)
         {
             lock (DeliveryRecords)
             {
@@ -86,16 +88,37 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 }
 
                 var deliveryRecord = DeliveryRecords[itemId];
+                uint newTotal = deliveryRecord.AmountDelivered + amount;
 
-                deliveryRecord.AmountDelivered += amount;
-
-                if (deliveryRecord.AmountDelivered > deliveryRecord.AmountRequired)
+                if (newTotal > deliveryRecord.AmountRequired)
                 {
                     Logger.Error($"Delivery overage {itemId} for quest {QuestId}");
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_QUEST_OVERRUN_DELIVER_ITEM);
                 }
 
-                return deliveryRecord.AmountRequired - deliveryRecord.AmountDelivered;
+                return (deliveryRecord.AmountRequired - newTotal, newTotal);
+            }
+        }
+
+        public void RestoreDeliveryAmount(ItemId itemId, uint amountDelivered)
+        {
+            lock (DeliveryRecords)
+            {
+                if (DeliveryRecords.TryGetValue(itemId, out var record))
+                    record.AmountDelivered = amountDelivered;
+            }
+        }
+
+        public void ClearCompletedDeliveryRecords()
+        {
+            lock (DeliveryRecords)
+            {
+                var completed = DeliveryRecords
+                    .Where(kv => kv.Value.AmountDelivered >= kv.Value.AmountRequired)
+                    .Select(kv => kv.Key)
+                    .ToList();
+                foreach (var key in completed)
+                    DeliveryRecords.Remove(key);
             }
         }
 
@@ -103,6 +126,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
         {
             lock (DeliveryRecords)
             {
+                if (DeliveryRecords.TryGetValue(itemId, out var existing))
+                {
+                    Logger.Info($"Quest {QuestId} already has delivery item {itemId} registered at process {existing.ProcessNo}, block {existing.BlockNo}; overwriting with process {processNo}, block {blockNo}.");
+                }
+
                 DeliveryRecords[itemId] = new QuestDeliveryRecord()
                 {
                     ProcessNo = processNo,
@@ -648,6 +676,15 @@ namespace Arrowgene.Ddon.GameServer.Quests
             }
         }
 
+        public void RestoreDeliveryProgress(uint questScheduleId, ItemId itemId, uint amountDelivered)
+        {
+            lock (ActiveQuests)
+            {
+                if (ActiveQuests.TryGetValue(questScheduleId, out var questState))
+                    questState.RestoreDeliveryAmount(itemId, amountDelivered);
+            }
+        }
+
         public abstract bool UpdateQuestProgress(uint questScheduleId, DbConnection? connectionIn = null);
         public abstract bool CompleteQuestProgress(uint questScheduleId, DbConnection? connectionIn = null);
         public abstract PacketQueue DistributeQuestRewards(uint questScheduleId, DbConnection? connectionIn = null);
@@ -973,6 +1010,49 @@ namespace Arrowgene.Ddon.GameServer.Quests
         {
             return IsQuestAccepted(QuestManager.GetQuestByQuestId(questId).QuestScheduleId);
         }
+
+        public List<S2CQuestDeliverItemNtc> GetRestoredDeliveryNtcs(uint characterId)
+        {
+            var ntcs = new List<S2CQuestDeliverItemNtc>();
+            lock (ActiveQuests)
+            {
+                foreach (var (questScheduleId, questState) in ActiveQuests)
+                {
+                    var byProcess = new Dictionary<ushort, List<CDataDeliveredItem>>();
+                    lock (questState.DeliveryRecords)
+                    {
+                        foreach (var (itemId, record) in questState.DeliveryRecords)
+                        {
+                            if (record.AmountDelivered > 0)
+                            {
+                                if (!byProcess.ContainsKey(record.ProcessNo))
+                                    byProcess[record.ProcessNo] = new List<CDataDeliveredItem>();
+                                byProcess[record.ProcessNo].Add(new CDataDeliveredItem()
+                                {
+                                    ItemId = (uint)itemId,
+                                    ItemNum = (ushort)record.AmountDelivered,
+                                    NeedNum = (ushort)(record.AmountRequired - record.AmountDelivered)
+                                });
+                            }
+                        }
+                    }
+                    foreach (var (processNo, items) in byProcess)
+                    {
+                        ntcs.Add(new S2CQuestDeliverItemNtc()
+                        {
+                            DeliveredItemRecord = new CDataDeliveredItemRecord()
+                            {
+                                CharacterId = characterId,
+                                QuestScheduleId = questScheduleId,
+                                ProcessNo = processNo,
+                                DeliveredItemList = items
+                            }
+                        });
+                    }
+                }
+            }
+            return ntcs;
+        }
     }
 
     public class SharedQuestStateManager : QuestStateManager
@@ -1030,7 +1110,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
 
         /// <summary>
         /// Replaces RolledInstanceWorldQuests with a copy of serverPool, then removes any quests
-        /// the party leader is not eligible for (no re-roll replacement — server pool is canonical).
+        /// the party leader is not eligible for (no re-roll replacement - server pool is canonical).
         /// </summary>
         public void ApplyServerPool(Dictionary<QuestAreaId, HashSet<uint>> serverPool)
         {
@@ -1405,8 +1485,10 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 }
 
                 Server.Database.UpdateQuestProgress(memberClient.Character.CommonId, questState.QuestScheduleId, questState.QuestType, questState.Step + 1, connectionIn);
+                Server.Database.DeleteQuestDeliveryProgress(memberClient.Character.CommonId, questState.QuestScheduleId, connectionIn);
             }
 
+            questState.ClearCompletedDeliveryRecords();
             questState.Step += 1;
 
             return true;
@@ -1447,7 +1529,9 @@ namespace Arrowgene.Ddon.GameServer.Quests
             }
 
             Server.Database.UpdateQuestProgress(Member.Client.Character.CommonId, questState.QuestScheduleId, questState.QuestType, questState.Step + 1, connectionIn);
+            Server.Database.DeleteQuestDeliveryProgress(Member.Client.Character.CommonId, questState.QuestScheduleId, connectionIn);
 
+            questState.ClearCompletedDeliveryRecords();
             questState.Step += 1;
 
             return true;
