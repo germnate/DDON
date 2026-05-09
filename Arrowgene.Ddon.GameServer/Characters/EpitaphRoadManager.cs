@@ -628,14 +628,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public T GetEpitahObject<T>(uint epitaphId)
         {
-            if (_EpitaphAssets.EpitaphObjects.ContainsKey(epitaphId))
-            {
-                return (T) Convert.ChangeType(_EpitaphAssets.EpitaphObjects[epitaphId], typeof(T));
-            }
-            else if (_TrialAssets.EpitahObjects.ContainsKey(epitaphId))
-            {
-                return (T) Convert.ChangeType(_TrialAssets.EpitahObjects[epitaphId], typeof(T));
-            }
+            var epitaphObjects = _EpitaphAssets.EpitaphObjects;
+            if (epitaphObjects.TryGetValue(epitaphId, out var epitaphObj))
+                return (T) Convert.ChangeType(epitaphObj, typeof(T));
+            var trialObjects = _TrialAssets.EpitahObjects;
+            if (trialObjects.TryGetValue(epitaphId, out var trialObj))
+                return (T) Convert.ChangeType(trialObj, typeof(T));
             return default;
         }
 
@@ -646,7 +644,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public bool IsEpitaphId(uint epitaphId)
         {
-            return _EpitaphAssets.EpitaphObjects.ContainsKey(epitaphId) || _TrialAssets.EpitahObjects.ContainsKey(epitaphId);
+            var epitaphObjects = _EpitaphAssets.EpitaphObjects;
+            var trialObjects = _TrialAssets.EpitahObjects;
+            return epitaphObjects.ContainsKey(epitaphId) || trialObjects.ContainsKey(epitaphId);
         }
 
         public EpitaphTrialOption GetTrialOption(PartyGroup party)
@@ -664,11 +664,10 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public EpitaphTrial GetTrial(StageLayoutId stageId, uint posId)
         {
-            if (_TrialAssets == null || !_TrialAssets.Trials.ContainsKey(stageId))
-            {
+            var trials = _TrialAssets?.Trials;
+            if (trials == null || !trials.TryGetValue(stageId, out var list))
                 return null;
-            }
-            return _TrialAssets.Trials[stageId].Where(x => x.PosId == posId).FirstOrDefault();
+            return list.FirstOrDefault(x => x.PosId == posId);
         }
 
         public EpitaphTrial GetTrial(uint epitaphId)
@@ -909,25 +908,19 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public List<CDataSoulOrdealItem> GetCostByEpitahId(uint epitahId)
         {
-            var result = new List<CDataSoulOrdealItem>();
+            var trialObjects = _TrialAssets.EpitahObjects;
+            if (trialObjects.TryGetValue(epitahId, out var trialObj) && trialObj is EpitaphTrial trial)
+                return trial.UnlockCost;
 
-            if (_Server.AssetRepository.EpitaphTrialAssets.EpitahObjects.ContainsKey(epitahId))
+            var epitaphObjects = _EpitaphAssets.EpitaphObjects;
+            if (epitaphObjects.TryGetValue(epitahId, out var epitaphObj))
             {
-                result = GetEpitahObject<EpitaphTrial>(epitahId).UnlockCost;
+                if (epitaphObj is EpitaphSection section)
+                    return section.UnlockCost;
+                if (epitaphObj is EpitaphBarrier barrier)
+                    return barrier.UnlockCost;
             }
-            else if (_Server.AssetRepository.EpitaphRoadAssets.EpitaphObjects.ContainsKey(epitahId))
-            {
-                var epitaphObject = _Server.AssetRepository.EpitaphRoadAssets.EpitaphObjects[epitahId];
-                if (epitaphObject is EpitaphSection section)
-                {
-                    result = section.UnlockCost;
-                }
-                else if (epitaphObject is EpitaphBarrier barrier)
-                {
-                    result = barrier.UnlockCost;
-                }
-            }
-            return result;
+            return new List<CDataSoulOrdealItem>();
         }
 
         public bool IsSectionUnlocked(Character character, uint epitaphId)

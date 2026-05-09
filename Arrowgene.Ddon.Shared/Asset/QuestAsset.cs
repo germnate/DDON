@@ -61,6 +61,7 @@ namespace Arrowgene.Ddon.Shared.Asset
         public bool OverrideEnemySpawn { get; set; }
         public bool EnableCancel { get; set; }
         public QuestSource QuestSource { get; set; }
+        public string SourceFile { get; set; }
 
         public List<QuestPointReward> PointRewards { get; set; }
 

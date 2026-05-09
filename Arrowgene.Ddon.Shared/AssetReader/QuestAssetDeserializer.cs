@@ -11,22 +11,43 @@ using System.Text.Json;
 
 namespace Arrowgene.Ddon.Shared.AssetReader
 {
-    public class QuestAssetDeserializer
+    public class QuestAssetDeserializer : IDirectoryAssetHandler
     {
         private static readonly ILogger Logger = LogProvider.Logger(typeof(QuestAssetDeserializer));
 
         private QuestDropItemAsset _QuestDrops;
         private AssetCommonDeserializer _CommonEnemyDeserializer;
         private Dictionary<QuestId, uint> _QuestScheduleIdAsset;
+        private readonly QuestAsset _liveAsset;
 
-        public QuestAssetDeserializer(AssetCommonDeserializer commonEnemyDeserializer, QuestDropItemAsset questDrops, Dictionary<QuestId, uint> scheduleIdAsset)
+        public QuestAssetDeserializer(AssetCommonDeserializer commonEnemyDeserializer, QuestDropItemAsset questDrops, Dictionary<QuestId, uint> scheduleIdAsset, QuestAsset liveAsset)
         {
             _QuestDrops = questDrops;
             _CommonEnemyDeserializer = commonEnemyDeserializer;
             _QuestScheduleIdAsset = scheduleIdAsset;
+            _liveAsset = liveAsset;
 
             // Force this class to be invoked so we can look up flags during deserialization
             QuestFlags.InvokeTypeInitializer();
+        }
+
+        public string DirectoryKey => AssetRepository.QuestAssestKey;
+        public string Filter => "*.json";
+        public object LiveAsset => _liveAsset;
+
+        public bool OnFileChanged(string filePath)
+        {
+            var freshEntry = new QuestAsset();
+            if (!LoadQuestFromFile(filePath, freshEntry))
+                return false;
+            OnFileRemoved(filePath);
+            _liveAsset.Quests.AddRange(freshEntry.Quests);
+            return true;
+        }
+
+        public void OnFileRemoved(string filePath)
+        {
+            _liveAsset.Quests.RemoveAll(q => q.SourceFile == filePath);
         }
 
         public bool LoadQuestsFromDirectory(string path, QuestAsset questAssets)
@@ -41,38 +62,45 @@ namespace Arrowgene.Ddon.Shared.AssetReader
             Logger.Info($"Reading quest files from {path}");
             foreach (var file in info.EnumerateFiles())
             {
-                Logger.Info($"{file.FullName}");
-
-                string json = Util.ReadAllText(file.FullName);
-                JsonDocument document = JsonDocument.Parse(json);
-
-                var jQuest = document.RootElement;
-                if (!Enum.TryParse(jQuest.GetProperty("state_machine").GetString(), true, out QuestStateMachineType questStateMachineType))
-                {
-                    Logger.Error($"Expected key 'state_machine' not in the root of the document. Unable to parse {file.FullName}.");
-                    continue;
-                }
-
-                if (questStateMachineType != QuestStateMachineType.GenericStateMachine)
-                {
-                    Logger.Error($"Unsupported QuestStateMachineType '{questStateMachineType}'. Unable to parse {file.FullName}.");
-                    continue;
-                }
-
-                QuestAssetData assetData = new QuestAssetData()
-                {
-                    QuestSource = QuestSource.Json
-                };
-
-                if (!ParseQuest(assetData, jQuest))
-                {
-                    Logger.Error($"Unable to parse '{file.FullName}'. Skipping.");
-                    continue;
-                }
-
-                questAssets.Quests.Add(assetData);
+                LoadQuestFromFile(file.FullName, questAssets);
             }
 
+            return true;
+        }
+
+        public bool LoadQuestFromFile(string filePath, QuestAsset questAssets)
+        {
+            Logger.Info($"{filePath}");
+
+            string json = Util.ReadAllText(filePath);
+            JsonDocument document = JsonDocument.Parse(json);
+
+            var jQuest = document.RootElement;
+            if (!Enum.TryParse(jQuest.GetProperty("state_machine").GetString(), true, out QuestStateMachineType questStateMachineType))
+            {
+                Logger.Error($"Expected key 'state_machine' not in the root of the document. Unable to parse {filePath}.");
+                return false;
+            }
+
+            if (questStateMachineType != QuestStateMachineType.GenericStateMachine)
+            {
+                Logger.Error($"Unsupported QuestStateMachineType '{questStateMachineType}'. Unable to parse {filePath}.");
+                return false;
+            }
+
+            QuestAssetData assetData = new QuestAssetData()
+            {
+                QuestSource = QuestSource.Json,
+                SourceFile = filePath
+            };
+
+            if (!ParseQuest(assetData, jQuest))
+            {
+                Logger.Error($"Unable to parse '{filePath}'. Skipping.");
+                return false;
+            }
+
+            questAssets.Quests.Add(assetData);
             return true;
         }
 
