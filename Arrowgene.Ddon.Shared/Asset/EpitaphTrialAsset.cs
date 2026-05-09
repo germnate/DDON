@@ -202,6 +202,7 @@ namespace Arrowgene.Ddon.Shared.Asset
 
         public StageLayoutId OmLayoutId { get; set; }
         public uint PosId { get; set; }
+        public string SourceFile { get; set; }
         public List<EpitaphTrialOption> Options { get; set; }
         public List<CDataSoulOrdealItem> UnlockCost { get; set; }
         public List<(StageLayoutId StageId, uint PosId)> Unlocks { get; set; }

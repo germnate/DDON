@@ -28,8 +28,14 @@ namespace Arrowgene.Ddon.GameServer.Characters
          * A QuestScheduleId should always get us back to a unique quest object.
          * A QuestId can return us a list of related QuestScheduleIds which all use the same QuestId.
          */
-        private static Dictionary<uint, Quest> gQuests = new Dictionary<uint, Quest>();
-        private static readonly Dictionary<QuestId, HashSet<uint>> gVariantQuests = new();
+        private static Dictionary<uint, Quest> gQuests = new();
+        private static Dictionary<QuestId, HashSet<uint>> gVariantQuests = new();
+
+        // Prevents two concurrent JSON reloads from interleaving their swaps.
+        // Readers never acquire this lock; they are safe because the swap replaces
+        // collection references rather than mutating live collections, so any reader
+        // that captured a reference before the swap iterates the old, immutable dict.
+        private static readonly object _reloadLock = new();
 
         private static Dictionary<QuestType, Dictionary<uint, HashSet<uint>>> QuestByStageNo = new();
         private static Dictionary<QuestAreaId, HashSet<QuestId>> gWorldQuests = new Dictionary<QuestAreaId, HashSet<QuestId>>();
@@ -50,52 +56,49 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         private static void AddQuestToCategory(Quest quest)
         {
-            if (!gVariantQuests.ContainsKey(quest.QuestId))
-            {
-                gVariantQuests[quest.QuestId] = new HashSet<uint>();
-            }
-            gVariantQuests[quest.QuestId].Add(quest.QuestScheduleId);
+            AddQuestToCollections(quest, gVariantQuests, QuestByStageNo, gWorldQuests, gAdventureGuideCategories, gAreaTrialRanks);
+        }
 
-            if ((quest.QuestType == QuestType.Tutorial) || (quest.QuestType == QuestType.Substory))
+        // Populates the supplied index collections with the quest. Callers pass either the
+        // live static dicts (initial load / scripted hotload) or freshly allocated locals
+        // (JSON hotload build-then-swap path).
+        private static void AddQuestToCollections(
+            Quest quest,
+            Dictionary<QuestId, HashSet<uint>> variantQuests,
+            Dictionary<QuestType, Dictionary<uint, HashSet<uint>>> questByStageNo,
+            Dictionary<QuestAreaId, HashSet<QuestId>> worldQuests,
+            Dictionary<QuestAdventureGuideCategory, HashSet<uint>> adventureGuideCategories,
+            Dictionary<QuestAreaId, Dictionary<uint, uint>> areaTrialRanks)
+        {
+            if (!variantQuests.ContainsKey(quest.QuestId))
+                variantQuests[quest.QuestId] = new HashSet<uint>();
+            variantQuests[quest.QuestId].Add(quest.QuestScheduleId);
+
+            if (quest.QuestType == QuestType.Tutorial || quest.QuestType == QuestType.Substory)
             {
                 uint stageNo = (uint)StageManager.ConvertIdToStageNo(quest.StageId);
-
-                if (!QuestByStageNo.ContainsKey(quest.QuestType))
-                {
-                    QuestByStageNo[quest.QuestType] = new();
-                }
-
-                var questDict = QuestByStageNo[quest.QuestType];
+                if (!questByStageNo.ContainsKey(quest.QuestType))
+                    questByStageNo[quest.QuestType] = new();
+                var questDict = questByStageNo[quest.QuestType];
                 if (!questDict.ContainsKey(stageNo))
-                {
                     questDict[stageNo] = new HashSet<uint>();
-                }
                 questDict[stageNo].Add(quest.QuestScheduleId);
             }
             else if (quest.QuestType == QuestType.World)
             {
-                if (!gWorldQuests.ContainsKey(quest.QuestAreaId))
-                {
-                    gWorldQuests[quest.QuestAreaId] = new HashSet<QuestId>();
-                }
-                gWorldQuests[quest.QuestAreaId].Add(quest.QuestId);
+                if (!worldQuests.ContainsKey(quest.QuestAreaId))
+                    worldQuests[quest.QuestAreaId] = new HashSet<QuestId>();
+                worldQuests[quest.QuestAreaId].Add(quest.QuestId);
             }
 
-            if (!gAdventureGuideCategories.ContainsKey(quest.AdventureGuideCategory))
-            {
-                gAdventureGuideCategories[quest.AdventureGuideCategory] = new HashSet<uint>();
-            }
-            gAdventureGuideCategories[quest.AdventureGuideCategory].Add(quest.QuestScheduleId);
+            if (!adventureGuideCategories.ContainsKey(quest.AdventureGuideCategory))
+                adventureGuideCategories[quest.AdventureGuideCategory] = new HashSet<uint>();
+            adventureGuideCategories[quest.AdventureGuideCategory].Add(quest.QuestScheduleId);
 
             // Build a ranking list for quests for area trials
             // TODO: This should probably be done in quest scripts, but who wants to rewrite 70+ quests?
             if (quest.AdventureGuideCategory == QuestAdventureGuideCategory.AreaTrialOrMission)
             {
-                if (!gAreaTrialRanks.ContainsKey(quest.QuestAreaId))
-                {
-                    gAreaTrialRanks[quest.QuestAreaId] = new Dictionary<uint, uint>();
-                }
-
                 // Search all process states for a CheckAreaRank command rather than assuming
                 // it is always the very first command - JSON quests and scripted .csx quests
                 // serialize their process state lists differently, so .First() is unreliable.
@@ -114,9 +117,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                             {
                                 requiredRank = (uint)cmd.Param02;
                                 if (areaId == QuestAreaId.None)
-                                {
                                     areaId = (QuestAreaId)cmd.Param01;
-                                }
                                 found = true;
                                 break;
                             }
@@ -128,11 +129,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
                 if (found)
                 {
-                    if (!gAreaTrialRanks.ContainsKey(areaId))
-                    {
-                        gAreaTrialRanks[areaId] = new Dictionary<uint, uint>();
-                    }
-                    gAreaTrialRanks[areaId][quest.QuestScheduleId] = requiredRank;
+                    if (!areaTrialRanks.ContainsKey(areaId))
+                        areaTrialRanks[areaId] = new Dictionary<uint, uint>();
+                    areaTrialRanks[areaId][quest.QuestScheduleId] = requiredRank;
                 }
             }
         }
@@ -246,6 +245,57 @@ namespace Arrowgene.Ddon.GameServer.Characters
             ComputeSubstoryLookups(server);
         }
 
+        public static void ReloadJsonQuests(DdonGameServer server)
+        {
+            Logger.Info($"Hotloading JSON quests...");
+
+            // Build entirely new index collections without touching live state.
+            // Scripted quests are preserved by copying them from a snapshot of the
+            // current live collections; JSON quests are discarded and rebuilt from
+            // the freshly loaded asset data.
+            var newQuests = new Dictionary<uint, Quest>();
+            var newVariantQuests = new Dictionary<QuestId, HashSet<uint>>();
+            var newQuestByStageNo = new Dictionary<QuestType, Dictionary<uint, HashSet<uint>>>();
+            var newWorldQuests = new Dictionary<QuestAreaId, HashSet<QuestId>>();
+            var newAdventureGuideCategories = new Dictionary<QuestAdventureGuideCategory, HashSet<uint>>();
+            var newAreaTrialRanks = new Dictionary<QuestAreaId, Dictionary<uint, uint>>();
+
+            // Snapshot current reference so we iterate a stable collection.
+            var currentQuests = gQuests;
+            foreach (var (scheduleId, quest) in currentQuests)
+            {
+                if (quest.QuestSource == QuestSource.Json)
+                    continue;
+                newQuests[scheduleId] = quest;
+                AddQuestToCollections(quest, newVariantQuests, newQuestByStageNo, newWorldQuests, newAdventureGuideCategories, newAreaTrialRanks);
+            }
+
+            foreach (var questAsset in server.AssetRepository.QuestAssets.Quests)
+            {
+                var quest = GenericQuest.FromAsset(server, questAsset);
+                newQuests[quest.QuestScheduleId] = quest;
+                if (quest.Enabled)
+                    AddQuestToCollections(quest, newVariantQuests, newQuestByStageNo, newWorldQuests, newAdventureGuideCategories, newAreaTrialRanks);
+            }
+
+            // Atomically swap all references under a lock to prevent two concurrent
+            // reloads from interleaving. Readers never acquire this lock; they are
+            // safe because swapping the reference (not mutating the dict) means any
+            // reader that already holds a reference to the old collection will
+            // finish iterating it without a "Collection was modified" exception.
+            lock (_reloadLock)
+            {
+                gQuests = newQuests;
+                gVariantQuests = newVariantQuests;
+                QuestByStageNo = newQuestByStageNo;
+                gWorldQuests = newWorldQuests;
+                gAdventureGuideCategories = newAdventureGuideCategories;
+                gAreaTrialRanks = newAreaTrialRanks;
+            }
+
+            Logger.Info($"JSON quest file reloaded. {server.AssetRepository.QuestAssets.Quests.Count} JSON quests total in memory.");
+        }
+
         public static void LoadLightQuests(DdonGameServer server)
         {
             foreach(var quest in server.LightQuestManager.ReadQuests(true))
@@ -282,12 +332,8 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public static HashSet<QuestId> GetWorldQuestIdsByAreaId(QuestAreaId areaId)
         {
-            if (!gWorldQuests.ContainsKey(areaId))
-            {
-                return new HashSet<QuestId>();
-            }
-
-            return gWorldQuests[areaId];
+            var snapshot = gWorldQuests;
+            return snapshot.TryGetValue(areaId, out var ids) ? ids : new HashSet<QuestId>();
         }
 
         public static Quest GetQuestByBoardId(ulong boardId)
@@ -298,16 +344,10 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public static HashSet<uint> GetQuestByStageNo(QuestType questType, uint stageNo)
         {
-            if (!QuestByStageNo.ContainsKey(questType))
-            {
+            var snapshot = QuestByStageNo;
+            if (!snapshot.TryGetValue(questType, out var byStage))
                 return new();
-            }
-
-            if (!QuestByStageNo[questType].ContainsKey(stageNo))
-            {
-                return new();
-            }
-            return QuestByStageNo[questType][stageNo];
+            return byStage.TryGetValue(stageNo, out var ids) ? ids : new();
         }
 
         public static bool IsVariantQuest(QuestId baseQuestId)
@@ -317,17 +357,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public static Quest GetQuestByScheduleId(uint questScheduleId)
         {
-            if (!gQuests.ContainsKey(questScheduleId))
-            {
-                if (!KnownBadQuestScheduleIds.Contains(questScheduleId) && !IsBoardQuest(questScheduleId))
-                {
-                    Logger.Error($"GetQuestByScheduleId: Invalid questScheduleId {questScheduleId}");
-                }
-
-                return null;
-            }
-
-            return gQuests[questScheduleId];
+            var snapshot = gQuests;
+            if (snapshot.TryGetValue(questScheduleId, out var quest))
+                return quest;
+            if (!KnownBadQuestScheduleIds.Contains(questScheduleId) && !IsBoardQuest(questScheduleId))
+                Logger.Error($"GetQuestByScheduleId: Invalid questScheduleId {questScheduleId}");
+            return null;
         }
 
         public static Quest GetQuestByQuestId(QuestId questId)
@@ -351,27 +386,22 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public static HashSet<uint> GetQuestScheduleIdsForQuestId(QuestId questId)
         {
-            if (gVariantQuests.ContainsKey(questId))
-            {
-                return gVariantQuests[questId];
-            }
-            return new HashSet<uint>();
+            var snapshot = gVariantQuests;
+            return snapshot.TryGetValue(questId, out var ids) ? ids : new HashSet<uint>();
         }
 
         public static Quest RollQuestForQuestId(QuestId questId)
         {
             var quests = GetQuestScheduleIdsForQuestId(questId);
             var questScheduleId = quests.ElementAt(Random.Shared.Next(0, quests.Count));
-            return gQuests[questScheduleId];
+            var snapshot = gQuests;
+            return snapshot.TryGetValue(questScheduleId, out var quest) ? quest : null;
         }
 
         public static HashSet<uint> GetQuestsByAdventureGuideCategory(QuestAdventureGuideCategory category)
         {
-            if (!gAdventureGuideCategories.ContainsKey(category))
-            {
-                return new();
-            }
-            return gAdventureGuideCategories[category].ToHashSet();
+            var snapshot = gAdventureGuideCategories;
+            return snapshot.TryGetValue(category, out var ids) ? ids.ToHashSet() : new();
         }
 
         public static bool IsQuestEnabled(uint questScheduleId)
