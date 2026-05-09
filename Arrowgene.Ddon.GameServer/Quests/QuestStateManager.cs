@@ -126,6 +126,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
         {
             lock (DeliveryRecords)
             {
+                if (DeliveryRecords.TryGetValue(itemId, out var existing))
+                {
+                    Logger.Info($"Quest {QuestId} already has delivery item {itemId} registered at process {existing.ProcessNo}, block {existing.BlockNo}; overwriting with process {processNo}, block {blockNo}.");
+                }
+
                 DeliveryRecords[itemId] = new QuestDeliveryRecord()
                 {
                     ProcessNo = processNo,

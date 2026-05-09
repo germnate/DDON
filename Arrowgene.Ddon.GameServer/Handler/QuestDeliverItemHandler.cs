@@ -5,6 +5,7 @@ using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Logging;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
@@ -36,6 +37,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             Dictionary<uint, (uint Remaining, uint NewTotal)> deliveryCommits = new Dictionary<uint, (uint, uint)>();
             Server.Database.ExecuteInTransaction(connection =>
             {
+                var deliveryProgressCommonIds = GetDeliveryProgressCommonIds(client, quest.IsPersonal, request.QuestScheduleId, connection);
                 foreach (var item in request.ItemUIDList)
                 {
                     uint itemId = client.Character.Storage.FindItemByUIdInStorage(ItemManager.AllItemStorages, item.ItemUID)?.Item2.Item2.ItemId
@@ -64,7 +66,13 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     // below throws the transaction rolls back cleanly with no state left behind.
                     var result = questState.ValidateDeliveryRequest((ItemId)deliveredItem.ItemId, deliveredItem.ItemNum);
                     deliveryCommits[deliveredItem.ItemId] = result;
-                    Server.Database.UpsertQuestDeliveryProgress(client.Character.CommonId, request.QuestScheduleId, deliveredItem.ItemId, result.NewTotal, connection);
+                    foreach (var commonId in deliveryProgressCommonIds)
+                    {
+                        if (!Server.Database.UpsertQuestDeliveryProgress(commonId, request.QuestScheduleId, deliveredItem.ItemId, result.NewTotal, connection))
+                        {
+                            throw new ResponseErrorException(ErrorCode.ERROR_CODE_QUEST_INTERNAL_ERROR, $"Failed to save delivery progress for character common id {commonId}.");
+                        }
+                    }
                 }
             });
 
@@ -103,6 +111,35 @@ namespace Arrowgene.Ddon.GameServer.Handler
             }
 
             return res;
+        }
+
+        private List<uint> GetDeliveryProgressCommonIds(GameClient client, bool isPersonal, uint questScheduleId, DbConnection connection)
+        {
+            if (isPersonal || client.Party == null)
+            {
+                return new List<uint>() { client.Character.CommonId };
+            }
+
+            var commonIds = new HashSet<uint>();
+            foreach (var memberClient in client.Party.Clients)
+            {
+                if (memberClient?.Character == null)
+                {
+                    continue;
+                }
+
+                if (Server.Database.GetQuestProgressByScheduleId(memberClient.Character.CommonId, questScheduleId, connection) != null)
+                {
+                    commonIds.Add(memberClient.Character.CommonId);
+                }
+            }
+
+            if (commonIds.Count == 0)
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_QUEST_INTERNAL_ERROR, $"No party members have quest progress for delivery quest {questScheduleId}.");
+            }
+
+            return commonIds.ToList();
         }
     }
 }

@@ -551,8 +551,31 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return freeSlots >= slotsRequired;
         }
 
+        private bool CanAddItem(Character character, StorageType destinationStorageType, uint itemId, long num, uint stackLimit, byte plusvalue = 0)
+        {
+            Storage storage = character.Storage.GetStorage(destinationStorageType);
+
+            long existingAvailableStackSlots = storage.Items
+                .Where(x => x != null && x.Item1.ItemId == itemId && x.Item1.PlusValue == plusvalue && x.Item2 < stackLimit)
+                .Sum(x => stackLimit - x!.Item2);
+
+            if (num <= existingAvailableStackSlots)
+            {
+                return true;
+            }
+
+            long requiredFreeStacks = num - existingAvailableStackSlots;
+            uint slotsRequired = (uint)Math.Ceiling(((double)requiredFreeStacks) / stackLimit);
+            return storage.EmptySlots() >= slotsRequired;
+        }
+
         private List<CDataItemUpdateResult> DoAddItem(IDatabase database, Character character, StorageType destinationStorageType, uint itemId, uint num, uint stackLimit = UInt32.MaxValue, byte plusvalue = 0, DbConnection? connectionIn = null)
         {
+            if (!CanAddItem(character, destinationStorageType, itemId, num, stackLimit, plusvalue))
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_STORAGE_OVERFLOW);
+            }
+
             // Add to existing stacks or make new stacks until there are no more items to add
             // The stack limit is specified by the stackLimit arg
             List<CDataItemUpdateResult> results = new List<CDataItemUpdateResult>();
@@ -630,6 +653,11 @@ namespace Arrowgene.Ddon.GameServer.Characters
         // TODO: Maybe make this more smoothly a part of the existing DoAddItem.
         private List<CDataItemUpdateResult> DoAddItemNoStack(IDatabase database, Character character, StorageType destinationStorageType, uint itemId, uint num, byte plusvalue = 0, DbConnection? connectionIn = null)
         {
+            if (character.Storage.GetStorage(destinationStorageType).EmptySlots() == 0)
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_STORAGE_OVERFLOW);
+            }
+
             // Add to existing stacks or make new stacks until there are no more items to add
             // The stack limit is specified by the stackLimit arg
             List<CDataItemUpdateResult> results = new List<CDataItemUpdateResult>();
