@@ -197,7 +197,7 @@
             "group_id": 1,
             "layer_no": 1
           },
-          "announce_type": "Update",
+          "announce_type": "CheckpointAndUpdate",
           "npc_id": "Vanessa0",
           "message_id": 12003
         }

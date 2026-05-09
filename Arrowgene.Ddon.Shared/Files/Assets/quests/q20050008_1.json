@@ -170,7 +170,7 @@
         },
         {
           "type": "CollectItem",
-          "announce_type": "Update",
+          "announce_type": "CheckpointAndUpdate",
           "stage_id": {
             "id": 1,
             "group_id": 3,
@@ -241,7 +241,7 @@
         },
         {
           "type": "CollectItem",
-          "announce_type": "Update",
+          "announce_type": "CheckpointAndUpdate",
           "stage_id": {
             "id": 1,
             "group_id": 4,
@@ -317,7 +317,7 @@
             "group_id": 1,
             "layer_no": 1
           },
-          "announce_type": "Update",
+          "announce_type": "CheckpointAndUpdate",
           "npc_id": "August",
           "message_id": 13312
         }

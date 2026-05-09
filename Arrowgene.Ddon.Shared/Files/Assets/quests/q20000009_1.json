@@ -70,7 +70,7 @@
 		},
         {
           "type": "Raw",
-          "announce_type": "Update",
+          "announce_type": "CheckpointAndUpdate",
           "result_commands": [
             {"type": "MyQstFlagOn", "Param1": 262},
             {"type": "LayoutFlagRandomOn", "Param1": 313, "Param2": 314, "Param3": 315},
@@ -94,7 +94,7 @@
             "id": 1,
             "group_id": 0
           },
-          "announce_type": "Update",
+          "announce_type": "CheckpointAndUpdate",
           "npc_id": "Henry",
           "message_id": 10925
 		}

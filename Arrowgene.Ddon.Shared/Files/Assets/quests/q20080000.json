@@ -157,7 +157,7 @@
                 },
                 {
                     "type": "CollectItem",
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "stage_id": {
                         "id": 32,
                         "group_id": 2,
@@ -182,7 +182,7 @@
                 },
                 {
                     "type": "CollectItem",
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "stage_id": {
                         "id": 32,
                         "group_id": 3,
@@ -212,7 +212,7 @@
                         "group_id": 1,
                         "layer_no": 1
                     },
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "npc_id": "Peddler",
                     "message_id": 8685
                 }

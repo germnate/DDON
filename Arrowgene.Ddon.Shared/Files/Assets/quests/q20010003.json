@@ -111,7 +111,7 @@
           "stage_id": {
             "id": 1
           },
-          "announce_type": "Update",
+          "announce_type": "CheckpointAndUpdate",
           "npc_id": "Rosa",
           "message_id": 11871
         }

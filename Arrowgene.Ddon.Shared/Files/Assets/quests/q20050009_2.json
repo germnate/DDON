@@ -190,7 +190,7 @@
                         "group_id": 1,
                         "layer_no": 1
                     },
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "npc_id": "LightlyEquippedFemaleSoldier",
                     "message_id": 13306
                 }
