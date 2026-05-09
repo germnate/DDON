@@ -280,13 +280,13 @@
                 },
                 {
                     "type": "MyQstFlags",
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "set_flags": [1],
                     "check_flags": [2]
                 },
                 {
                     "type": "MyQstFlags",
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "check_flags": [3, 4, 5]
                 },
                 {
@@ -294,7 +294,7 @@
                     "stage_id": {
                         "id": 317
                     },
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "npc_id": "Bertrand",
                     "message_id": 17155
                 }

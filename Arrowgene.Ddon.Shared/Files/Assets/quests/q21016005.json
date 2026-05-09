@@ -61,7 +61,7 @@
                 },
                 {
                     "type": "Raw",
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "check_commands": [
                         {"type": "TalkNpc", "Param1": 920, "Param2": 2600},
                         {"type": "IngameTimeRangeEq", "Param1": 16, "Param2": 20}
@@ -72,7 +72,7 @@
                 },
                 {
                     "type": "Raw",
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "result_commands": [
                         {"type": "MyQstFlagOn", "Param1": 0},
                         {"type": "QstTalkChg", "Param1": 2600, "Param2": 19682}

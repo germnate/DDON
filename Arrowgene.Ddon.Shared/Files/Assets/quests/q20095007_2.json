@@ -175,7 +175,7 @@
                 },
                 {
                     "type": "MyQstFlags",
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "check_flags": [2, 3, 4]
                 },
                 {
@@ -183,7 +183,7 @@
                     "stage_id": {
                         "id": 55
                     },
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "npc_id": "Bayard",
                     "message_id": 16107
                 }

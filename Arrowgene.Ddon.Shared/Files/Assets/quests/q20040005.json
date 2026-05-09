@@ -177,7 +177,7 @@
         },
         {
           "type": "CollectItem",
-          "announce_type": "Update",
+          "announce_type": "CheckpointAndUpdate",
           "stage_id": {
             "id": 104,
             "group_id": 3,
@@ -260,7 +260,7 @@
         },
         {
           "type": "CollectItem",
-          "announce_type": "Update",
+          "announce_type": "CheckpointAndUpdate",
           "stage_id": {
             "id": 104,
             "group_id": 4,
@@ -348,7 +348,7 @@
             "group_id": 13,
             "layer_no": 1
           },
-          "announce_type": "Update",
+          "announce_type": "CheckpointAndUpdate",
           "npc_id": "Nelson",
           "message_id": 11098
         }
