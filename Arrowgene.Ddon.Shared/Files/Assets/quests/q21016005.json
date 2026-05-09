@@ -83,7 +83,7 @@
                 },
                 {
                     "type": "DeliverItems",
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "stage_id": {
                         "id": 340
                     },
