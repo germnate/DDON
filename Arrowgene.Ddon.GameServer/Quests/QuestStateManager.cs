@@ -729,30 +729,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 {
                     case PointType.ExperiencePoints:
                         packets.AddRange(server.ExpManager.AddExp(client, client.Character, amount, RewardSource.Quest, quest.QuestType, connectionIn));
-                        if (server.GameSettings.GameServerSettings.EnableMainPartyPawnsQuestRewards)
-                        {
-                            foreach (PartyMember member in client.Party.Members)
-                            {
-                                if (member is PawnPartyMember pawnMember && client.Character.Pawns.Contains(pawnMember.Pawn))
-                                {
-                                    var pawnAmount = server.ExpManager.GetAdjustedPointsForQuest(pointReward.Type, pointReward.Reward, quest.QuestType, client, pawnMember.Pawn);
-                                    packets.AddRange(server.ExpManager.AddExp(client, pawnMember.Pawn, pawnAmount, RewardSource.Quest, quest.QuestType, connectionIn));
-                                }
-                            }
-                        }
+                        AddMainPartyPawnQuestPointRewards(server, client, quest, pointReward, amount, packets, connectionIn);
                         break;
                     case PointType.JobPoints:
                         packets.AddRange(server.ExpManager.AddJp(client, client.Character, amount.BasePoints, RewardSource.Quest, quest.QuestType, connectionIn));
-                        if (server.GameSettings.GameServerSettings.EnableMainPartyPawnsQuestRewards)
-                        {
-                            foreach (PartyMember member in client.Party.Members)
-                            {
-                                if (member is PawnPartyMember pawnMember && client.Character.Pawns.Contains(pawnMember.Pawn))
-                                {
-                                    packets.AddRange(server.ExpManager.AddJp(client, pawnMember.Pawn, amount.BasePoints, RewardSource.Quest, quest.QuestType, connectionIn));
-                                }
-                            }
-                        }
+                        AddMainPartyPawnQuestPointRewards(server, client, quest, pointReward, amount, packets, connectionIn);
                         break;
                     case PointType.PlayPoints:
                         var ntc = server.PPManager.AddPlayPoint(client, amount, type: 1, connectionIn: connectionIn);
@@ -832,9 +813,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 {
                     case PointType.ExperiencePoints:
                         packets.AddRange(server.ExpManager.AddExp(client, client.Character, amount, RewardSource.Quest, quest.QuestType, connectionIn));
+                        AddMainPartyPawnQuestPointRewards(server, client, quest, pointReward, amount, packets, connectionIn);
                         break;
                     case PointType.JobPoints:
                         packets.AddRange(server.ExpManager.AddJp(client, client.Character, amount.BasePoints, RewardSource.Quest, quest.QuestType, connectionIn));
+                        AddMainPartyPawnQuestPointRewards(server, client, quest, pointReward, amount, packets, connectionIn);
                         break;
                     case PointType.AreaPoints:
                         var areaId = quest.QuestAreaId > 0 ? quest.QuestAreaId : (QuestAreaId)quest.LightQuestDetail.AreaId;
@@ -892,9 +875,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 {
                     case PointType.ExperiencePoints:
                         packets.AddRange(server.ExpManager.AddExp(client, client.Character, amount, RewardSource.Quest, quest.QuestType, connectionIn));
+                        AddMainPartyPawnQuestPointRewards(server, client, quest, pointReward, amount, packets, connectionIn);
                         break;
                     case PointType.JobPoints:
                         packets.AddRange(server.ExpManager.AddJp(client, client.Character, amount.BasePoints, RewardSource.Quest, quest.QuestType, connectionIn));
+                        AddMainPartyPawnQuestPointRewards(server, client, quest, pointReward, amount, packets, connectionIn);
                         break;
                     case PointType.PlayPoints:
                         var ntc = server.PPManager.AddPlayPoint(client, amount, type: 1, connectionIn: connectionIn);
@@ -908,6 +893,40 @@ namespace Arrowgene.Ddon.GameServer.Quests
             }
 
             return packets;
+        }
+
+        private void AddMainPartyPawnQuestPointRewards(
+            DdonGameServer server,
+            GameClient client,
+            Quest quest,
+            CDataQuestExp pointReward,
+            (uint BasePoints, uint BonusPoints) playerAmount,
+            PacketQueue packets,
+            DbConnection? connectionIn = null)
+        {
+            if (!server.GameSettings.GameServerSettings.EnableMainPartyPawnsQuestRewards)
+            {
+                return;
+            }
+
+            foreach (PartyMember member in client.Party.Members)
+            {
+                if (member is not PawnPartyMember pawnMember || !client.Character.Pawns.Contains(pawnMember.Pawn))
+                {
+                    continue;
+                }
+
+                switch (pointReward.Type)
+                {
+                    case PointType.ExperiencePoints:
+                        var pawnAmount = server.ExpManager.GetAdjustedPointsForQuest(pointReward.Type, pointReward.Reward, quest.QuestType, client, pawnMember.Pawn);
+                        packets.AddRange(server.ExpManager.AddExp(client, pawnMember.Pawn, pawnAmount, RewardSource.Quest, quest.QuestType, connectionIn));
+                        break;
+                    case PointType.JobPoints:
+                        packets.AddRange(server.ExpManager.AddJp(client, pawnMember.Pawn, playerAmount.BasePoints, RewardSource.Quest, quest.QuestType, connectionIn));
+                        break;
+                }
+            }
         }
 
         public virtual void EnforceInitialPoolEligibility() { }
