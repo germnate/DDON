@@ -1263,6 +1263,12 @@ namespace Arrowgene.Ddon.GameServer.Quests
                     continue;
                 }
 
+                if (quest.QuestType == QuestType.Main
+                    && !QuestManager.IsClientAlignedForMainQuestProgress(Server, memberClient, quest, questState.Step, connectionIn))
+                {
+                    continue;
+                }
+
                 if (result.Step != questState.Step && !quest.SaveWorkAsStep)
                 {
                     continue;
@@ -1324,13 +1330,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 // If this is a main quest, check to see that the member is currently on this quest, otherwise don't reward
                 if (quest.QuestType == QuestType.Main)
                 {
-                    var result = Server.Database.GetQuestProgressByScheduleId(memberClient.Character.CommonId, quest.QuestScheduleId, connectionIn);
-                    if (result == null)
-                    {
-                        continue;
-                    }
-
-                    if (result.Step != questState.Step)
+                    if (!QuestManager.IsClientAlignedForMainQuestProgress(Server, memberClient, quest, questState.Step, connectionIn))
                     {
                         continue;
                     }
@@ -1494,6 +1494,12 @@ namespace Arrowgene.Ddon.GameServer.Quests
             {
                 var result = Server.Database.GetQuestProgressByScheduleId(memberClient.Character.CommonId, questState.QuestScheduleId, connectionIn);
                 if (result == null)
+                {
+                    continue;
+                }
+
+                if (quest.QuestType == QuestType.Main
+                    && !QuestManager.IsClientAlignedForMainQuestProgress(Server, memberClient, quest, questState.Step, connectionIn))
                 {
                     continue;
                 }
