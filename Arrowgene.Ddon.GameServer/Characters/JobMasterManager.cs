@@ -15,6 +15,11 @@ namespace Arrowgene.Ddon.GameServer.Characters
     public class JobMasterManager
     {
         private static readonly ServerLogger Logger = LogProvider.Logger<ServerLogger>(typeof(JobMasterManager));
+        private static readonly Dictionary<uint, uint[]> EnemyUIIdAliases = new()
+        {
+            [(uint)EnemyUIId.Golgorran0] = [(uint)EnemyUIId.Golgorran0, (uint)EnemyUIId.Golgorran1],
+            [(uint)EnemyUIId.Golgorran1] = [(uint)EnemyUIId.Golgorran0, (uint)EnemyUIId.Golgorran1],
+        };
 
         private DdonGameServer Server;
 
@@ -47,7 +52,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             bool isOrbEnemy = enemy.BloodOrbs > 0;
 
             var matchingOrders = client.Character.JobMasterActiveOrders[jobId]
-                .Where(x => x.JobOrderProgressList.Any(c => (c.TargetId == targetId) || ((c.ConditionType == JobOrderCondType.BloodOrbEnemies) && isOrbEnemy)))
+                .Where(x => x.JobOrderProgressList.Any(c => TargetMatchesKilledEnemy(c, targetId, isOrbEnemy)))
                 .Where(x => x.OrderAccepted)
                 .ToList();
             if (matchingOrders.Count == 0)
@@ -64,7 +69,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 bool updatedRecord = false;
 
                 var matchingProgress = matchingOrder.JobOrderProgressList
-                    .Where(x => (x.TargetId == targetId) || (x.ConditionType == JobOrderCondType.BloodOrbEnemies && isOrbEnemy))
+                    .Where(x => TargetMatchesKilledEnemy(x, targetId, isOrbEnemy))
                     .Where(x => x.CurrentNum < x.TargetNum)
                     .Where(x => enemy.Lv >= x.TargetRank)
                     .ToList();
@@ -133,8 +138,16 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     ReleaseType = completedOrder.ReleaseType,
                 };
 
-                Server.Database.DeleteJobMasterActiveOrder(client.Character.CharacterId, jobId, completedOrder, connectionIn);
-                Server.Database.InsertJobMasterReleasedElement(client.Character.CharacterId, jobId, releasedElement, connectionIn);
+                if (!Server.Database.DeleteJobMasterActiveOrder(client.Character.CharacterId, jobId, completedOrder, connectionIn))
+                {
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_DB_FAILURE, "Failed to delete completed job training order");
+                }
+
+                if (!Server.Database.HasJobMasterReleasedElement(client.Character.CharacterId, jobId, releasedElement, connectionIn)
+                    && !Server.Database.InsertJobMasterReleasedElement(client.Character.CharacterId, jobId, releasedElement, connectionIn))
+                {
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_DB_FAILURE, "Failed to insert completed job training release");
+                }
 
                 newReleasedElement.Add(releasedElement);
 
@@ -183,11 +196,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             // Create the new order
-            Server.Database.InsertJobMasterActiveOrder(client.Character.CharacterId, jobId, match, connectionIn);
-            foreach (var condition in match.JobOrderProgressList)
-            {
-                Server.Database.InsertJobMasterActiveOrderProgress(client.Character.CharacterId, jobId, ReleaseType.CustomSkill, match.ReleaseId, condition, connectionIn);
-            }
+            Server.Database.InsertJobMasterActiveOrder(client.Character.CharacterId, jobId, CloneOrder(match), connectionIn);
 
             // Update the stored orders
             client.Character.JobMasterActiveOrders[jobId] = GetJobMasterActiveOrders(client.Character, jobId, connectionIn);
@@ -210,11 +219,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             // Create the new order
-            Server.Database.InsertJobMasterActiveOrder(client.Character.CharacterId, jobId, match, connectionIn);
-            foreach (var condition in match.JobOrderProgressList)
-            {
-                Server.Database.InsertJobMasterActiveOrderProgress(client.Character.CharacterId, jobId, ReleaseType.Augment, match.ReleaseId, condition, connectionIn);
-            }
+            Server.Database.InsertJobMasterActiveOrder(client.Character.CharacterId, jobId, CloneOrder(match), connectionIn);
 
             // Update the stored orders
             client.Character.JobMasterActiveOrders[jobId] = GetJobMasterActiveOrders(client.Character, jobId, connectionIn);
@@ -223,11 +228,25 @@ namespace Arrowgene.Ddon.GameServer.Characters
         public List<CDataActiveJobOrder> GetJobMasterActiveOrders(Character character, JobId jobId, DbConnection? connectionIn)
         {
             var results = Server.Database.GetJobMasterActiveOrders(character.CharacterId, jobId, connectionIn);
+            List<CDataActiveJobOrder> activeOrders = new();
             foreach (var activeOrder in results)
             {
-                activeOrder.JobOrderProgressList = Server.Database.GetJobMasterActiveOrderProgress(character.CharacterId, jobId, activeOrder.ReleaseType, activeOrder.ReleaseId, connectionIn);
+                var progress = Server.Database.GetJobMasterActiveOrderProgress(character.CharacterId, jobId, activeOrder.ReleaseType, activeOrder.ReleaseId, connectionIn);
+                var template = GetOrderTemplate(jobId, activeOrder);
+                if (template == null)
+                {
+                    activeOrder.JobOrderProgressList = progress;
+                    activeOrders.Add(activeOrder);
+                    Logger.Info($"No job master asset template found for CharacterId={character.CharacterId}, JobId={jobId}, ReleaseType={activeOrder.ReleaseType}, ReleaseId={activeOrder.ReleaseId}, ReleaseLv={activeOrder.ReleaseLv}. Using stored DB progress.");
+                    continue;
+                }
+
+                var hydratedOrder = CloneOrder(template);
+                hydratedOrder.OrderAccepted = activeOrder.OrderAccepted;
+                ApplyStoredProgress(hydratedOrder, progress);
+                activeOrders.Add(hydratedOrder);
             }
-            return results;
+            return activeOrders;
         }
 
         public PacketQueue HandleAreaChange(GameClient client)
@@ -243,6 +262,11 @@ namespace Arrowgene.Ddon.GameServer.Characters
             var ntc = new S2CJobMasterMarkTargetsNtc();
             foreach (var order in client.Character.JobMasterActiveOrders[jobId])
             {
+                if (!order.OrderAccepted)
+                {
+                    continue;
+                }
+
                 foreach (var target in order.JobOrderProgressList)
                 {
                     if (target.CurrentNum >= target.TargetNum)
@@ -250,20 +274,91 @@ namespace Arrowgene.Ddon.GameServer.Characters
                         continue;
                     }
 
-                    ntc.TargetList.Add(new CDataJobMasterTargetData()
+                    foreach (var targetId in GetEquivalentEnemyUIIds(target.TargetId))
                     {
-                        ReleaseType = order.ReleaseType,
-                        ReleaseLv = order.ReleaseLv,
-                        ReleaseId = order.ReleaseId,
-                        Condition = target.ConditionType,
-                        TargetId = target.TargetId,
-                        TargetRank = target.TargetRank,
-                    });
+                        ntc.TargetList.Add(new CDataJobMasterTargetData()
+                        {
+                            ReleaseType = order.ReleaseType,
+                            ReleaseLv = order.ReleaseLv,
+                            ReleaseId = order.ReleaseId,
+                            Condition = target.ConditionType,
+                            TargetId = targetId,
+                            TargetRank = target.TargetRank,
+                        });
+                    }
                 }
             }
             packets.Enqueue(client, ntc);
 
             return packets;
+        }
+
+        private static bool TargetMatchesKilledEnemy(CDataJobOrderProgress target, uint killedTargetId, bool isOrbEnemy)
+        {
+            return (target.ConditionType == JobOrderCondType.BloodOrbEnemies && isOrbEnemy)
+                || GetEquivalentEnemyUIIds(target.TargetId).Contains(killedTargetId);
+        }
+
+        private static uint[] GetEquivalentEnemyUIIds(uint targetId)
+        {
+            return EnemyUIIdAliases.GetValueOrDefault(targetId, [targetId]);
+        }
+
+        private CDataActiveJobOrder GetOrderTemplate(JobId jobId, CDataActiveJobOrder activeOrder)
+        {
+            if (!Server.AssetRepository.JobMasterAsset.JobOrders.TryGetValue(jobId, out var jobOrders)
+                || !jobOrders.TryGetValue(activeOrder.ReleaseType, out var releaseOrders)
+                || !releaseOrders.TryGetValue(activeOrder.ReleaseId, out var orders))
+            {
+                return null;
+            }
+
+            return orders
+                .Where(x => x.ReleaseType == activeOrder.ReleaseType)
+                .Where(x => x.ReleaseId == activeOrder.ReleaseId)
+                .Where(x => x.ReleaseLv == activeOrder.ReleaseLv)
+                .FirstOrDefault();
+        }
+
+        private static CDataActiveJobOrder CloneOrder(CDataActiveJobOrder source)
+        {
+            return new CDataActiveJobOrder()
+            {
+                ReleaseType = source.ReleaseType,
+                ReleaseId = source.ReleaseId,
+                ReleaseLv = source.ReleaseLv,
+                OrderAccepted = source.OrderAccepted,
+                JobOrderProgressList = source.JobOrderProgressList.Select(CloneProgress).ToList()
+            };
+        }
+
+        private static CDataJobOrderProgress CloneProgress(CDataJobOrderProgress source)
+        {
+            return new CDataJobOrderProgress()
+            {
+                ConditionType = source.ConditionType,
+                TargetId = source.TargetId,
+                TargetRank = source.TargetRank,
+                TargetNum = source.TargetNum,
+                CurrentNum = source.CurrentNum,
+            };
+        }
+
+        private static void ApplyStoredProgress(CDataActiveJobOrder order, List<CDataJobOrderProgress> storedProgress)
+        {
+            var progressLookup = storedProgress
+                .GroupBy(x => (x.ConditionType, x.TargetId, x.TargetRank))
+                .ToDictionary(x => x.Key, x => x.Max(y => y.CurrentNum));
+
+            foreach (var condition in order.JobOrderProgressList)
+            {
+                if (!progressLookup.TryGetValue((condition.ConditionType, condition.TargetId, condition.TargetRank), out var currentNum))
+                {
+                    continue;
+                }
+
+                condition.CurrentNum = Math.Min(currentNum, condition.TargetNum);
+            }
         }
     }
 }
