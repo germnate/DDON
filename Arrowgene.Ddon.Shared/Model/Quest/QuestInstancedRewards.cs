@@ -16,6 +16,11 @@ public class InstancedLootPoolItem : LootPoolItem
         return Guid.CreateVersion7(DateTimeOffset.UtcNow).ToString();
     }
 
+    public override string GetUID(QuestRewardType rewardType, bool isHelp = false, uint selectGroupId = 0)
+    {
+        return GetUID();
+    }
+
     public StagedRewardItem ToStagedRewardItem()
     {
         string uid = GetUID();
