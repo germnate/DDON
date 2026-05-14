@@ -6,21 +6,86 @@ using Arrowgene.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 
 namespace Arrowgene.Ddon.Shared.AssetReader
 {
-    public class EpitaphTrialAssetDeserializer
+    public class EpitaphTrialAssetDeserializer : IDirectoryAssetHandler
     {
         private static readonly ILogger Logger = LogProvider.Logger(typeof(EpitaphTrialAssetDeserializer));
 
         private AssetCommonDeserializer _CommonEnemyDeserializer;
         private QuestDropItemAsset _QuestDrops;
+        private readonly EpitaphTrialAsset _liveAsset;
 
-        public EpitaphTrialAssetDeserializer(AssetCommonDeserializer commonEnemyDeserializer, QuestDropItemAsset questDrops)
+        public EpitaphTrialAssetDeserializer(AssetCommonDeserializer commonEnemyDeserializer, QuestDropItemAsset questDrops, EpitaphTrialAsset liveAsset)
         {
             _CommonEnemyDeserializer = commonEnemyDeserializer;
             _QuestDrops = questDrops;
+            _liveAsset = liveAsset;
+        }
+
+        public string DirectoryKey => AssetRepository.EpitaphAssestKey;
+        public string Filter => "*.json";
+        public object LiveAsset => _liveAsset;
+
+        public bool OnFileChanged(string filePath)
+        {
+            var freshEntry = new EpitaphTrialAsset();
+            if (!LoadTrialFromFile(filePath, freshEntry))
+                return false;
+
+            var newTrials = BuildTrialsExcluding(filePath);
+            foreach (var (k, v) in freshEntry.Trials)
+            {
+                if (!newTrials.ContainsKey(k))
+                    newTrials[k] = new List<EpitaphTrial>();
+                newTrials[k].AddRange(v);
+            }
+
+            var newObjects = BuildObjectsExcluding(filePath);
+            foreach (var (k, v) in freshEntry.EpitahObjects)
+                newObjects[k] = v;
+
+            _liveAsset.Trials = newTrials;
+            _liveAsset.EpitahObjects = newObjects;
+            return true;
+        }
+
+        public void OnFileRemoved(string filePath)
+        {
+            _liveAsset.Trials = BuildTrialsExcluding(filePath);
+            _liveAsset.EpitahObjects = BuildObjectsExcluding(filePath);
+        }
+
+        private Dictionary<StageLayoutId, List<EpitaphTrial>> BuildTrialsExcluding(string filePath)
+        {
+            var result = new Dictionary<StageLayoutId, List<EpitaphTrial>>();
+            foreach (var (stageId, list) in _liveAsset.Trials)
+            {
+                var kept = list.Where(t => t.SourceFile != filePath).ToList();
+                if (kept.Count > 0)
+                    result[stageId] = kept;
+            }
+            return result;
+        }
+
+        private Dictionary<uint, EpitaphObject> BuildObjectsExcluding(string filePath)
+        {
+            var result = new Dictionary<uint, EpitaphObject>();
+            foreach (var (id, obj) in _liveAsset.EpitahObjects)
+            {
+                bool fromFile = obj switch
+                {
+                    EpitaphTrial t => t.SourceFile == filePath,
+                    EpitaphTrialOption opt => opt.Parent.SourceFile == filePath,
+                    _ => false
+                };
+                if (!fromFile)
+                    result[id] = obj;
+            }
+            return result;
         }
 
         public bool LoadTrialsFromDirectory(string path, EpitaphTrialAsset trialAssets)
@@ -35,34 +100,41 @@ namespace Arrowgene.Ddon.Shared.AssetReader
             Logger.Info($"Reading epitaph road trial files from {path}");
             foreach (var file in info.EnumerateFiles())
             {
-                Logger.Info($"{file.FullName}");
+                LoadTrialFromFile(file.FullName, trialAssets);
+            }
 
-                string json = Util.ReadAllText(file.FullName);
-                JsonDocument document = JsonDocument.Parse(json);
+            return true;
+        }
 
-                var assetData = new EpitaphTrial();
-                if (!ParseTrial(assetData, document.RootElement))
+        public bool LoadTrialFromFile(string filePath, EpitaphTrialAsset trialAssets)
+        {
+            Logger.Info($"{filePath}");
+
+            string json = Util.ReadAllText(filePath);
+            JsonDocument document = JsonDocument.Parse(json);
+
+            var assetData = new EpitaphTrial() { SourceFile = filePath };
+            if (!ParseTrial(assetData, document.RootElement))
+            {
+                Logger.Error($"Unable to parse '{filePath}'. Skipping.");
+                return false;
+            }
+
+            if (!trialAssets.Trials.ContainsKey(assetData.OmLayoutId))
+            {
+                trialAssets.Trials[assetData.OmLayoutId] = new List<EpitaphTrial>();
+            }
+
+            trialAssets.Trials[assetData.OmLayoutId].Add(assetData);
+            trialAssets.EpitahObjects[assetData.EpitaphId] = assetData;
+
+            foreach (var option in assetData.Options)
+            {
+                if (trialAssets.EpitahObjects.ContainsKey(option.EpitaphId))
                 {
-                    Logger.Error($"Unable to parse '{file.FullName}'. Skipping.");
-                    continue;
+                    Logger.Error($"Multiple Epitaph trials options have TrialId={option.EpitaphId}");
                 }
-
-                if (!trialAssets.Trials.ContainsKey(assetData.OmLayoutId))
-                {
-                    trialAssets.Trials[assetData.OmLayoutId] = new List<EpitaphTrial>();
-                }
-
-                trialAssets.Trials[assetData.OmLayoutId].Add(assetData);
-                trialAssets.EpitahObjects[assetData.EpitaphId] = assetData;
-
-                foreach (var option in assetData.Options)
-                {
-                    if (trialAssets.EpitahObjects.ContainsKey(option.EpitaphId))
-                    {
-                        Logger.Error($"Multiple Epitaph trials options have TrialId={option.EpitaphId}");
-                    }
-                    trialAssets.EpitahObjects[option.EpitaphId] = option;
-                }
+                trialAssets.EpitahObjects[option.EpitaphId] = option;
             }
 
             return true;

@@ -163,6 +163,8 @@ namespace Arrowgene.Ddon.GameServer
             WorldQuestManager.Initialize();
             GpCourseManager.EvaluateCourses();
 
+            AssetRepository.AssetChanged += OnAssetChanged;
+
             if (ServerUtils.IsHeadServer(this))
             {
                 ScheduleManager.StartServerTasks();
@@ -171,6 +173,19 @@ namespace Arrowgene.Ddon.GameServer
             LoadChatHandler();
             LoadPacketHandler();
             base.Start();
+        }
+
+        private void OnAssetChanged(object sender, AssetChangedEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case AssetRepository.QuestAssestKey:
+                    QuestManager.ReloadJsonQuests(this);
+                    break;
+                case AssetRepository.EpitaphAssestKey:
+                    Logger.Info("Epitaph trial JSON directory changed, hotloaded.");
+                    break;
+            }
         }
 
         protected override void ClientConnected(GameClient client)

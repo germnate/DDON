@@ -20,7 +20,7 @@ public class CDataRewardBoxItem
     public bool IsHelp { get; set; }
     public uint SelectGroupId { get; set; }
 
-    // Server-side only — not serialized to the client
+    // Server-side only - not serialized to the client
     public long RewardBoxItemId { get; set; }
     public bool IsInstance { get; set; }
     public StagedRewardItem? StagedItem { get; set; }

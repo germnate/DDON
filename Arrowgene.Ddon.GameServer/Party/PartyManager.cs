@@ -88,7 +88,7 @@ public class PartyManager
                     $"PartyMemberCount:{invitation.Party.MemberCount()} " +
                     $"AliveClients:{invitation.Party.Clients.Count}");
 
-        // KickNtc must be sent before Leave() — after Leave() frees the slot, SendToAll
+        // KickNtc must be sent before Leave() - after Leave() frees the slot, SendToAll
         // won't include the invitee and they won't see their own ghost slot removal.
         if (memberIndex != PartyGroup.InvalidSlotIndex)
         {

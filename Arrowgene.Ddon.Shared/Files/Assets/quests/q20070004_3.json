@@ -167,7 +167,7 @@
         },
         {
           "type": "MyQstFlags",
-          "announce_type": "Update",
+          "announce_type": "CheckpointAndUpdate",
           "check_flags": [2, 3]
         },
         {
@@ -177,7 +177,7 @@
             "group_id": 1,
             "layer_no": 1
           },
-          "announce_type": "Update",
+          "announce_type": "CheckpointAndUpdate",
           "npc_id": "Lent",
           "message_id": 11275
         }

@@ -3,9 +3,11 @@ using Arrowgene.Ddon.GameServer.Quests;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
+using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -31,12 +33,21 @@ namespace Arrowgene.Ddon.GameServer.Handler
             if (client.Party.Leader?.Client == client && client.Party.QuestState.GetActiveQuestScheduleIds().Count == 0)
             {
                 var progress = Server.Database.GetQuestProgressByType(client.Character.CommonId, QuestType.All);
+                var deliveryProgressByQuest = Server.Database.GetAllQuestDeliveryProgress(client.Character.CommonId)
+                    .GroupBy(x => x.QuestScheduleId)
+                    .ToDictionary(g => g.Key, g => g.ToList());
                 foreach (var questProgress in progress)
                 {
                     var quest = QuestManager.GetQuestByScheduleId(questProgress.QuestScheduleId);
                     if (quest is null) continue;
                     QuestStateManager questStateManager = QuestManager.GetQuestStateManager(client, quest);
                     questStateManager.AddNewQuest(questProgress.QuestScheduleId, questProgress.Step);
+
+                    if (deliveryProgressByQuest.TryGetValue(questProgress.QuestScheduleId, out var deliveryItems))
+                    {
+                        foreach (var dp in deliveryItems)
+                            questStateManager.RestoreDeliveryProgress(questProgress.QuestScheduleId, (ItemId)dp.ItemId, dp.AmountDelivered);
+                    }
                 }
                 Logger.Info(client, $"[QuestGetSetQuestList] Reloaded quest state for promoted leader {client.Character.CharacterId}");
             }
@@ -58,6 +69,13 @@ namespace Arrowgene.Ddon.GameServer.Handler
             {
                 client.Send(ntc);
             }
+
+            // Resync the client's delivery UI with any partial deliveries already in memory.
+            uint charId = client.Character.CharacterId;
+            foreach (var deliveryNtc in client.QuestState.GetRestoredDeliveryNtcs(charId))
+                client.Send(deliveryNtc);
+            foreach (var deliveryNtc in client.Party.QuestState.GetRestoredDeliveryNtcs(charId))
+                client.Send(deliveryNtc);
 
             return res;
         }

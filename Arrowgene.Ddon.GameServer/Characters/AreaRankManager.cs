@@ -320,7 +320,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return false;
             }
 
-            // Scripted quests may have QuestAreaId = None — resolve from the stored rankings
+            // Scripted quests may have QuestAreaId = None - resolve from the stored rankings
             var areaId = quest.QuestAreaId != QuestAreaId.None
                 ? quest.QuestAreaId
                 : QuestManager.GetAreaIdForTrial(quest.QuestScheduleId);

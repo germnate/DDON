@@ -69,7 +69,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             }
 
             if (selectedRewards
-                .Where(x => x.SelectGroupId != 0 && x.Type == (byte)QuestRewardType.Select)
+                .Where(x => x.SelectGroupId != 0)
                 .GroupBy(x => x.SelectGroupId)
                 .Any(x => x.Count() > 1))
             {

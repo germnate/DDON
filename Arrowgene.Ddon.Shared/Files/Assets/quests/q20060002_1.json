@@ -181,7 +181,7 @@
         },
         {
           "type": "CollectItem",
-          "announce_type": "Update",
+          "announce_type": "CheckpointAndUpdate",
           "stage_id": {
             "id": 112,
             "group_id": 2,
@@ -252,7 +252,7 @@
         },
         {
           "type": "CollectItem",
-          "announce_type": "Update",
+          "announce_type": "CheckpointAndUpdate",
           "stage_id": {
             "id": 112,
             "group_id": 3,
@@ -328,7 +328,7 @@
             "group_id": 1,
             "layer_no": 1
           },
-          "announce_type": "Update",
+          "announce_type": "CheckpointAndUpdate",
           "npc_id": "Soldier0",
           "message_id": 11223
         }
