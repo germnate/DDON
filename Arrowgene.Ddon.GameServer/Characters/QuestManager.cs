@@ -2661,16 +2661,16 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsPlayerSpecificLayoutFlag, Param01 = playerId, Param02 = flagId, Param03 = expectedValue, Param04 = param04 };
             }
 
-            /** @brief Checks if a quest enemy group (type 3) is alive. */
-            public static CDataQuestCommand IsQuestEnemyAlive(uint stageNo, int groupNo, int setNo, int param04 = 0)
+            /** @brief Checks if an OM has finished its animation. */
+            public static CDataQuestCommand OmEndAnimation(uint stageNo, int groupNo, int setNo, int param04 = 0)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsQuestEnemyAlive, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.OmEndAnimation, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
             }
 
-            /** @brief Duplicate/variant of IsQuestEnemyAlive. */
-            public static CDataQuestCommand IsQuestEnemyAlive2(uint stageNo, int groupNo, int setNo, int param04 = 0)
+            /** @brief Variant of OmEndAnimation without a marker. */
+            public static CDataQuestCommand OmEndAnimationNoMarker(uint stageNo, int groupNo, int setNo, int param04 = 0)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsQuestEnemyAlive2, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.OmEndAnimationNoMarker, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
             }
 
             /** @brief Area-aware version of IsQuestEnemyAlive using FUN_00a41890 when an area instance exists. */
@@ -2715,10 +2715,10 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsEnemyFoundForOrderRadius, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
             }
 
-            /** @brief Checks if a pawn with pawnId is active/available in the pawn list. */
-            public static CDataQuestCommand IsPawnAvailable(int pawnId, int param02 = 0, int param03 = 0, int param04 = 0)
+            /** @brief Checks if player has an achievement from a given category. */
+            public static CDataQuestCommand HasAchievement(int categoryNo, int achievementId, int param03 = 0, int param04 = 0)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsPawnAvailable, Param01 = pawnId, Param02 = param02, Param03 = param03, Param04 = param04 };
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.HasAchievement, Param01 = categoryNo, Param02 = achievementId, Param03 = param03, Param04 = param04 };
             }
 
             /** @brief Returns bit 19 of the substory state word at ctx+0x5c+0x20c. */
@@ -2829,10 +2829,10 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsContentsModeStateFlag, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
             }
 
-            /** @brief Checks if a quest enemy's HP-lost% <= hpLostPct (i.e., enemy HP >= threshold). */
-            public static CDataQuestCommand IsQuestEnemyHpNotGreater(uint stageNo, int groupNo, int setNo, int hpLostPct)
+            /** @brief Checks if a quest layout's HP-lost% <= hpLostPct (i.e., layout HP >= threshold). */
+            public static CDataQuestCommand IsQuestLayoutHpNotGreater(uint stageNo, int groupNo, int setNo, int hpLostPct)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsQuestEnemyHpNotGreater, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = hpLostPct };
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsQuestLayoutHpNotGreater, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = hpLostPct };
             }
 
             /** @brief Grand Mission / Extreme Mission: checks if an area-linkage flag (type-9) is set. flagKey matched against entry+4. */
@@ -3817,10 +3817,10 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.AddFsmTalkNpc, Param01 = npcId, Param02 = param02, Param03 = param03, Param04 = param04 };
             }
 
-            /** @brief Sends an animation/event trigger to a substory enemy group. If flagValue != 0, also calls FUN_00bd3870. */
-            public static CDataQuestCommand SetSubstoryEnemyGroupFlag(int groupId, int flagValue, int param03 = 0, int param04 = 0)
+            /** @brief Displays an achievement banner from a given category. Only category 6 (Great Purpose) has banners to display. */
+            public static CDataQuestCommand AchievementBanner(int categoryNo, int bannerNo, int param03 = 0, int param04 = 0)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetSubstoryEnemyGroupFlag, Param01 = groupId, Param02 = flagValue, Param03 = param03, Param04 = param04 };
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.AchievementBanner, Param01 = categoryNo, Param02 = bannerNo, Param03 = param03, Param04 = param04 };
             }
 
             /** @brief Enables substory element variant B. Sets +0x4c reference via FUN_00598860. */
