@@ -248,11 +248,121 @@ namespace Arrowgene.Ddon.Shared
             // This must be set before calling QuestAssetDeserializer and EpitaphTrialAssetDeserializer
             var commonEnemyDeserializer = new AssetCommonDeserializer(this.NamedParamAsset);
 
-            var questAssetDeserializer = new QuestAssetDeserializer(commonEnemyDeserializer, QuestDropItemAsset, QuestScheduleIdAsset);
+            var questAssetDeserializer = new QuestAssetDeserializer(commonEnemyDeserializer, QuestDropItemAsset, QuestScheduleIdAsset, QuestAssets);
             questAssetDeserializer.LoadQuestsFromDirectory(Path.Combine(_directory.FullName, QuestAssestKey), QuestAssets);
+            RegisterDirectoryWatcher(questAssetDeserializer);
 
-            var epitaphTrialDeserializer = new EpitaphTrialAssetDeserializer(commonEnemyDeserializer, QuestDropItemAsset);
+            var epitaphTrialDeserializer = new EpitaphTrialAssetDeserializer(commonEnemyDeserializer, QuestDropItemAsset, EpitaphTrialAssets);
             epitaphTrialDeserializer.LoadTrialsFromDirectory(Path.Combine(_directory.FullName, EpitaphAssestKey), EpitaphTrialAssets);
+            RegisterDirectoryWatcher(epitaphTrialDeserializer);
+        }
+
+        private void RegisterDirectoryWatcher(IDirectoryAssetHandler handler)
+        {
+            string dirPath = Path.Combine(_directory.FullName, handler.DirectoryKey);
+            if (_fileSystemWatchers.ContainsKey(handler.DirectoryKey) || !Directory.Exists(dirPath))
+                return;
+
+            // One lock per directory: serializes concurrent watcher callbacks and holds
+            // through OnAssetChanged so downstream consumers (e.g. QuestManager.ReloadJsonQuests)
+            // cannot read the live asset list while a callback is still mutating it.
+            var handlerLock = new object();
+            var debounceTimers = new Dictionary<string, Timer>();
+            const int DebounceMs = 200;
+
+            void scheduleChange(string fullPath)
+            {
+                lock (handlerLock)
+                {
+                    if (debounceTimers.TryGetValue(fullPath, out var existing))
+                    {
+                        existing.Change(DebounceMs, Timeout.Infinite);
+                    }
+                    else
+                    {
+                        debounceTimers[fullPath] = new Timer(_ =>
+                        {
+                            lock (handlerLock)
+                                debounceTimers.Remove(fullPath);
+                            ReloadWithRetry(fullPath, () =>
+                            {
+                                lock (handlerLock)
+                                {
+                                    if (handler.OnFileChanged(fullPath))
+                                        OnAssetChanged(handler.DirectoryKey, handler.LiveAsset);
+                                }
+                            });
+                        }, null, DebounceMs, Timeout.Infinite);
+                    }
+                }
+            }
+
+            void handleDelete(string fullPath)
+            {
+                lock (handlerLock)
+                {
+                    if (debounceTimers.TryGetValue(fullPath, out var timer))
+                    {
+                        timer.Dispose();
+                        debounceTimers.Remove(fullPath);
+                    }
+                    handler.OnFileRemoved(fullPath);
+                    OnAssetChanged(handler.DirectoryKey, handler.LiveAsset);
+                }
+            }
+
+            bool matchesFilter(string path)
+            {
+                if (handler.Filter == "*" || handler.Filter == "*.*")
+                    return true;
+                if (handler.Filter.StartsWith("*."))
+                    return path.EndsWith(handler.Filter[1..], StringComparison.OrdinalIgnoreCase);
+                return string.Equals(Path.GetFileName(path), handler.Filter, StringComparison.OrdinalIgnoreCase);
+            }
+
+            FileSystemWatcher watcher = new FileSystemWatcher(dirPath, handler.Filter);
+            watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.CreationTime;
+            watcher.Changed += (s, e) => scheduleChange(e.FullPath);
+            watcher.Created += (s, e) => scheduleChange(e.FullPath);
+            watcher.Deleted += (s, e) => handleDelete(e.FullPath);
+            watcher.Renamed += (s, e) =>
+            {
+                if (matchesFilter(e.OldFullPath))
+                    handleDelete(e.OldFullPath);
+                if (matchesFilter(e.FullPath))
+                    scheduleChange(e.FullPath);
+            };
+            watcher.EnableRaisingEvents = true;
+            _fileSystemWatchers.Add(handler.DirectoryKey, watcher);
+        }
+
+        private void ReloadWithRetry(string filePath, Action action)
+        {
+            int attempts = 0;
+            while (true)
+            {
+                try
+                {
+                    action();
+                    break;
+                }
+                catch (IOException ex)
+                {
+                    attempts++;
+                    Logger.Info($"Attempt {attempts} to reload '{filePath}' unsuccessful.");
+                    if (attempts > 10)
+                    {
+                        Logger.Write(LogLevel.Error, $"Failed to reload '{filePath}' after {attempts} attempts. Giving up.", ex);
+                        break;
+                    }
+                    Thread.Sleep(1000);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Write(LogLevel.Error, $"Failed to reload '{filePath}' due to a parse error. Live data is unchanged.", ex);
+                    break;
+                }
+            }
         }
 
         private void RegisterAsset<T>(Action<T> onLoadAction, string key, IAssetDeserializer<T> readerWriter)

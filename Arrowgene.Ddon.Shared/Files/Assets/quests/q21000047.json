@@ -213,7 +213,7 @@
                     "stage_id": {
                         "id": 317
                     },
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "npc_id": "549",
                     "message_id": 11842
                 }

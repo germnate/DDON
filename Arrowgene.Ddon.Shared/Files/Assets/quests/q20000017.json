@@ -80,7 +80,7 @@
         "group_id": 0
       },
       "npc_id": "Fabio0",
-      "announce_type": "Update",
+      "announce_type": "CheckpointAndUpdate",
       "result_commands": [
         {
           "comment": "Idle dialogue",
@@ -105,7 +105,7 @@
         "group_id": 0
       },
       "npc_id": "Fabio0",
-      "announce_type": "Update",
+      "announce_type": "CheckpointAndUpdate",
       "result_commands": [
         {
           "comment": "Idle dialogue",

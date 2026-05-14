@@ -153,7 +153,6 @@
                         {"type": "QstLayout", "action": "Clear", "value": 1026, "comment": "Spawns Karno, White Knight and Gerd"},
                         {"type": "QstLayout", "action": "Set", "value": 919, "comment": "Blocks Boss Room"}
                     ],
-                    "announce_type": "Update",
                     "groups": [0]
                 },
                 {

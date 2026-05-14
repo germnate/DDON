@@ -71,7 +71,25 @@ public class ChatCommand : IChatCommand
         var (queue, isSpecial) = server.ItemManager.HandleSpecialItem(client, ntc, (ItemId)itemId, amount);
         if (!isSpecial)
         {
-            ntc.UpdateItemList.AddRange(server.ItemManager.AddItem(server, client.Character, true, itemId, amount));
+            var itemInfo = server.AssetRepository.ClientItemInfos[itemId];
+            var destinationStorage = force ? StorageType.StorageBoxNormal : itemInfo.StorageType;
+            if (!server.ItemManager.CanAddItem(client.Character, destinationStorage, itemId, amount))
+            {
+                string hint = force
+                    ? "Storage is also full."
+                    : $"Use `/giveitem {itemId} {amount} true` to send regular items to storage.";
+                responses.Add(ChatResponse.CommandError(client, $"Not enough room in {destinationStorage} for {itemInfo.Name} x{amount}. {hint}"));
+                return;
+            }
+
+            if (force)
+            {
+                ntc.UpdateItemList.AddRange(server.ItemManager.AddItem(server, client.Character, StorageType.StorageBoxNormal, itemId, amount));
+            }
+            else
+            {
+                ntc.UpdateItemList.AddRange(server.ItemManager.AddItem(server, client.Character, true, itemId, amount));
+            }
         }
 
         queue.Send();

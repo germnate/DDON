@@ -65,7 +65,7 @@
                 },
                 {
                     "type": "Raw",
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "check_commands": [
                         {"type": "TalkNpc", "Param1": 930, "Param2": 2600},
                         {"type": "IngameTimeRangeEq", "Param1": 11, "Param2": 15}
@@ -76,7 +76,7 @@
                 },
                 {
                     "type": "Raw",
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "result_commands": [
                         {"type": "MyQstFlagOn", "Param1": 0},
                         {"type": "QstTalkChg", "Param1": 2501, "Param2": 19672}
@@ -87,7 +87,7 @@
                 },
                 {
                     "type": "DeliverItems",
-                    "announce_type": "Update",
+                    "announce_type": "CheckpointAndUpdate",
                     "stage_id": {
                         "id": 341
                     },

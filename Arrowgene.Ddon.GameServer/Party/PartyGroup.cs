@@ -359,7 +359,7 @@ namespace Arrowgene.Ddon.GameServer.Party
                 PlayerPartyMember partyMember = GetPlayerPartyMember(client);
                 if (partyMember == null)
                 {
-                    // Not in this party at all — nothing to clean up.
+                    // Not in this party at all - nothing to clean up.
                     return;
                 }
 

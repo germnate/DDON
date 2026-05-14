@@ -1213,7 +1213,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 RewardBoxItemId = reward.RewardBoxItemId,
                 ItemId = reward.ItemId,
                 Num = reward.Num,
-                UID = reward.UID,
+                UID = GetRewardBoxItemUID(reward),
                 Type = reward.Type,
                 IsCharge = reward.IsCharge,
                 IsHelp = reward.IsHelp,
@@ -1278,10 +1278,20 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 ItemId = item.ItemId,
                 Num = item.Num,
                 Type = (byte)rewardType,
-                UID = item.GetUID(),
+                UID = item.GetUID(rewardType, isHelp, selectGroupId),
                 IsHelp = isHelp,
                 SelectGroupId = selectGroupId,
             };
+        }
+
+        private static string GetRewardBoxItemUID(CDataRewardBoxItem item)
+        {
+            if (item.IsInstance)
+            {
+                return item.UID;
+            }
+
+            return LootPoolItem.CreateUID(item.ItemId, item.Num, (QuestRewardType)item.Type, item.IsHelp, item.SelectGroupId);
         }
 
         private void AppendCategorizedRewardBoxItems(List<CDataRewardBoxItem> results, QuestBoxRewards rewards)

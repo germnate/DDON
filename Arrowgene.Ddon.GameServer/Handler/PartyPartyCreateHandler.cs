@@ -6,6 +6,7 @@ using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
+using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -31,6 +32,9 @@ namespace Arrowgene.Ddon.GameServer.Handler
             party.QuestState.EnforceInitialPoolEligibility();
             
             var progress = Server.Database.GetQuestProgressByType(client.Character.CommonId, QuestType.All);
+            var deliveryProgressByQuest = Server.Database.GetAllQuestDeliveryProgress(client.Character.CommonId)
+                .GroupBy(x => x.QuestScheduleId)
+                .ToDictionary(g => g.Key, g => g.ToList());
             foreach (var questProgress in progress)
             {
                 var quest = QuestManager.GetQuestByScheduleId(questProgress.QuestScheduleId);
@@ -43,6 +47,12 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
                 QuestStateManager questStateManager = QuestManager.GetQuestStateManager(client, quest);
                 questStateManager.AddNewQuest(questProgress.QuestScheduleId, questProgress.Step);
+
+                if (deliveryProgressByQuest.TryGetValue(questProgress.QuestScheduleId, out var deliveryItems))
+                {
+                    foreach (var dp in deliveryItems)
+                        questStateManager.RestoreDeliveryProgress(questProgress.QuestScheduleId, (ItemId)dp.ItemId, dp.AmountDelivered);
+                }
             }
 
             // Add quest for debug command
