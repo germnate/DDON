@@ -167,10 +167,10 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         AddFsmTalkNpc = 107, // 0x00633B30 (cQuestProcess* this, s32 npcId, s32 param02, s32 param03, s32 param04)
 
         /// <summary>
-        /// Sends an animation/event trigger (opcode 0x21 via FUN_00b68090) to a substory enemy group.
-        /// If param02 != 0, calls FUN_00bd3870(param01, param02-1).
+        /// Displays an achievement banner from a given category.
+        /// Only category 6 (Great Purpose) has banners to display.
         /// </summary>
-        SetSubstoryEnemyGroupFlag = 108, // 0x00633B80 (cQuestProcess* this, s32 groupId, s32 flagValue, s32 param03, s32 param04)
+        AchievementBanner = 108, // 0x00633B80 (cQuestProcess* this, s32 categoryNo, s32 bannerNo, s32 param03, s32 param04)
 
         /// <summary>
         /// Enables substory element variant B. Gets area context, calls FUN_00bdee50(0xb) then FUN_00598860 to set +0x4c.

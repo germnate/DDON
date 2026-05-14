@@ -287,12 +287,12 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// <summary>
         /// Checks if a quest enemy group (type 3) is alive. Looks up via FUN_00a41780, checks status bit 15 via FUN_00bc2da0.
         /// </summary>
-        IsQuestEnemyAlive = 221, // 0x00636000 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
+        OmEndAnimation = 221, // 0x00636000 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
 
         /// <summary>
         /// Duplicate/variant of IsQuestEnemyAlive (221). Same decompilation, may differ in calling convention.
         /// </summary>
-        IsQuestEnemyAlive2 = 222, // 0x00636060 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
+        OmEndAnimationNoMarker = 222, // 0x00636060 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
 
         /// <summary>
         /// Area-aware version of IsQuestEnemyAlive. Uses FUN_00a41890 when an area instance exists (FUN_009cff70 != 0).
@@ -363,13 +363,10 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         IsEnemyFoundForOrderRadius = 231, // 0x00636610 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04_unused)
 
         /// <summary>
-        /// Checks if a pawn with a given ID is active/available. Retrieves the pawn list manager via
-        /// FUN_00868170() (accesses this+0x29cc+0x45c), iterates entries matching pawnId against entry+8,
-        /// and returns true if a match is found with entry+0x18 or entry+0x1c non-zero (active state).
-        /// Only two parameters are used (this, pawnId); params 3 and 4 are ignored.
-        /// @note Previous description "action type 6" was incorrect — no such constant exists in the decompilation.
+        /// Checks if player has an achievement from a given category.
+        /// Only seems to work for category 6 (Great Purpose).
         /// </summary>
-        IsPawnAvailable = 233, // 0x00636900 (cQuestProcess* this, s32 pawnId, s32 param02_unused, s32 param03_unused, s32 param04_unused)
+        HasAchievement = 233, // 0x00636900 (cQuestProcess* this, s32 categoryNo, s32 achievementId, s32 param03_unused, s32 param04_unused)
 
         /// <summary>
         /// Returns bit 19 of the substory state word at this→substory+0x20c (offset 0x5c+0x20c from base).
@@ -497,11 +494,11 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         Padding254 = 254, // 0x00637860 stub/nop — always returns 0
 
         /// <summary>
-        /// Checks if a quest enemy's HP-lost percentage &lt;= hpLostPct. Looks up enemy (type 3) via FUN_00a41780,
+        /// Checks if a quest layout's HP-lost percentage &lt;= hpLostPct. Looks up layout (type 3) via FUN_00a41780,
         /// computes HP lost% via FUN_00bc0ab0 (= 100 - current/max*100), returns true if 0 &lt;= lost% &lt;= hpLostPct.
-        /// Effectively: enemy HP >= threshold.
+        /// Effectively: layout HP >= threshold.
         /// </summary>
-        IsQuestEnemyHpNotGreater = 255, // 0x00637890 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 hpLostPct)
+        IsQuestLayoutHpNotGreater = 255, // 0x00637890 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 hpLostPct)
 
         /// <summary>
         /// Checks whether a Grand Mission / Area-Linkage battle content flag (sub-type 9) is set.

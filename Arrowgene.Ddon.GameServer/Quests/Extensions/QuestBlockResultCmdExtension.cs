@@ -344,9 +344,9 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddResultCmdSetSubstoryEnemyGroupFlag(this QuestBlock questBlock, int groupId, int flagValue)
+        public static QuestBlock AddResultCmdAchievementBanner(this QuestBlock questBlock, int categoryNo, int bannerNo)
         {
-            questBlock.ResultCommands.AddResultCmdSetSubstoryEnemyGroupFlag(groupId, flagValue);
+            questBlock.ResultCommands.AddResultCmdAchievementBanner(categoryNo, bannerNo);
             return questBlock;
         }
 
@@ -467,6 +467,12 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
         public static QuestBlock AddResultCmdResetRandom(this QuestBlock questBlock, int randomNo)
         {
             questBlock.ResultCommands.AddResultCmdResetRandom(randomNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdStopMessage(this QuestBlock questBlock)
+        {
+            questBlock.ResultCommands.AddResultCmdStopMessage();
             return questBlock;
         }
     }

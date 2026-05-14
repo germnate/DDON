@@ -784,17 +784,17 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsQuestEnemyAlive(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdOmEndAnimation(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestEnemyAlive(stageInfo, groupNo, setNo);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdOmEndAnimation(stageInfo, groupNo, setNo);
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsQuestEnemyAlive2(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdOmEndAnimationNoMarker(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestEnemyAlive2(stageInfo, groupNo, setNo);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdOmEndAnimationNoMarker(stageInfo, groupNo, setNo);
             return questBlock;
         }
 
@@ -847,10 +847,10 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsPawnAvailable(this QuestBlock questBlock, int pawnId, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdHasAchievement(this QuestBlock questBlock, int categoryNo, int achievementId, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsPawnAvailable(pawnId);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdHasAchievement(categoryNo, achievementId);
             return questBlock;
         }
 
@@ -980,10 +980,10 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsQuestEnemyHpNotGreater(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int hpLostPct, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdIsQuestLayoutHpNotGreater(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int hpLostPct, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestEnemyHpNotGreater(stageInfo, groupNo, setNo, hpLostPct);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestLayoutHpNotGreater(stageInfo, groupNo, setNo, hpLostPct);
             return questBlock;
         }
 

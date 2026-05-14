@@ -714,15 +714,15 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsQuestEnemyAlive(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
+        public static List<CDataQuestCommand> AddCheckCmdOmEndAnimation(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsQuestEnemyAlive(stageInfo.StageNo, groupNo, setNo));
+            checkCommands.Add(QuestManager.CheckCommand.OmEndAnimation(stageInfo.StageNo, groupNo, setNo));
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsQuestEnemyAlive2(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
+        public static List<CDataQuestCommand> AddCheckCmdOmEndAnimationNoMarker(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsQuestEnemyAlive2(stageInfo.StageNo, groupNo, setNo));
+            checkCommands.Add(QuestManager.CheckCommand.OmEndAnimationNoMarker(stageInfo.StageNo, groupNo, setNo));
             return checkCommands;
         }
 
@@ -768,9 +768,9 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsPawnAvailable(this List<CDataQuestCommand> checkCommands, int pawnId)
+        public static List<CDataQuestCommand> AddCheckCmdHasAchievement(this List<CDataQuestCommand> checkCommands, int categoryNo, int achievementId)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsPawnAvailable(pawnId));
+            checkCommands.Add(QuestManager.CheckCommand.HasAchievement(categoryNo, achievementId));
             return checkCommands;
         }
 
@@ -882,9 +882,9 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsQuestEnemyHpNotGreater(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo, int hpLostPct)
+        public static List<CDataQuestCommand> AddCheckCmdIsQuestLayoutHpNotGreater(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo, int hpLostPct)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsQuestEnemyHpNotGreater(stageInfo.StageNo, groupNo, setNo, hpLostPct));
+            checkCommands.Add(QuestManager.CheckCommand.IsQuestLayoutHpNotGreater(stageInfo.StageNo, groupNo, setNo, hpLostPct));
             return checkCommands;
         }
 
