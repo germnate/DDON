@@ -2865,10 +2865,10 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsQuestLayoutHpNotGreater, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = hpLostPct };
             }
 
-            /** @brief Grand Mission / Extreme Mission: checks if an area-linkage flag (type-9) is set. flagKey matched against entry+4. */
-            public static CDataQuestCommand IsAreaLinkageQuestFlagOn(int flagKey, int param02 = 0, int param03 = 0, int param04 = 0)
+            /** @brief Checks if a player has cleared a specific Extreme Mission/Grand Mission/Chain Dungeon (category 9 quests). questId matched against entry+4. */
+            public static CDataQuestCommand IsExtremeMissionClear(int questId, int param02 = 0, int param03 = 0, int param04 = 0)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsAreaLinkageQuestFlagOn, Param01 = flagKey, Param02 = param02, Param03 = param03, Param04 = param04 };
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsExtremeMissionClear, Param01 = questId, Param02 = param02, Param03 = param03, Param04 = param04 };
             }
 
             /**

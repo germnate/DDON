@@ -501,7 +501,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         IsQuestLayoutHpNotGreater = 255, // 0x00637890 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 hpLostPct)
 
         /// <summary>
-        /// Checks whether a Grand Mission / Area-Linkage battle content flag (sub-type 9) is set.
+        /// Checks if a player has cleared a specific Extreme Mission/Grand Mission/Chain Dungeon (category 9 quests).
         /// Guards on content-mode equality: DAT_0220456c+0x9f4+0x4654 == +0x45cc (current-mode match required;
         /// fails during transitions or wrong content phase).
         /// FUN_00a336e0(param01) constructs a typed wrapper object using the Grand Mission vtable
@@ -510,6 +510,6 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// and returns 1 if any entry's field (+4) matches the wrapper's key.
         /// @note This is a Grand Mission / Extreme Mission system check, not a general world-quest flag.
         /// </summary>
-        IsAreaLinkageQuestFlagOn = 256, // 0x00637950 (cQuestProcess* this, s32 flagKey, s32 param02_unused, s32 param03_unused, s32 param04_unused)
+        IsExtremeMissionClear = 256, // 0x00637950 (cQuestProcess* this, s32 questId, s32 param02_unused, s32 param03_unused, s32 param04_unused)
     }
 }

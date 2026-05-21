@@ -479,5 +479,17 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             resultCommands.Add(QuestManager.ResultCommand.StopMessage());
             return resultCommands;
         }
+
+        public static List<CDataQuestCommand> AddResultCmdLinkageEnemyFlagOn(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, int groupNo, int setNo, uint flagNo)
+        {
+            resultCommands.Add(QuestManager.ResultCommand.LinkageEnemyFlagOn(stageInfo.StageNo, groupNo, setNo, (int)flagNo));
+            return resultCommands;
+        }
+
+        public static List<CDataQuestCommand> AddResultCmdLinkageEnemyFlagOff(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, int groupNo, int setNo, uint flagNo)
+        {
+            resultCommands.Add(QuestManager.ResultCommand.LinkageEnemyFlagOff(stageInfo.StageNo, groupNo, setNo, (int)flagNo));
+            return resultCommands;
+        }
     }
 }

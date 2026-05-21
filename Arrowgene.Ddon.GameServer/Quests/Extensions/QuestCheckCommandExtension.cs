@@ -888,9 +888,9 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsAreaLinkageQuestFlagOn(this List<CDataQuestCommand> checkCommands, int flagKey)
+        public static List<CDataQuestCommand> AddCheckCmdIsExtremeMissionClear(this List<CDataQuestCommand> checkCommands, QuestId questId)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsAreaLinkageQuestFlagOn(flagKey));
+            checkCommands.Add(QuestManager.CheckCommand.IsExtremeMissionClear((int)questId));
             return checkCommands;
         }
 
@@ -927,6 +927,18 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
         public static List<CDataQuestCommand> AddCheckCmdRandomNotLess(this List<CDataQuestCommand> checkCommands, int randomNo, int value)
         {
             checkCommands.Add(QuestManager.CheckCommand.RandomNotLess(randomNo, value));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsLinkageEnemyFlag(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo, uint flagNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsLinkageEnemyFlag(stageInfo.StageNo, groupNo, setNo, (int)flagNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsLinkageEnemyFlagOff(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo, uint flagNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsLinkageEnemyFlagOff(stageInfo.StageNo, groupNo, setNo, (int)flagNo));
             return checkCommands;
         }
     }

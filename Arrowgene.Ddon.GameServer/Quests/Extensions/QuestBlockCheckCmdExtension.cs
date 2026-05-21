@@ -987,10 +987,10 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsAreaLinkageQuestFlagOn(this QuestBlock questBlock, int flagKey, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdIsExtremeMissionClear(this QuestBlock questBlock, QuestId questId, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsAreaLinkageQuestFlagOn(flagKey);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsExtremeMissionClear(questId);
             return questBlock;
         }
 
@@ -1033,6 +1033,20 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
             questBlock.CheckCommands[commandListIndex].AddCheckCmdRandomNotLess(randomNo, value);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsLinkageEnemyFlag(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, uint flagNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsLinkageEnemyFlag(stageInfo, groupNo, setNo, flagNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsLinkageEnemyFlagOff(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, uint flagNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsLinkageEnemyFlagOff(stageInfo, groupNo, setNo, flagNo);
             return questBlock;
         }
     }
