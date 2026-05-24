@@ -2841,6 +2841,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsKillGroupCompleteInRadius, Param01 = flagNo, Param02 = param02, Param03 = param03, Param04 = param04 };
             }
 
+            /** @brief Checks if a player has reached a chain number from a Chain Dungeon (Extreme Mission). */
+            public static CDataQuestCommand ChainNotLess(int chainNo, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.ChainNotLess, Param01 = chainNo, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
             /** @brief Checks if a Timer List A entry's state value equals zero. Content-mode gated. */
             public static CDataQuestCommand IsContentsTimerAZero(int timerNo, int param02 = 0, int param03 = 0, int param04 = 0)
             {

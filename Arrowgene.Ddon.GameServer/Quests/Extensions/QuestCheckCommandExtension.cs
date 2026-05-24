@@ -941,5 +941,11 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             checkCommands.Add(QuestManager.CheckCommand.IsLinkageEnemyFlagOff(stageInfo.StageNo, groupNo, setNo, (int)flagNo));
             return checkCommands;
         }
+
+        public static List<CDataQuestCommand> AddCheckCmdChainNotLess(this List<CDataQuestCommand> checkCommands, int chainNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.ChainNotLess(chainNo));
+            return checkCommands;
+        }
     }
 }

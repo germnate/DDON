@@ -466,6 +466,12 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         IsKillGroupCompleteInRadius = 248, // 0x00637430 (cQuestProcess* this, s32 flagNo, s32 param02_unused, s32 param03_unused, s32 param04_unused)
 
         /// <summary>
+        /// Checks if a player has reached a chain number from a Chain Dungeon (Extreme Mission).
+        /// Reads Unk2 sent by packet S2CSituationDataUpdateObjectivesNtc and checks against param1.
+        /// </summary>
+        ChainNotLess = 250, // (cQuestProcess* this, s32 chainNo, s32 param02_unused, s32 param03_unused, s32 param04_unused)
+
+        /// <summary>
         /// Checks if a contents timer (Timer List A) has reached state zero. Content-mode gated (same guard as 242/243).
         /// Calls FUN_0064d130(timerNo) which searches Timer List A at offset +0xf0 for entry with +4 == timerNo,
         /// returns its +8 field (state value). Returns true if that state value == 0.

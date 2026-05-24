@@ -1049,5 +1049,12 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             questBlock.CheckCommands[commandListIndex].AddCheckCmdIsLinkageEnemyFlagOff(stageInfo, groupNo, setNo, flagNo);
             return questBlock;
         }
+
+        public static QuestBlock AddCheckCmdChainNotLess(this QuestBlock questBlock, int chainNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdChainNotLess(chainNo);
+            return questBlock;
+        }
     }
 }
