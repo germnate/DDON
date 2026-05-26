@@ -279,10 +279,11 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         IsOmBehaviorState = 219, // 0x00635D70 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 behaviorState)
 
         /// <summary>
-        /// Player-specific substory item flag check. Guards on GM mode and matching playerId at DAT_022044c4+0x3834+0x8c.
-        /// Calls FUN_00bfc1e0(flagId) and compares result == expectedValue.
+        /// Checks if a specific enemy group has spawned in a monster gathering spot.
+        /// Reads SpotState from CDataAreaRankMonsterGatheringSpot and checks against param3.
+        /// SpotState ranges from 1 to 4 and rotated every 18 hours in the original game, with SpotState = 3 spawning the Spot Boss.
         /// </summary>
-        IsPlayerSpecificLayoutFlag = 220, // 0x00635EF0 (cQuestProcess* this, s32 playerId, s32 flagId, s32 expectedValue, s32 param04)
+        MonsterGatheringSpotState = 220, // 0x00635EF0 (cQuestProcess* this, s32 stageNo, s32 spotId, s32 spotState, s32 param04)
 
         /// <summary>
         /// Checks if a quest enemy group (type 3) is alive. Looks up via FUN_00a41780, checks status bit 15 via FUN_00bc2da0.
@@ -295,14 +296,14 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         OmEndAnimationNoMarker = 222, // 0x00636060 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
 
         /// <summary>
-        /// Area-aware version of IsQuestEnemyAlive. Uses FUN_00a41890 when an area instance exists (FUN_009cff70 != 0).
+        /// Checks if a player has interacted with a quest-spawned OM and its animation has played out completely.
         /// </summary>
-        IsQuestOrAreaEnemyAlive = 223, // 0x006360B0 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
+        QuestOmEndAnimation = 223, // 0x006360B0 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
 
         /// <summary>
-        /// Duplicate/variant of IsQuestOrAreaEnemyAlive (223).
+        /// Variant of QuestOmEndAnimation (223) without quest markers.
         /// </summary>
-        IsQuestOrAreaEnemyAlive2 = 224, // 0x00636110 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
+        QuestOmEndAnimationNoMarker = 224, // 0x00636110 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
 
         /// <summary>
         /// Reward point collection check. Guards on playerId. If param03 &lt; 0 calls FUN_00bfc5d0(rewardId) to check

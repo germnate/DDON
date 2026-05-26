@@ -708,9 +708,9 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsPlayerSpecificLayoutFlag(this List<CDataQuestCommand> checkCommands, int playerId, int flagId, int expectedValue)
+        public static List<CDataQuestCommand> AddCheckCmdMonsterGatheringSpotState(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int spotId, int spotState)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsPlayerSpecificLayoutFlag(playerId, flagId, expectedValue));
+            checkCommands.Add(QuestManager.CheckCommand.MonsterGatheringSpotState(stageInfo.StageNo, spotId, spotState));
             return checkCommands;
         }
 
@@ -726,15 +726,15 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsQuestOrAreaEnemyAlive(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
+        public static List<CDataQuestCommand> AddCheckCmdQuestOmEndAnimation(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsQuestOrAreaEnemyAlive(stageInfo.StageNo, groupNo, setNo));
+            checkCommands.Add(QuestManager.CheckCommand.QuestOmEndAnimation(stageInfo.StageNo, groupNo, setNo));
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsQuestOrAreaEnemyAlive2(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
+        public static List<CDataQuestCommand> AddCheckCmdQuestOmEndAnimationNoMarker(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsQuestOrAreaEnemyAlive2(stageInfo.StageNo, groupNo, setNo));
+            checkCommands.Add(QuestManager.CheckCommand.QuestOmEndAnimationNoMarker(stageInfo.StageNo, groupNo, setNo));
             return checkCommands;
         }
 

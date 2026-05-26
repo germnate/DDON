@@ -777,10 +777,10 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsPlayerSpecificLayoutFlag(this QuestBlock questBlock, int playerId, int flagId, int expectedValue, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdMonsterGatheringSpotState(this QuestBlock questBlock, StageInfo stageInfo, int spotId, int spotState, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsPlayerSpecificLayoutFlag(playerId, flagId, expectedValue);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdMonsterGatheringSpotState(stageInfo, spotId, spotState);
             return questBlock;
         }
 
@@ -798,17 +798,17 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsQuestOrAreaEnemyAlive(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdQuestOmEndAnimation(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestOrAreaEnemyAlive(stageInfo, groupNo, setNo);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdQuestOmEndAnimation(stageInfo, groupNo, setNo);
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsQuestOrAreaEnemyAlive2(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdQuestOmEndAnimationNoMarker(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestOrAreaEnemyAlive2(stageInfo, groupNo, setNo);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdQuestOmEndAnimationNoMarker(stageInfo, groupNo, setNo);
             return questBlock;
         }
 

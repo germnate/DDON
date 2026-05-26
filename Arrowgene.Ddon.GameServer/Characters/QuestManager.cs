@@ -2685,10 +2685,10 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsOmBehaviorState, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = behaviorState };
             }
 
-            /** @brief Player-specific layout flag check. Guards on playerId; calls FUN_00bfc1e0(flagId) and compares result == expectedValue. */
-            public static CDataQuestCommand IsPlayerSpecificLayoutFlag(int playerId, int flagId, int expectedValue, int param04 = 0)
+            /** @brief Checks if a specific enemy group has spawned in a monster gathering spot. */
+            public static CDataQuestCommand MonsterGatheringSpotState(uint stageNo, int spotId, int spotState, int param04 = 0)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsPlayerSpecificLayoutFlag, Param01 = playerId, Param02 = flagId, Param03 = expectedValue, Param04 = param04 };
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.MonsterGatheringSpotState, Param01 = (int)stageNo, Param02 = spotId, Param03 = spotState, Param04 = param04 };
             }
 
             /** @brief Checks if an OM has finished its animation. */
@@ -2703,16 +2703,16 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.OmEndAnimationNoMarker, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
             }
 
-            /** @brief Area-aware version of IsQuestEnemyAlive using FUN_00a41890 when an area instance exists. */
-            public static CDataQuestCommand IsQuestOrAreaEnemyAlive(uint stageNo, int groupNo, int setNo, int param04 = 0)
+            /** @brief Checks if a player has interacted with a quest-spawned OM and its animation has played out completely. */
+            public static CDataQuestCommand QuestOmEndAnimation(uint stageNo, int groupNo, int setNo, int param04 = 0)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsQuestOrAreaEnemyAlive, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.QuestOmEndAnimation, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
             }
 
-            /** @brief Duplicate/variant of IsQuestOrAreaEnemyAlive. */
-            public static CDataQuestCommand IsQuestOrAreaEnemyAlive2(uint stageNo, int groupNo, int setNo, int param04 = 0)
+            /** @brief Variant of QuestOmEndAnimation (223) without quest markers. */
+            public static CDataQuestCommand QuestOmEndAnimationNoMarker(uint stageNo, int groupNo, int setNo, int param04 = 0)
             {
-                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsQuestOrAreaEnemyAlive2, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.QuestOmEndAnimationNoMarker, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
             }
 
             /** @brief Reward point check guarded on playerId. Checks flag at +0x274 (param03 < 0) or queues collection action. */
