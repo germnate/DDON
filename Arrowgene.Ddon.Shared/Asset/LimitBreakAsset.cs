@@ -19,8 +19,10 @@ namespace Arrowgene.Ddon.Shared.Asset
     {
         public LimitStatLottery()
         {
+            Name = string.Empty;
             Rolls = new List<ushort>();
         }
+        public string Name { get; set; }
         public uint MinGreatSuccessIndex { get; set; }
         public List<ushort> Rolls { get; set; }
     }

@@ -9,6 +9,9 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
 {
     public abstract class IBitterblackEarringMixin
     {
-        public abstract ushort RollBitterBlackMazeEarringPercent(JobId jobId);
+        public virtual ushort RollBitterBlackMazeEarringPercent(JobId jobId)
+            => RollBitterBlackMazeEarringPercent(jobId, Random.Shared);
+
+        public abstract ushort RollBitterBlackMazeEarringPercent(JobId jobId, Random rng);
     }
 }

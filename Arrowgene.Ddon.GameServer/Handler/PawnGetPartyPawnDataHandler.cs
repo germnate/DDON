@@ -2,6 +2,7 @@ using Arrowgene.Ddon.GameServer.Scripting.Interfaces;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
+using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Logging;
 using System.Collections.Generic;
@@ -45,11 +46,14 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     // This is a rented pawn, the real owner may not be online.
                     //S2C_PAWN_GET_PAWN_PROFILE_NTC
+                    var ownerBaseInfo = rentalPawn.IsOfficialPawn || rentalPawn.OwningCharacterId == Character.ServerCharacterId
+                        ? new CDataCommunityCharacterBaseInfo { CharacterId = Character.ServerCharacterId, CharacterName = new CDataCharacterName { FirstName = Character.ServerCharacterFirstName } }
+                        : Server.Database.SelectCommunityCharacterBaseInfo(rentalPawn.OwningCharacterId, connection);
                     var profileNtc = new S2CPawnGetPawnProfileNtc()
                     {
                         CharacterId = client.Character.CharacterId,
                         PawnId = rentalPawn.PawnId,
-                        OwnerBaseInfo = Server.Database.SelectCommunityCharacterBaseInfo(rentalPawn.OwningCharacterId, connection),
+                        OwnerBaseInfo = ownerBaseInfo,
                         PawnProfile = rentalPawn.CharacterProfile.CDataArisenProfile,
                         Comment = rentalPawn.CharacterProfile.Comment,
                         RentalCost = mixin.GetRentalCost(client, rentalPawn.CDataRegisterdPawnList, clanPawns.Contains(rentalPawn.PawnId))
