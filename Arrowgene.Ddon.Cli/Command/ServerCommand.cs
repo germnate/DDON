@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
 using Arrowgene.Ddon.Metrics;
 using Arrowgene.Networking.Metrics;
 
@@ -163,7 +164,11 @@ public class ServerCommand : ICommand
 
         if (parameter.Arguments.Contains("start"))
         {
-            _webServer.Start();
+            _ = _webServer.Start().ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                    Logger.Error($"WebServer crashed: {t.Exception?.Flatten().InnerException}");
+            }, TaskScheduler.Default);
             _gameServer.Start();
             _loginServer.Start();
             _loginServerMetricsCollector?.Start("LoginServerMetrics");

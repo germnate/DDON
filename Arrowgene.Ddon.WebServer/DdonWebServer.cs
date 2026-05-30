@@ -38,7 +38,6 @@ namespace Arrowgene.Ddon.WebServer
 
             AddMiddleware(staticFile);
 
-            AddRoute(new IndexRoute());
             AddRoute(new AccountRoute(database, setting));
         }
 
