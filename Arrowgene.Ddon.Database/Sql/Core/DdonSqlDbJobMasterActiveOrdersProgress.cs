@@ -15,7 +15,7 @@ public partial class DdonSqlDb : SqlDb
 
     protected static readonly string[] JobMasterActiveOrdersProgressKeyFields =
     [
-        "character_id", "job_id", "release_type", "release_id", "target_id"
+        "character_id", "job_id", "release_type", "release_id", "condition", "target_id", "target_rank"
     ];
 
     protected static readonly string[] JobMasterActiveOrdersProgressNonKeyFields = JobMasterActiveOrdersProgress.Except(JobMasterActiveOrdersProgressKeyFields).ToArray();
@@ -24,13 +24,13 @@ public partial class DdonSqlDb : SqlDb
         $"INSERT INTO \"ddon_job_master_active_orders_progress\" ({BuildQueryField(JobMasterActiveOrdersProgress)}) VALUES ({BuildQueryInsert(JobMasterActiveOrdersProgress)});";
 
     private readonly string SqlSelectJobMasterActiveOrdersProgress =
-        $"SELECT {BuildQueryField(JobMasterActiveOrdersProgress)} FROM \"ddon_job_master_active_orders_progress\" WHERE  \"character_id\"=@character_id AND \"job_id\"=@job_id AND \"release_type\"=@release_type AND \"release_id\"=@release_id AND \"target_id\"=@target_id;";
+        $"SELECT {BuildQueryField(JobMasterActiveOrdersProgress)} FROM \"ddon_job_master_active_orders_progress\" WHERE  \"character_id\"=@character_id AND \"job_id\"=@job_id AND \"release_type\"=@release_type AND \"release_id\"=@release_id AND \"condition\"=@condition AND \"target_id\"=@target_id AND \"target_rank\"=@target_rank;";
 
     private readonly string SqlSelectJobMasterActiveOrdersProgressAllTargets =
         $"SELECT {BuildQueryField(JobMasterActiveOrdersProgress)} FROM \"ddon_job_master_active_orders_progress\" WHERE  \"character_id\"=@character_id AND \"job_id\"=@job_id AND \"release_type\"=@release_type AND \"release_id\"=@release_id";
 
     private readonly string SqlUpdateJobMasterActiveOrdersProgress =
-        $"UPDATE \"ddon_job_master_active_orders_progress\" SET {BuildQueryUpdate(JobMasterActiveOrdersProgress)} WHERE \"character_id\"=@character_id AND \"job_id\"=@job_id AND \"release_type\"=@release_type AND \"release_id\"=@release_id AND \"target_id\"=@target_id;";
+        $"UPDATE \"ddon_job_master_active_orders_progress\" SET {BuildQueryUpdate(JobMasterActiveOrdersProgress)} WHERE \"character_id\"=@character_id AND \"job_id\"=@job_id AND \"release_type\"=@release_type AND \"release_id\"=@release_id AND \"condition\"=@condition AND \"target_id\"=@target_id AND \"target_rank\"=@target_rank;";
 
     private readonly string SqlUpsertJobMasterActiveOrdersProgress =
         $"""
@@ -94,7 +94,9 @@ public partial class DdonSqlDb : SqlDb
                 AddParameter(command, "job_id", (byte)jobId);
                 AddParameter(command, "release_type", (byte)releaseType);
                 AddParameter(command, "release_id", releaseId);
+                AddParameter(command, "condition", (byte)jobOrderProgress.ConditionType);
                 AddParameter(command, "target_id", jobOrderProgress.TargetId);
+                AddParameter(command, "target_rank", jobOrderProgress.TargetRank);
             }, reader => { foundRecord = reader.Read(); });
         });
         return foundRecord;
