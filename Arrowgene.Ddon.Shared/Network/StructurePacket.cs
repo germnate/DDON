@@ -128,6 +128,11 @@ namespace Arrowgene.Ddon.Shared.Network
 
                 return filtered;
             }
+
+            public override string GetEnumName(Type enumType, string name) => _innerTypeDescriptor.GetEnumName(enumType, name);
+            public override string GetEnumValue(object enumValue) => _innerTypeDescriptor.GetEnumValue(enumValue);
+            public override bool HasParseMethod(Type type) => _innerTypeDescriptor.HasParseMethod(type);
+            public override object Parse(string value, Type type) => _innerTypeDescriptor.Parse(value, type);
         }
     }
 
@@ -138,7 +143,7 @@ namespace Arrowgene.Ddon.Shared.Network
             return type == typeof(byte[]);
         }
 
-        public object ReadYaml(IParser parser, Type type)
+        public object ReadYaml(IParser parser, Type type, ObjectDeserializer rootDeserializer)
         {
             var scalar = (YamlDotNet.Core.Events.Scalar)parser.Current;
             var bytes = Util.FromHexString(scalar.Value);
@@ -146,7 +151,7 @@ namespace Arrowgene.Ddon.Shared.Network
             return bytes;
         }
 
-        public void WriteYaml(IEmitter emitter, object value, Type type)
+        public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)
         {
             var bytes = (byte[])value;
             emitter.Emit(new YamlDotNet.Core.Events.Scalar(

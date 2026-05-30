@@ -2,7 +2,6 @@ using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Model.EpitaphRoad;
 using Arrowgene.Logging;
-using YamlDotNet.Core.Tokens;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {

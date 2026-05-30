@@ -23,5 +23,7 @@
     <Import Project="./../SetSourceRevision.targets" />
     <ItemGroup>
         <PackageReference Include="Arrowgene.Networking" Version="2.1.7" />
+        <PackageReference Include="Microsoft.NETCore.App" Version="2.2.8" />
+        <PackageReference Include="Microsoft.NETCore.Jit" Version="2.0.8" />
     </ItemGroup>
 </Project>

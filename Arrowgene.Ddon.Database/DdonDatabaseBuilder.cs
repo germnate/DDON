@@ -13,7 +13,7 @@ public static class DdonDatabaseBuilder
 {
     private const string DefaultSchemaFile = "Script/schema_sqlite.sql";
 
-    public const uint Version = 62;
+    public const uint Version = 63;
     private static readonly ILogger Logger = LogProvider.Logger<Logger>(typeof(DdonDatabaseBuilder));
 
     public static IDatabase Build(DatabaseSetting settings)
@@ -101,7 +101,7 @@ public static class DdonDatabaseBuilder
 
     private static DdonPostgresDb BuildPostgres(DatabaseSetting settings)
     {
-        DdonPostgresDb db = new(settings.Host, settings.User, settings.Password, settings.Database, settings.WipeOnStartup, settings.BufferSize, settings.NoResetOnClose, settings.EnablePooling, settings.EnableTracing, settings.MaxAutoPrepare);
+        DdonPostgresDb db = new(settings.Host, settings.Port, settings.User, settings.Password, settings.Database, settings.WipeOnStartup, settings.BufferSize, settings.NoResetOnClose, settings.EnablePooling, settings.EnableTracing, settings.MaxAutoPrepare);
         if (db.CreateDatabase())
         {
             string schemaFilePath = Path.Combine(settings.DatabaseFolder, DefaultSchemaFile);
