@@ -9,7 +9,6 @@ using Arrowgene.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using YamlDotNet.Core.Tokens;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {

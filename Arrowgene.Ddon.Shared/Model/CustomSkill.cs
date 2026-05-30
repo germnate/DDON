@@ -1,6 +1,5 @@
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using System.Collections.Generic;
-using YamlDotNet.Core.Tokens;
 
 namespace Arrowgene.Ddon.Shared.Model
 {

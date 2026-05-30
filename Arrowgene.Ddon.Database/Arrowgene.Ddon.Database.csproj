@@ -21,10 +21,12 @@
     <Import Project="./../SetSourceRevision.targets" />
     <ItemGroup>
         <PackageReference Include="Arrowgene.Logging" Version="1.2.1" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.5" />
-        <PackageReference Include="System.Data.SQLite" Version="2.0.2" />
-        <PackageReference Include="Npgsql" Version="9.0.3" />
-        <PackageReference Include="MySqlConnector" Version="2.2.7" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.8" />
+        <PackageReference Include="Microsoft.NETCore.App" Version="2.2.8" />
+        <PackageReference Include="Microsoft.NETCore.Jit" Version="2.0.8" />
+        <PackageReference Include="System.Data.SQLite" Version="2.0.3" />
+        <PackageReference Include="Npgsql" Version="10.0.3" />
+        <PackageReference Include="MySqlConnector" Version="2.5.0" />
     </ItemGroup>
 
     <ItemGroup>
