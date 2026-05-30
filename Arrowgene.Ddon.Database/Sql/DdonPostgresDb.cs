@@ -14,10 +14,10 @@ public partial class DdonPostgresDb : DdonSqlDb
     private readonly string _connectionString;
     private NpgsqlDataSource _dataSource;
 
-    public DdonPostgresDb(string host, string user, string password, string database, bool wipeOnStartup, uint bufferSize, bool noResetOnClose, bool enablePooling,
+    public DdonPostgresDb(string host, short port, string user, string password, string database, bool wipeOnStartup, uint bufferSize, bool noResetOnClose, bool enablePooling,
         bool enableTracing, uint maxAutoPrepare)
     {
-        _connectionString = BuildConnectionString(host, user, password, database, bufferSize, noResetOnClose, enablePooling, enableTracing, maxAutoPrepare);
+        _connectionString = BuildConnectionString(host, port, user, password, database, bufferSize, noResetOnClose, enablePooling, enableTracing, maxAutoPrepare);
         if (wipeOnStartup) Logger.Info("WipeOnStartup is currently not supported.");
     }
 
@@ -65,12 +65,13 @@ public partial class DdonPostgresDb : DdonSqlDb
         _dataSource.Dispose();
     }
 
-    private string BuildConnectionString(string host, string user, string password, string database, uint bufferSize, bool noResetOnClose, bool enablePooling, bool enableTracing,
+    private string BuildConnectionString(string host, short port, string user, string password, string database, uint bufferSize, bool noResetOnClose, bool enablePooling, bool enableTracing,
         uint maxAutoPrepare)
     {
         NpgsqlConnectionStringBuilder builder = new()
         {
             Host = host,
+            Port = port,
             Username = user,
             Password = password,
             Database = database,
