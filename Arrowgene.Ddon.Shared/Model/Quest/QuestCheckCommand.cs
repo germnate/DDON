@@ -279,30 +279,31 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         IsOmBehaviorState = 219, // 0x00635D70 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 behaviorState)
 
         /// <summary>
-        /// Player-specific substory item flag check. Guards on GM mode and matching playerId at DAT_022044c4+0x3834+0x8c.
-        /// Calls FUN_00bfc1e0(flagId) and compares result == expectedValue.
+        /// Checks if a specific enemy group has spawned in a monster gathering spot.
+        /// Reads SpotState from CDataAreaRankMonsterGatheringSpot and checks against param3.
+        /// SpotState ranges from 1 to 4 and rotated every 18 hours in the original game, with SpotState = 3 spawning the Spot Boss.
         /// </summary>
-        IsPlayerSpecificLayoutFlag = 220, // 0x00635EF0 (cQuestProcess* this, s32 playerId, s32 flagId, s32 expectedValue, s32 param04)
+        MonsterGatheringSpotState = 220, // 0x00635EF0 (cQuestProcess* this, s32 stageNo, s32 spotId, s32 spotState, s32 param04)
 
         /// <summary>
         /// Checks if a quest enemy group (type 3) is alive. Looks up via FUN_00a41780, checks status bit 15 via FUN_00bc2da0.
         /// </summary>
-        IsQuestEnemyAlive = 221, // 0x00636000 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
+        OmEndAnimation = 221, // 0x00636000 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
 
         /// <summary>
         /// Duplicate/variant of IsQuestEnemyAlive (221). Same decompilation, may differ in calling convention.
         /// </summary>
-        IsQuestEnemyAlive2 = 222, // 0x00636060 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
+        OmEndAnimationNoMarker = 222, // 0x00636060 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
 
         /// <summary>
-        /// Area-aware version of IsQuestEnemyAlive. Uses FUN_00a41890 when an area instance exists (FUN_009cff70 != 0).
+        /// Checks if a player has interacted with a quest-spawned OM and its animation has played out completely.
         /// </summary>
-        IsQuestOrAreaEnemyAlive = 223, // 0x006360B0 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
+        QuestOmEndAnimation = 223, // 0x006360B0 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
 
         /// <summary>
-        /// Duplicate/variant of IsQuestOrAreaEnemyAlive (223).
+        /// Variant of QuestOmEndAnimation (223) without quest markers.
         /// </summary>
-        IsQuestOrAreaEnemyAlive2 = 224, // 0x00636110 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
+        QuestOmEndAnimationNoMarker = 224, // 0x00636110 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04)
 
         /// <summary>
         /// Reward point collection check. Guards on playerId. If param03 &lt; 0 calls FUN_00bfc5d0(rewardId) to check
@@ -363,13 +364,10 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         IsEnemyFoundForOrderRadius = 231, // 0x00636610 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 param04_unused)
 
         /// <summary>
-        /// Checks if a pawn with a given ID is active/available. Retrieves the pawn list manager via
-        /// FUN_00868170() (accesses this+0x29cc+0x45c), iterates entries matching pawnId against entry+8,
-        /// and returns true if a match is found with entry+0x18 or entry+0x1c non-zero (active state).
-        /// Only two parameters are used (this, pawnId); params 3 and 4 are ignored.
-        /// @note Previous description "action type 6" was incorrect - no such constant exists in the decompilation.
+        /// Checks if player has an achievement from a given category.
+        /// Only seems to work for category 6 (Great Purpose).
         /// </summary>
-        IsPawnAvailable = 233, // 0x00636900 (cQuestProcess* this, s32 pawnId, s32 param02_unused, s32 param03_unused, s32 param04_unused)
+        HasAchievement = 233, // 0x00636900 (cQuestProcess* this, s32 categoryNo, s32 achievementId, s32 param03_unused, s32 param04_unused)
 
         /// <summary>
         /// Returns bit 19 of the substory state word at this→substory+0x20c (offset 0x5c+0x20c from base).
@@ -469,6 +467,12 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         IsKillGroupCompleteInRadius = 248, // 0x00637430 (cQuestProcess* this, s32 flagNo, s32 param02_unused, s32 param03_unused, s32 param04_unused)
 
         /// <summary>
+        /// Checks if a player has reached a chain number from a Chain Dungeon (Extreme Mission).
+        /// Reads Unk2 sent by packet S2CSituationDataUpdateObjectivesNtc and checks against param1.
+        /// </summary>
+        ChainNotLess = 250, // (cQuestProcess* this, s32 chainNo, s32 param02_unused, s32 param03_unused, s32 param04_unused)
+
+        /// <summary>
         /// Checks if a contents timer (Timer List A) has reached state zero. Content-mode gated (same guard as 242/243).
         /// Calls FUN_0064d130(timerNo) which searches Timer List A at offset +0xf0 for entry with +4 == timerNo,
         /// returns its +8 field (state value). Returns true if that state value == 0.
@@ -497,14 +501,14 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         Padding254 = 254, // 0x00637860 stub/nop - always returns 0
 
         /// <summary>
-        /// Checks if a quest enemy's HP-lost percentage &lt;= hpLostPct. Looks up enemy (type 3) via FUN_00a41780,
+        /// Checks if a quest layout's HP-lost percentage &lt;= hpLostPct. Looks up layout (type 3) via FUN_00a41780,
         /// computes HP lost% via FUN_00bc0ab0 (= 100 - current/max*100), returns true if 0 &lt;= lost% &lt;= hpLostPct.
-        /// Effectively: enemy HP >= threshold.
+        /// Effectively: layout HP >= threshold.
         /// </summary>
-        IsQuestEnemyHpNotGreater = 255, // 0x00637890 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 hpLostPct)
+        IsQuestLayoutHpNotGreater = 255, // 0x00637890 (cQuestProcess* this, s32 stageNo, s32 groupNo, s32 setNo, s32 hpLostPct)
 
         /// <summary>
-        /// Checks whether a Grand Mission / Area-Linkage battle content flag (sub-type 9) is set.
+        /// Checks if a player has cleared a specific Extreme Mission/Grand Mission/Chain Dungeon (category 9 quests).
         /// Guards on content-mode equality: DAT_0220456c+0x9f4+0x4654 == +0x45cc (current-mode match required;
         /// fails during transitions or wrong content phase).
         /// FUN_00a336e0(param01) constructs a typed wrapper object using the Grand Mission vtable
@@ -513,6 +517,6 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         /// and returns 1 if any entry's field (+4) matches the wrapper's key.
         /// @note This is a Grand Mission / Extreme Mission system check, not a general world-quest flag.
         /// </summary>
-        IsAreaLinkageQuestFlagOn = 256, // 0x00637950 (cQuestProcess* this, s32 flagKey, s32 param02_unused, s32 param03_unused, s32 param04_unused)
+        IsExtremeMissionClear = 256, // 0x00637950 (cQuestProcess* this, s32 questId, s32 param02_unused, s32 param03_unused, s32 param04_unused)
     }
 }

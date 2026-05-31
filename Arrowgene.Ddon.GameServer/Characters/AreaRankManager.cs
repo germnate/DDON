@@ -294,7 +294,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             // Until S3.
-            if (spot.AreaId >= QuestAreaId.RathniteFoothills)
+            if (spot.AreaId >= QuestAreaId.MegadosysPlateau)
             {
                 return true;
             }

@@ -70,7 +70,6 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 Stage.ManunVillage,
 
                 //Acre Selund
-                Stage.FortressCityMegadoResidentialLevel0,
                 Stage.FortressCityMegadoResidentialLevel1,
                 Stage.FortressCityMegadoResidentialLevel2,
                 Stage.FortressCityMegadoResidentialLevel3,
@@ -114,11 +113,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
             Stage.ClanHall, //  (has special handling)
             Stage.FortThines1,
             Stage.LookoutCastle1,
-            Stage.FortressCityMegadoResidentialLevel0, 
             Stage.FortressCityMegadoResidentialLevel1, 
             Stage.FortressCityMegadoResidentialLevel2, 
             Stage.FortressCityMegadoResidentialLevel3,
-            Stage.FortressCityMegadoRoyalPalaceLevel,
             Stage.BitterblackMazeCove
         }.Select(x => x.StageId).ToHashSet();
 

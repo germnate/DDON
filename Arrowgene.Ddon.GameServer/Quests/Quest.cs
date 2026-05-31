@@ -395,6 +395,9 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 processState.ResultCommandList = processState.ResultCommandList
                     .Where(x => x.Command != (ushort)QuestResultCommand.UpdateAnnounce &&
                                 x.Command != (ushort)QuestResultCommand.SetAnnounce &&
+                                x.Command != (ushort)QuestResultCommand.CallGeneralAnnounce &&
+                                x.Command != (ushort)QuestResultCommand.PlayMessage &&
+                                x.Command != (ushort)QuestResultCommand.AchievementBanner &&
                                 x.Command != (ushort)QuestResultCommand.HandItem &&
                                 x.Command != (ushort)QuestResultCommand.PushImteToPlBag)
                     .ToList();

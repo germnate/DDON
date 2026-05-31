@@ -347,9 +347,9 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return resultCommands;
         }
 
-        public static List<CDataQuestCommand> AddResultCmdSetSubstoryEnemyGroupFlag(this List<CDataQuestCommand> resultCommands, int groupId, int flagValue)
+        public static List<CDataQuestCommand> AddResultCmdAchievementBanner(this List<CDataQuestCommand> resultCommands, int categoryNo, int bannerNo)
         {
-            resultCommands.Add(QuestManager.ResultCommand.SetSubstoryEnemyGroupFlag(groupId, flagValue));
+            resultCommands.Add(QuestManager.ResultCommand.AchievementBanner(categoryNo, bannerNo));
             return resultCommands;
         }
 
@@ -471,6 +471,24 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
         public static List<CDataQuestCommand> AddResultCmdResetRandom(this List<CDataQuestCommand> resultCommands, int randomNo)
         {
             resultCommands.Add(QuestManager.ResultCommand.ResetRandom(randomNo));
+            return resultCommands;
+        }
+
+        public static List<CDataQuestCommand> AddResultCmdStopMessage(this List<CDataQuestCommand> resultCommands)
+        {
+            resultCommands.Add(QuestManager.ResultCommand.StopMessage());
+            return resultCommands;
+        }
+
+        public static List<CDataQuestCommand> AddResultCmdLinkageEnemyFlagOn(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, int groupNo, int setNo, uint flagNo)
+        {
+            resultCommands.Add(QuestManager.ResultCommand.LinkageEnemyFlagOn(stageInfo.StageNo, groupNo, setNo, (int)flagNo));
+            return resultCommands;
+        }
+
+        public static List<CDataQuestCommand> AddResultCmdLinkageEnemyFlagOff(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, int groupNo, int setNo, uint flagNo)
+        {
+            resultCommands.Add(QuestManager.ResultCommand.LinkageEnemyFlagOff(stageInfo.StageNo, groupNo, setNo, (int)flagNo));
             return resultCommands;
         }
     }

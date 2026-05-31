@@ -777,38 +777,38 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsPlayerSpecificLayoutFlag(this QuestBlock questBlock, int playerId, int flagId, int expectedValue, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdMonsterGatheringSpotState(this QuestBlock questBlock, StageInfo stageInfo, int spotId, int spotState, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsPlayerSpecificLayoutFlag(playerId, flagId, expectedValue);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdMonsterGatheringSpotState(stageInfo, spotId, spotState);
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsQuestEnemyAlive(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdOmEndAnimation(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestEnemyAlive(stageInfo, groupNo, setNo);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdOmEndAnimation(stageInfo, groupNo, setNo);
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsQuestEnemyAlive2(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdOmEndAnimationNoMarker(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestEnemyAlive2(stageInfo, groupNo, setNo);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdOmEndAnimationNoMarker(stageInfo, groupNo, setNo);
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsQuestOrAreaEnemyAlive(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdQuestOmEndAnimation(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestOrAreaEnemyAlive(stageInfo, groupNo, setNo);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdQuestOmEndAnimation(stageInfo, groupNo, setNo);
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsQuestOrAreaEnemyAlive2(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdQuestOmEndAnimationNoMarker(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestOrAreaEnemyAlive2(stageInfo, groupNo, setNo);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdQuestOmEndAnimationNoMarker(stageInfo, groupNo, setNo);
             return questBlock;
         }
 
@@ -847,10 +847,10 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsPawnAvailable(this QuestBlock questBlock, int pawnId, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdHasAchievement(this QuestBlock questBlock, int categoryNo, int achievementId, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsPawnAvailable(pawnId);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdHasAchievement(categoryNo, achievementId);
             return questBlock;
         }
 
@@ -980,17 +980,17 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsQuestEnemyHpNotGreater(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int hpLostPct, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdIsQuestLayoutHpNotGreater(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int hpLostPct, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestEnemyHpNotGreater(stageInfo, groupNo, setNo, hpLostPct);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsQuestLayoutHpNotGreater(stageInfo, groupNo, setNo, hpLostPct);
             return questBlock;
         }
 
-        public static QuestBlock AddCheckCmdIsAreaLinkageQuestFlagOn(this QuestBlock questBlock, int flagKey, int commandListIndex = 0)
+        public static QuestBlock AddCheckCmdIsExtremeMissionClear(this QuestBlock questBlock, QuestId questId, int commandListIndex = 0)
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
-            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsAreaLinkageQuestFlagOn(flagKey);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsExtremeMissionClear(questId);
             return questBlock;
         }
 
@@ -1033,6 +1033,27 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
         {
             ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
             questBlock.CheckCommands[commandListIndex].AddCheckCmdRandomNotLess(randomNo, value);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsLinkageEnemyFlag(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, uint flagNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsLinkageEnemyFlag(stageInfo, groupNo, setNo, flagNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdIsLinkageEnemyFlagOff(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, uint flagNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdIsLinkageEnemyFlagOff(stageInfo, groupNo, setNo, flagNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddCheckCmdChainNotLess(this QuestBlock questBlock, int chainNo, int commandListIndex = 0)
+        {
+            ValidateIndexAndUpdateCommandList(questBlock.CheckCommands, commandListIndex);
+            questBlock.CheckCommands[commandListIndex].AddCheckCmdChainNotLess(chainNo);
             return questBlock;
         }
     }

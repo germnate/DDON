@@ -708,33 +708,33 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsPlayerSpecificLayoutFlag(this List<CDataQuestCommand> checkCommands, int playerId, int flagId, int expectedValue)
+        public static List<CDataQuestCommand> AddCheckCmdMonsterGatheringSpotState(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int spotId, int spotState)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsPlayerSpecificLayoutFlag(playerId, flagId, expectedValue));
+            checkCommands.Add(QuestManager.CheckCommand.MonsterGatheringSpotState(stageInfo.StageNo, spotId, spotState));
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsQuestEnemyAlive(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
+        public static List<CDataQuestCommand> AddCheckCmdOmEndAnimation(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsQuestEnemyAlive(stageInfo.StageNo, groupNo, setNo));
+            checkCommands.Add(QuestManager.CheckCommand.OmEndAnimation(stageInfo.StageNo, groupNo, setNo));
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsQuestEnemyAlive2(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
+        public static List<CDataQuestCommand> AddCheckCmdOmEndAnimationNoMarker(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsQuestEnemyAlive2(stageInfo.StageNo, groupNo, setNo));
+            checkCommands.Add(QuestManager.CheckCommand.OmEndAnimationNoMarker(stageInfo.StageNo, groupNo, setNo));
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsQuestOrAreaEnemyAlive(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
+        public static List<CDataQuestCommand> AddCheckCmdQuestOmEndAnimation(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsQuestOrAreaEnemyAlive(stageInfo.StageNo, groupNo, setNo));
+            checkCommands.Add(QuestManager.CheckCommand.QuestOmEndAnimation(stageInfo.StageNo, groupNo, setNo));
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsQuestOrAreaEnemyAlive2(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
+        public static List<CDataQuestCommand> AddCheckCmdQuestOmEndAnimationNoMarker(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsQuestOrAreaEnemyAlive2(stageInfo.StageNo, groupNo, setNo));
+            checkCommands.Add(QuestManager.CheckCommand.QuestOmEndAnimationNoMarker(stageInfo.StageNo, groupNo, setNo));
             return checkCommands;
         }
 
@@ -768,9 +768,9 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsPawnAvailable(this List<CDataQuestCommand> checkCommands, int pawnId)
+        public static List<CDataQuestCommand> AddCheckCmdHasAchievement(this List<CDataQuestCommand> checkCommands, int categoryNo, int achievementId)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsPawnAvailable(pawnId));
+            checkCommands.Add(QuestManager.CheckCommand.HasAchievement(categoryNo, achievementId));
             return checkCommands;
         }
 
@@ -882,15 +882,15 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsQuestEnemyHpNotGreater(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo, int hpLostPct)
+        public static List<CDataQuestCommand> AddCheckCmdIsQuestLayoutHpNotGreater(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo, int hpLostPct)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsQuestEnemyHpNotGreater(stageInfo.StageNo, groupNo, setNo, hpLostPct));
+            checkCommands.Add(QuestManager.CheckCommand.IsQuestLayoutHpNotGreater(stageInfo.StageNo, groupNo, setNo, hpLostPct));
             return checkCommands;
         }
 
-        public static List<CDataQuestCommand> AddCheckCmdIsAreaLinkageQuestFlagOn(this List<CDataQuestCommand> checkCommands, int flagKey)
+        public static List<CDataQuestCommand> AddCheckCmdIsExtremeMissionClear(this List<CDataQuestCommand> checkCommands, QuestId questId)
         {
-            checkCommands.Add(QuestManager.CheckCommand.IsAreaLinkageQuestFlagOn(flagKey));
+            checkCommands.Add(QuestManager.CheckCommand.IsExtremeMissionClear((int)questId));
             return checkCommands;
         }
 
@@ -927,6 +927,24 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
         public static List<CDataQuestCommand> AddCheckCmdRandomNotLess(this List<CDataQuestCommand> checkCommands, int randomNo, int value)
         {
             checkCommands.Add(QuestManager.CheckCommand.RandomNotLess(randomNo, value));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsLinkageEnemyFlag(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo, uint flagNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsLinkageEnemyFlag(stageInfo.StageNo, groupNo, setNo, (int)flagNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsLinkageEnemyFlagOff(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo, uint flagNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsLinkageEnemyFlagOff(stageInfo.StageNo, groupNo, setNo, (int)flagNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdChainNotLess(this List<CDataQuestCommand> checkCommands, int chainNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.ChainNotLess(chainNo));
             return checkCommands;
         }
     }

@@ -275,20 +275,6 @@
             ]
         }
     ],
-    "server_actions": [
-        {
-            "comment": "Detects when Ifirt destroys the stage, so the second form can come out.",
-            "action_type": "OmSetInstantValue",
-            "instant_value_action": "ResetGroup",
-            "stage_id": {
-                "id": 586,
-                "group_id": 1,
-                "layer_no": 0
-            },
-            "key": 9379,
-            "value": 8
-        }
-    ],
     "processes": [
         {
             "blocks": [
@@ -303,13 +289,12 @@
                     "announce_type": "Start",
                     "groups": [0],
                     "check_commands": [
-                        {"type": "EmHpLess", "Param1": 138, "Param2": 1, "Param3": 0, "Param4": 85}
+                        {"type": "IsLinkageEnemyFlag", "Param1": 138, "Param2": 1, "Param3": 0, "Param4": 2}
                     ]
                 },
                 {
                     "type": "KillGroup",
                     "show_marker": false,
-                    "reset_group": false,
                     "groups": [1]
                 }
             ]

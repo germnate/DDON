@@ -538,6 +538,22 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             return this;
         }
 
+        public QuestBlock AddConsumePlayerItem(QuestItem value)
+        {
+            ConsumePlayerItems.Add(value);
+            return this;
+        }
+
+        public QuestBlock AddConsumePlayerItem(ItemId itemId, uint amount)
+        {
+            ConsumePlayerItems.Add(new QuestItem()
+            {
+                ItemId = itemId,
+                Amount = amount
+            });
+            return this;
+        }
+
         public QuestBlock AddNpcOrderDetails(List<QuestNpcOrder> values)
         {
             NpcOrderDetails.AddRange(values);
