@@ -2694,7 +2694,9 @@ TutorialEnemyInvincibleOff(int param01 = 0, int param02 = 0, int param03 = 0, in
 ### SetDiePlayerReturnPos
 ```
 /**
- * @brief
+ * @brief Changes a player's respawn position when fully dead and executes command SetBarricade.
+ * The player is also kept perpetually in combat, disallowing the use of teleports. They must use Exit Content to leave or proceed with quest steps.
+ * Used in several Main and Personal Quests with closed off arenas.
  * @param stageNo
  * @param startPos
  * @param outSceNo
@@ -2742,7 +2744,8 @@ ResetCheckPoint(int param01 = 0, int param02 = 0, int param03 = 0, int param04 =
 ### ResetDiePlayerReturnPos
 ```
 /**
- * @brief
+ * @brief Resets a player's respawn position when fully dead to default and executes command ResetBarricade.
+ * Used to revert SetDiePlayerReturnPos.
  * @param stageNo
  * @param startPos
  */
@@ -3359,7 +3362,7 @@ SetSubstoryEnemyInvincible(int enemyGroupFlag, int invincible, int param03 = 0, 
 AddFsmTalkNpc(int npcId, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
 
-### AchievementAnnounce (108)
+### AchievementBanner (108)
 
 | Field | Value |
 |-------|-------|
@@ -3368,10 +3371,10 @@ AddFsmTalkNpc(int npcId, int param02 = 0, int param03 = 0, int param04 = 0);
 
 ```
 /**
- * @brief Sends an animation/sound trigger event (opcode 0x21) to a substory enemy group.
- * Does nothing if param02 == 0.
- * @param groupId   Enemy group identifier
- * @param flagValue Event value; passed as (flagValue - 1) to FUN_00bd3870
+ * @brief Displays an achievement banner from a given category.
+ * Only category 6 (Great Purpose) has banners to display.
+ * @param categoryNo  Achievement category
+ * @param bannerNo    Banner number (1 to 16, 15 is empty/unused)
  */
 AchievementAnnounce(int category, int flagValue, int param03 = 0, int param04 = 0);
 ```
@@ -3890,62 +3893,66 @@ SubstoryAvgEnemyHpLess(int param01 = 0, int hpRatePercent = 0, int param03 = 0, 
 IsOmBehaviorState(StageNo stageNo, int groupNo, int setNo, int behaviorState);
 ```
 
-### IsPlayerSpecificLayoutFlag (220)
+### MonsterGatheringSpotState (220)
 
 | Field | Value |
 |-------|-------|
 | Address | `0x00635EF0` |
 | Table index | 220 |
-| Key callees | `FUN_00b19cc0` (GM check), `DAT_022044c4+0x3834+0x8c` (stored player ID), `FUN_00bfc1e0(flagId)` |
+| Key callees | `FUN_00b19cc0` (GM check), `DAT_022044c4+0x3834+0x8c` (stage number), `FUN_00bfc1e0` (spotId) |
 
 ```
 /**
- * @brief Checks a player-specific substory item flag.
- * Guards on GM mode and matching the stored player ID. Returns 1 if FUN_00bfc1e0(flagId) == expectedValue.
- * @param playerId      Player identifier to match against DAT_022044c4+0x3834+0x8c
- * @param flagId        Flag identifier passed to FUN_00bfc1e0
- * @param expectedValue Expected return value from FUN_00bfc1e0
+ * @brief Checks if a specific enemy group has spawned in a monster gathering spot.
+ * Reads SpotState from CDataAreaRankMonsterGatheringSpot and checks against param3.
+ * SpotState ranges from 1 to 4 and rotated every 18 hours in the original game, with SpotState = 3 spawning the Spot Boss.
+ * Returns 1 if FUN_00bfc1e0(spotId) has the expected spot state.
+ * Used in gathering S3 World Quests that require the Spot Boss to not be present.
+ * @param stageNo   Stage number DAT_022044c4+0x3834+0x8c
+ * @param spotId    Spot identifier passed to FUN_00bfc1e0
+ * @param spotState Expected spot value from FUN_00bfc1e0
  */
-IsPlayerSpecificLayoutFlag(int playerId, int flagId, int expectedValue, int param04 = 0);
+MonsterGatheringSpotState(int stageNo, int spotId, int spotState, int param04 = 0);
 ```
 
-### IsQuestEnemyAlive (221)
+### OmEndAnimation (221)
 
 | Field | Value |
 |-------|-------|
 | Address | `0x00636000` |
 | Table index | 221 |
-| Key callees | `FUN_00a41780(stageNo, groupNo, setNo, 0)` (quest enemy type 3), `FUN_00bc2da0` (checks status bit 15) |
+| Key callees | `FUN_00a41780(stageNo, groupNo, setNo, 0)` (quest layout type 3), `FUN_00bc2da0` (checks status bit 15) |
 
 ```
 /**
- * @brief Checks if a quest enemy group (type 3) is alive (status bit 15 set).
+ * @brief Checks if a player has interacted with an OM and its animation has played out completely.
+ * Mainly used for the new Season 3 levers with a longer animation.
  * @param stageNo  Stage number
- * @param groupNo  Enemy group number
- * @param setNo    Enemy set number
+ * @param groupNo  Layout group number
+ * @param setNo    Layout set number
  */
-IsQuestEnemyAlive(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
+OmEndAnimation(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
 ```
 
-### IsQuestEnemyAlive2 (222)
+### OmEndAnimationNoMarker (222)
 
 | Field | Value |
 |-------|-------|
 | Address | `0x00636060` |
 | Table index | 222 |
-| Notes | Identical decompilation to IsQuestEnemyAlive (221). May differ in calling convention. |
+| Notes | Identical decompilation to OmEndAnimation (221). May differ in calling convention. |
 
 ```
 /**
- * @brief Duplicate/variant of IsQuestEnemyAlive. Identical behaviour.
+ * @brief Variant of OmEndAnimation without a marker.
  * @param stageNo  Stage number
- * @param groupNo  Enemy group number
- * @param setNo    Enemy set number
+ * @param groupNo  Layout group number
+ * @param setNo    Layout set number
  */
-IsQuestEnemyAlive2(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
+OmEndAnimationNoMarker(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
 ```
 
-### IsQuestOrAreaEnemyAlive (223)
+### QuestOmEndAnimation (223)
 
 | Field | Value |
 |-------|-------|
@@ -3955,31 +3962,32 @@ IsQuestEnemyAlive2(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
 
 ```
 /**
- * @brief Area-aware version of IsQuestEnemyAlive.
+ * @brief Checks if a player has interacted with a quest-spawned OM and its animation has played out completely.
+ * Mainly used for the new Season 3 levers with a longer animation.
  * Uses the area-specific lookup (FUN_00a41890) when an area instance is active.
  * @param stageNo  Stage number
- * @param groupNo  Enemy group number
- * @param setNo    Enemy set number
+ * @param groupNo  Layout group number
+ * @param setNo    Layout set number
  */
-IsQuestOrAreaEnemyAlive(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
+QuestOmEndAnimation(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
 ```
 
-### IsQuestOrAreaEnemyAlive2 (224)
+### QuestOmEndAnimationNoMarker (224)
 
 | Field | Value |
 |-------|-------|
 | Address | `0x00636110` |
 | Table index | 224 |
-| Notes | Duplicate of IsQuestOrAreaEnemyAlive (223). |
+| Notes | Duplicate of QuestOmEndAnimation (223). |
 
 ```
 /**
- * @brief Duplicate/variant of IsQuestOrAreaEnemyAlive.
+ * @brief Variant of QuestOmEndAnimation without a marker.
  * @param stageNo  Stage number
- * @param groupNo  Enemy group number
- * @param setNo    Enemy set number
+ * @param groupNo  Layout group number
+ * @param setNo    Layout set number
  */
-IsQuestOrAreaEnemyAlive2(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
+QuestOmEndAnimationNoMarker(StageNo stageNo, int groupNo, int setNo, int param04 = 0);
 ```
 
 ### OmSetTouchRadius (226)
@@ -4113,7 +4121,7 @@ IsEnemyFoundForOrderRadius(StageNo stageNo, int groupNo, int setNo = -1, int mar
 IsEnemyFoundForOrderRadiusNoMarker(StageNo stageNo, int groupNo, int setNo = -1, int param04 = 0);
 ```
 
-### IsAchievementObtained (233)
+### HasAchievement (233)
 
 | Field | Value |
 |-------|-------|
@@ -4122,11 +4130,12 @@ IsEnemyFoundForOrderRadiusNoMarker(StageNo stageNo, int groupNo, int setNo = -1,
 
 ```
 /**
- * @brief Checks if an achievement was unlocked.
- * @param1 category
- * @param2 achievementId
+ * @brief Checks if player has an achievement from a given category.
+ * @brief Only seems to work for category 6 (Great Purpose).
+ * @param1  categoryNo
+ * @param2  achievementId
  */
-IsAchievementObtained(int category, int achievementId, int param03_unused = 0, int param04_unused = 0);
+HasAchievement(int categoryNo, int achievementId, int param03_unused = 0, int param04_unused = 0);
 ```
 
 ### IsOmBrokenInCurrentPhase (229)
@@ -4342,23 +4351,23 @@ IsContentsModeTimerNotLess(int timeSec, int param02 = 0, int param03 = 0, int pa
 IsTriggerFlagSetAndClear(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
 
-### IsGameProgressionLevelReached (250)
+### ChainNotLess (250)
 
 | Field | Value |
 |-------|-------|
 | Address | `0x006374C0` |
 | Table index | 250 |
-| Key callees | param01==0: checks tutorial-complete flag at game instance +0x10 and fires message 0x25e; param01>0: compares `param01 <= *(sGame::mpInstance + 0x3a0c)` |
+| Key callees | param01==0: checks phase-complete flag at game instance +0x10 and fires message 0x25e; param01>0: compares `param01 <= *(sGame::mpInstance + 0x3a0c)` |
 
 ```
 /**
- * @brief Checks global story progression level.
- * @brief Used to check chain # progress.
- * progressLevel == 0: checks if tutorial is complete (fires announce 0x25e if so).
- * progressLevel  > 0: checks if progressLevel <= *(sGame::mpInstance + 0x3a0c).
- * @param progressLevel Story progression threshold (0 = tutorial-complete check)
+ * @brief Checks if the player has reached a chain number from a Chain Dungeon (Extreme Mission).
+ * Reads Unk2 from packet S2CSituationDataUpdateObjectivesNtc and checks against param1.
+ * chainNo == 0: checks if initial phase is complete (fires announce 0x25e if so).
+ * chainNo  > 0: checks if chainNo <= *(sGame::mpInstance + 0x3a0c).
+ * @param chainNo Chain counter threshold (0 = phase-complete check)
  */
-IsGameProgressionLevelReached(int progressLevel, int param02 = 0, int param03 = 0, int param04 = 0);
+ChainNotLess(int chainNo, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
 
 ### IsContentsModeStateFlag (253)
@@ -4377,50 +4386,49 @@ IsGameProgressionLevelReached(int progressLevel, int param02 = 0, int param03 = 
 IsContentsModeStateFlag(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0);
 ```
 
-### IsQuestEnemyHpNotGreater (255)
+### IsQuestLayoutHpNotGreater (255)
 
 | Field | Value |
 |-------|-------|
 | Address | `0x00637890` |
 | Table index | 255 |
-| Key callees | `FUN_00a41780` (quest enemy type 3 lookup), `FUN_00bc0ab0` computes HP-lost% = `100 - (current/max)*100` |
+| Key callees | `FUN_00a41780` (quest layout type 3 lookup), `FUN_00bc0ab0` computes HP-lost% = `100 - (current/max)*100` |
 
 ```
 /**
- * @brief Checks if a quest enemy's HP-lost percentage is within [0, hpPct].
- * Effectively checks that the enemy's remaining HP >= (100 - hpPct)%.
+ * @brief Checks if a quest layout's HP-lost percentage is within [0, hpPct].
+ * Effectively checks that the layout's remaining HP >= (100 - hpPct)%.
  * @note Works on Layout Enemies in EXM (Chain Dungeon)
  * @param stageNo Stage number
- * @param groupNo Enemy group number
- * @param setNo   Enemy set number
+ * @param groupNo Layout group number
+ * @param setNo   Layout set number
  * @param hpPct   Hp % to trigger check on (0 = full HP required, 100 = any HP)
  */
-IsQuestEnemyHpNotGreater(StageNo stageNo, int groupNo, int setNo, int hpPct);
+IsQuestLayoutHpNotGreater(StageNo stageNo, int groupNo, int setNo, int hpPct);
 ```
 
-### IsAreaLinkageQuestFlagOn (256)
+### IsExtremeMissionClear (256)
 
 | Field | Value |
 |-------|-------|
 | Address | `0x00637950` |
 | Table index | 256 |
-| System | **Grand Mission / Extreme Mission** (Area-Linkage battle content) |
-| Key callees | Content-mode guard: `DAT_0220456c+0x9f4+0x4654 == +0x45cc`; `FUN_00a336e0(flagKey)` (constructs Grand Mission vtable wrapper); `FUN_00be1ce0` → `FUN_00be1f70(9)` (walks type-9 flag list at manager+0x90) |
+| System | **Grand Mission / Extreme Mission / Chain Dungeons** (Area-Linkage battle content) |
+| Key callees | Content-mode guard: `DAT_0220456c+0x9f4+0x4654 == +0x45cc`; `FUN_00a336e0(questId)` (constructs Grand Mission vtable wrapper); `FUN_00be1ce0` → `FUN_00be1f70(9)` (walks type-9 quest list at manager+0x90) |
 | Vtable ID | `PTR_FUN_01afa2d0` — same vtable as "Grand Mission:Raid Boss" (`0x01afae08`) and "Grand Mission:Fort Defense" (`0x01afa388`) |
 | Content-mode guard | `+0x4654 == +0x45cc` — general content-phase equality check; fails during transitions. Same guard used by commands 242/243/244/251. |
 
 ```
 /**
- * @brief Checks whether a Grand Mission / Extreme Mission area-linkage flag (content sub-type 9) is set.
- * This is a **flag/state presence check** — it is NOT a kill check and NOT a proximity check.
- * Constructs a typed Grand Mission wrapper via FUN_00a336e0(flagKey), then walks the type-9 flag
- * list at Grand Mission manager+0x90 via FUN_00be1f70(9). Returns 1 if any entry's +4 field matches flagKey.
- * Guarded by content-mode equality (DAT_0220456c+0x9f4+0x4654 == +0x45cc); returns 0 if not in the expected phase.
- * @note This is a Grand Mission system check, not a generic world-quest flag.
+ * @brief Checks if a player has cleared a specific Extreme Mission/Grand Mission/Chain Dungeon (category 9 quests).
+ * Constructs a typed Grand Mission wrapper via FUN_00a336e0(questId), then walks the type-9 quest
+ * list at Grand Mission manager+0x90 via FUN_00be1f70(9). Returns 1 if any entry's +4 field matches questId.
+ * Guarded by content-mode equality (DAT_0220456c+0x9f4+0x4654 == +0x45cc); returns 0 if player has not yet cleared the quest.
+ * @note This is merely a quest completion check — adding a clear to the database is enough.
  *       Other sub-types: 3 (+0x68), 4 (+0x7c), 0xb (+0xa4) — each has a parallel check command.
- * @param flagKey Key matched against entry+4 in the type-9 flag list (params 2-4 unused)
+ * @param questId Quest identifier matched against entry+4 in the type-9 quest category list (params 2-4 unused)
  */
-IsAreaLinkageQuestFlagOn(int flagKey, int param02_unused = 0, int param03_unused = 0, int param04_unused = 0);
+IsExtremeMissionClear(int questId, int param02_unused = 0, int param03_unused = 0, int param04_unused = 0);
 ```
 
 ### IsKilledTargetEnemySetGroupMode15 (242)

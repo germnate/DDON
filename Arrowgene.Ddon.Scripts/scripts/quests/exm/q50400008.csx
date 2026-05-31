@@ -63,34 +63,34 @@ public class ScriptedQuest : IQuest
         AddEnemies(0, Stage.DarknessShroudedShadoleanGreatTemple0, 10, QuestEnemyPlacementType.Manual, new()
         {
             LibDdon.Enemy.Create(EnemyId.HighPixiePow, 100, 4461, 2)
-				.SetRepopNum(1)
+                .SetRepopNum(1)
                 .SetRepopCount(2)
                 .SetNamedEnemyParams(NamedParamId.Corrupted2752)
                 .SetEnemyTargetTypesId(1),
             LibDdon.Enemy.Create(EnemyId.HighPixiePow, 100, 4461, 3)
-				.SetRepopNum(0)
+                .SetRepopNum(0)
                 .SetRepopCount(2)
                 .SetNamedEnemyParams(NamedParamId.Corrupted2752)
                 .SetEnemyTargetTypesId(1),
             LibDdon.Enemy.Create(EnemyId.InfectedHobgoblin, 100, 4461, 5)
-				.SetRepopNum(0)
+                .SetRepopNum(0)
                 .SetRepopCount(2)
                 .SetNamedEnemyParams(NamedParamId.Corrupted2752)
                 .SetEnemyTargetTypesId(1)
                 .SetInfectionType(3),
             LibDdon.Enemy.Create(EnemyId.InfectedHobgoblin, 100, 4461, 6)
-				.SetRepopNum(1)
+                .SetRepopNum(1)
                 .SetRepopCount(2)
                 .SetNamedEnemyParams(NamedParamId.Corrupted2752)
                 .SetEnemyTargetTypesId(1)
                 .SetInfectionType(3),
             LibDdon.Enemy.Create(EnemyId.LegionFighter, 100, 4461, 8)
-				.SetRepopNum(0)
+                .SetRepopNum(0)
                 .SetRepopCount(2)
                 .SetNamedEnemyParams(NamedParamId.Corrupted2752)
                 .SetEnemyTargetTypesId(1),
             LibDdon.Enemy.Create(EnemyId.LegionFighter, 100, 4461, 9)
-				.SetRepopNum(1)
+                .SetRepopNum(1)
                 .SetRepopCount(2)
                 .SetNamedEnemyParams(NamedParamId.Corrupted2752)
                 .SetEnemyTargetTypesId(1),
@@ -99,7 +99,7 @@ public class ScriptedQuest : IQuest
         AddEnemies(EnemyGroupId.Set8672, Stage.DarknessShroudedShadoleanGreatTemple0, 10, QuestEnemyPlacementType.Manual, new()
         {
             LibDdon.Enemy.Create(EnemyId.AlteredZuhl, 100, 111525, 0)
-				//.SetRepopNum(0)
+                //.SetRepopNum(0)
                 //.SetRepopCount(1)
                 .SetNamedEnemyParams(NamedParamId.Corrupted3158)
                 .SetEnemyTargetTypesId(4)
@@ -121,7 +121,7 @@ public class ScriptedQuest : IQuest
                 QuestManager.CheckCommand.MyQstFlagOn(5219)
             ])
             .AddResultCommands([
-                //QuestManager.ResultCommand.StartMissionAnnounce(),
+                QuestManager.ResultCommand.StartMissionAnnounce(),
                 QuestManager.ResultCommand.SetDiePlayerReturnPos(3110, 0, 0),
                 QuestManager.ResultCommand.Unknown(127, 0, 0, 0, 0),
                 QuestManager.ResultCommand.StartContentsTimer(0),
@@ -143,7 +143,7 @@ public class ScriptedQuest : IQuest
             ])
             .AddResultCommands([
                 QuestManager.ResultCommand.StageJump(3110, 3, 1, 0),
-                QuestManager.ResultCommand.Unknown(130, 0, 0, 0, 0),
+                QuestManager.ResultCommand.Unknown(130, 0, 0, 0, 0), // Sends S2C_63_5_16_NTC - Actually C2S
                 QuestManager.ResultCommand.ResetDiePlayerReturnPos(0, 0, 0, 0),
                 QuestManager.ResultCommand.SetDiePlayerReturnPos(3110, 3, 0, 0)
             ]);
@@ -173,7 +173,7 @@ public class ScriptedQuest : IQuest
         var process1 = AddNewProcess(1);
         //process1.AddRawBlock(QuestAnnounceType.None)
             //.AddCheckCommands([
-                //QuestManager.CheckCommand.ChainNotLess(0) // Not working for 0
+                //QuestManager.CheckCommand.ChainNotLess(0) // Not working for 0, but according to ingame footage should be actually 5?
             //]);
         process1.AddRawBlock(QuestAnnounceType.None)
             .AddCheckCommands([
@@ -269,16 +269,16 @@ public class ScriptedQuest : IQuest
                 QuestManager.ResultCommand.QstLayoutFlagOff (8686),
                 QuestManager.ResultCommand.QstLayoutFlagOn (8687)
             ]);
-		process3.AddRawBlock(QuestAnnounceType.None)
-			.AddResultCommands([
-				QuestManager.ResultCommand.CallGeneralAnnounce (0, 100770),
-				QuestManager.ResultCommand.SetQuestOmMontageFix(3110, 161, 0, 2),
-				QuestManager.ResultCommand.QstLayoutFlagOff (8688),
-				QuestManager.ResultCommand.QstLayoutFlagOn (8689)
-			])
-			.AddCheckCommands([
-				QuestManager.CheckCommand.DummyNotProgress() // ChainNotLess 15?
-			]);
+        process3.AddRawBlock(QuestAnnounceType.None)
+            .AddResultCommands([
+                QuestManager.ResultCommand.CallGeneralAnnounce (0, 100770),
+                QuestManager.ResultCommand.SetQuestOmMontageFix(3110, 161, 0, 2),
+                QuestManager.ResultCommand.QstLayoutFlagOff (8688),
+                QuestManager.ResultCommand.QstLayoutFlagOn (8689)
+            ])
+            .AddCheckCommands([
+                QuestManager.CheckCommand.DummyNotProgress() // ChainNotLess 15?
+            ]);
         // Missing next block?
 
         var process4 = AddNewProcess(4);
