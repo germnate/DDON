@@ -12,6 +12,9 @@ namespace Arrowgene.Ddon.Shared.Model
 {
     public class Character : CharacterCommon
     {
+        public const uint ServerCharacterId = 0;
+        public const string ServerCharacterFirstName = "Server";
+
         public Character() : base()
         {
             FirstName = string.Empty;

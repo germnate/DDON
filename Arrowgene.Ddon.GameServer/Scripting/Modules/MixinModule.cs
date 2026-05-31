@@ -28,6 +28,17 @@ namespace Arrowgene.Ddon.GameServer.Scripting
             return (T) Mixins[scriptName];
         }
 
+        public bool TryGet<T>(string scriptName, out T mixin)
+        {
+            if (Mixins.TryGetValue(scriptName, out var raw) && raw is T typed)
+            {
+                mixin = typed;
+                return true;
+            }
+            mixin = default;
+            return false;
+        }
+
         public override bool EvaluateResult(string path, object result, IDictionary<string, object> variables)
         {
             if (result == null)
