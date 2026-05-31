@@ -52,12 +52,14 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 };
                 client.Enqueue(profileNtc, queue);
 
+                bool isOfficialPawn = pawn.IsOfficialPawn || pawn.OwningCharacterId == Character.ServerCharacterId;
+
                 //S2C_PAWN_GET_PAWN_HISTORY_INFO_NTC
                 var historyNtc = new S2CPawnGetPawnHistoryInfoNtc()
                 {
                     CharacterId = client.Character.CharacterId,
                     PawnId = pawn.PawnId,
-                    PawnHistoryList = Server.Database.SelectPawnHistory(pawn.PawnId, connection)
+                    PawnHistoryList = isOfficialPawn ? [] : Server.Database.SelectPawnHistory(pawn.PawnId, connection)
                 };
                 client.Enqueue(historyNtc, queue);
 
@@ -66,7 +68,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     CharacterId = client.Character.CharacterId,
                     PawnId = pawn.PawnId,
-                    PawnTotalScore = Server.Database.SelectPawnTotalScore(pawn.PawnId, connection)
+                    PawnTotalScore = isOfficialPawn ? new CDataPawnTotalScore() : Server.Database.SelectPawnTotalScore(pawn.PawnId, connection)
                 };
                 client.Enqueue(scoreNtc, queue);
             });

@@ -23,19 +23,43 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Modules
 
         private readonly Dictionary<uint, IOfficialPawnScript> _pawnsById = [];
         private readonly Dictionary<string, uint> _pawnIdByFilename = [];
+        private readonly object _pawnsLock = new();
 
         private const string SettingsScript = "official_pawns";
 
-        public bool IsOfficialPawn(uint pawnId) => _pawnsById.ContainsKey(pawnId);
+        public bool IsOfficialPawn(uint pawnId)
+        {
+            lock (_pawnsLock)
+            {
+                return _pawnsById.ContainsKey(pawnId);
+            }
+        }
 
         public IOfficialPawnScript? GetById(uint pawnId)
-            => _pawnsById.GetValueOrDefault(pawnId);
+        {
+            lock (_pawnsLock)
+            {
+                return _pawnsById.GetValueOrDefault(pawnId);
+            }
+        }
 
         public IEnumerable<IOfficialPawnScript> GetAll()
-            => _pawnsById.Values;
+        {
+            lock (_pawnsLock)
+            {
+                return _pawnsById.Values.ToList();
+            }
+        }
 
         public IEnumerable<IOfficialPawnScript> GetForLevel(int playerLevel)
-            => _pawnsById.Values.Where(p => playerLevel >= p.MinLevel && playerLevel <= p.MaxLevel);
+        {
+            lock (_pawnsLock)
+            {
+                return _pawnsById.Values
+                    .Where(p => playerLevel >= p.MinLevel && playerLevel <= p.MaxLevel)
+                    .ToList();
+            }
+        }
 
         /// <summary>Generate a server-owned rental pawn for the hiring character.</summary>
         public RentalPawnRecord Generate(IOfficialPawnScript script, Character hiringCharacter, DdonGameServer server)
@@ -276,7 +300,7 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Modules
                     .Distinct()
                     .ToList();
             }
-            catch
+            catch (Exception ex) when (IsMissingSettingException(ex))
             {
                 // Settings file not loaded or a pool key is missing.
                 return [];
@@ -317,16 +341,19 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Modules
 
             string filename = Path.GetFileNameWithoutExtension(path);
             uint pawnId = ComputeStablePawnId(filename);
-            if (_pawnsById.TryGetValue(pawnId, out var existingScript)
-                && (!_pawnIdByFilename.TryGetValue(filename, out uint existingPawnId) || existingPawnId != pawnId))
+            lock (_pawnsLock)
             {
-                throw new InvalidOperationException(
-                    $"Official pawn id collision for '{filename}' and '{existingScript.Name}' using PawnId {pawnId}.");
-            }
+                if (_pawnsById.TryGetValue(pawnId, out var existingScript)
+                    && (!_pawnIdByFilename.TryGetValue(filename, out uint existingPawnId) || existingPawnId != pawnId))
+                {
+                    throw new InvalidOperationException(
+                        $"Official pawn id collision for '{filename}' and '{existingScript.Name}' using PawnId {pawnId}.");
+                }
 
-            script.PawnId = pawnId;
-            _pawnsById[pawnId] = script;
-            _pawnIdByFilename[filename] = pawnId;
+                script.PawnId = pawnId;
+                _pawnsById[pawnId] = script;
+                _pawnIdByFilename[filename] = pawnId;
+            }
 
             return true;
         }
@@ -521,7 +548,7 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Modules
                 : "PreferredArmorLimitBreakStats";
 
             var statMap = server.GameSettings.Get<Dictionary<JobId, List<string>>>(SettingsScript, settingName);
-            return statMap[job];
+            return statMap.TryGetValue(job, out var stats) ? stats : [];
         }
 
         private static void ApplyRecommendedListsFromSettings(OfficialPawnBuilder builder, JobId job, DdonGameServer server)
@@ -534,7 +561,7 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Modules
                     builder.WithRecommendedCustomSkills(skills);
                 }
             }
-            catch
+            catch (Exception ex) when (IsMissingSettingException(ex))
             {
                 // Without configured recommendations, the builder uses its generic job fallback.
             }
@@ -547,10 +574,15 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Modules
                     builder.WithRecommendedAbilities(abilities);
                 }
             }
-            catch
+            catch (Exception ex) when (IsMissingSettingException(ex))
             {
                 // Without configured recommendations, the builder uses its generic job fallback.
             }
+        }
+
+        private static bool IsMissingSettingException(Exception ex)
+        {
+            return ex.Message.Contains("doesn't exist", StringComparison.Ordinal);
         }
 
         /// <summary>
