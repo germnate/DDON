@@ -35,6 +35,9 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             foreach (var script in officialPawnModule.GetForLevel(playerLevel))
             {
+                if (!officialPawnModule.IsAvailableToClient(script, client, Server))
+                    continue;
+
                 if (rentedOfficialPawnIds.Contains(script.PawnId) || rentedOfficialPawnNames.Contains(script.Name))
                     continue;
 

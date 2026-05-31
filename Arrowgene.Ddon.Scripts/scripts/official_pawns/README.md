@@ -55,8 +55,32 @@ as a `CDataEditInfo` block, then paste that block into `EditInfo`.
   uses the server default.
 - `CraftCount`: Optional number of crafts available after hire. `null` uses the
   server default.
+- `IsUnlocked(GameClient client, DdonGameServer server)`: Optional unlock check.
+  Return `true` when the player should be able to see, preview, and hire this
+  pawn. The default implementation always returns `true`.
 
 Official pawns are server-owned and display `Server` as their Arisen name.
+
+## Unlock Conditions
+
+Override `IsUnlocked` when a pawn should appear only after a player completes
+content or reaches a milestone:
+
+```csharp
+public override bool IsUnlocked(GameClient client, DdonGameServer server)
+{
+    return client.Character.HasQuestCompleted((QuestId)12345)
+        && client.Character.HasJobOfLevel(JobId.Warrior, 40);
+}
+```
+
+The method receives the connected `GameClient`, so scripts can inspect the
+player's character state. It also receives `DdonGameServer` for advanced checks
+that need server managers or database access.
+
+Locked official pawns are hidden from the official pawn list. Direct profile and
+hire requests are rejected with the same not-found error used for unavailable
+pawns.
 
 ## Quality Tiers
 

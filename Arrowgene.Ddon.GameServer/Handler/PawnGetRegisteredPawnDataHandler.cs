@@ -26,6 +26,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
             var officialScript = Server.ScriptManager.OfficialPawnModule.GetById(unchecked((uint)request.PawnId));
             if (officialScript != null)
             {
+                if (!Server.ScriptManager.OfficialPawnModule.IsAvailableToClient(officialScript, client, Server))
+                {
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED);
+                }
+
                 HandleOfficialPawn(client, officialScript, queue);
                 return queue;
             }
