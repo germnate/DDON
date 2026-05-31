@@ -61,6 +61,14 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Modules
             }
         }
 
+        public bool IsAvailableToClient(IOfficialPawnScript script, GameClient client, DdonGameServer server)
+        {
+            int playerLevel = (int)(client.Character.ActiveCharacterJobData?.Lv ?? 1);
+            return playerLevel >= script.MinLevel
+                && playerLevel <= script.MaxLevel
+                && script.IsUnlocked(client, server);
+        }
+
         /// <summary>Generate a server-owned rental pawn for the hiring character.</summary>
         public RentalPawnRecord Generate(IOfficialPawnScript script, Character hiringCharacter, DdonGameServer server)
         {

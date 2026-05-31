@@ -29,18 +29,23 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_ALREADY_RENTED);
             }
 
-            if (Server.WalletManager.GetWalletAmount(client.Character, WalletType.RiftPoints) < request.RentalCost)
-            {
-                throw new ResponseErrorException(ErrorCode.ERROR_CODE_CHARACTER_DATA_NO_RIM);
-            }
-
             // Official pawn: generate without loading from DB
             var officialScript = Server.ScriptManager.OfficialPawnModule.GetById(request.RequestedPawnId);
             if (officialScript != null)
             {
+                if (!Server.ScriptManager.OfficialPawnModule.IsAvailableToClient(officialScript, client, Server))
+                {
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED);
+                }
+
                 if (client.Character.RentedPawns.Any(x => x.IsOfficialPawn && x.Name == officialScript.Name))
                 {
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_ALREADY_RENTED);
+                }
+
+                if (Server.WalletManager.GetWalletAmount(client.Character, WalletType.RiftPoints) < request.RentalCost)
+                {
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_CHARACTER_DATA_NO_RIM);
                 }
 
                 HandleOfficialPawnRent(client, officialScript, request, packetQueue);
@@ -48,6 +53,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
             }
 
             // Normal player pawn: existing path
+            if (Server.WalletManager.GetWalletAmount(client.Character, WalletType.RiftPoints) < request.RentalCost)
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_CHARACTER_DATA_NO_RIM);
+            }
+
             S2CPawnRentRegisteredPawnRes response = new();
             RentalPawnRecord rentalRecord = null;
 

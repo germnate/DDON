@@ -30,6 +30,9 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
         /// <summary>Maximum number of crafts after hire. null uses the server default.</summary>
         public virtual byte? CraftCount => null;
 
+        /// <summary>Return true when the hiring client has unlocked this official pawn.</summary>
+        public virtual bool IsUnlocked(GameClient client, DdonGameServer server) => true;
+
         /// <summary>Generate a rental pawn record for the given hiring context.</summary>
         public abstract RentalPawnRecord Generate(OfficialPawnContext ctx);
     }
