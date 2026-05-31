@@ -63,6 +63,7 @@ namespace Arrowgene.Ddon.Shared.AssetReader
                 {
                     var stat = new LimitStatLottery()
                     {
+                        Name = jStatList.GetProperty("name").GetString() ?? string.Empty,
                         MinGreatSuccessIndex = jStatList.GetProperty("min_great_success_index").GetUInt32()
                     };
 
