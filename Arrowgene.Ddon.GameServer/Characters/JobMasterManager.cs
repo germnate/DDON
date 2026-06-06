@@ -195,8 +195,11 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return;
             }
 
-            // Create the new order
-            Server.Database.InsertJobMasterActiveOrder(client.Character.CharacterId, jobId, CloneOrder(match), connectionIn);
+            // Create or refresh the order. Re-learning/upgrading around an already active task should be idempotent.
+            if (!Server.Database.UpsertJobMasterActiveOrder(client.Character.CharacterId, jobId, CloneOrder(match), connectionIn))
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_DB_FAILURE, "Failed to upsert custom skill job training order");
+            }
 
             // Update the stored orders
             client.Character.JobMasterActiveOrders[jobId] = GetJobMasterActiveOrders(client.Character, jobId, connectionIn);
@@ -218,8 +221,11 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return;
             }
 
-            // Create the new order
-            Server.Database.InsertJobMasterActiveOrder(client.Character.CharacterId, jobId, CloneOrder(match), connectionIn);
+            // Create or refresh the order. Re-learning/upgrading around an already active task should be idempotent.
+            if (!Server.Database.UpsertJobMasterActiveOrder(client.Character.CharacterId, jobId, CloneOrder(match), connectionIn))
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_DB_FAILURE, "Failed to upsert augment job training order");
+            }
 
             // Update the stored orders
             client.Character.JobMasterActiveOrders[jobId] = GetJobMasterActiveOrders(client.Character, jobId, connectionIn);
@@ -235,9 +241,11 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 var template = GetOrderTemplate(jobId, activeOrder);
                 if (template == null)
                 {
-                    activeOrder.JobOrderProgressList = progress;
-                    activeOrders.Add(activeOrder);
-                    Logger.Info($"No job master asset template found for CharacterId={character.CharacterId}, JobId={jobId}, ReleaseType={activeOrder.ReleaseType}, ReleaseId={activeOrder.ReleaseId}, ReleaseLv={activeOrder.ReleaseLv}. Using stored DB progress.");
+                    Logger.Info($"No job master asset template found for CharacterId={character.CharacterId}, JobId={jobId}, ReleaseType={activeOrder.ReleaseType}, ReleaseId={activeOrder.ReleaseId}, ReleaseLv={activeOrder.ReleaseLv}. Removing stale active order.");
+                    if (!Server.Database.DeleteJobMasterActiveOrder(character.CharacterId, jobId, activeOrder, connectionIn))
+                    {
+                        throw new ResponseErrorException(ErrorCode.ERROR_CODE_DB_FAILURE, "Failed to delete stale job training order");
+                    }
                     continue;
                 }
 
