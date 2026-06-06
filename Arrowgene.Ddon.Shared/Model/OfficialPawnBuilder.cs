@@ -68,6 +68,15 @@ namespace Arrowgene.Ddon.Shared.Model
         /// <summary>Maximum number of ability slots shown in the pawn UI.</summary>
         public const int MaxAbilitySlots = 8;
 
+        /// <summary>Maximum primary crafting skill level supported by the normal crafting formulas.</summary>
+        public const uint MaxCraftSkillLevel = 70;
+
+        /// <summary>Maximum primary crafting skill level accepted by manual script helpers.</summary>
+        public const uint MaxCraftSkillDisplayLevel = MaxCraftSkillLevel + 1;
+
+        /// <summary>Maximum craft rank used by official pawn auto-generation.</summary>
+        public const uint MaxCraftRank = 71;
+
         /// <summary>Player level where auto skill and ability levels reach their cap.</summary>
         private const int MaxSkillPlayerLevel = 90;
 
@@ -102,6 +111,7 @@ namespace Arrowgene.Ddon.Shared.Model
         private float? _autoCustomSkillsQuality;
         private float? _autoAbilitiesQuality;
         private float? _autoCraftQuality;
+        private bool _explicitCraftData;
 
         private readonly HashSet<(EquipType Type, EquipSlot Slot)> _explicitEquipmentSlots = [];
         private readonly Dictionary<(EquipType Type, EquipSlot Slot), ushort> _limitBreakOverrides = [];
@@ -593,6 +603,52 @@ namespace Arrowgene.Ddon.Shared.Model
         public OfficialPawnBuilder WithAutoCraft(float quality = PawnQuality.Normal)
         {
             _autoCraftQuality = Math.Clamp(quality, 0f, 1f);
+            _explicitCraftData = false;
+            return this;
+        }
+
+        /// <summary>Replace the pawn's crafting data with an explicit hand-authored value.</summary>
+        public OfficialPawnBuilder WithCraftData(CDataPawnCraftData craftData)
+        {
+            _craftData = craftData ?? throw new ArgumentNullException(nameof(craftData));
+            EnsureAllCraftSkills(_craftData);
+            ClampCraftSkillLevels(_craftData);
+            _explicitCraftData = true;
+            return this;
+        }
+
+        /// <summary>Set explicit crafting rank metadata and optional crafting skill levels.</summary>
+        public OfficialPawnBuilder WithCraft(
+            uint craftRank,
+            uint craftRankLimit = MaxCraftRank,
+            uint craftPoint = 0,
+            uint craftExp = 0,
+            IReadOnlyDictionary<CraftSkillType, uint>? skillLevels = null)
+        {
+            _craftData = BuildDefaultCraftData(ToStoredCraftSkillLevels(skillLevels ?? new Dictionary<CraftSkillType, uint>()));
+            _craftData.CraftRank = Math.Clamp(craftRank, 1, MaxCraftRank);
+            _craftData.CraftRankLimit = Math.Clamp(craftRankLimit, _craftData.CraftRank, MaxCraftRank);
+            _craftData.CraftPoint = craftPoint;
+            _craftData.CraftExp = craftExp;
+            _explicitCraftData = true;
+            return this;
+        }
+
+        /// <summary>Set one explicit crafting skill level while preserving the rest of the current craft data.</summary>
+        public OfficialPawnBuilder WithCraftSkill(CraftSkillType type, uint level)
+        {
+            EnsureAllCraftSkills(_craftData);
+            CDataPawnCraftSkill? skill = _craftData.PawnCraftSkillList.FirstOrDefault(skill => skill.Type == type);
+            if (skill == null)
+            {
+                skill = new CDataPawnCraftSkill { Type = type };
+                _craftData.PawnCraftSkillList.Add(skill);
+            }
+
+            skill.Level = IsPrimaryCraftSkill(type)
+                ? ToStoredCraftSkillLevel(level)
+                : level;
+            _explicitCraftData = true;
             return this;
         }
 
@@ -688,7 +744,7 @@ namespace Arrowgene.Ddon.Shared.Model
             if ((_autoAbilitiesQuality ?? _autoDefaultQuality) is float abilitiesQuality)
                 ApplyAutoAbilities(abilitiesQuality);
 
-            if ((_autoCraftQuality ?? _autoDefaultQuality) is float craftQuality)
+            if (!_explicitCraftData && (_autoCraftQuality ?? _autoDefaultQuality) is float craftQuality)
                 ApplyAutoCraft(craftQuality);
 
             ApplyLimitBreakOverrides();
@@ -1216,18 +1272,56 @@ namespace Arrowgene.Ddon.Shared.Model
                 CraftPoint = 0,
                 PawnCraftSkillList =
                 [
-                    new() { Type = CraftSkillType.ProductionSpeed, Level = skillLevels.GetValueOrDefault(CraftSkillType.ProductionSpeed) },
-                    new() { Type = CraftSkillType.EquipmentEnhancement, Level = skillLevels.GetValueOrDefault(CraftSkillType.EquipmentEnhancement) },
-                    new() { Type = CraftSkillType.EquipmentQuality, Level = skillLevels.GetValueOrDefault(CraftSkillType.EquipmentQuality) },
-                    new() { Type = CraftSkillType.ConsumableQuantity, Level = skillLevels.GetValueOrDefault(CraftSkillType.ConsumableQuantity) },
-                    new() { Type = CraftSkillType.CostPerformance, Level = skillLevels.GetValueOrDefault(CraftSkillType.CostPerformance) },
-                    new() { Type = CraftSkillType.ConsumableProductionIsAlwaysGreatSuccess, Level = 0 },
-                    new() { Type = CraftSkillType.CreatingHighQualityEquipmentIsAlwaysGreatSuccess, Level = 0 },
-                    new() { Type = CraftSkillType.CostPerformanceEffectUpFactor1, Level = 0 },
-                    new() { Type = CraftSkillType.CostPerformanceEffectUpFactor2, Level = 0 },
-                    new() { Type = CraftSkillType.UnknownEffect10, Level = 0 },
+                    new() { Type = CraftSkillType.ProductionSpeed, Level = Math.Min(skillLevels.GetValueOrDefault(CraftSkillType.ProductionSpeed), MaxCraftSkillLevel) },
+                    new() { Type = CraftSkillType.EquipmentEnhancement, Level = Math.Min(skillLevels.GetValueOrDefault(CraftSkillType.EquipmentEnhancement), MaxCraftSkillLevel) },
+                    new() { Type = CraftSkillType.EquipmentQuality, Level = Math.Min(skillLevels.GetValueOrDefault(CraftSkillType.EquipmentQuality), MaxCraftSkillLevel) },
+                    new() { Type = CraftSkillType.ConsumableQuantity, Level = Math.Min(skillLevels.GetValueOrDefault(CraftSkillType.ConsumableQuantity), MaxCraftSkillLevel) },
+                    new() { Type = CraftSkillType.CostPerformance, Level = Math.Min(skillLevels.GetValueOrDefault(CraftSkillType.CostPerformance), MaxCraftSkillLevel) },
+                    new() { Type = CraftSkillType.ConsumableProductionIsAlwaysGreatSuccess, Level = skillLevels.GetValueOrDefault(CraftSkillType.ConsumableProductionIsAlwaysGreatSuccess) },
+                    new() { Type = CraftSkillType.CreatingHighQualityEquipmentIsAlwaysGreatSuccess, Level = skillLevels.GetValueOrDefault(CraftSkillType.CreatingHighQualityEquipmentIsAlwaysGreatSuccess) },
+                    new() { Type = CraftSkillType.CostPerformanceEffectUpFactor1, Level = skillLevels.GetValueOrDefault(CraftSkillType.CostPerformanceEffectUpFactor1) },
+                    new() { Type = CraftSkillType.CostPerformanceEffectUpFactor2, Level = skillLevels.GetValueOrDefault(CraftSkillType.CostPerformanceEffectUpFactor2) },
+                    new() { Type = CraftSkillType.UnknownEffect10, Level = skillLevels.GetValueOrDefault(CraftSkillType.UnknownEffect10) },
                 ]
             };
+        }
+
+        private static void EnsureAllCraftSkills(CDataPawnCraftData craftData)
+        {
+            craftData.PawnCraftSkillList ??= [];
+
+            foreach (CraftSkillType type in Enum.GetValues<CraftSkillType>())
+            {
+                if (craftData.PawnCraftSkillList.Any(skill => skill.Type == type))
+                    continue;
+
+                craftData.PawnCraftSkillList.Add(new CDataPawnCraftSkill { Type = type, Level = 0 });
+            }
+        }
+
+        private static void ClampCraftSkillLevels(CDataPawnCraftData craftData)
+        {
+            foreach (CDataPawnCraftSkill skill in craftData.PawnCraftSkillList)
+            {
+                if (IsPrimaryCraftSkill(skill.Type))
+                    skill.Level = Math.Min(skill.Level, MaxCraftSkillLevel);
+            }
+        }
+
+        private static bool IsPrimaryCraftSkill(CraftSkillType type)
+            => PrimaryCraftSkillTypes.Contains(type);
+
+        private static IReadOnlyDictionary<CraftSkillType, uint> ToStoredCraftSkillLevels(IReadOnlyDictionary<CraftSkillType, uint> displaySkillLevels)
+        {
+            return displaySkillLevels.ToDictionary(
+                pair => pair.Key,
+                pair => IsPrimaryCraftSkill(pair.Key) ? ToStoredCraftSkillLevel(pair.Value) : pair.Value);
+        }
+
+        private static uint ToStoredCraftSkillLevel(uint displayLevel)
+        {
+            uint clampedDisplayLevel = Math.Clamp(displayLevel, 1, MaxCraftSkillDisplayLevel);
+            return clampedDisplayLevel - 1;
         }
 
         private static CDataCharacterJobData BuildDefaultJobData(JobId job, int level)

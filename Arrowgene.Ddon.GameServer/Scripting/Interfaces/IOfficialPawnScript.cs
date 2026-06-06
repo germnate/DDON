@@ -18,6 +18,9 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Interfaces
         /// <summary>Maximum player job level that can hire this pawn. Default 999 = no cap.</summary>
         public virtual int MaxLevel => 999;
 
+        /// <summary>Fixed generated pawn level. null scales the pawn to the hiring player's active job level.</summary>
+        public virtual int? PawnLevel => null;
+
         /// <summary>Multiplier applied on top of the normal rental cost formula.</summary>
         public virtual float RentalCostMultiplier => 1.0f;
 
