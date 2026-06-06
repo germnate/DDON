@@ -47,6 +47,8 @@ as a `CDataEditInfo` block, then paste that block into `EditInfo`.
 - `EditInfo`: Appearance, voice, personality, and body customization.
 - `MinLevel`: Minimum player job level required to see and hire this pawn.
 - `MaxLevel`: Maximum player job level that can hire this pawn.
+- `PawnLevel`: Optional fixed generated pawn level. `null` scales the pawn to
+  the hiring player's active job level.
 - `Quality`: The pawn quality tier used by automatic equipment, skill, augment,
   crest, limit break, craft, and cost systems.
 - `RentalCostMultiplier`: Extra multiplier applied to the rental cost. Use
@@ -114,6 +116,9 @@ Automatic equipment, crests, limit breaks, skills, augments, and crafting use
 separate deterministic streams, so changing one category does not reroll the
 others.
 
+If `PawnLevel` is set, automatic generation uses that fixed pawn level and does
+not reroll when the hiring player gains levels.
+
 Avoid using `Random.Shared` in official pawn scripts unless you intentionally
 want non-deterministic output.
 
@@ -152,7 +157,8 @@ ctx.Builder
 Specific manual choices take precedence over automatic generation. For example,
 setting one weapon slot still lets automatic equipment fill the remaining
 performance slots, and setting one augment still lets automatic augments fill
-the remaining slots within the point budget.
+the remaining slots within the point budget. Manual craft data replaces
+automatic craft generation for that pawn.
 
 ## Equipment
 
@@ -359,6 +365,60 @@ The automatic augment picker respects the visible augment slot limit and the
 pawn's augment point budget. Manual assignments are trusted, so scripts should
 keep their own manual augment builds valid.
 
+## Crafting
+
+Automatic crafting data is applied by default. Use this when craft quality
+should be different from the script's `Quality`:
+
+```csharp
+ctx.Builder.WithAutoCraft(Quality);
+```
+
+Use manual crafting when a pawn should be a specialist:
+
+```csharp
+WithCraft(
+    uint craftRank,
+    uint craftRankLimit = OfficialPawnBuilder.MaxCraftRank,
+    uint craftPoint = 0,
+    uint craftExp = 0,
+    IReadOnlyDictionary<CraftSkillType, uint>? skillLevels = null)
+
+WithCraftSkill(CraftSkillType type, uint level)
+WithCraftData(CDataPawnCraftData craftData)
+```
+
+Primary craft skill levels are capped at
+`OfficialPawnBuilder.MaxCraftSkillDisplayLevel` by the manual helpers so
+generated pawns stay inside the normal crafting formula tables. The client
+displays primary craft skills one level higher than their stored value, so
+`WithCraft` and `WithCraftSkill` accept the displayed level a script author
+expects to see. Non-primary craft skill flags can also be set through
+`skillLevels` or `WithCraftSkill`.
+
+> [!NOTE]
+> Primary craft skills start at level `1` in the pawn profile UI. Use the level
+> you want players to see, not the raw stored value.
+
+```csharp
+ctx.Builder
+    .WithCraft(
+        craftRank: 71,
+        craftPoint: 70,
+        skillLevels: new Dictionary<CraftSkillType, uint>
+        {
+            [CraftSkillType.ProductionSpeed] = 20,
+            [CraftSkillType.EquipmentEnhancement] = 30,
+            [CraftSkillType.EquipmentQuality] = 15,
+            [CraftSkillType.CostPerformance] = 5,
+        })
+    .WithCraftSkill(CraftSkillType.ConsumableQuantity, 1);
+```
+
+`WithCraftData` replaces the entire `CDataPawnCraftData` object and is intended
+for scripts that need exact packet-level control. It uses raw stored craft skill
+values instead of display levels.
+
 ## Advanced Overrides
 
 These methods are available for special cases:
@@ -368,6 +428,7 @@ ctx.Builder.WithJobData(customJobData);
 ctx.Builder.WithExtendedParams(customExtendedParams);
 ctx.Builder.WithRecommendedCustomSkills(customSkillList);
 ctx.Builder.WithRecommendedAbilities(customAbilityList);
+ctx.Builder.WithCraftData(customCraftData);
 ```
 
 Use `WithJobData` and `WithExtendedParams` carefully. They replace core values
@@ -376,8 +437,8 @@ such as job level data, jewelry slots, and augment capacity.
 ## Level Gating
 
 Official pawn generation runs with the hiring player's current job level in
-`ctx.PlayerLevel`. Use it for any behavior that should unlock as the player
-progresses:
+`ctx.PlayerLevel` and the generated pawn level in `ctx.PawnLevel`. Use
+`ctx.PlayerLevel` for behavior that should unlock as the player progresses:
 
 ```csharp
 if (ctx.PlayerLevel >= 50)
@@ -399,6 +460,16 @@ ctx.Builder
 
 Level-gated manual overrides take precedence over automatic defaults whenever
 their level condition is met.
+
+Use `PawnLevel` when the pawn itself should stay at a fixed level:
+
+```csharp
+public override int? PawnLevel => 5;
+```
+
+`MinLevel` and `MaxLevel` still control which players can hire the pawn. A fixed
+level pawn can be visible to high-level players if its visibility range allows
+it.
 
 ## Global Settings
 

@@ -79,11 +79,12 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Modules
             }
 
             int playerLevel = (int)(hiringCharacter.ActiveCharacterJobData?.Lv ?? 1);
+            int pawnLevel = Math.Max(1, script.PawnLevel ?? playerLevel);
             int seed = StableRandomSeed.ForOfficialPawn(
                 script.PawnId,
                 hiringCharacter.CharacterId,
                 "script",
-                (uint)playerLevel);
+                (uint)pawnLevel);
             var rng = new Random(seed);
 
             var builder = new OfficialPawnBuilder(
@@ -91,7 +92,7 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Modules
                 script.EditInfo,
                 script.Job,
                 script.PawnId,
-                playerLevel,
+                pawnLevel,
                 hiringCharacter.CharacterId,
                 server.AssetRepository.ClientItemInfos,
                 server.AssetRepository.LearnedNormalSkillsAsset,
@@ -105,6 +106,7 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Modules
             var ctx = new OfficialPawnContext
             {
                 PlayerLevel = playerLevel,
+                PawnLevel = pawnLevel,
                 CharacterId = hiringCharacter.CharacterId,
                 Rng = rng,
                 Builder = builder,
@@ -113,10 +115,10 @@ namespace Arrowgene.Ddon.GameServer.Scripting.Modules
             var record = script.Generate(ctx);
 
             // Fill remaining crest slots after the pawn script has run.
-            ApplyAutoCrests(record, playerLevel, script.Quality, hiringCharacter.CharacterId, server);
+            ApplyAutoCrests(record, pawnLevel, script.Quality, hiringCharacter.CharacterId, server);
 
             // Apply automatic limit break unless the script already chose one.
-            ApplyAutoLimitBreak(record, playerLevel, script.Quality, hiringCharacter.CharacterId, server);
+            ApplyAutoLimitBreak(record, pawnLevel, script.Quality, hiringCharacter.CharacterId, server);
 
             return record;
         }

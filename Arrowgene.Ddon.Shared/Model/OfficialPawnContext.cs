@@ -7,6 +7,9 @@ namespace Arrowgene.Ddon.Shared.Model
         /// <summary>The hiring character's active job level at the time of hire.</summary>
         public int PlayerLevel { get; init; }
 
+        /// <summary>The generated pawn's job level. Usually the player level unless the script fixes it.</summary>
+        public int PawnLevel { get; init; }
+
         /// <summary>Character id of the hiring character.</summary>
         public uint CharacterId { get; init; }
 
