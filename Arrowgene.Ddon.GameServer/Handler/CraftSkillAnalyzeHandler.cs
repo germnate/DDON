@@ -116,12 +116,23 @@ namespace Arrowgene.Ddon.GameServer.Handler
             if (reducedTime > recipeTime)
             {
                 Logger.Error($"Overflow detected in [AnalyzeProductionSpeed]: {reducedTime} > {recipeTime} when crafting {itemInfo.Name}");
-                timeFactor = 100;
+                timeFactor = 0;
+            }
+            else if (recipeTime > 0)
+            {
+                uint deltaTime = recipeTime - reducedTime;
+                double reductionPercentage = (deltaTime * 100.0) / recipeTime;
+                
+                if (reductionPercentage > 100.0)
+                {
+                    reductionPercentage = 100.0;
+                }
+
+                timeFactor = (byte)reductionPercentage;
             }
             else
             {
-                uint deltaTime = recipeTime - reducedTime;
-                timeFactor = (byte)(deltaTime * 100.0 / reducedTime);
+                timeFactor = 100;
             }
 
             CDataCraftSkillAnalyzeResult productionSpeedAnalysisResult = new CDataCraftSkillAnalyzeResult
@@ -129,6 +140,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 SkillType = CraftSkillType.ProductionSpeed,
                 Rate = timeFactor
             };
+
             return productionSpeedAnalysisResult;
         }
 

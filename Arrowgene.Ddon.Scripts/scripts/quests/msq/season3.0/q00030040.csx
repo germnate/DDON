@@ -184,7 +184,8 @@ public class ScriptedQuest : IQuest
             .AddQuestFlag(QuestFlagType.QstLayout, QuestFlagAction.Set, QstLayoutFlag.LiberationArmySoldierAndGillian)
             .AddQuestFlag(QuestFlagType.QstLayout, QuestFlagAction.Set, QstLayoutFlag.FloorMountedHeavyLever);
         process0.AddDestroyGroupBlock(QuestAnnounceType.None, EnemyGroupId.Encounter + 0, resetGroup: false);
-        process0.AddOmInteractEventBlock(QuestAnnounceType.Update, Stage.FortThines0, 2, 0, OmQuestType.MyQuest, OmInteractType.Release);
+		process0.AddRawBlock(QuestAnnounceType.Update)
+			.AddCheckCmdQuestOmEndAnimation(Stage.FortThines0, 2, 0);
         process0.AddPartyGatherBlock(QuestAnnounceType.Update, Stage.FortThines0, 62, 350, -2050)
             .AddQuestFlag(QuestFlagType.QstLayout, QuestFlagAction.Clear, QstLayoutFlag.LiberationArmySoldierAndGillian);
         process0.AddPlayEventBlock(QuestAnnounceType.None, Stage.FortThines0, 0, 3);
@@ -222,8 +223,15 @@ public class ScriptedQuest : IQuest
             var process = AddNewProcess(processNo++);
             process.AddMyQstFlagsBlock(QuestAnnounceType.None)
                 .AddMyQstCheckFlag(MyQstFlag.SpawnCannonMarkers);
-            process.AddIsBrokenLayoutBlock(QuestAnnounceType.None, Stage.RathniteFoothills, cannon.GroupNo, 0)
-                .AddQuestFlag(QuestFlagType.QstLayout, QuestFlagAction.Set, cannon.FlagNo);
+			process.AddRawBlock(QuestAnnounceType.None)
+                .AddQuestFlag(QuestFlagType.QstLayout, QuestFlagAction.Set, cannon.FlagNo)
+				.AddCheckCommands([
+					QuestManager.CheckCommand.IsOmBrokenLayout(Stage.RathniteFoothills.StageNo, cannon.GroupNo, 0)
+				])
+				.AddCheckCommands([
+					QuestManager.CheckCommand.SceHitIn(Stage.RathniteFoothills.StageNo, cannon.GroupNo - 45),
+					QuestManager.CheckCommand.DummyNotProgress()
+				]);
             process.AddProcessEndBlock(false)
                 .AddQuestFlag(QuestFlagType.QstLayout, QuestFlagAction.Clear, cannon.FlagNo)
                 .AddCallback(UpdateCannonsCb);

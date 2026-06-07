@@ -6,7 +6,9 @@
     "base_level": 65,
     "minimum_item_rank": 0,
     "discoverable": true,
-	"area_id": "BloodbaneIsle",	
+    "area_id": "BloodbaneIsle",
+    "news_image": 532,
+    "order_conditions": [{"type": "AreaRank", "Param1": 13, "Param2": 8}],
     "rewards": [
         {
             "type": "wallet",
@@ -26,16 +28,16 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "item_id": 11775,
+                    "item_id": "StalactiteTip",
                     "num": 3
                 },
-                {					
-                    "item_id": 7848,
+                {
+                    "item_id": "BlueAlluvialGold",
                     "num": 3
                 },
-                {				
-                    "item_id": 9364,
-                    "num": 3					
+                {
+                    "item_id": "SuperiorStrongGalaExtract",
+                    "num": 3
                 }
             ]
         }
@@ -46,68 +48,84 @@
                 "id": 321,
                 "group_id": 2
             },
+            "placement_type": "manual",
             "enemies": [
                 {
+                    "comment": "Golem",
                     "enemy_id": "0x015100",
                     "level": 65,
-                    "exp": 50000,
-                    "is_boss": true
-    },
-    {
+                    "exp": 3940,
+                    "is_boss": true,
+                    "index": 1
+                },
+                {
+                    "comment": "Infected Hobgoblin Slinger",
                     "enemy_id": "0x010162",
                     "level": 65,
-                    "exp": 3500,
-                    "is_boss": false
-    },
-    {
+                    "exp": 788,
+                    "index": 2
+                },
+                {
+                    "comment": "Infected Hobgoblin Slinger",
                     "enemy_id": "0x010162",
                     "level": 65,
-                    "exp": 3500,
-                    "is_boss": false
-    },
-    {
+                    "exp": 788,
+                    "index": 3
+                },
+                {
+                    "comment": "Infected Hobgoblin Slinger",
+                    "enemy_id": "0x010162",
+                    "level": 65,
+                    "exp": 788,
+                    "index": 4
+                },
+                {
+                    "comment": "Saurian Sage",
                     "enemy_id": "0x010430",
                     "level": 65,
-                    "exp": 3500,
-                    "is_boss": false	
-    },
-    {
+                    "exp": 788,
+                    "index": 7
+                },
+                {
+                    "comment": "Saurian Sage",
                     "enemy_id": "0x010430",
                     "level": 65,
-                    "exp": 3500,
-                    "is_boss": false						
+                    "exp": 788,
+                    "index": 9
                 }
             ]
         }
-    ],		
+    ],
     "blocks": [
-    {
-      "type": "NpcTalkAndOrder",
-      "stage_id": {
-        "id": 317
-      },
-      "npc_id": "Rolf",
-      "message_id": 10800
-    },
-    {
-      "type": "DeliverItems",
-      "stage_id": {
-        "id": 317,
-        "group_id": 1
-      },
-      "npc_id": "Rolf",
-      "announce_type": "Accept",
-      "items": [
         {
-          "id": 7956,
-          "amount": 2
-        }
-      ],
-      "message_id": 10737
+            "type": "NpcTalkAndOrder",
+            "stage_id": {
+                "id": 317
+            },
+            "npc_id": "Rolf",
+            "message_id": 17156
+        },
+        {
+            "type": "DeliverItems",
+            "stage_id": {
+                "id": 317
+            },
+            "npc_id": "Rolf",
+            "announce_type": "Accept",
+            "result_commands": [
+                {"type": "QstTalkChg", "Param1": 2402, "Param2": 17157, "comment": "Extra dialogue - Rolf"}
+            ],
+            "items": [
+                {"id": 7956, "amount": 2, "comment": "Strong Thread"}
+            ],
+            "message_id": 17158
         },
         {
             "type": "SeekOutEnemiesAtMarkedLocation",
             "announce_type": "Update",
+            "result_commands": [
+                {"type": "QstTalkChg", "Param1": 2402, "Param2": 17159, "comment": "Extra dialogue 2 - Rolf"}
+            ],
             "groups": [0]
         },
         {
@@ -116,16 +134,14 @@
             "reset_group": false,
             "groups": [0]
         },
-        {		
+        {
             "type": "TalkToNpc",
             "stage_id": {
-                "id": 317,
-                "group_id": 1,
-                "layer_no": 1
+                "id": 317
             },
             "announce_type": "Update",
             "npc_id": "Rolf",
-            "message_id": 11842			
+            "message_id": 17160
     }
   ]
 }

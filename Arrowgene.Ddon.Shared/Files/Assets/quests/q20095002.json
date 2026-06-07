@@ -7,7 +7,7 @@
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "ZandoraWastelands",
-    "variant_index": 0,
+    "order_conditions": [{"type": "MainQuestCompleted", "Param1": 20}],
     "news_image": 182,
     "rewards": [
         {
@@ -28,14 +28,17 @@
             "type": "select",
             "loot_pool": [
                 {
+                    "comment": "Moist Black Leather",
                     "item_id": 7742,
                     "num": 1
                 },
                 {
+                    "comment": "Enhanced Lumber Knife",
                     "item_id": 9402,
                     "num": 3
                 },
                 {
+                    "comment": "Strong Gala Extract",
                     "item_id": 9363,
                     "num": 3
                 }
@@ -48,35 +51,40 @@
                 "id": 1,
                 "group_id": 397
             },
+            "placement_type": "manual",
             "enemies": [
                 {
                     "comment": "Vigilant Harpy",
                     "enemy_id": "0x010600",
+                    "named_enemy_params_id": 53,
                     "level": 49,
-                    "exp_scheme": "Automatic",
-                    "named_enemy_params_id": 53
+                    "exp": 135,
+                    "index": 0
                 },
                 {
                     "comment": "Vigilant Harpy",
                     "enemy_id": "0x010600",
+                    "named_enemy_params_id": 53,
                     "level": 49,
-                    "exp_scheme": "Automatic",
-                    "named_enemy_params_id": 53
-                },
-                {
-                    "comment": "Vigilant Harpy",
-                    "enemy_id": "0x010600",
-                    "level": 49,
-                    "exp_scheme": "Automatic",
-                    "named_enemy_params_id": 53
+                    "exp": 135,
+                    "index": 1
                 },
                 {
                     "comment": "Brutal Black Griffin",
                     "enemy_id": "0x015303",
-                    "level": 49,
-                    "exp_scheme": "Automatic",
                     "named_enemy_params_id": 54,
-                    "is_boss": true
+                    "level": 49,
+                    "exp": 5343,
+                    "is_boss": true,
+                    "index": 6
+                },
+                {
+                    "comment": "Vigilant Harpy",
+                    "enemy_id": "0x010600",
+                    "named_enemy_params_id": 53,
+                    "level": 49,
+                    "exp": 135,
+                    "index": 7
                 }
             ]
         }
@@ -103,6 +111,14 @@
         {
             "type": "SeekOutEnemiesAtMarkedLocation",
             "announce_type": "Accept",
+            "result_commands": [
+               {
+                    "comment": "Idle dialogue",
+                    "type": "QstTalkChg",
+                    "Param1": 4701,
+                    "Param2": 16056
+               }
+           ],
             "groups": [ 0 ]
         },
         {

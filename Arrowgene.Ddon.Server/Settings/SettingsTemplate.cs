@@ -147,10 +147,8 @@ namespace Arrowgene.Ddon.Server.Settings
         {
             StringBuilder sb = new StringBuilder();
 
-            // Split the summary text into lines based on newlines preserved in XML
-            string[] lines = summaryNode.InnerText.Trim().Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-           
-            // Multi-line summary
+            string[] lines = ExtractText(summaryNode).Trim().Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+
             sb.AppendLine("/// <summary>");
             foreach (string line in lines)
             {
@@ -159,6 +157,35 @@ namespace Arrowgene.Ddon.Server.Settings
             sb.AppendLine("/// </summary>");
 
             return sb.ToString().TrimEnd();
+        }
+
+        // Walks an XML node tree and extracts readable text, resolving <see cref="T:Ns.Name"/>
+        // to just "Name" instead of silently dropping it as InnerText would.
+        private static string ExtractText(XmlNode node)
+        {
+            var sb = new StringBuilder();
+            foreach (XmlNode child in node.ChildNodes)
+            {
+                if (child.NodeType == XmlNodeType.Text)
+                {
+                    sb.Append(child.Value);
+                }
+                else if (child.Name is "see" or "seealso")
+                {
+                    var cref = child.Attributes?["cref"]?.Value;
+                    if (cref != null)
+                    {
+                        // cref format: "T:Namespace.TypeName" or bare "TypeName"
+                        var typePath = cref.Contains(':') ? cref[(cref.IndexOf(':') + 1)..] : cref;
+                        sb.Append(typePath.Contains('.') ? typePath[(typePath.LastIndexOf('.') + 1)..] : typePath);
+                    }
+                }
+                else
+                {
+                    sb.Append(ExtractText(child));
+                }
+            }
+            return sb.ToString();
         }
     }
 }

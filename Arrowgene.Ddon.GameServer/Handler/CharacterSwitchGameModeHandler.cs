@@ -36,6 +36,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             var acquirableSkills = client.Character.AcquirableSkills;
             var acquirableAbilities = client.Character.AcquirableAbilities;
             var dispelSeals = client.Character.DispelSeals;
+            var msgSetList = client.Character.MsgSetList;
 
             var serverInfo = client.Character.Server;
 
@@ -82,6 +83,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             client.Character.AcquirableSkills = acquirableSkills;
             client.Character.AcquirableAbilities = acquirableAbilities;
             client.Character.DispelSeals = dispelSeals;
+            client.Character.MsgSetList = msgSetList;
 
             client.Send(new S2CCharacterSwitchGameModeNtc()
             {
@@ -89,11 +91,30 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 CreateCharacter = createCharacter,
                 CharacterInfo = client.Character.CDataCharacterInfo,
             });
+            
+            client.Send(new S2CItemUpdateCharacterItemNtc()
+            {
+                UpdateType = ItemNoticeType.SwitchingStorage,
+                UpdateItemList = SwapCharacterInventories(client.Character, previousStorage, 
+                    [.. ItemManager.ItemBagStorageTypes, 
+                    StorageType.CharacterEquipment
+                ])
+            });
 
             client.Send(new S2CItemUpdateCharacterItemNtc()
             {
                 UpdateType = ItemNoticeType.SwitchingStorage,
-                UpdateItemList = SwapCharacterInventories(client.Character, previousStorage, ItemManager.ItemBagStorageTypes.Concat([StorageType.CharacterEquipment]).ToList())
+                UpdateItemList = SwapCharacterInventories(client.Character, previousStorage,
+                    [StorageType.StorageBoxNormal]
+                )
+            });
+
+            client.Send(new S2CItemUpdateCharacterItemNtc()
+            {
+                UpdateType = ItemNoticeType.SwitchingStorage,
+                UpdateItemList = SwapCharacterInventories(client.Character, previousStorage,
+                    [StorageType.StorageBoxExpansion]
+               )
             });
 
             client.Send(new S2CEquipChangeCharacterEquipLobbyNtc()
@@ -111,6 +132,14 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     StorageType = x,
                     Bin = client.Character.Storage.GetStorage(x).SortData
                 })]
+            });
+
+            client.Send(new S2CSkillSetPresetAbilityNtc()
+            {
+                CharacterId = client.Character.CharacterId,
+                AbilityDataList = [.. client.Character.EquippedAbilitiesDictionary[client.Character.Job]
+                .Where(x => x != null)
+                .Select((x, i) => x.AsCDataContextAcquirementData((byte)(i + 1)))]
             });
 
             return new S2CCharacterSwitchGameModeRes()

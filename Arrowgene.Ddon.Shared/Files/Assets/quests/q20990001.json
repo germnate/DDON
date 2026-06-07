@@ -7,6 +7,8 @@
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "MergodaRuins",
+    "news_image": 229,
+    "order_conditions": [{"type": "MainQuestCompleted", "Param1": 22}],
     "rewards": [
         {
             "type": "wallet",
@@ -16,7 +18,7 @@
         {
             "type": "wallet",
             "wallet_type": "RiftPoints",
-            "amount": 180
+            "amount": 150
         },
         {
             "type": "exp",
@@ -26,16 +28,19 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "item_id": 8027,
-                    "num": 1
+                    "comment": "Large Scallop Shell",
+                    "item_id": 8018,
+                    "num": 2
                 },
                 {
-                    "item_id": 7554,
-                    "num": 3
-                },
-                {
+                    "comment": "Strong Gala Extract",
                     "item_id": 9363,
                     "num": 3
+                },
+                {
+                    "comment": "Panacea",
+                    "item_id": 41,
+                    "num": 1
                 }
             ]
         }
@@ -47,7 +52,7 @@
                 "id": 63
             },
             "npc_id": "Theodor",
-            "message_id": 10800
+            "message_id": 11486
         },
         {
             "type": "DeliverItems",
@@ -57,13 +62,22 @@
             },
             "npc_id": "Theodor",
             "announce_type": "Accept",
+            "result_commands": [ 
+                { 
+                "type": "QstTalkChg", 
+                "Param1": 10, 
+                "Param2": 12021,
+                "comment": "Idle dialogue"
+                }
+            ],
             "items": [
                 {
+                    "comment": "Blob Flesh",
                     "id": 7734,
                     "amount": 8
                 }
             ],
-            "message_id": 10737
+            "message_id": 12017
         },
         {
             "type": "DeliverItems",
@@ -72,14 +86,23 @@
                 "group_id": 1
             },
             "npc_id": "Theodor",
-            "announce_type": "Update",
+            "announce_type": "CheckpointAndUpdate",
+            "result_commands": [ 
+                { 
+                "type": "QstTalkChg", 
+                "Param1": 10, 
+                "Param2": 12021,
+                "comment": "Idle dialogue"
+                }
+            ],
             "items": [
                 {
+                    "comment": "Mysterious Gold Lump",
                     "id": 8026,
                     "amount": 6
                 }
             ],
-            "message_id": 10737
+            "message_id": 12018
         }
     ]
 }

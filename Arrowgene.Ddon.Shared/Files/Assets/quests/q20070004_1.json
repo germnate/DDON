@@ -1,13 +1,14 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Perfect Warrior",
+  "comment": "The Perfect Warrior (II)",
   "quest_id": 20070004,
   "base_level": 45,
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "NorthernBetlandPlains",
   "news_image": 151,
+  "order_conditions": [{"type": "MainQuestCompleted", "Param1": 16}],
   "variant_index": 1,
   "rewards": [
     {
@@ -28,15 +29,18 @@
       "type": "select",
       "loot_pool": [
         {
-          "item_id": 7929,
+          "comment": "Crest of Incineration",
+          "item_id": 9258,
           "num": 1
         },
         {
-          "item_id": 9418,
+          "comment": "Special Mushroom Dip",
+          "item_id": 9419,
           "num": 1
         },
         {
-          "item_id": 9415,
+          "comment": "Exquisite Fried Meat",
+          "item_id": 9416,
           "num": 2
         }
       ]
@@ -46,17 +50,19 @@
     {
       "stage_id": {
         "id": 68,
-        "group_id": 9
+        "group_id": 4
       },
+      "placement_type": "manual",
       "enemies": [
-        
         {
+          "comment": "Bounty Behemoth",
           "enemy_id": "0x015709",
           "start_think_tbl_no": 1,
-		      "named_enemy_params_id": 467,
+          "named_enemy_params_id": 467,
           "level": 45,
-          "exp": 6476,
-          "is_boss": true
+          "exp": 7840,
+          "is_boss": true,
+          "index": 14
         }
       ]
     }
@@ -78,11 +84,19 @@
         "layer_no": 1
       },
       "npc_id": "Lent",
-      "message_id": 11372
+      "message_id": 11272
     },
     {
       "type": "SeekOutEnemiesAtMarkedLocation",
       "announce_type": "Accept",
+      "result_commands": [
+        {
+          "comment": "Idle dialogue",
+          "type": "QstTalkChg",
+          "Param1": 520,
+          "Param2": 11278
+        }
+      ],
       "groups": [ 0 ]
     },
     {
@@ -100,7 +114,7 @@
       },
       "announce_type": "Update",
       "npc_id": "Lent",
-      "message_id": 11842
+      "message_id": 11275
     }
   ]
 }

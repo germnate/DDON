@@ -600,6 +600,16 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             public static QuestFlagInfo Quintus { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(8166, QuestId.Q70033001, StageInfo);
         }
 
+        public static class FortThinesGreatDiningHall
+        {
+            private static StageInfo StageInfo = Stage.FortThinesGreatDiningHall;
+
+            /// <summary>
+            /// Spawns Carrie, used for the substory quests.
+            /// </summary>
+            public static QuestFlagInfo Carrie { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(6409, QuestId.Q70030001, StageInfo);
+        }
+
         public static class RathniteFoothillsLakeside
         {
             private static StageInfo StageInfo = Stage.RathniteFoothillsLakeside0;
@@ -608,6 +618,11 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             /// Opens the front gate to Rothgill.
             /// </summary>
             public static QuestFlagInfo RothgillFrontGate { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(2816, QuestId.Q70030001);
+
+            /// <summary>
+            /// Opens the "Demon Army War Machine Gate"
+            /// </summary>
+            public static QuestFlagInfo DemonArmyWarMachineGate { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(3284, QuestId.Q70030001);
 
             /// <summary>
             /// Closes the hole in the wall when set.
@@ -653,6 +668,11 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             /// Opens gate next to "West Feryana Wilderness" warp point
             /// </summary>
             public static QuestFlagInfo WestFeryanaGate { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(2930, QuestId.Q70030001);
+
+            /// <summary>
+            /// Opens the entrance to "Old Tekia Grotto"
+            /// </summary>
+            public static QuestFlagInfo OldTekiaGrotto { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(3286, QuestId.Q70031001);
         }
 
         public static class MephiteTravelersInn

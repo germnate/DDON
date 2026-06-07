@@ -7,6 +7,8 @@
     "minimum_item_rank": 0,
     "discoverable": true,
     "area_id": "BloodbaneIsle",
+    "news_image": 583,
+    "order_conditions": [{"type": "MainQuestCompleted", "Param1": 20140}, {"type": "AreaRank", "Param1": 13, "Param2": 11}],
     "rewards": [
         {
             "type": "wallet",
@@ -26,15 +28,15 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "item_id": 7886,
+                    "item_id": "MagickGoldIngot",
                     "num": 1
                 },
                 {
-                    "item_id": 9364,
+                    "item_id": "SuperiorStrongGalaExtract",
                     "num": 3
                 },
                 {
-                    "item_id": 41,
+                    "item_id": "Panacea",
                     "num": 3
                 }
             ]
@@ -46,24 +48,26 @@
                 "id": 409,
                 "group_id": 3
             },
+            "starting_index": 6,
             "enemies": [
                 {
+                    "comment": "Chimera",
                     "enemy_id": "0x015200",
                     "level": 65,
-                    "exp": 50000,
+                    "exp": 5100,
                     "is_boss": true
                 },
                 {
+                    "comment": "Flame Skeleton Brute",
                     "enemy_id": "0x010320",
                     "level": 65,
-                    "exp": 4000,
-                    "is_boss": false
+                    "exp": 540
                 },
                 {
+                    "comment": "Flame Skeleton Brute",
                     "enemy_id": "0x010320",
                     "level": 65,
-                    "exp": 4000,
-                    "is_boss": false
+                    "exp": 540
                 }
             ]
         }
@@ -75,27 +79,29 @@
                 "id": 317
             },
             "npc_id": "Clarissa",
-            "message_id": 10800
+            "message_id": 17453
         },
         {
             "type": "DeliverItems",
             "stage_id": {
-                "id": 317,
-                "group_id": 1
+                "id": 317
             },
             "npc_id": "Clarissa",
             "announce_type": "Accept",
-            "items": [
-                {
-                    "id": 8011,
-                    "amount": 2
-                }
+            "result_commands": [
+                {"type": "QstTalkChg", "Param1": 2400, "Param2": 17454, "comment": "Extra dialogue - Clarissa"}
             ],
-            "message_id": 10737
+            "items": [
+                {"id": 8011, "amount": 2, "comment": "Scroll of Fire"}
+            ],
+            "message_id": 17455
         },
         {
             "type": "SeekOutEnemiesAtMarkedLocation",
             "announce_type": "Update",
+            "result_commands": [
+                {"type": "QstTalkChg", "Param1": 2400, "Param2": 17456, "comment": "Extra dialogue 2 - Clarissa"}
+            ],
             "groups": [0]
         },
         {
@@ -107,13 +113,11 @@
         {
             "type": "TalkToNpc",
             "stage_id": {
-                "id": 317,
-                "group_id": 1,
-                "layer_no": 1
+                "id": 317
             },
             "announce_type": "Update",
             "npc_id": "Clarissa",
-            "message_id": 11842
+            "message_id": 17457
         }
     ]
 }

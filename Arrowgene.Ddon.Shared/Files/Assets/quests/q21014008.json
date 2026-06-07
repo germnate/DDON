@@ -6,7 +6,9 @@
     "base_level": 70,
     "minimum_item_rank": 0,
     "discoverable": true,
-	"area_id": "ElanWaterGrove",	
+    "area_id": "ElanWaterGrove",
+    "news_image": 583,
+    "order_conditions": [{"type": "AreaRank", "Param1": 14, "Param2": 4}],
     "rewards": [
         {
             "type": "exp",
@@ -26,16 +28,16 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "item_id": 15915,
+                    "item_id": "PurplePetals",
                     "num": 3
                 },
                 {
-                    "item_id": 15961,
+                    "item_id": "StiffCrocodileSkin",
                     "num": 3
                 },
                 {
-                    "item_id": 15960,
-                    "num": 3					
+                    "item_id": "DemonWolfsSinewyMeat",
+                    "num": 3
                 }
             ]
         }
@@ -46,31 +48,49 @@
                 "id": 415,
                 "group_id": 1
             },
+            "placement_type": "manual",
             "enemies": [
                 {
-                    "enemy_id": "0x010203",
-                    "level": 70,
-                    "exp": 3000
-                },
-                {
-                    "enemy_id": "0x010203",
-                    "level": 70,
-                    "exp": 3000
-                },
-                {
-                    "enemy_id": "0x010203",
-                    "level": 70,
-                    "exp": 3000
-                },
-                {
+                    "comment": "Foot-Biter",
                     "enemy_id": "0x011500",
                     "level": 70,
-                    "exp": 3000
+                    "exp": 1535,
+                    "index": 3
                 },
                 {
+                    "comment": "Foot-Biter",
                     "enemy_id": "0x011500",
                     "level": 70,
-                    "exp": 3000						
+                    "exp": 1535,
+                    "index": 4
+                },
+                {
+                    "comment": "Foot-Biter",
+                    "enemy_id": "0x011500",
+                    "level": 70,
+                    "exp": 1535,
+                    "index": 5
+                },
+                {
+                    "comment": "Warg",
+                    "enemy_id": "0x010203",
+                    "level": 70,
+                    "exp": 1535,
+                    "index": 7
+                },
+                {
+                    "comment": "Warg",
+                    "enemy_id": "0x010203",
+                    "level": 70,
+                    "exp": 1535,
+                    "index": 8
+                },
+                {
+                    "comment": "Warg",
+                    "enemy_id": "0x010203",
+                    "level": 70,
+                    "exp": 1535,
+                    "index": 9
                 }
             ]
         },
@@ -79,32 +99,43 @@
                 "id": 415,
                 "group_id": 4
             },
+            "placement_type": "manual",
             "enemies": [
                 {
+                    "comment": "Warg",
+                    "enemy_id": "0x010203",
+                    "level": 70,
+                    "exp": 1535,
+                    "index": 8
+                },
+                {
+                    "comment": "Warg",
+                    "enemy_id": "0x010203",
+                    "level": 70,
+                    "exp": 1535,
+                    "index": 9
+                },
+                {
+                    "comment": "Warg",
+                    "enemy_id": "0x010203",
+                    "level": 70,
+                    "exp": 1535,
+                    "index": 10
+                },
+                {
+                    "comment": "Warg",
+                    "enemy_id": "0x010203",
+                    "level": 70,
+                    "exp": 1535,
+                    "index": 11
+                },
+                {
+                    "comment": "Silver Roar",
                     "enemy_id": "0x015505",
                     "level": 70,
-                    "exp": 85000,
-					"is_boss": true
-                },
-                {
-                    "enemy_id": "0x010203",
-                    "level": 70,
-                    "exp": 3000
-                },
-                {
-                    "enemy_id": "0x010203",
-                    "level": 70,
-                    "exp": 3000
-                },
-                {
-                    "enemy_id": "0x010203",
-                    "level": 70,
-                    "exp": 3000
-                },
-                {
-                    "enemy_id": "0x010203",
-                    "level": 70,
-                    "exp": 3000					
+                    "exp": 7675,
+                    "is_boss": true,
+                    "index": 14
                 }
             ]
         },
@@ -113,37 +144,68 @@
                 "id": 415,
                 "group_id": 5
             },
+            "starting_index": 3,
             "enemies": [
                 {
+                    "comment": "Saurian Sage",
                     "enemy_id": "0x010430",
                     "level": 70,
-                    "exp": 3000
+                    "exp": 1535
                 },
                 {
+                    "comment": "Saurian Sage",
                     "enemy_id": "0x010430",
                     "level": 70,
-                    "exp": 3000
+                    "exp": 1535
                 },
                 {
+                    "comment": "Saurian Sage",
                     "enemy_id": "0x010430",
                     "level": 70,
-                    "exp": 3000
+                    "exp": 1535
+                },
+                {
+                    "comment": "Foot-Biter",
+                    "enemy_id": "0x011500",
+                    "level": 70,
+                    "exp": 1535
+                },
+                {
+                    "comment": "Foot-Biter",
+                    "enemy_id": "0x011500",
+                    "level": 70,
+                    "exp": 1535
+                },
+                {
+                    "comment": "Foot-Biter",
+                    "enemy_id": "0x011500",
+                    "level": 70,
+                    "exp": 1535
+                },
+                {
+                    "comment": "Saurian Sage",
+                    "enemy_id": "0x010430",
+                    "level": 70,
+                    "exp": 1535
                 }
             ]
         }
     ],
     "blocks": [
-    {
-      "type": "NpcTalkAndOrder",
-      "stage_id": {
-        "id": 372
-      },
-      "npc_id": "Enna",
-      "message_id": 10800
-    },
-    {
+        {
+            "type": "NpcTalkAndOrder",
+            "stage_id": {
+                "id": 372
+            },
+            "npc_id": "Enna",
+            "message_id": 19252
+        },
+        {
             "type": "SeekOutEnemiesAtMarkedLocation",
             "announce_type": "Accept",
+            "result_commands": [
+                {"type": "QstTalkChg", "Param1": 556, "Param2": 19253}
+            ],
             "groups": [0]
         },
         {
@@ -152,10 +214,10 @@
             "reset_group": false,
             "groups": [0]
         },
-        {			
+        {
             "type": "SeekOutEnemiesAtMarkedLocation",
             "announce_type": "Update",
-            "groups": [1]			
+            "groups": [1]
         },
         {
             "type": "KillGroup",
@@ -163,27 +225,25 @@
             "reset_group": false,
             "groups": [1]
         },
-        {			
+        {
             "type": "SeekOutEnemiesAtMarkedLocation",
             "announce_type": "Update",
             "groups": [2]
         },
-        {				
+        {
             "type": "KillGroup",
             "announce_type": "Update",
             "reset_group": false,
-            "groups": [2]			
+            "groups": [2]
         },
-        {		
+        {
             "type": "TalkToNpc",
             "stage_id": {
-                "id": 372,
-                "group_id": 1,
-                "layer_no": 1
+                "id": 372
             },
             "announce_type": "Update",
             "npc_id": "Enna",
-            "message_id": 11842			
-    }
-  ]
+            "message_id": 19254
+        }
+    ]
 }

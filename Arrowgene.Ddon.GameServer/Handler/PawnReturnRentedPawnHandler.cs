@@ -24,7 +24,13 @@ namespace Arrowgene.Ddon.GameServer.Handler
             S2CItemUpdateCharacterItemNtc walletUpdateNtc = null;
             Server.Database.ExecuteInTransaction(connection =>
             {
-                Server.Database.InsertRentalPawnFeedback(client.Character.CharacterId, pawn, request.PawnFeedbackList, connection);
+                // Official pawns have no row in ddon_pawn so the feedback table's FK constraint
+                // would fail. Skip feedback — there is no real owner to receive it.
+                if (!pawn.IsOfficialPawn)
+                {
+                    Server.Database.InsertRentalPawnFeedback(client.Character.CharacterId, pawn, request.PawnFeedbackList, connection);
+                }
+
                 Server.Database.DeleteRentalPawn(client.Character.CharacterId, pawn.PawnId, connection);
                 walletUpdateNtc = Server.WalletManager.AddToWalletNtc(client, client.Character, WalletType.RentalPoints, rentalPointReward, connectionIn: connection);
             });

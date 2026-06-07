@@ -781,7 +781,7 @@ namespace Arrowgene.Ddon.Shared.Network
         public static readonly PacketId S2C_QUEST_11_106_16_NTC = new PacketId(11, 106, 16, "S2C_QUEST_11_106_16_NTC", ServerType.Game, PacketSource.Server); // <syslog_wm_statement_gauge_0_defeat>
         public static readonly PacketId S2C_QUEST_PLAY_INTERRUPT_RESULT_NTC = new PacketId(11, 107, 16, "S2C_QUEST_PLAY_INTERRUPT_RESULT_NTC", ServerType.Game, PacketSource.Server, "S2C_QUEST_11_107_16_NTC");
         public static readonly PacketId S2C_QUEST_11_108_16_NTC = new PacketId(11, 108, 16, "S2C_QUEST_11_108_16_NTC", ServerType.Game, PacketSource.Server); // The request to end the mission was successful (S2C_PLAY_FORCE_INTERRUPT_NOTICE?)
-        public static readonly PacketId S2C_QUEST_11_109_16_NTC = new PacketId(11, 109, 16, "S2C_QUEST_11_109_16_NTC", ServerType.Game, PacketSource.Server);
+        public static readonly PacketId S2C_QUEST_TIMER_NTC = new PacketId(11, 109, 16, "S2C_QUEST_TIMER_NTC", ServerType.Game, PacketSource.Server, "S2C_QUEST_11_109_16_NTC");
         public static readonly PacketId S2C_QUEST_11_110_16_NTC = new PacketId(11, 110, 16, "S2C_QUEST_11_110_16_NTC", ServerType.Game, PacketSource.Server); // <syslog_quest_progress_failed> (S2C_FORT_DEFENSE_PLAY_START_NOTICE)
         public static readonly PacketId S2C_QUEST_11_111_16_NTC = new PacketId(11, 111, 16, "S2C_QUEST_11_111_16_NTC", ServerType.Game, PacketSource.Server); // Nothing?
         public static readonly PacketId S2C_QUEST_11_112_16_NTC = new PacketId(11, 112, 16, "S2C_QUEST_11_112_16_NTC", ServerType.Game, PacketSource.Server); // Nothing?
@@ -2010,7 +2010,7 @@ namespace Arrowgene.Ddon.Shared.Network
         public static readonly PacketId S2C_63_6_16_NTC = new PacketId(63, 6, 16, "S2C_63_6_16_NTC", ServerType.Game, PacketSource.Server);
         public static readonly PacketId S2C_63_7_16_NTC = new PacketId(63, 7, 16, "S2C_63_7_16_NTC", ServerType.Game, PacketSource.Server);
         public static readonly PacketId S2C_63_10_16_NTC = new PacketId(63, 10, 16, "S2C_63_10_16_NTC", ServerType.Game, PacketSource.Server);
-        public static readonly PacketId S2C_63_11_16_NTC = new PacketId(63, 11, 16, "S2C_63_11_16_NTC", ServerType.Game, PacketSource.Server);
+        public static readonly PacketId C2S_63_11_16_NTC = new PacketId(63, 11, 16, "S2C_63_11_16_NTC", ServerType.Game, PacketSource.Server);
 
         // Group: 64 - (MANDRAGORA)
         public static readonly PacketId C2S_MANDRAGORA_GET_MY_MANDRAGORA_REQ = new PacketId(64, 0, 1, "C2S_MANDRAGORA_GET_MY_MANDRAGORA_REQ", ServerType.Game, PacketSource.Client);
@@ -2713,7 +2713,7 @@ namespace Arrowgene.Ddon.Shared.Network
             AddPacketIdEntry(packetIds, S2C_QUEST_11_106_16_NTC);
             AddPacketIdEntry(packetIds, S2C_QUEST_PLAY_INTERRUPT_RESULT_NTC);
             AddPacketIdEntry(packetIds, S2C_QUEST_11_108_16_NTC);
-            AddPacketIdEntry(packetIds, S2C_QUEST_11_109_16_NTC);
+            AddPacketIdEntry(packetIds, S2C_QUEST_TIMER_NTC);
             AddPacketIdEntry(packetIds, S2C_QUEST_11_110_16_NTC);
             AddPacketIdEntry(packetIds, S2C_QUEST_11_111_16_NTC);
             AddPacketIdEntry(packetIds, S2C_QUEST_11_112_16_NTC);
@@ -3942,7 +3942,7 @@ namespace Arrowgene.Ddon.Shared.Network
             AddPacketIdEntry(packetIds, S2C_63_6_16_NTC);
             AddPacketIdEntry(packetIds, S2C_63_7_16_NTC);
             AddPacketIdEntry(packetIds, S2C_63_10_16_NTC);
-            AddPacketIdEntry(packetIds, S2C_63_11_16_NTC);
+            AddPacketIdEntry(packetIds, C2S_63_11_16_NTC);
 
 // Group: 64 - (MANDRAGORA)
             AddPacketIdEntry(packetIds, C2S_MANDRAGORA_GET_MY_MANDRAGORA_REQ);

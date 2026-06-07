@@ -25,10 +25,28 @@ namespace Arrowgene.Ddon.GameServer.Enemies.Generators
 
             questId = quest.QuestId;
 
-            var questStateManager = QuestManager.GetQuestStateManager(client, quest);
+            var questStateManager = GetEffectiveQuestStateManager(client, quest);
             instancedEnemySet.AddRange(questStateManager.GetInstancedEnemies(quest, stageLayoutId, subGroupId));
 
             return true;
+        }
+
+        // For personal quests (substory, tutorial, main), a non-leader party member
+        // may have the leader's quest schedule ID in their collected set but not in
+        // their own QuestState. Fall back to the leader's state so enemies are visible.
+        private static QuestStateManager GetEffectiveQuestStateManager(GameClient client, Quest quest)
+        {
+            if (!quest.IsPersonal)
+                return client.Party.QuestState;
+
+            if (client.QuestState.IsQuestActive(quest.QuestScheduleId))
+                return client.QuestState;
+
+            var leader = client.Party.Leader;
+            if (leader != null && !ReferenceEquals(leader.Client, client) && leader.Client.QuestState.IsQuestActive(quest.QuestScheduleId))
+                return leader.Client.QuestState;
+
+            return client.QuestState;
         }
 
         private Quest FindQuestBasedOnPriority(GameClient client, StageLayoutId stageLayoutId, uint subgroupId)
@@ -37,7 +55,7 @@ namespace Arrowgene.Ddon.GameServer.Enemies.Generators
             foreach (var questScheduleId in QuestManager.CollectQuestScheduleIds(client, stageLayoutId))
             {
                 var quest = QuestManager.GetQuestByScheduleId(questScheduleId);
-                var questStateManager = QuestManager.GetQuestStateManager(client, quest);
+                var questStateManager = GetEffectiveQuestStateManager(client, quest);
                 if (quest.OverrideEnemySpawn && quest.HasEnemiesInCurrentStageGroup(stageLayoutId))
                 {
                     quests.Add(quest);

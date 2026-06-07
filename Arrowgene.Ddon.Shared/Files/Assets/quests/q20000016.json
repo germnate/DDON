@@ -7,7 +7,8 @@
   "minimum_item_rank": 0,
   "discoverable": true,
   "area_id": "HidellPlains",
-  "news_image": 14,
+  "news_image": 42,
+  "order_conditions": [{"type": "AreaRank", "Param1": 1, "Param2": 8}],
   "rewards": [
     {
       "type": "exp",
@@ -32,18 +33,8 @@
           "num": 1
         },
         {
-          "comment": "atone cap",
-          "item_id": 737,
-          "num": 1
-        },
-        {
-          "comment": "fiend helm",
-          "item_id": 2139,
-          "num": 1
-        },
-        {
           "comment": "Enhanced Pickaxe",
-          "item_id": 9401,
+          "item_id": 737,
           "num": 2
         },
         {
@@ -52,17 +43,18 @@
           "num": 3
         }
       ]
-  },
-  {
+    },
+    {
       "type": "random",
       "loot_pool": [
           {
+              "comment": "Superior Gala Extract",
               "item_id": 61,
               "num": 2,
               "chance": 1.0
           }
       ]
-  }
+    }
   ],
   "enemy_groups": [
     {
@@ -70,45 +62,39 @@
         "id": 1,
         "group_id": 259
       },
-      "starting_index": 2,
+      "starting_index": 4,
       "enemies": [
         {
-          "comment": "Orc Soldier",
+          "comment": "Brutal Orc Soldier",
           "enemy_id": "0x015800",
           "named_enemy_params_id": 54,
           "level": 30,
-          "exp": 996
-        },{
-          "comment": "Orc Soldier",
-          "enemy_id": "0x015800",
-          "named_enemy_params_id": 54,
-          "level": 30,
-          "exp": 996
-        },{
-          "comment": "Orc Soldier",
-          "enemy_id": "0x015800",
-          "named_enemy_params_id": 54,
-          "level": 30,
-          "exp": 996
-        },{
-          "comment": "Orc Soldier",
-          "enemy_id": "0x015800",
-          "named_enemy_params_id": 54,
-          "level": 30,
-          "exp": 996
-        },{
-          "comment": "Orc Soldier",
-          "enemy_id": "0x015800",
-          "named_enemy_params_id": 54,
-          "level": 30,
-          "exp": 996
+          "exp": 168
         },
         {
-          "comment": "Orc Soldier",
+          "comment": "Brutal Orc Soldier",
           "enemy_id": "0x015800",
           "named_enemy_params_id": 54,
           "level": 30,
-          "exp": 996
+          "exp": 168,
+          "repop_count": 1,
+          "repop_wait_second": 10
+        },
+        {
+          "comment": "Brutal Orc Soldier",
+          "enemy_id": "0x015800",
+          "named_enemy_params_id": 54,
+          "level": 30,
+          "exp": 168,
+          "repop_count": 1,
+          "repop_wait_second": 10
+        },
+        {
+          "comment": "Brutal Orc Soldier",
+          "enemy_id": "0x015800",
+          "named_enemy_params_id": 54,
+          "level": 30,
+          "exp": 168
         }
       ]
     }
@@ -128,12 +114,20 @@
         "id": 2
       },
       "npc_id": "Heinz2",
-      "message_id": 11372
+      "message_id": 11840
     },
     {
       "type": "DiscoverEnemy",
       "announce_type": "Accept",
-      "groups": [ 0 ]
+      "groups": [ 0 ],
+      "result_commands": [
+        {
+          "comment": "Idle dialogue",
+          "type": "QstTalkChg",
+          "Param1": 8,
+          "Param2": 11845
+        }
+      ]
     },
     {
       "type": "KillGroup",
@@ -173,7 +167,7 @@
       ],
       "announce_type": "Update",
       "npc_id": "Heinz2",
-      "message_id": 11842
+      "message_id": 11843
     }
   ]
 }

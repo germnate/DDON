@@ -293,5 +293,199 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             questBlock.ResultCommands.AddResultCmdAreaJumpFadeContinue();
             return questBlock;
         }
+
+        // Ghidra-discovered result commands (IDs 99–134)
+
+        public static QuestBlock AddResultCmdSubstoryProgress(this QuestBlock questBlock, int delta)
+        {
+            questBlock.ResultCommands.AddResultCmdSubstoryProgress(delta);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdAddSubstoryProgress(this QuestBlock questBlock, int substoryId, int progressDelta)
+        {
+            questBlock.ResultCommands.AddResultCmdAddSubstoryProgress(substoryId, progressDelta);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdTriggerSubstoryEvent(this QuestBlock questBlock, int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+        {
+            questBlock.ResultCommands.AddResultCmdTriggerSubstoryEvent(param01, param02, param03, param04);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdEnableSubstoryUIElement(this QuestBlock questBlock)
+        {
+            questBlock.ResultCommands.AddResultCmdEnableSubstoryUIElement();
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdDisableSubstoryUIElement(this QuestBlock questBlock)
+        {
+            questBlock.ResultCommands.AddResultCmdDisableSubstoryUIElement();
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdQstTalkChgFsm(this QuestBlock questBlock, NpcId npcId, int msgNo, int param03 = 0, int param04 = 0)
+        {
+            questBlock.ResultCommands.AddResultCmdQstTalkChgFsm(npcId, msgNo, param03, param04);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetSubstoryEnemyInvincible(this QuestBlock questBlock, int enemyGroupFlag, int invincible)
+        {
+            questBlock.ResultCommands.AddResultCmdSetSubstoryEnemyInvincible(enemyGroupFlag, invincible);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdAddFsmTalkNpc(this QuestBlock questBlock, int npcId)
+        {
+            questBlock.ResultCommands.AddResultCmdAddFsmTalkNpc(npcId);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdAchievementBanner(this QuestBlock questBlock, int categoryNo, int bannerNo)
+        {
+            questBlock.ResultCommands.AddResultCmdAchievementBanner(categoryNo, bannerNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdEnableSubstoryElementB(this QuestBlock questBlock)
+        {
+            questBlock.ResultCommands.AddResultCmdEnableSubstoryElementB();
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdDisableSubstoryElementB(this QuestBlock questBlock)
+        {
+            questBlock.ResultCommands.AddResultCmdDisableSubstoryElementB();
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetWorldManageBarrierOn(this QuestBlock questBlock, int param01 = 0, int param02 = 0)
+        {
+            questBlock.ResultCommands.AddResultCmdSetWorldManageBarrierOn(param01, param02);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetWorldManageBarrierOff(this QuestBlock questBlock)
+        {
+            questBlock.ResultCommands.AddResultCmdSetWorldManageBarrierOff();
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetFsmNpcSchedule(this QuestBlock questBlock, int scheduleId)
+        {
+            questBlock.ResultCommands.AddResultCmdSetFsmNpcSchedule(scheduleId);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetQuestEnemyLevel(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int level)
+        {
+            questBlock.ResultCommands.AddResultCmdSetQuestEnemyLevel(stageInfo, groupNo, setNo, level);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetQuestEnemyLevelEx(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int level)
+        {
+            questBlock.ResultCommands.AddResultCmdSetQuestEnemyLevelEx(stageInfo, groupNo, setNo, level);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetQuestEnemyTierUp(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int tier)
+        {
+            questBlock.ResultCommands.AddResultCmdSetQuestEnemyTierUp(stageInfo, groupNo, setNo, tier);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetQuestEnemyTierUpEx(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int tier)
+        {
+            questBlock.ResultCommands.AddResultCmdSetQuestEnemyTierUpEx(stageInfo, groupNo, setNo, tier);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetQuestOmMontageFix(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int montagueNo)
+        {
+            questBlock.ResultCommands.AddResultCmdSetQuestOmMontageFix(stageInfo, groupNo, setNo, montagueNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetQuestOmMontageFixEx(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int montagueNo)
+        {
+            questBlock.ResultCommands.AddResultCmdSetQuestOmMontageFixEx(stageInfo, groupNo, setNo, montagueNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetQuestLayoutEnemyLevel(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int level)
+        {
+            questBlock.ResultCommands.AddResultCmdSetQuestLayoutEnemyLevel(stageInfo, groupNo, setNo, level);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdRemoveFsmNpcFromSchedule(this QuestBlock questBlock, int param01 = 0)
+        {
+            questBlock.ResultCommands.AddResultCmdRemoveFsmNpcFromSchedule(param01);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetEnemyExpeditionState(this QuestBlock questBlock, int mode)
+        {
+            questBlock.ResultCommands.AddResultCmdSetEnemyExpeditionState(mode);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdTriggerSubstoryEndSequence(this QuestBlock questBlock)
+        {
+            questBlock.ResultCommands.AddResultCmdTriggerSubstoryEndSequence();
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdCheckSubstoryCondition(this QuestBlock questBlock, int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+        {
+            questBlock.ResultCommands.AddResultCmdCheckSubstoryCondition(param01, param02, param03, param04);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetPawnExpeditionFlag(this QuestBlock questBlock, int mode)
+        {
+            questBlock.ResultCommands.AddResultCmdSetPawnExpeditionFlag(mode);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetQuestLayoutEnemyBodyPose(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, int poseId)
+        {
+            questBlock.ResultCommands.AddResultCmdSetQuestLayoutEnemyBodyPose(stageInfo, groupNo, setNo, poseId);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetRandom(this QuestBlock questBlock, int randomNo, int minValue, int maxValue)
+        {
+            questBlock.ResultCommands.AddResultCmdSetRandom(randomNo, minValue, maxValue);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdResetRandom(this QuestBlock questBlock, int randomNo)
+        {
+            questBlock.ResultCommands.AddResultCmdResetRandom(randomNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdStopMessage(this QuestBlock questBlock)
+        {
+            questBlock.ResultCommands.AddResultCmdStopMessage();
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdLinkageEnemyFlagOn(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, uint flagNo)
+        {
+            questBlock.ResultCommands.AddResultCmdLinkageEnemyFlagOn(stageInfo, groupNo, setNo, flagNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdLinkageEnemyFlagOff(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, uint flagNo)
+        {
+            questBlock.ResultCommands.AddResultCmdLinkageEnemyFlagOff(stageInfo, groupNo, setNo, flagNo);
+            return questBlock;
+        }
     }
 }

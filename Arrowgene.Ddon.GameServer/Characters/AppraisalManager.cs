@@ -38,6 +38,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
         }
 
         public static uint RollBitterBlackMazeEarringCrest(HashSet<uint> seals, JobId jobId)
+            => RollBitterBlackMazeEarringCrest(seals, jobId, Random.Shared);
+
+        public static uint RollBitterBlackMazeEarringCrest(HashSet<uint> seals, JobId jobId, Random rng)
         {
             List<uint> rolls = [.. BitterblackMazeRewards.AppraisalData.Where(x => x.BaseItem == ItemId.BitterblackEarring
                 && x.SpecificJob == jobId
@@ -46,7 +49,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
             if (rolls.Count != 0)
             {
-                return rolls[Random.Shared.Next(0, rolls.Count)];
+                return rolls[rng.Next(0, rolls.Count)];
             }
             else
             {
@@ -55,13 +58,16 @@ namespace Arrowgene.Ddon.GameServer.Characters
         }
 
         public static uint RollBitterBlackMazeBraceletCrest(HashSet<uint> seals)
+            => RollBitterBlackMazeBraceletCrest(seals, Random.Shared);
+
+        public static uint RollBitterBlackMazeBraceletCrest(HashSet<uint> seals, Random rng)
         {
             List<uint> rolls = [.. BitterblackMazeRewards.AppraisalData.Where(x => x.BaseItem == ItemId.BitterblackBracelet
                 && !seals.Contains(x.SealIndex))
                 .Select(x => (uint)x.CrestId)];
             if (rolls.Count != 0)
             {
-                return rolls[Random.Shared.Next(0, rolls.Count)];
+                return rolls[rng.Next(0, rolls.Count)];
             }
             else
             {

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 
@@ -13,11 +14,26 @@ public partial class DdonSqlDb : SqlDb
         "character_id", "job_id", "release_type", "release_id", "release_level", "order_accepted"
     };
 
+    protected static readonly string[] JobMasterActiveOrdersKeyFields = new[]
+    {
+        "character_id", "job_id", "release_type", "release_id"
+    };
+
+    protected static readonly string[] JobMasterActiveOrdersNonKeyFields = JobMasterActiveOrdersField.Except(JobMasterActiveOrdersKeyFields).ToArray();
+
     private readonly string SqlDeleteJobMasterActiveOrder =
         "DELETE FROM \"ddon_job_master_active_orders\" WHERE \"character_id\"=@character_id AND \"job_id\"=@job_id AND \"release_type\"=@release_type AND \"release_id\"=@release_id;";
 
     private readonly string SqlInsertJobMasterActiveOrder =
         $"INSERT INTO \"ddon_job_master_active_orders\" ({BuildQueryField(JobMasterActiveOrdersField)}) VALUES ({BuildQueryInsert(JobMasterActiveOrdersField)});";
+
+    private readonly string SqlUpsertJobMasterActiveOrder =
+        $"""
+         INSERT INTO "ddon_job_master_active_orders" ({BuildQueryField(JobMasterActiveOrdersField)})
+                        VALUES ({BuildQueryInsert(JobMasterActiveOrdersField)})
+                        ON CONFLICT ({BuildQueryField(JobMasterActiveOrdersKeyFields)})
+                        DO UPDATE SET {BuildQueryUpdateWithPrefix("EXCLUDED.", JobMasterActiveOrdersNonKeyFields)};
+         """;
 
     private readonly string SqlSelectJobMasterActiveOrder =
         $"SELECT {BuildQueryField(JobMasterActiveOrdersField)} FROM \"ddon_job_master_active_orders\" WHERE  \"character_id\"=@character_id AND \"job_id\"=@job_id AND \"release_type\"=@release_type AND \"release_id\"=@release_id;";
@@ -79,9 +95,18 @@ public partial class DdonSqlDb : SqlDb
 
     public override bool UpsertJobMasterActiveOrder(uint characterId, JobId jobId, CDataActiveJobOrder activeJobOrder, DbConnection? connectionIn = null)
     {
-        return HasJobMasterActiveOrder(characterId, jobId, activeJobOrder, connectionIn)
-            ? UpdateJobMasterActiveOrder(characterId, jobId, activeJobOrder, connectionIn)
-            : InsertJobMasterActiveOrder(characterId, jobId, activeJobOrder, connectionIn);
+        return ExecuteQuerySafe(connectionIn, connection =>
+        {
+            return ExecuteNonQuery(connection, SqlUpsertJobMasterActiveOrder, command =>
+            {
+                AddParameter(command, "character_id", characterId);
+                AddParameter(command, "job_id", (byte)jobId);
+                AddParameter(command, "release_type", (byte)activeJobOrder.ReleaseType);
+                AddParameter(command, "release_id", activeJobOrder.ReleaseId);
+                AddParameter(command, "release_level", activeJobOrder.ReleaseLv);
+                AddParameter(command, "order_accepted", activeJobOrder.OrderAccepted);
+            }) == 1;
+        });
     }
 
     public override CDataActiveJobOrder GetJobMasterActiveOrder(uint characterId, JobId jobId, CDataActiveJobOrder activeJobOrder, DbConnection? connectionIn = null)

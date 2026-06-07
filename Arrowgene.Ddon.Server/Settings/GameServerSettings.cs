@@ -1,5 +1,6 @@
 using Arrowgene.Ddon.Server.Scripting.utils;
 using Arrowgene.Ddon.Shared.Model;
+using Arrowgene.Ddon.Shared.Model.Quest;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -366,6 +367,25 @@ namespace Arrowgene.Ddon.Server.Settings
             }
         }
         private const uint _JobLevelMax = 120;
+
+        /// <summary>
+        /// The maximum job points which a job can own at a given time.
+        /// job points past this point will trigger a UI message saying
+        /// you can't earn anymore.
+        /// </summary>
+        [DefaultValue(_JobPointMax)]
+        public uint JobPointMax
+        {
+            set
+            {
+                SetSetting("JobPointMax", value);
+            }
+            get
+            {
+                return TryGetSetting("JobPointMax", _JobPointMax);
+            }
+        }
+        private const uint _JobPointMax = 500000;
 
         /// <summary>
         /// Maximum number of members in a single clan. 
@@ -1124,6 +1144,23 @@ namespace Arrowgene.Ddon.Server.Settings
         private const int _LightQuestGenerationAttemptsPerQuest = 20;
 
         /// <summary>
+        /// The number of times a player can repeat a board quest before it is no longer offered. Resets when quests rotate.
+        /// </summary>
+        [DefaultValue(_LightQuestRepeatsPerDay)]
+        public uint Board
+        {
+            set
+            {
+                SetSetting("LightQuestRepeatsPerDay", value);
+            }
+            get
+            {
+                return TryGetSetting("LightQuestRepeatsPerDay", _LightQuestRepeatsPerDay);
+            }
+        }
+        private const uint _LightQuestRepeatsPerDay = 10000;
+
+        /// <summary>
         /// 
         /// </summary>
         [DefaultValue(_UrlDomain)]
@@ -1763,5 +1800,152 @@ namespace Arrowgene.Ddon.Server.Settings
             }
         }
         private const uint _BBMResetGGCost = 1;
+
+        /// <summary>
+        /// Controls how world quests are rolled and refreshed.
+        /// Both modes cannot be active simultaneously.
+        /// Valid values:
+        ///   InstanceReset - each party instance rolls quests independently on area entry.
+        ///   ServerReset   - all players share a single server-wide pool that rotates on a weekly schedule (original game behavior).
+        /// </summary>
+        [DefaultValue("WorldQuestSystemMode.ServerReset")]
+        public WorldQuestSystemMode WorldQuestSystem
+        {
+            set
+            {
+                SetSetting("WorldQuestSystem", value);
+            }
+            get
+            {
+                return TryGetSetting("WorldQuestSystem", _WorldQuestSystem);
+            }
+        }
+        private const WorldQuestSystemMode _WorldQuestSystem = WorldQuestSystemMode.ServerReset;
+
+
+        /// <summary>
+        /// Timezone used for all calendar-aligned task scheduler resets (daily, weekly) and world
+        /// quest seed computation. Set this to the same value on every shard.
+        ///
+        /// Use the named constants in <see cref="TimeZoneId"/> - they cover both DST-observing and fixed-offset
+        /// timezones, so no manual update is ever needed when clocks change:
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneId.Japan;          // Japan (JST) - original game timezone
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneId.CentralEurope;  // Germany, France, Spain, etc. (CET/CEST auto)
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneId.EasternEurope;  // Finland, Greece, Romania, etc. (EET/EEST auto)
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneId.UKIreland;      // UK/Ireland (GMT/BST auto)
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneId.Eastern;        // US/Canada Eastern (EST/EDT auto)
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneId.UTC;            // UTC
+        ///
+        /// For a timezone not listed in <see cref="TimeZoneId"/>, use FindSystemTimeZoneById with any IANA ID:
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Indiana/Knox");
+        ///
+        /// Full list of IANA timezone IDs:
+        ///   https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+        ///
+        /// For a fully custom fixed offset with no IANA ID:
+        ///   TimeZoneInfo ServerTimeZone = TimeZoneInfo.CreateCustomTimeZone("custom", TimeSpan.FromHours(5.5), "UTC+5:30", "UTC+5:30");
+        /// </summary>
+        [DefaultValue("TimeZoneId.Japan")]
+        public TimeZoneInfo ServerTimeZone
+        {
+            set
+            {
+                SetSetting("ServerTimeZone", value);
+            }
+            get
+            {
+                return TryGetSetting("ServerTimeZone", _ServerTimeZone);
+            }
+        }
+        private static readonly TimeZoneInfo _ServerTimeZone =
+            TimeZoneInfo.TryFindSystemTimeZoneById("Asia/Tokyo", out var _jst) ? _jst : TimeZoneInfo.Utc;
+
+        /// <summary>
+        /// Returns the UTC offset for the configured ServerTimeZone at the current moment.
+        /// </summary>
+        public TimeSpan GetEffectiveUtcOffset() => ServerTimeZone.GetUtcOffset(DateTimeOffset.UtcNow);
+
+        /// <summary>
+        /// When true, world quests that the party leader does not meet the area rank requirement for
+        /// are hidden. In InstanceReset mode the slot is re-rolled with an eligible quest. In
+        /// ServerReset mode the ineligible quest is simply removed without replacement.
+        /// Applies to both WorldQuestSystem modes.
+        /// </summary>
+        [DefaultValue(_WorldQuestFilterByLeaderAreaRank)]
+        public bool WorldQuestFilterByLeaderAreaRank
+        {
+            set
+            {
+                SetSetting("WorldQuestFilterByLeaderAreaRank", value);
+            }
+            get
+            {
+                return TryGetSetting("WorldQuestFilterByLeaderAreaRank", _WorldQuestFilterByLeaderAreaRank);
+            }
+        }
+        private const bool _WorldQuestFilterByLeaderAreaRank = false;
+
+        /// <summary>
+        /// When true, world quests use a first-clear / repeat-clear reward system per period.
+        /// First clear per period: full rewards (fixed, random, selectable).
+        /// Repeat clears: reduced random item pool (if defined per quest) plus configurable wallet reward penalties.
+        /// The WorldQuestResetTask resets first-clear records when it fires, regardless of WorldQuestSystem mode.
+        /// When false, every clear gives full rewards as if it were a first clear.
+        /// </summary>
+        [DefaultValue(_WorldQuestFirstClearRewards)]
+        public bool WorldQuestFirstClearRewards
+        {
+            set { SetSetting("WorldQuestFirstClearRewards", value); }
+            get { return TryGetSetting("WorldQuestFirstClearRewards", _WorldQuestFirstClearRewards); }
+        }
+        private const bool _WorldQuestFirstClearRewards = true;
+
+        /// <summary>
+        /// EXP reward ratio for repeat world quest clears (0.0 = none, 1.0 = full).
+        /// Only applies when WorldQuestFirstClearRewards = true.
+        /// </summary>
+        [DefaultValue(_WorldQuestRepeatClearExpPct)]
+        public double WorldQuestRepeatClearExpPct
+        {
+            set { SetSetting("WorldQuestRepeatClearExpPct", value); }
+            get { return TryGetSetting("WorldQuestRepeatClearExpPct", _WorldQuestRepeatClearExpPct); }
+        }
+        private const double _WorldQuestRepeatClearExpPct = 1.0;
+
+        /// <summary>
+        /// Rift Points reward ratio for repeat world quest clears (0.0 = none, 1.0 = full).
+        /// Only applies when WorldQuestFirstClearRewards = true.
+        /// </summary>
+        [DefaultValue(_WorldQuestRepeatClearRpPct)]
+        public double WorldQuestRepeatClearRpPct
+        {
+            set { SetSetting("WorldQuestRepeatClearRpPct", value); }
+            get { return TryGetSetting("WorldQuestRepeatClearRpPct", _WorldQuestRepeatClearRpPct); }
+        }
+        private const double _WorldQuestRepeatClearRpPct = 1.0;
+
+        /// <summary>
+        /// Gold reward ratio for repeat world quest clears (0.0 = none, 1.0 = full).
+        /// Only applies when WorldQuestFirstClearRewards = true.
+        /// </summary>
+        [DefaultValue(_WorldQuestRepeatClearGoldPct)]
+        public double WorldQuestRepeatClearGoldPct
+        {
+            set { SetSetting("WorldQuestRepeatClearGoldPct", value); }
+            get { return TryGetSetting("WorldQuestRepeatClearGoldPct", _WorldQuestRepeatClearGoldPct); }
+        }
+        private const double _WorldQuestRepeatClearGoldPct = 1.0;
+
+        /// <summary>
+        /// Job Points reward ratio for repeat world quest clears (0.0 = none, 1.0 = full).
+        /// Only applies when WorldQuestFirstClearRewards = true.
+        /// </summary>
+        [DefaultValue(_WorldQuestRepeatClearJpPct)]
+        public double WorldQuestRepeatClearJpPct
+        {
+            set { SetSetting("WorldQuestRepeatClearJpPct", value); }
+            get { return TryGetSetting("WorldQuestRepeatClearJpPct", _WorldQuestRepeatClearJpPct); }
+        }
+        private const double _WorldQuestRepeatClearJpPct = 1.0;
     }
 }

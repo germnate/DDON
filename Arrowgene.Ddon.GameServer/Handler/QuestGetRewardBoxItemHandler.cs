@@ -1,15 +1,12 @@
-using Arrowgene.Buffers;
 using Arrowgene.Ddon.GameServer.Characters;
-using Arrowgene.Ddon.GameServer.Dump;
 using Arrowgene.Ddon.GameServer.Quests;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
-using Arrowgene.Ddon.Shared.Network;
+using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
-using Arrowgene.Networking.Tcp.Consumer.BlockingQueueConsumption;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -60,8 +57,26 @@ namespace Arrowgene.Ddon.GameServer.Handler
             }
 
             var distinctRewards = packet.GetRewardBoxItemList.Select(x => x.UID).Distinct().ToList();
+            var selectedRewards = new List<CDataRewardBoxItem>();
+            foreach (var rewardUID in distinctRewards)
+            {
+                if (!coalescedRewards.TryGetValue(rewardUID, out var reward))
+                {
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_QUEST_NOT_EXIST_REWARD_BOX_LIST_NO, $"Illegal reward UID sent to server.");
+                }
 
-            var slotCount = coalescedRewards.Sum(x => distinctRewards.Contains(x.Key) ? Server.ItemManager.PredictAddItemSlots(client.Character, StorageType.StorageBoxNormal, (uint) x.Value.ItemId, x.Value.Num) : 0);
+                selectedRewards.Add(reward);
+            }
+
+            if (selectedRewards
+                .Where(x => x.SelectGroupId != 0)
+                .GroupBy(x => x.SelectGroupId)
+                .Any(x => x.Count() > 1))
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_QUEST_NOT_EXIST_REWARD_BOX_LIST_NO, $"Multiple select rewards were requested from the same select group.");
+            }
+
+            var slotCount = selectedRewards.Sum(x => x.IsInstance ? 1L : (long)Server.ItemManager.PredictAddItemSlots(client.Character, StorageType.StorageBoxNormal, (uint) x.ItemId, x.Num));
             if (slotCount > client.Character.Storage.GetStorage(StorageType.StorageBoxNormal).EmptySlots())
             {
                 throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_STORAGE_OVERFLOW);
@@ -74,15 +89,27 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     var reward = coalescedRewards[rewardUID];
 
-                    var (specialQueue, isSpecial) = Server.ItemManager.HandleSpecialItem(client, updateCharacterItemNtc, reward.ItemId, reward.Num, false, connection);
-                    if (isSpecial)
+                    if (reward.IsInstance)
                     {
-                        queue.AddRange(specialQueue);
+                        var result = Server.ItemManager.MaterializeStagedItem(Server, client.Character, reward.UID, StorageType.StorageBoxNormal, connection);
+                        if (result == null)
+                        {
+                            throw new ResponseErrorException(ErrorCode.ERROR_CODE_QUEST_INTERNAL_ERROR, $"Missing staged reward item for reward UID {reward.UID}.");
+                        }
+                        updateCharacterItemNtc.UpdateItemList.Add(result);
                     }
-                    else if (reward.Num > 0)
+                    else
                     {
-                        var result = Server.ItemManager.AddItem(Server, client.Character, false, (uint) reward.ItemId, reward.Num, connectionIn: connection);
-                        updateCharacterItemNtc.UpdateItemList.AddRange(result);
+                        var (specialQueue, isSpecial) = Server.ItemManager.HandleSpecialItem(client, updateCharacterItemNtc, reward.ItemId, reward.Num, SpecialItemMode.OnAcquire, connection);
+                        if (isSpecial)
+                        {
+                            queue.AddRange(specialQueue);
+                        }
+                        else if (reward.Num > 0)
+                        {
+                            var result = Server.ItemManager.AddItem(Server, client.Character, false, (uint) reward.ItemId, reward.Num, connectionIn: connection);
+                            updateCharacterItemNtc.UpdateItemList.AddRange(result);
+                        }
                     }
                 }
                 Server.RewardManager.DeleteQuestBoxReward(client, questBoxReward.UniqRewardId, connectionIn: connection);

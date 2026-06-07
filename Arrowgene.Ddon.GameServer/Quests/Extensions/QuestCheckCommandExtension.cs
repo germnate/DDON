@@ -462,13 +462,13 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
 
         public static List<CDataQuestCommand> AddCheckCmdWorldManageQuestFlagOn(this List<CDataQuestCommand> checkCommands, QuestId questId, uint flagNo)
         {
-            checkCommands.Add(QuestManager.CheckCommand.WorldManageQuestFlagOn((int)questId, (int)flagNo));
+            checkCommands.Add(QuestManager.CheckCommand.WorldManageQuestFlagOn((int)flagNo, (int)questId));
             return checkCommands;
         }
 
         public static List<CDataQuestCommand> AddCheckCmdWorldManageQuestFlagOff(this List<CDataQuestCommand> checkCommands, QuestId questId, uint flagNo)
         {
-            checkCommands.Add(QuestManager.CheckCommand.WorldManageQuestFlagOff((int)questId, (int)flagNo));
+            checkCommands.Add(QuestManager.CheckCommand.WorldManageQuestFlagOff((int)flagNo, (int)questId));
             return checkCommands;
         }
 
@@ -637,6 +637,314 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
         public static List<CDataQuestCommand> AddCheckCmdNewTalkNpcWithoutMarker(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo, QuestId questId)
         {
             checkCommands.Add(QuestManager.CheckCommand.NewTalkNpcWithoutMarker(stageInfo.StageNo, groupNo, setNo, (int)questId));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdTalkNpcChoice(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, NpcId npcId, int choice)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.TalkNpcChoice((int) stageInfo.StageNo, npcId, choice));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdOmSetTouchRadius(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.OmSetTouchRadius((int)stageInfo.StageNo, groupNo, setNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdOmReleaseTouchRadius(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.OmReleaseTouchRadius((int)stageInfo.StageNo, groupNo, setNo));
+            return checkCommands;
+        }
+
+        // Ghidra-discovered check commands (IDs 211–256)
+
+        public static List<CDataQuestCommand> AddCheckCmdIsSubstoryStateBit18(this List<CDataQuestCommand> checkCommands)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsSubstoryStateBit18());
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdStoreLinkageEnemyFlagGlobal(this List<CDataQuestCommand> checkCommands)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.StoreLinkageEnemyFlagGlobal());
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdNpcPreTalkAndOrderUi(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, NpcId npcId, int noOrderGroupSerial, int storeVal)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.NpcPreTalkAndOrderUi((int) stageInfo.StageNo, (int) npcId, noOrderGroupSerial, storeVal));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdSubstoryEnemyHpNotLess(this List<CDataQuestCommand> checkCommands, int substoryId, int hpRatePercent)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.SubstoryEnemyHpNotLess(substoryId, hpRatePercent));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdSubstoryEnemyHpLess(this List<CDataQuestCommand> checkCommands, int substoryId, int hpRatePercent)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.SubstoryEnemyHpLess(substoryId, hpRatePercent));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdSubstoryAvgEnemyHpNotLess(this List<CDataQuestCommand> checkCommands, int param01, int hpRatePercent)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.SubstoryAvgEnemyHpNotLess(param01, hpRatePercent));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdSubstoryAvgEnemyHpLess(this List<CDataQuestCommand> checkCommands, int param01, int hpRatePercent)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.SubstoryAvgEnemyHpLess(param01, hpRatePercent));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsOmBehaviorState(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo, int behaviorState)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsOmBehaviorState(stageInfo.StageNo, groupNo, setNo, behaviorState));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdMonsterGatheringSpotState(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int spotId, int spotState)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.MonsterGatheringSpotState(stageInfo.StageNo, spotId, spotState));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdOmEndAnimation(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.OmEndAnimation(stageInfo.StageNo, groupNo, setNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdOmEndAnimationNoMarker(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.OmEndAnimationNoMarker(stageInfo.StageNo, groupNo, setNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdQuestOmEndAnimation(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.QuestOmEndAnimation(stageInfo.StageNo, groupNo, setNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdQuestOmEndAnimationNoMarker(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.QuestOmEndAnimationNoMarker(stageInfo.StageNo, groupNo, setNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsRewardPointNotLess(this List<CDataQuestCommand> checkCommands, int playerId, int rewardId, int expectedValue)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsRewardPointNotLess(playerId, rewardId, expectedValue));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdQuestTalkNpcRadius(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, uint groupNo, int setNo, int param04 = 0)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.QuestTalkNpcRadius(stageInfo.StageNo, groupNo, setNo, param04));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsOmBrokenInCurrentPhase(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsOmBrokenInCurrentPhase(stageInfo.StageNo, groupNo, setNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsEnemyFoundRadius(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo = -1, int markerFlag = 0)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsEnemyFoundRadius(stageInfo.StageNo, groupNo, setNo, markerFlag));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsEnemyFoundForOrderRadius(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo = -1)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsEnemyFoundForOrderRadius(stageInfo.StageNo, groupNo, setNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdHasAchievement(this List<CDataQuestCommand> checkCommands, int categoryNo, int achievementId)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.HasAchievement(categoryNo, achievementId));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsSubstoryStateBit19(this List<CDataQuestCommand> checkCommands)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsSubstoryStateBit19());
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsPartyMemberHasItem(this List<CDataQuestCommand> checkCommands, int itemListIdx)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsPartyMemberHasItem(itemListIdx));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsSubstoryStateBit20(this List<CDataQuestCommand> checkCommands)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsSubstoryStateBit20());
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsSubstoryStateBit21(this List<CDataQuestCommand> checkCommands)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsSubstoryStateBit21());
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsSubstoryStateBit22(this List<CDataQuestCommand> checkCommands)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsSubstoryStateBit22());
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsSubstoryStateBit23(this List<CDataQuestCommand> checkCommands)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsSubstoryStateBit23());
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsFsmNpcTalkComplete(this List<CDataQuestCommand> checkCommands, int npcId)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsFsmNpcTalkComplete(npcId));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsSubstoryIngameHourInRange(this List<CDataQuestCommand> checkCommands, int minHour, int maxHour)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsSubstoryIngameHourInRange(minHour, maxHour));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsKilledTargetEnemySetGroupMode15(this List<CDataQuestCommand> checkCommands, int flagNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsKilledTargetEnemySetGroupMode15(flagNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsKilledTargetEnemySetGroupMode15NoMarker(this List<CDataQuestCommand> checkCommands, int flagNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsKilledTargetEnemySetGroupMode15NoMarker(flagNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsContentsTimerBElapsed(this List<CDataQuestCommand> checkCommands, int timerNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsContentsTimerBElapsed(timerNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsQuestClearCountNotLess(this List<CDataQuestCommand> checkCommands, int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsQuestClearCountNotLess(param01, param02, param03, param04));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsContentsModeTimerNotLess(this List<CDataQuestCommand> checkCommands, int timeSec)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsContentsModeTimerNotLess(timeSec));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsTriggerFlagSetAndClear(this List<CDataQuestCommand> checkCommands)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsTriggerFlagSetAndClear());
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsKillGroupCompleteInRadius(this List<CDataQuestCommand> checkCommands, int flagNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsKillGroupCompleteInRadius(flagNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsContentsTimerAZero(this List<CDataQuestCommand> checkCommands, int timerNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsContentsTimerAZero(timerNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsWildHuntTargetEnemyKilled(this List<CDataQuestCommand> checkCommands, int zoneLinkageId, int markerFlag = 0)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsWildHuntTargetEnemyKilled(zoneLinkageId, markerFlag: markerFlag));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsContentsModeStateFlag(this List<CDataQuestCommand> checkCommands)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsContentsModeStateFlag());
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsQuestLayoutHpNotGreater(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo, int hpLostPct)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsQuestLayoutHpNotGreater(stageInfo.StageNo, groupNo, setNo, hpLostPct));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsExtremeMissionClear(this List<CDataQuestCommand> checkCommands, QuestId questId)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsExtremeMissionClear((int)questId));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdRandomEq(this List<CDataQuestCommand> checkCommands, int randomNo, int value)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.RandomEq(randomNo, value));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdRandomNotEq(this List<CDataQuestCommand> checkCommands, int randomNo, int value)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.RandomNotEq(randomNo, value));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdRandomLess(this List<CDataQuestCommand> checkCommands, int randomNo, int value)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.RandomLess(randomNo, value));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdRandomNotGreater(this List<CDataQuestCommand> checkCommands, int randomNo, int value)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.RandomNotGreater(randomNo, value));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdRandomGreater(this List<CDataQuestCommand> checkCommands, int randomNo, int value)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.RandomGreater(randomNo, value));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdRandomNotLess(this List<CDataQuestCommand> checkCommands, int randomNo, int value)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.RandomNotLess(randomNo, value));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsLinkageEnemyFlag(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo, uint flagNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsLinkageEnemyFlag(stageInfo.StageNo, groupNo, setNo, (int)flagNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdIsLinkageEnemyFlagOff(this List<CDataQuestCommand> checkCommands, StageInfo stageInfo, int groupNo, int setNo, uint flagNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.IsLinkageEnemyFlagOff(stageInfo.StageNo, groupNo, setNo, (int)flagNo));
+            return checkCommands;
+        }
+
+        public static List<CDataQuestCommand> AddCheckCmdChainNotLess(this List<CDataQuestCommand> checkCommands, int chainNo)
+        {
+            checkCommands.Add(QuestManager.CheckCommand.ChainNotLess(chainNo));
             return checkCommands;
         }
     }

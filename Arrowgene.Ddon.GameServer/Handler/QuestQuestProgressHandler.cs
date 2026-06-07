@@ -8,6 +8,7 @@ using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 
@@ -51,6 +52,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
             else
             {
                 QuestStateManager questStateManager = QuestManager.GetQuestStateManager(client, quest);
+                uint questStep = questStateManager.GetQuestState(questScheduleId)?.Step ?? 0;
+                HashSet<uint> questProgressRecipientIds = new();
 
                 var processState = questStateManager.GetProcessState(questScheduleId, processNo);
                 res.QuestProcessState = quest.StateMachineExecute(Server, client, processState, packets, out questProgressState);
@@ -63,6 +66,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
                 Server.Database.ExecuteInTransaction(connection =>
                 {
+                    questProgressRecipientIds = GetQuestProgressRecipientIds(client, quest, questStep, connection);
+
                     if (questProgressState == QuestProgressState.Accepted && quest.QuestType == QuestType.World)
                     {
                         foreach (var memberClient in client.Party.Clients)
@@ -83,7 +88,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     else if (questProgressState == QuestProgressState.Accepted &&
                              (quest.QuestType == QuestType.Tutorial ||
                               quest.QuestType == QuestType.WildHunt ||
-                              quest.QuestType == QuestType.Light))
+                              quest.QuestType == QuestType.Light ||
+                              quest.QuestType == QuestType.Substory))
                     {
                         // Add a new personal quest record for the player
                         if (!Server.Database.InsertQuestProgress(client.Character.CommonId, questScheduleId, quest.QuestType, 0, connection))
@@ -99,7 +105,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     else if (questProgressState == QuestProgressState.Complete)
                     {
                         res.QuestProgressResult = 3; // ProcessEnd
-                        var ntcs = CompleteQuest(quest, client, questStateManager, connection);
+                        var ntcs = CompleteQuest(quest, client, questStateManager, connection, questProgressRecipientIds);
                         packets.AddRange(ntcs);
 
                         // Add Deferred work
@@ -140,6 +146,26 @@ namespace Arrowgene.Ddon.GameServer.Handler
             return packets;
         }
 
+        private HashSet<uint> GetQuestProgressRecipientIds(GameClient client, Quest quest, uint step, DbConnection? connectionIn = null)
+        {
+            if (quest.IsPersonal)
+            {
+                return new HashSet<uint>() { client.Character.CharacterId };
+            }
+
+            if (quest.QuestType != QuestType.Main)
+            {
+                return client.Party.Clients
+                    .Select(memberClient => memberClient.Character.CharacterId)
+                    .ToHashSet();
+            }
+
+            return client.Party.Clients
+                .Where(memberClient => QuestManager.IsClientAlignedForMainQuestProgress(Server, memberClient, quest, step, connectionIn))
+                .Select(memberClient => memberClient.Character.CharacterId)
+                .ToHashSet();
+        }
+
         private PacketQueue HandleDefferredWork(GameClient client, Quest quest)
         {
             PacketQueue packets = new();
@@ -160,20 +186,54 @@ namespace Arrowgene.Ddon.GameServer.Handler
             return packets;
         }
 
-        private PacketQueue CompleteQuest(Quest quest, GameClient client, QuestStateManager questState, DbConnection? connectionIn = null)
+        private PacketQueue CompleteQuest(Quest quest, GameClient client, QuestStateManager questState, DbConnection? connectionIn = null, HashSet<uint>? questProgressRecipientIds = null)
         {
             PacketQueue packets = new();
+
+            // Snapshot repeat-clear state before DistributeQuestRewards mutates period first-clear state.
+            bool isWorldQuest = QuestManager.IsWorldQuest(quest);
+            bool rewardSystemEnabled = Server.GameSettings.GameServerSettings.WorldQuestFirstClearRewards;
+            bool isRepeatClear = isWorldQuest && rewardSystemEnabled
+                && client.Character.GetQuestPeriodFirstClears(quest.QuestType).Contains(quest.QuestScheduleId);
+            bool useExtremeMissionRewardBuckets = quest.QuestType == QuestType.ExtremeMission && quest.HasCategorizedRewards();
+            Dictionary<uint, QuestBoxRewardFlags> exmRewardFlags = useExtremeMissionRewardBuckets
+                ? GetExtremeMissionRewardFlags(quest, client)
+                : new Dictionary<uint, QuestBoxRewardFlags>();
+
             packets.AddRange(questState.DistributeQuestRewards(quest.QuestScheduleId, connectionIn));
             packets.AddRange(Server.AreaRankManager.NotifyAreaRankUpOnQuestComplete(client, quest));
             questState.CompleteQuestProgress(quest.QuestScheduleId, connectionIn);
 
+            byte randomRewardNum;
+            bool isRepeatRewardFlag;
+            if (useExtremeMissionRewardBuckets && exmRewardFlags.TryGetValue(client.Character.CharacterId, out var clientRewardFlags))
+            {
+                isRepeatRewardFlag = clientRewardFlags.HasFlag(QuestBoxRewardFlags.RepeatClear);
+                randomRewardNum = quest.RandomRewardNum(clientRewardFlags);
+            }
+            else if (isRepeatClear)
+            {
+                isRepeatRewardFlag = true;
+                if (quest.HasRepeatClearItemRewards())
+                    randomRewardNum = quest.RepeatClearRandomRewardNum();
+                else if (quest.GetAutoRepeatPool().Count > 0)
+                    randomRewardNum = 1; // auto-repeat yields one item from the combined first-clear pool
+                else
+                    randomRewardNum = 0;
+            }
+            else
+            {
+                isRepeatRewardFlag = quest.RewardParams.IsRepeatReward;
+                randomRewardNum = quest.RandomRewardNum();
+            }
+
             S2CQuestCompleteNtc completeNtc = new S2CQuestCompleteNtc()
             {
                 QuestScheduleId = quest.QuestScheduleId,
-                RandomRewardNum = quest.RandomRewardNum(),
+                RandomRewardNum = randomRewardNum,
                 ChargeRewardNum = quest.RewardParams.ChargeRewardNum,
                 ProgressBonusNum = quest.RewardParams.ProgressBonusNum,
-                IsRepeatReward = quest.RewardParams.IsRepeatReward,
+                IsRepeatReward = isRepeatRewardFlag,
                 IsUndiscoveredReward = quest.RewardParams.IsUndiscoveredReward,
                 IsHelpReward = quest.RewardParams.IsHelpReward,
                 IsPartyBonus = quest.RewardParams.IsPartyBonus,
@@ -191,11 +251,38 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
                 packets.AddRange(Server.AchievementManager.HandleClearQuest(client, quest, connectionIn));
             }
+            else if (useExtremeMissionRewardBuckets)
+            {
+                foreach (var memberClient in client.Party.Clients)
+                {
+                    var memberFlags = exmRewardFlags.GetValueOrDefault(memberClient.Character.CharacterId);
+                    memberClient.Enqueue(new S2CQuestCompleteNtc()
+                    {
+                        QuestScheduleId = quest.QuestScheduleId,
+                        RandomRewardNum = quest.RandomRewardNum(memberFlags),
+                        ChargeRewardNum = quest.RewardParams.ChargeRewardNum,
+                        ProgressBonusNum = quest.RewardParams.ProgressBonusNum,
+                        IsRepeatReward = memberFlags.HasFlag(QuestBoxRewardFlags.RepeatClear),
+                        IsUndiscoveredReward = quest.RewardParams.IsUndiscoveredReward,
+                        IsHelpReward = memberFlags.HasFlag(QuestBoxRewardFlags.HelperBonus),
+                        IsPartyBonus = quest.RewardParams.IsPartyBonus,
+                    }, packets);
+                }
+                packets.AddRange(client.Party.QuestState.UpdatePriorityQuestList(client.Party.Leader.Client, connectionIn));
+                foreach (var memberClient in client.Party.Clients)
+                {
+                    packets.AddRange(Server.AchievementManager.HandleClearQuest(memberClient, quest, connectionIn));
+                }
+            }
             else
             {
+                var completionClients = quest.QuestType == QuestType.Main && questProgressRecipientIds != null
+                    ? client.Party.Clients.Where(memberClient => questProgressRecipientIds.Contains(memberClient.Character.CharacterId)).ToList()
+                    : client.Party.Clients.ToList();
+
                 client.Party.EnqueueToAll(completeNtc, packets);
                 packets.AddRange(client.Party.QuestState.UpdatePriorityQuestList(client.Party.Leader.Client, connectionIn));
-                foreach(var memberClient in client.Party.Clients)
+                foreach(var memberClient in completionClients)
                 {
                     packets.AddRange(Server.AchievementManager.HandleClearQuest(memberClient, quest, connectionIn));
                 }
@@ -204,7 +291,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             if (quest.QuestType == QuestType.ExtremeMission)
             {
                 double timeScore = Server.PartyQuestContentManager.CheckTimer(client.Party.Id);
-                double playerMult = 1 + (8 - client.Party.MemberCount()) * 0.2;
+                double playerMult = 1 + (8 - client.Party.ExmInitialPartySize) * 0.2;
                 long totalScore = (long)(timeScore * playerMult);
                 foreach (var player in client.Party.Clients.Select(x => x.Character.CharacterId).OrderBy(x => Random.Shared.Next()))
                 {
@@ -221,6 +308,32 @@ namespace Arrowgene.Ddon.GameServer.Handler
             }
 
             return packets;
+        }
+
+        private Dictionary<uint, QuestBoxRewardFlags> GetExtremeMissionRewardFlags(Quest quest, GameClient completingClient)
+        {
+            var result = new Dictionary<uint, QuestBoxRewardFlags>();
+            bool partyHasFirstEverClear = completingClient.Party.Clients.Any(x => !x.Character.CompletedQuests.ContainsKey(quest.QuestId));
+
+            foreach (var memberClient in completingClient.Party.Clients)
+            {
+                bool hasEverCleared = memberClient.Character.CompletedQuests.ContainsKey(quest.QuestId);
+                bool hasPeriodClear = memberClient.Character.GetQuestPeriodFirstClears(quest.QuestType).Contains(quest.QuestScheduleId);
+
+                QuestBoxRewardFlags rewardFlags = QuestBoxRewardFlags.None;
+                if (!hasEverCleared)
+                    rewardFlags |= QuestBoxRewardFlags.FirstClear;
+                if (!hasPeriodClear)
+                    rewardFlags |= QuestBoxRewardFlags.PeriodFirstClear;
+                else
+                    rewardFlags |= QuestBoxRewardFlags.RepeatClear;
+                if (hasEverCleared && partyHasFirstEverClear)
+                    rewardFlags |= QuestBoxRewardFlags.HelperBonus;
+
+                result[memberClient.Character.CharacterId] = rewardFlags;
+            }
+
+            return result;
         }
     }
 }

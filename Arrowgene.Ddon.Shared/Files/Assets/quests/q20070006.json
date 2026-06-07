@@ -27,14 +27,17 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Protective Cloth",
           "item_id": 7940,
           "num": 2
         },
         {
+          "comment": "Blue Whiskey",
           "item_id": 9417,
           "num": 2
         },
         {
+          "comment": "Forest Dwellers' Old Key",
           "item_id": 9066,
           "num": 2
         }
@@ -44,6 +47,7 @@
       "type": "random",
       "loot_pool": [
         {
+          "comment": "Superior Healing Elixir",
           "item_id": 7553,
           "num": 1,
           "chance": 1.0
@@ -57,59 +61,68 @@
         "id": 130,
         "group_id": 0
       },
-        "placement_type": "manual",
+      "starting_index": 4,
       "enemies": [
         {
+          "comment": "Blob",
+          "enemy_id": "0x010910",
+          "start_think_tbl_no": 8,
+          "level": 43,
+          "exp": 138,
+          "is_required": false,
+          "is_manual_set": true
+        },
+        {
+          "comment": "Blob",
+          "enemy_id": "0x010910",
+          "start_think_tbl_no": 8,
+          "level": 43,
+          "exp": 138,
+          "is_required": false,
+          "is_manual_set": true
+        },
+        {
+          "comment": "Blob",
+          "enemy_id": "0x010910",
+          "start_think_tbl_no": 8,
+          "level": 43,
+          "exp": 138,
+          "is_required": false,
+          "is_manual_set": true
+        },
+        {
+          "comment": "Blob",
+          "enemy_id": "0x010910",
+          "start_think_tbl_no": 8,
+          "level": 43,
+          "exp": 138,
+          "is_required": false,
+          "is_manual_set": true
+        },
+        {
+          "comment": "Blob",
+          "enemy_id": "0x010910",
+          "start_think_tbl_no": 8,
+          "level": 43,
+          "exp": 138,
+          "is_required": false,
+          "is_manual_set": true
+        },
+        {
+          "comment": "Brutal Witch",
           "enemy_id": "0x015604",
+          "named_enemy_params_id": 54,
           "start_think_tbl_no": 2,
-          "named_enemy_params_id": 53,
           "level": 44,
-          "exp": 6824,
-          "is_boss": true,
-          "index": 0
-        },
-        {
-          "enemy_id": "0x010510",
-          "start_think_tbl_no": 1,
-          "is_manual_set": true,
-          "level": 43,
-          "exp": 5264,
-          "is_boss": false,
-          "index": 6
-        },
-        {
-          "enemy_id": "0x010510",
-          "start_think_tbl_no": 1,
-          "is_manual_set": true,
-          "level": 43,
-          "exp": 5264,
-          "is_boss": false,
-          "index": 5
-        },
-        {
-          "enemy_id": "0x010510",
-          "start_think_tbl_no": 1,
-          "is_manual_set": true,
-          "level": 43,
-          "exp": 5264,
-          "is_boss": false,
-          "index": 1
-        },
-        {
-          "enemy_id": "0x010510",
-          "start_think_tbl_no": 1,
-          "is_manual_set": true,
-          "level": 43,
-          "exp": 5264,
-          "is_boss": false,
-          "index": 3
+          "exp": 2898,
+          "is_boss": true
         }
       ]
     }
   ],
   "blocks": [
     {
-      "type": "NpcTalkAndOrder",
+      "type": "NewNpcTalkAndOrder",
       "flags": [
         {
           "type": "QstLayout",
@@ -129,23 +142,30 @@
     {
       "type": "SeekOutEnemiesAtMarkedLocation",
       "announce_type": "Accept",
+      "result_commands": [
+        {
+          "comment": "Idle dialogue",
+          "type": "QstTalkChg",
+          "Param1": 539,
+          "Param2": 13339
+        }
+      ],
       "groups": [ 0 ]
     },
     {
       "type": "KillGroup",
-      "announce_type": "Accept",
       "reset_group": false,
-       "groups": [ 0 ]
+      "groups": [ 0 ]
     },
     {
-      "type": "TalkToNpc",
+      "type": "NewTalkToNpc",
       "stage_id": {
         "id": 130,
         "group_id": 1,
         "layer_no": 1
       },
       "npc_id": "LightlyEquippedSoldier",
-      "announce_type": "Update",      
+      "announce_type": "Update",
       "message_id": 13288
     },
     {
@@ -156,9 +176,18 @@
         "layer_no": 1
       },
       "npc_id": "LightlyEquippedSoldier",
-      "announce_type": "Update",
+      "announce_type": "CheckpointAndUpdate",
+      "result_commands": [
+        {
+          "comment": "Idle dialogue",
+          "type": "QstTalkChg",
+          "Param1": 539,
+          "Param2": 13339
+        }
+      ],
       "items": [
         {
+          "comment": "Superior Healing Elixir",
           "id": 7553,
           "amount": 3
         }
@@ -167,4 +196,3 @@
     }
   ]
 }
-    

@@ -122,12 +122,17 @@
                     "message_id": 16098
                 },
                 {
-                    "type": "IsStageNo",
-                    "comment": "Place holder block. This requires a world quest to be completed",
+                    "type": "raw",
+                    "checkpoint": true,
                     "announce_type": "Update",
-                    "stage_id": {
-                        "id": 56
-                    }
+                    "comment": "Wait for player to complete any world quest in Mergoda Ruins.",
+                    "check_commands": [
+                        {
+                            "type": "SetQuestClearNum",
+                            "Param1": 1,
+                            "Param2": 12
+                        }
+                    ]
                 },
                 {
                     "type": "TalkToNpc",

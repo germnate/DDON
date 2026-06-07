@@ -16,7 +16,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
 
         public CDataStageLayoutId LayoutId { get; set; }
         public uint PosId { get; set; }
-        public SoulOrdealOmState State { get; set; } // Changes marker on map and unlocks doors
+        public SeasonDungeonOmState State { get; set; } // Changes marker on map and unlocks doors
 
         public class Serializer : PacketEntitySerializer<S2CSeasonDungeonSetOmStateNtc>
         {
@@ -32,7 +32,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
                 S2CSeasonDungeonSetOmStateNtc obj = new S2CSeasonDungeonSetOmStateNtc();
                 obj.LayoutId = ReadEntity<CDataStageLayoutId>(buffer);
                 obj.PosId = ReadUInt32(buffer);
-                obj.State = (SoulOrdealOmState) ReadByte(buffer);
+                obj.State = (SeasonDungeonOmState) ReadByte(buffer);
                 return obj;
             }
         }

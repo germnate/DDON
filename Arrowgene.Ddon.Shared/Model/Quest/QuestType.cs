@@ -20,6 +20,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         Board = Light,
         World = Set,
         ExtremeMission = TimeGain, // Unsure if this is the proper category
+        Substory = Unk0,
         WildHunt = Unk3
     }
 }

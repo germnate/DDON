@@ -6,6 +6,7 @@ using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Ddon.Shared.Model.Rpc;
 using Arrowgene.Logging;
 using Arrowgene.WebServer;
+using Microsoft.AspNetCore.Hosting.Server;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,113 +27,185 @@ namespace Arrowgene.Ddon.Rpc.Web.Route.Internal
 
             public override RpcCommandResult Execute(DdonGameServer gameServer)
             {
-                switch (_entry.Command)
+                return _entry.Command switch
                 {
-                    case RpcInternalCommand.Ping:
-                        {
-                            return new RpcCommandResult(this, true)
-                            {
-                                Message = $"Ping {_entry.Origin}"
-                            };
-                        }
-                    case RpcInternalCommand.NotifyPlayerList:
-                        {
-                            List<RpcCharacterData> data = _entry.GetData<List<RpcCharacterData>>();
-                            gameServer.RpcManager.ReceivePlayerList(_entry.Origin, _entry.Timestamp, data);
-                            return new RpcCommandResult(this, true)
-                            {
-                                Message = $"NotifyPlayerList Channel {_entry.Origin}"
-                            };
-                        }
-                    case RpcInternalCommand.NotifyClanQuestCompletion:
-                        {
-                            RpcQuestCompletionData data = _entry.GetData<RpcQuestCompletionData>();
-                            gameServer.ClanManager.UpdateClanQuestCompletion(data.CharacterId, data.QuestStatus);
-                            return new RpcCommandResult(this, true)
-                            {
-                                Message = $"NotifyClanQuestCompletion for CharacterId {data.CharacterId}"
-                            };
-                        }
-                    case RpcInternalCommand.EpitaphRoadWeeklyReset:
-                        {
-                            gameServer.EpitaphRoadManager.PerformWeeklyReset();
-                            return new RpcCommandResult(this, true)
-                            {
-                                Message = "EpitaphRoadWeeklyReset"
-                            };
-                        }
-                    case RpcInternalCommand.KickInternal:
-                        {
-                            int target = _entry.GetData<int>();
-                            var clientList = gameServer.ClientLookup.GetAll();
-                            foreach (var client in clientList)
-                            {
-                                if (client.Account?.Id == target)
-                                {
-                                    Logger.Error(client, $"[AUTOKICK] Handling auto kick for account {target}");
-                                    client.Close();
-                                }
-                            }
-                            gameServer.Database.DeleteConnection(gameServer.Id, target);
-                            return new RpcCommandResult(this, true)
-                            {
-                                Message = $"KickInternal for AccountId {target}"
-                            };
-                        }
+                    RpcInternalCommand.Ping => HandlePing(),
+                    RpcInternalCommand.NotifyPlayerList => HandleNotifyPlayerList(gameServer),
+                    RpcInternalCommand.NotifyClanQuestCompletion => HandleNotifyClanQuestCompletion(gameServer),
+                    RpcInternalCommand.EpitaphRoadWeeklyReset => HandleEpitaphRoadWeeklyReset(gameServer),
+                    RpcInternalCommand.KickInternal => HandleKickInternal(gameServer),
+                    RpcInternalCommand.AreaRankResetStart => HandleAreaRankResetStart(gameServer),
+                    RpcInternalCommand.AreaRankResetEnd => HandleAreaRankResetEnd(gameServer),
+                    RpcInternalCommand.BoardQuestDailyRotation => HandleBoardQuestDailyRotation(gameServer),
+                    RpcInternalCommand.StampReset => HandleStampReset(gameServer),
+                    RpcInternalCommand.UpdateCrafting => HandleUpdateCrafting(gameServer),
+                    RpcInternalCommand.WorldQuestReset => HandleWorldQuestReset(gameServer),
+                    RpcInternalCommand.ExtremeMissionRewardReset => HandleExtremeMissionRewardReset(gameServer),
+                    _ => new RpcCommandResult(this, false),
+                };
+            }
 
-                    case RpcInternalCommand.AreaRankResetStart:
-                        {
-                            foreach (var character in gameServer.ClientLookup.GetAllCharacter())
-                            {
-                                foreach ((var area, var rank) in character.AreaRanks)
-                                {
-                                    lock(rank)
-                                    {
-                                        rank.LastWeekPoint = rank.WeekPoint;
-                                        rank.WeekPoint = 0;
-                                    }
-                                }
-                                character.AreaSupply.Clear();
-                            }
-                            
-                            return new RpcCommandResult(this, true)
-                            {
-                                Message = "AreaRankResetStart"
-                            };
-                        }
-                    case RpcInternalCommand.AreaRankResetEnd:
-                        {
-                            gameServer.Database.ExecuteInTransaction(connection =>
-                            {
-                                foreach (var character in gameServer.ClientLookup.GetAllCharacter())
-                                {
-                                    character.AreaSupply = gameServer.Database.SelectAreaRankSupply(character.CharacterId, connection);
-                                }
-                            });
-                            return new RpcCommandResult(this, true)
-                            {
-                                Message = "AreaRankResetEnd"
-                            };
-                        }
-                    case RpcInternalCommand.BoardQuestDailyRotation:
-                        {
-                            var questRecords = gameServer.Database.SelectLightQuestRecords();
-                            var extantQuests = QuestManager.GetQuestsByType(QuestType.Light);
+            private RpcCommandResult HandlePing()
+            {
+                return new RpcCommandResult(this, true)
+                {
+                    Message = $"Ping {_entry.Origin}"
+                };
+            }
 
-                            var quests = questRecords
-                                .Where(x => !extantQuests.Contains(x.QuestScheduleId))
-                                .Select(x => gameServer.LightQuestManager.GenerateQuestFromRecord(x));
+            private RpcCommandResult HandleNotifyPlayerList(DdonGameServer gameServer)
+            {
+                gameServer.RpcManager.UpdatePlayerList();
 
-                            QuestManager.AddQuests(gameServer, quests);
+                return new RpcCommandResult(this, true)
+                {
+                    Message = $"NotifyPlayerList Channel {_entry.Origin}"
+                };
+            }
 
-                            return new RpcCommandResult(this, true)
-                            {
-                                Message = "BoardQuestDailyRotation"
-                            };
-                        }
-                    default:
-                        return new RpcCommandResult(this, false);
+            private RpcCommandResult HandleNotifyClanQuestCompletion(DdonGameServer gameServer)
+            {
+                RpcQuestCompletionData data = _entry.GetData<RpcQuestCompletionData>();
+                gameServer.ClanManager.UpdateClanQuestCompletion(data.CharacterId, data.QuestStatus);
+                return new RpcCommandResult(this, true)
+                {
+                    Message = $"NotifyClanQuestCompletion for CharacterId {data.CharacterId}"
+                };
+            }
+
+            private RpcCommandResult HandleEpitaphRoadWeeklyReset(DdonGameServer gameServer)
+            {
+                gameServer.EpitaphRoadManager.PerformWeeklyReset();
+                return new RpcCommandResult(this, true)
+                {
+                    Message = _entry.Command.ToString()
+                };
+            }
+
+            private RpcCommandResult HandleKickInternal(DdonGameServer gameServer)
+            {
+                int target = _entry.GetData<int>();
+                var clientList = gameServer.ClientLookup.GetAll();
+                foreach (var client in clientList)
+                {
+                    if (client.Account?.Id == target)
+                    {
+                        Logger.Error(client, $"[AUTOKICK] Handling auto kick for account {target}");
+                        client.Close();
+                    }
                 }
+                gameServer.Database.DeleteConnection(gameServer.Id, target);
+                return new RpcCommandResult(this, true)
+                {
+                    Message = $"KickInternal for AccountId {target}"
+                };
+            }
+
+            private RpcCommandResult HandleAreaRankResetStart(DdonGameServer gameServer)
+            {
+                foreach (var character in gameServer.ClientLookup.GetAllCharacter())
+                {
+                    foreach ((var area, var rank) in character.AreaRanks)
+                    {
+                        lock (rank)
+                        {
+                            rank.LastWeekPoint = rank.WeekPoint;
+                            rank.WeekPoint = 0;
+                        }
+                    }
+                    character.AreaSupply.Clear();
+                }
+
+                return new RpcCommandResult(this, true)
+                {
+                    Message = _entry.Command.ToString()
+                };
+            }
+
+            private RpcCommandResult HandleAreaRankResetEnd(DdonGameServer gameServer)
+            {
+                gameServer.Database.ExecuteInTransaction(connection =>
+                {
+                    foreach (var character in gameServer.ClientLookup.GetAllCharacter())
+                    {
+                        character.AreaSupply = gameServer.Database.SelectAreaRankSupply(character.CharacterId, connection);
+                    }
+                });
+                return new RpcCommandResult(this, true)
+                {
+                    Message = _entry.Command.ToString()
+                };
+            }
+
+            private RpcCommandResult HandleBoardQuestDailyRotation(DdonGameServer gameServer)
+            {
+                var questRecords = gameServer.Database.SelectLightQuestRecords();
+                var extantQuests = QuestManager.GetQuestsByType(QuestType.Light);
+
+                var quests = questRecords
+                    .Where(x => !extantQuests.Contains(x.QuestScheduleId))
+                    .Select(x => gameServer.LightQuestManager.GenerateQuestFromRecord(x));
+
+                QuestManager.AddQuests(gameServer, quests);
+
+                foreach (var character in gameServer.ClientLookup.GetAllCharacter())
+                {
+                    foreach (var key in character.CompletedQuests.Keys
+                        .Where(QuestManager.IsBoardQuest)
+                        .ToList())
+                    {
+                        character.CompletedQuests.Remove(key);
+                    }
+                }
+
+                return new RpcCommandResult(this, true)
+                {
+                    Message = _entry.Command.ToString()
+                };
+            }
+
+            private RpcCommandResult HandleStampReset(DdonGameServer gameServer)
+            {
+                foreach (var character in gameServer.ClientLookup.GetAllCharacter())
+                {
+                    gameServer.StampManager.RefreshStamp(character);
+                }
+
+                return new RpcCommandResult(this, true)
+                {
+                    Message = _entry.Command.ToString()
+                };
+            }
+
+            private RpcCommandResult HandleUpdateCrafting(DdonGameServer gameServer)
+            {
+                gameServer.CraftManager.UpdateOnlineCraftingProgress();
+                return new RpcCommandResult(this, true);
+
+
+            }
+            private RpcCommandResult HandleWorldQuestReset(DdonGameServer gameServer)
+            {
+                long seed = _entry.GetData<long>();
+                gameServer.WorldQuestManager.PerformReset(seed);
+                return new RpcCommandResult(this, true)
+                {
+                    Message = $"WorldQuestReset with seed {seed}"
+                };
+            }
+
+            private RpcCommandResult HandleExtremeMissionRewardReset(DdonGameServer gameServer)
+            {
+                gameServer.Database.DeleteQuestPeriodFirstClears(QuestType.ExtremeMission);
+                foreach (var character in gameServer.ClientLookup.GetAllCharacter())
+                {
+                    character.GetQuestPeriodFirstClears(QuestType.ExtremeMission).Clear();
+                }
+
+                return new RpcCommandResult(this, true)
+                {
+                    Message = _entry.Command.ToString()
+                };
             }
         }
 

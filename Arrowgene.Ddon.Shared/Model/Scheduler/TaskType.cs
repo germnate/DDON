@@ -32,5 +32,7 @@ namespace Arrowgene.Ddon.Shared.Model.Scheduler
         SeasonalEventSchedule = 22,
         RankingBoardReset = 23,
         EquipmentRecycleReset = 24,
+        Crafting = 25,
+        GroupChatPruning = 26,
     }
 }

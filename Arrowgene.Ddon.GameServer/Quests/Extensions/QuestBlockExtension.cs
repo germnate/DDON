@@ -5,6 +5,7 @@ using Arrowgene.Ddon.Shared.Model.Quest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Arrowgene.Ddon.GameServer.Characters.QuestManager;
 
 namespace Arrowgene.Ddon.GameServer.Quests.Extensions
 {
@@ -42,6 +43,15 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
         {
             var block = CreateGenericBlock(process.QuestScheduleId, 0, 0, QuestBlockType.Raw, QuestAnnounceType.None)
                 .AddCheckCmdNpcTouchAndOrderUi(stageInfo, npcId, msgId);
+            process.AddBlock(block);
+            return block;
+        }
+
+        public static QuestBlock AddNpcPreTalkAndOrderUIBlock(this QuestProcess process, StageInfo stageInfo, NpcId npcId, int msgId, int storeVal)
+        {
+            var block = CreateGenericBlock(process.QuestScheduleId, 0, 0, QuestBlockType.Raw, QuestAnnounceType.None)
+                .AddCheckCmdNpcPreTalkAndOrderUi(stageInfo, npcId, (int) npcId, storeVal)
+                .AddResultCommand(QuestManager.ResultCommand.QstTalkChg(npcId, msgId));
             process.AddBlock(block);
             return block;
         }

@@ -1,6 +1,7 @@
 using Arrowgene.Ddon.GameServer.Context;
 using Arrowgene.Ddon.GameServer.Instance;
 using Arrowgene.Ddon.GameServer.Quests;
+using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity;
@@ -20,6 +21,7 @@ namespace Arrowgene.Ddon.GameServer.Party
     {
         public const uint MaxPartyMember = 8; // TODO: Different max sizes per party type
         public const int InvalidSlotIndex = -1;
+        public uint ExmInitialPartySize { get; set; } = 0;
 
         private static readonly ServerLogger Logger = LogProvider.Logger<ServerLogger>(typeof(PartyGroup));
 
@@ -96,7 +98,7 @@ namespace Arrowgene.Ddon.GameServer.Party
                 {
                     for (int i = 0; i < MaxSlots; i++)
                     {
-                        if (_slots[i] is PlayerPartyMember member)
+                        if (_slots[i] is PlayerPartyMember member && member.Client != null && member.Client.IsAlive)
                         {
                             clients.Add(member.Client);
                         }
@@ -177,12 +179,22 @@ namespace Arrowgene.Ddon.GameServer.Party
 
                 invitation.CancelTimer();
 
-                Leader.Client.Send(new S2CPartyPartyInviteFailNtc
+                // Guard: leader may have disconnected between the invite being sent and
+                // the invitee refusing. A NRE here would leave the slot reserved forever
+                // because FreeSlot below would never run.
+                if (Leader != null && Leader.Client != null && Leader.Client.IsAlive)
                 {
-                    ErrorCode = ErrorCode.ERROR_CODE_PARTY_INVITE_TARGET_REFUSE,
-                    ServerId = Leader.Client.Character.Server.Id,
-                    PartyId = invitation.Party.Id
-                });
+                    Leader.Client.Send(new S2CPartyPartyInviteFailNtc
+                    {
+                        ErrorCode = ErrorCode.ERROR_CODE_PARTY_INVITE_TARGET_REFUSE,
+                        ServerId = Leader.Client.Character.Server.Id,
+                        PartyId = invitation.Party.Id
+                    });
+                }
+                else
+                {
+                    Logger.Info($"[PartyId:{Id}][RefuseInvite] leader is gone, skipping InviteFail NTC");
+                }
                 
                 FreeSlot(partyMember.MemberIndex);
                 Logger.Info(client, $"[PartyId:{Id}][RefuseInvite] refused invite");
@@ -221,6 +233,7 @@ namespace Arrowgene.Ddon.GameServer.Party
                 if (ContentId == 0 && Leader is null)
                 {
                     // Leaderless check only applies for regular parties.
+                    _partyManager.RemovePartyInvitation(client);
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_PARTY_INVITE_FAIL_REASON_NO_LEADER,
                         $"[PartyId:{Id}][Accept] has no leader");
                 }
@@ -341,7 +354,18 @@ namespace Arrowgene.Ddon.GameServer.Party
 
             lock (_lock)
             {
-                if (!Clients.Contains(client))
+                // Check the slot directly (not Clients) so disconnect cleanup runs
+                // even when the socket is already dead and Clients filters it out.
+                PlayerPartyMember partyMember = GetPlayerPartyMember(client);
+                if (partyMember == null)
+                {
+                    // Not in this party at all - nothing to clean up.
+                    return;
+                }
+
+                // For a live client also verify they are in the active Clients list.
+                // Skip this check for dead/disconnected clients so cleanup always runs.
+                if (client.IsAlive && !Clients.Contains(client))
                 {
                     // TODO: Suppressing this log message for now; it spams the log and is usually not helpful.
                     // This is partly due to an order of operations problem when quitting the game.
@@ -352,13 +376,6 @@ namespace Arrowgene.Ddon.GameServer.Party
 
                 if (_isBreakup)
                 {
-                    return;
-                }
-
-                PlayerPartyMember partyMember = GetPlayerPartyMember(client);
-                if (partyMember == null)
-                {
-                    Logger.Info(client, $"[PartyId:{Id}][Leave(GameClient)] has no slot");
                     return;
                 }
 
@@ -383,6 +400,17 @@ namespace Arrowgene.Ddon.GameServer.Party
                 FreeSlot(partyMember.MemberIndex);
                 Logger.Info(client, $"[PartyId:{Id}][Leave(GameClient)] left");
 
+                // Purge dead slots so Clients.Count reflects reality and disband fires correctly.
+                for (int i = 0; i < MaxSlots; i++)
+                {
+                    if (_slots[i] is PlayerPartyMember deadMember
+                        && (deadMember.Client == null || !deadMember.Client.IsAlive))
+                    {
+                        Logger.Info($"[PartyId:{Id}][Leave] purging dead slot {i} for disconnected client");
+                        FreeSlot(i);
+                    }
+                }
+
                 if (Clients.Count <= 0)
                 {
                     Logger.Info(client, $"[PartyId:{Id}][Leave(GameClient)] was the last person, disband");
@@ -393,7 +421,93 @@ namespace Arrowgene.Ddon.GameServer.Party
                 if (partyMember.IsLeader)
                 {
                     _leader = null;
-                    Logger.Info(client, $"[PartyId:{Id}][Leave(GameClient)] leader left");
+                    partyMember.IsLeader = false;
+
+                    for (int i = 0; i < MaxSlots; i++)
+                    {
+                        if (_slots[i] is PlayerPartyMember candidate
+                            && candidate != partyMember
+                            && candidate.Client != null
+                            && candidate.Client.IsAlive)
+                        {
+                            candidate.IsLeader = true;
+                            _leader = candidate;
+                            Logger.Info(client, $"[PartyId:{Id}][Leave] auto-promoted {candidate.Client.Identity} to leader");
+
+                            SendToAll(new S2CPartyPartyChangeLeaderNtc
+                            {
+                                CharacterId = candidate.Client.Character.CharacterId
+                            });
+
+                            break;
+                        }
+                    }
+
+                    if (_leader == null)
+                    {
+                        Logger.Info(client, $"[PartyId:{Id}][Leave] leader left, no eligible candidate for promotion");
+                    }
+
+                    // Clear the old leader's quest state so stale quests aren't shown.
+                    // All entries belong to the leader - personal quests are never in shared state.
+                    // Repopulates from DB on next area entry.
+                    try
+                    {
+                        foreach (var questScheduleId in QuestState.GetActiveQuestScheduleIds().ToList())
+                        {
+                            QuestState.RemoveQuest(questScheduleId);
+                        }
+
+                        // S2CQuestGetMainQuestNtc appends rather than replaces on the client,
+                        // so send an empty list to clear the stale display.
+                        SendToAll(new S2CQuestGetMainQuestNtc());
+
+                        if (_leader != null && _leader.Client?.Character?.AreaId != QuestAreaId.None)
+                        {
+                            SendToAll(new S2CQuestGetSetQuestListNtc()
+                            {
+                                DistributeId = _leader.Client.Character.AreaId,
+                                SelectCharacterId = _leader.Client.Character.CharacterId,
+                                SetQuestList = new List<CDataSetQuestList>()
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"[PartyId:{Id}][Leave] Failed to clean up quest state on promotion: {ex.Message}");
+                    }
+
+                    if (_leader?.Client != null)
+                    {
+                        try
+                        {
+                            var priorityNtc = new S2CQuestSetPriorityQuestNtc()
+                            {
+                                CharacterId = _leader.Client.Character.CharacterId
+                            };
+                            var priorityQuests = _partyManager.Server.Database
+                                .GetPriorityQuestScheduleIds(_leader.Client.Character.CommonId);
+                            foreach (var questScheduleId in priorityQuests)
+                            {
+                                if (!Arrowgene.Ddon.GameServer.Characters.QuestManager.IsQuestEnabled(questScheduleId))
+                                {
+                                    continue;
+                                }
+                                var quest = Arrowgene.Ddon.GameServer.Characters.QuestManager.GetQuestByScheduleId(questScheduleId);
+                                if (quest == null) continue;
+                                var questStateManager = Arrowgene.Ddon.GameServer.Characters.QuestManager.GetQuestStateManager(_leader.Client, quest);
+                                if (questStateManager == null) continue;
+                                var questState = questStateManager.GetQuestState(questScheduleId);
+                                if (questState == null) continue;
+                                priorityNtc.PriorityQuestList.Add(quest.ToCDataPriorityQuest(questState?.Step ?? 0));
+                            }
+                            SendToAll(priorityNtc);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Error($"[PartyId:{Id}][Leave] Failed to send priority quest NTC on promotion: {ex.Message}");
+                        }
+                    }
                 }
             }
         }
@@ -606,6 +720,15 @@ namespace Arrowgene.Ddon.GameServer.Party
                 _host = null;
                 _isBreakup = true;
 
+                // FIX: Clear shared quest state on disband so disbanded members'
+                // solo parties don't inherit the leader's MSQ and world quests.
+                // Without this, QuestGetSetQuestListHandler reads stale shared state
+                // on the next area entry and re-displays the old leader's quests.
+                foreach (var questScheduleId in QuestState.GetActiveQuestScheduleIds().ToList())
+                {
+                    QuestState.RemoveQuest(questScheduleId);
+                }
+
                 return members;
             }
         }
@@ -659,7 +782,12 @@ namespace Arrowgene.Ddon.GameServer.Party
         {
             foreach (GameClient client in Clients)
             {
-                client.Send(packet);
+                // Second layer guard - Clients already filters dead sockets but
+                // this protects against any future code path that bypasses Clients.
+                if (client != null && client.IsAlive)
+                {
+                    client.Send(packet);
+                }
             }
         }
 
@@ -776,6 +904,11 @@ namespace Arrowgene.Ddon.GameServer.Party
                 {
                     if (_slots[i] is PlayerPartyMember member)
                     {
+                        if (member.Client == null)
+                        {
+                            continue;
+                        }
+
                         Character character = member.Client.Character;
                         if (character == null)
                         {
@@ -905,11 +1038,25 @@ namespace Arrowgene.Ddon.GameServer.Party
         {
             if (!Members.Any() || !Clients.Any()) return 0;
 
-            var ind = Members.FindIndex(member =>
-                member is PlayerPartyMember playerMember
-                && playerMember.Client == client
-            );
-            return ind >= 0 ? ind : ClientIndex(Clients.First());
+            // Use MemberIndex (the actual _slots position) not the index in the
+            // filtered Members list. The client was told its slot index when it
+            // joined and uses that as its identity in MasterChangeNtc. If a party
+            // member crashes and their slot is freed, Members shrinks but the
+            // remaining clients still have their original slot indices. Using
+            // Members.FindIndex would return the wrong (compressed) index.
+            lock (_lock)
+            {
+                for (int i = 0; i < MaxSlots; i++)
+                {
+                    if (_slots[i] is PlayerPartyMember playerMember && playerMember.Client == client)
+                    {
+                        return i;
+                    }
+                }
+            }
+
+            // Fallback: client not found in slots, use first alive client's index.
+            return ClientIndex(Clients.First());
         }
 
         public bool Contains(CharacterCommon character)

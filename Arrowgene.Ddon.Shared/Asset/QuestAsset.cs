@@ -61,12 +61,27 @@ namespace Arrowgene.Ddon.Shared.Asset
         public bool OverrideEnemySpawn { get; set; }
         public bool EnableCancel { get; set; }
         public QuestSource QuestSource { get; set; }
+        public string SourceFile { get; set; }
 
         public List<QuestPointReward> PointRewards { get; set; }
 
         public bool Discoverable { get; set; }
         public List<QuestRewardItem> RewardItems;
         public List<QuestWalletReward> RewardCurrency;
+
+        // Repeat-clear rewards (used when WorldQuestFirstClearRewards is enabled and player has already cleared this period)
+        public List<QuestRewardItem> RepeatClearRewardItems;
+        public List<QuestWalletReward> RepeatClearRewardCurrency;
+        public List<QuestPointReward> RepeatClearPointRewards;
+        public List<QuestRewardItem> FirstClearRewardItems;
+        public List<QuestWalletReward> FirstClearRewardCurrency;
+        public List<QuestPointReward> FirstClearPointRewards;
+        public List<QuestRewardItem> PeriodFirstClearRewardItems;
+        public List<QuestWalletReward> PeriodFirstClearRewardCurrency;
+        public List<QuestPointReward> PeriodFirstClearPointRewards;
+        public List<QuestRewardItem> HelperRewardItems;
+        public List<QuestWalletReward> HelperRewardCurrency;
+        public List<QuestPointReward> HelperPointRewards;
         public List<QuestOrderCondition> OrderConditions;
         public bool ResetPlayerAfterQuest { get; set; }
         public List<QuestLayoutFlag> QuestLayoutFlags { get; set; }
@@ -88,6 +103,18 @@ namespace Arrowgene.Ddon.Shared.Asset
             PointRewards = new List<QuestPointReward>();
             RewardItems = new List<QuestRewardItem>();
             RewardCurrency = new List<QuestWalletReward>();
+            RepeatClearRewardItems = new List<QuestRewardItem>();
+            RepeatClearRewardCurrency = new List<QuestWalletReward>();
+            RepeatClearPointRewards = new List<QuestPointReward>();
+            FirstClearRewardItems = new List<QuestRewardItem>();
+            FirstClearRewardCurrency = new List<QuestWalletReward>();
+            FirstClearPointRewards = new List<QuestPointReward>();
+            PeriodFirstClearRewardItems = new List<QuestRewardItem>();
+            PeriodFirstClearRewardCurrency = new List<QuestWalletReward>();
+            PeriodFirstClearPointRewards = new List<QuestPointReward>();
+            HelperRewardItems = new List<QuestRewardItem>();
+            HelperRewardCurrency = new List<QuestWalletReward>();
+            HelperPointRewards = new List<QuestPointReward>();
             QuestLayoutFlags = new List<QuestLayoutFlag>();
             QuestLayoutSetInfoFlags = new List<QuestLayoutFlagSetInfo>();
             EnemyGroups = new Dictionary<uint, QuestEnemyGroup>();

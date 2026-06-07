@@ -75,7 +75,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 client.Party.SendToAll(new S2CSeasonDungeonSetOmStateNtc()
                 {
                     LayoutId = trial.OmLayoutId.ToCDataStageLayoutId(),
-                    State = SoulOrdealOmState.TrialAvailable,
+                    State = SeasonDungeonOmState.TrialAvailable,
                 });
             }
             else if (EpitaphId.GetKind(request.EpitaphId) == EpitaphIdKind.Barrier)
@@ -84,7 +84,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 client.Send(new S2CSeasonDungeonSetOmStateNtc()
                 {
                     LayoutId = barrier.StageId.ToCDataStageLayoutId(),
-                    State = SoulOrdealOmState.AreaUnlocked
+                    State = SeasonDungeonOmState.AreaUnlocked
                 });
             }
 
