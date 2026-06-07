@@ -18,37 +18,31 @@ namespace Arrowgene.Ddon.GameServer.Handler
         {
             var quest = QuestManager.GetQuestByScheduleId(packet.QuestScheduleId);
             var questStateManager = QuestManager.GetQuestStateManager(client, quest);
-            Server.Database.RemoveQuestProgress(client.Character.CommonId, quest.QuestScheduleId, quest.QuestType);
-            
             bool isPriority = Server.Database.DeletePriorityQuest(client.Character.CommonId, quest.QuestScheduleId);
+            Server.Database.RemoveQuestProgress(client.Character.CommonId, quest.QuestScheduleId, quest.QuestType);
 
-            if (quest.IsPersonal)
+            bool isLeaderOrSolo = client.Party.IsSolo || client.Party.Leader?.Client == client;
+            if (quest.IsPersonal || isLeaderOrSolo)
             {
                 questStateManager.CancelQuest(quest.QuestScheduleId);
 
-                if (isPriority && (client.Party.IsSolo || client.Party.Leader?.Client == client))
+                S2CQuestQuestCancelNtc cancelNtc = new S2CQuestQuestCancelNtc()
                 {
-                    client.Party.QuestState.UpdatePriorityQuestList(client.Party.Leader.Client).Send();
+                    QuestId = (uint)quest.QuestId,
+                    QuestScheduleId = quest.QuestScheduleId
+                };
+                client.Send(cancelNtc);
+
+                if (!quest.IsPersonal && !client.Party.IsSolo)
+                {
+                    client.Party.SendToAllExcept(cancelNtc, client);
                 }
             }
-            else
+
+            if (isPriority && isLeaderOrSolo)
             {
-                if (client.Party.Leader?.Client == client) //Only the leader should be able to inform the party quest state.
-                {
-                    questStateManager.CancelQuest(quest.QuestScheduleId);
-
-                    S2CQuestQuestCancelNtc cancelNtc = new S2CQuestQuestCancelNtc()
-                    {
-                        QuestId = (uint)quest.QuestId,
-                        QuestScheduleId = quest.QuestScheduleId
-                    };
-                    client.Party.SendToAllExcept(cancelNtc, client);
-
-                    if (isPriority)
-                    {
-                        client.Party.QuestState.UpdatePriorityQuestList(client).Send();
-                    }
-                }
+                var leaderClient = client.Party.Leader?.Client ?? client;
+                client.Party.QuestState.UpdatePriorityQuestList(leaderClient).Send();
             }
             
             return new S2CQuestQuestCancelRes()

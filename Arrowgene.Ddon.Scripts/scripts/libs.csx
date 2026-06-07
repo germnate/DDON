@@ -8,8 +8,8 @@
 // To get syntax completion in visual studio and vscode, uncomment the #r lines below and
 // update "path\to" to be the path to the builds output directory.
 //
-// #r "path\to\Arrowgene.DragonsDogmaOnline\Arrowgene.Ddon.Cli\bin\Debug\net9.0\Arrowgene.Ddon.Shared.dll"
-// #r "path\to\Arrowgene.DragonsDogmaOnline\Arrowgene.Ddon.Cli\bin\Debug\net9.0\Arrowgene.Ddon.GameServer.dll"
+// #r "path\to\Arrowgene.DragonsDogmaOnline\Arrowgene.Ddon.Cli\bin\Debug\net10.0\Arrowgene.Ddon.Shared.dll"
+// #r "path\to\Arrowgene.DragonsDogmaOnline\Arrowgene.Ddon.Cli\bin\Debug\net10.0\Arrowgene.Ddon.GameServer.dll"
 
 // Point these to the ones in the output directory if you are using hot reload
 // Otherwise point these into the Arrowgene.Ddon.Scripts in the source
@@ -45,3 +45,6 @@ global using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 global using Arrowgene.Ddon.Shared.Entity.Structure;
 global using Arrowgene.Ddon.Shared.Model;
 global using Arrowgene.Ddon.Shared.Model.Quest;
+global using Arrowgene.Ddon.Shared.Model.Rpc;
+global using Arrowgene.Ddon.Shared.Model.Scheduler;
+global using Arrowgene.Ddon.GameServer.Tasks;

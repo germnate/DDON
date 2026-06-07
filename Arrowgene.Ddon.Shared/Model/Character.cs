@@ -12,6 +12,9 @@ namespace Arrowgene.Ddon.Shared.Model
 {
     public class Character : CharacterCommon
     {
+        public const uint ServerCharacterId = 0;
+        public const string ServerCharacterFirstName = "Server";
+
         public Character() : base()
         {
             FirstName = string.Empty;
@@ -57,6 +60,7 @@ namespace Arrowgene.Ddon.Shared.Model
             JobEmblems = new();
 
             DispelSeals = [];
+            SubstoryProgress = new();
         }
 
         public int AccountId { get; set; }
@@ -134,6 +138,9 @@ namespace Arrowgene.Ddon.Shared.Model
         public uint NextBBMStageId {  get; set; }
         public uint MaxBazaarExhibits { get; set; }
         public Dictionary<QuestId, CompletedQuest> CompletedQuests { get; set; }
+        public Dictionary<QuestType, HashSet<uint>> QuestPeriodFirstClears { get; set; } = new();
+        public HashSet<uint> WorldQuestPeriodFirstClears => GetQuestPeriodFirstClears(QuestType.World);
+        public HashSet<uint> ExtremeMissionPeriodFirstClears => GetQuestPeriodFirstClears(QuestType.ExtremeMission);
         public uint LastSafeStageId { get; set; }
         public uint ClanId { get; set; }
         public ClanName ClanName { get; set; }
@@ -161,6 +168,8 @@ namespace Arrowgene.Ddon.Shared.Model
         public Dictionary<JobId, List<CDataAbilityParam>> AcquirableAbilities { get; set; }
 
         public HashSet<uint> DispelSeals { get; set; }
+        public ulong GroupChatId { get; set; }
+        public Dictionary<QuestSubstoryGroupId, SubstoryProgress> SubstoryProgress { get; set; }
 
         // TODO: Move to a more sensible place
         public uint LastEnteredShopId { get; set; }
@@ -238,6 +247,17 @@ namespace Arrowgene.Ddon.Shared.Model
         public bool HasContentReleased(ContentsRelease releaseId)
         {
             return ContentsReleased.Contains(releaseId);
+        }
+
+        public HashSet<uint> GetQuestPeriodFirstClears(QuestType questType)
+        {
+            if (!QuestPeriodFirstClears.TryGetValue(questType, out var periodFirstClears))
+            {
+                periodFirstClears = new HashSet<uint>();
+                QuestPeriodFirstClears[questType] = periodFirstClears;
+            }
+
+            return periodFirstClears;
         }
 
         public List<CDataQuestFlag> GetWorldManageQuestUnlocks(QuestId questId)

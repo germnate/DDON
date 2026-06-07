@@ -14,10 +14,10 @@ public partial class DdonPostgresDb : DdonSqlDb
     private readonly string _connectionString;
     private NpgsqlDataSource _dataSource;
 
-    public DdonPostgresDb(string host, string user, string password, string database, bool wipeOnStartup, uint bufferSize, bool noResetOnClose, bool enablePooling,
+    public DdonPostgresDb(string host, short port, string user, string password, string database, bool wipeOnStartup, uint bufferSize, bool noResetOnClose, bool enablePooling,
         bool enableTracing, uint maxAutoPrepare)
     {
-        _connectionString = BuildConnectionString(host, user, password, database, bufferSize, noResetOnClose, enablePooling, enableTracing, maxAutoPrepare);
+        _connectionString = BuildConnectionString(host, port, user, password, database, bufferSize, noResetOnClose, enablePooling, enableTracing, maxAutoPrepare);
         if (wipeOnStartup) Logger.Info("WipeOnStartup is currently not supported.");
     }
 
@@ -33,7 +33,10 @@ public partial class DdonPostgresDb : DdonSqlDb
         if (_dataSource == null)
         {
             NpgsqlDataSourceBuilder dataSourceBuilder = new(_connectionString);
+
+            // Log parameter values during tracing
             dataSourceBuilder.EnableParameterLogging();
+
             _dataSource = dataSourceBuilder.Build();
         }
 
@@ -62,26 +65,32 @@ public partial class DdonPostgresDb : DdonSqlDb
         _dataSource.Dispose();
     }
 
-    private string BuildConnectionString(string host, string user, string password, string database, uint bufferSize, bool noResetOnClose, bool enablePooling, bool enableTracing,
+    private string BuildConnectionString(string host, short port, string user, string password, string database, uint bufferSize, bool noResetOnClose, bool enablePooling, bool enableTracing,
         uint maxAutoPrepare)
     {
         NpgsqlConnectionStringBuilder builder = new()
         {
             Host = host,
+            Port = port,
             Username = user,
             Password = password,
             Database = database,
+
             MaxAutoPrepare = (int)maxAutoPrepare,
-            MinPoolSize = enablePooling ? 1 : 0,
+            MinPoolSize = enablePooling ? 2 : 0,
+            MaxPoolSize = enablePooling ? 100 : 1,
+            ConnectionIdleLifetime = 300,
             ConnectionLifetime = 0,
             ReadBufferSize = (int)bufferSize,
             WriteBufferSize = (int)bufferSize,
-            NoResetOnClose = noResetOnClose,
             SocketReceiveBufferSize = (int)bufferSize,
             SocketSendBufferSize = (int)bufferSize,
+            NoResetOnClose = noResetOnClose,
             Pooling = enablePooling,
-            IncludeErrorDetail = enableTracing
+            IncludeErrorDetail = enableTracing,
+            WriteCoalescingBufferThresholdBytes = 1000,
         };
+
         string connectionString = builder.ToString();
         Logger.Info($"Connection String: {connectionString}");
         return connectionString;
@@ -194,6 +203,11 @@ public partial class DdonPostgresDb : DdonSqlDb
         AddTypedParameter(command, name, (int)value);
     }
 
+    public override void AddParameter(DbCommand command, string name, uint? value)
+    {
+        AddTypedParameter(command, name, (int?)value);
+    }
+
     public override void AddParameterEnumInt32<T>(DbCommand command, string name, T value)
     {
         AddTypedParameter(command, name, (int)(object)value);
@@ -220,6 +234,14 @@ public partial class DdonPostgresDb : DdonSqlDb
     public override void AddParameter(DbCommand command, string name, bool value)
     {
         AddTypedParameter(command, name, value);
+    }
+
+    public override (string SqlFragment, Action<DbCommand> Bind) PrepareArrayParameter(string paramName, string[] values)
+    {
+        return (
+            $"= ANY(@{paramName})",
+            cmd => cmd.Parameters.Add(new NpgsqlParameter<string[]>($"@{paramName}", values))
+        );
     }
 
     #endregion

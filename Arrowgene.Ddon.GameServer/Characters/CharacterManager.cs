@@ -53,6 +53,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
                 character.ContentsReleased = GetContentsReleased(character, connectionIn);
                 character.WorldManageUnlocks = GetWorldManageState(character, connectionIn);
+                character.SubstoryProgress = Server.Database.SelectSubstoryProgress(character.CharacterId, connectionIn);
 
                 character.FavoritedPawnIds = Server.Database.GetPawnFavorites(character.CharacterId, connectionIn);
 
@@ -344,6 +345,15 @@ namespace Arrowgene.Ddon.GameServer.Characters
             {
                 pawn.MaxAdventureCount = Server.GameSettings.GameServerSettings.RentalPawnAdventureCount;
                 pawn.MaxCraftCount = Server.GameSettings.GameServerSettings.RentalPawnCraftCount;
+
+                foreach (var item in pawn.Equipment.GetItems(EquipType.Performance))
+                {
+                    if (item is not null && item.ItemId == (uint)pawn.Job.VocationEmblemItemId())
+                    {
+                        pawn.EmblemStatList = Server.JobEmblemManager.GetEmblemStatsForCurrentJob(character, pawn.Job);
+                        item.EquipElementParamList = Server.JobEmblemManager.GetEmblemCrestsForCurrentJob(character, pawn.Job);
+                    }
+                }
             }
         }
 

@@ -294,7 +294,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             // Until S3.
-            if (spot.AreaId >= QuestAreaId.RathniteFoothills)
+            if (spot.AreaId >= QuestAreaId.MegadosysPlateau)
             {
                 return true;
             }
@@ -320,13 +320,23 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return false;
             }
 
-            var plAreaRank = GetEffectiveRank(client.Character, quest.QuestAreaId);
+            // Scripted quests may have QuestAreaId = None - resolve from the stored rankings
+            var areaId = quest.QuestAreaId != QuestAreaId.None
+                ? quest.QuestAreaId
+                : QuestManager.GetAreaIdForTrial(quest.QuestScheduleId);
+
+            if (areaId == QuestAreaId.None)
+            {
+                return false;
+            }
+
+            var plAreaRank = GetEffectiveRank(client.Character, areaId);
             if (plAreaRank == 0)
             {
                 return false;
             }
 
-            var areaTrialRanks = QuestManager.GetAreaTrialRankings(quest.QuestAreaId);
+            var areaTrialRanks = QuestManager.GetAreaTrialRankings(areaId);
             if (!areaTrialRanks.TryGetValue(quest.QuestScheduleId, out uint value) || value > plAreaRank)
             {
                 return false;

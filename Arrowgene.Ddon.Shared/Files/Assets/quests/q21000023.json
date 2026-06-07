@@ -6,7 +6,7 @@
     "base_level": 60,
     "minimum_item_rank": 0,
     "discoverable": true,
-	"area_id": "BloodbaneIsle",	
+    "area_id": "BloodbaneIsle",
     "rewards": [
         {
             "type": "wallet",
@@ -26,16 +26,16 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "item_id": 11504,
+                    "item_id": "IceCubeFragment",
                     "num": 3
                 },
-                {					
-                    "item_id": 7901,
+                {
+                    "item_id": "Crystal",
                     "num": 5
                 },
-                {				
-                    "item_id": 7555,
-                    "num": 3					
+                {
+                    "item_id": "SuperiorHealingRemedy",
+                    "num": 3
                 }
             ]
         }
@@ -46,62 +46,90 @@
                 "id": 330,
                 "group_id": 3
             },
+            "placement_type": "manual",
             "enemies": [
                 {
-                    "enemy_id": "0x010315",
-                    "level": 60,
-                    "exp": 3500,
-                    "is_boss": false
-    },
-    {
-                    "enemy_id": "0x010315",
-                    "level": 60,
-                    "exp": 3500,
-                    "is_boss": false
-    },
-    {
+                    "comment": "Frost Skeleton Brute",
                     "enemy_id": "0x010511",
                     "level": 60,
-                    "exp": 4500,
-                    "is_boss": false
-    },
-    {
+                    "exp": 756,
+                    "index": 1
+                },
+                {
+                    "comment": "Frost Skeleton Brute",
                     "enemy_id": "0x010511",
                     "level": 60,
-                    "exp": 4500,
-                    "is_boss": false					
+                    "exp": 756,
+                    "index": 2
+                },
+                {
+                    "comment": "Frost Skeleton Brute",
+                    "enemy_id": "0x010511",
+                    "level": 60,
+                    "exp": 756,
+                    "index": 3
+                },
+                {
+                    "comment": "Frost Skeleton Brute",
+                    "enemy_id": "0x010511",
+                    "level": 60,
+                    "exp": 756,
+                    "index": 4
+                },
+                {
+                    "comment": "Frost Skeleton Brute",
+                    "enemy_id": "0x010511",
+                    "level": 60,
+                    "exp": 756,
+                    "index": 5
+                },
+                {
+                    "comment": "Frost Skeleton",
+                    "enemy_id": "0x010315",
+                    "level": 60,
+                    "exp": 756,
+                    "index": 8
+                },
+                {
+                    "comment": "Frost Skeleton",
+                    "enemy_id": "0x010315",
+                    "level": 60,
+                    "exp": 756,
+                    "index": 9
                 }
             ]
         }
-    ],		
+    ],
     "blocks": [
-    {
-      "type": "NpcTalkAndOrder",
-      "stage_id": {
-        "id": 317
-      },
-      "npc_id": "Rolf",
-      "message_id": 10800
-    },
-    {
-      "type": "DeliverItems",
-      "stage_id": {
-        "id": 317,
-        "group_id": 1
-      },
-      "npc_id": "Rolf",
-      "announce_type": "Accept",
-      "items": [
         {
-          "id": 7958,
-          "amount": 2
-        }
-      ],
-      "message_id": 10737
+            "type": "NpcTalkAndOrder",
+            "stage_id": {
+                "id": 317
+            },
+            "npc_id": "Rolf",
+            "message_id": 17148
+        },
+        {
+            "type": "DeliverItems",
+            "stage_id": {
+                "id": 317
+            },
+            "npc_id": "Rolf",
+            "announce_type": "Accept",
+            "result_commands": [
+                {"type": "QstTalkChg", "Param1": 2402, "Param2": 17149, "comment": "Extra dialogue - Rolf"}
+            ],
+            "items": [
+                {"id": 7958, "amount": 2, "comment": "Drómi"}
+            ],
+            "message_id": 17150
         },
         {
             "type": "SeekOutEnemiesAtMarkedLocation",
             "announce_type": "Update",
+            "result_commands": [
+                {"type": "QstTalkChg", "Param1": 2402, "Param2": 17151, "comment": "Extra dialogue 2 - Rolf"}
+            ],
             "groups": [0]
         },
         {
@@ -110,16 +138,14 @@
             "reset_group": false,
             "groups": [0]
         },
-        {		
+        {
             "type": "TalkToNpc",
             "stage_id": {
-                "id": 317,
-                "group_id": 1,
-                "layer_no": 1
+                "id": 317
             },
             "announce_type": "Update",
             "npc_id": "Rolf",
-            "message_id": 11842			
-    }
-  ]
+            "message_id": 17152
+        }
+    ]
 }

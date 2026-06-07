@@ -5,7 +5,7 @@
     "quest_id": 22018033,
     "base_level": 90,
     "minimum_item_rank": 0,
-    "discoverable": false,
+    "discoverable": true,
     "area_id": "FeryanaWilderness",
     "news_image": 330,
     "rewards": [

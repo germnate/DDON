@@ -50,6 +50,23 @@ namespace Arrowgene.Ddon.GameServer.Quests
         public Dictionary<ItemId, QuestDeliveryRecord> DeliveryRecords { get; set; } = [];
         public Dictionary<EnemyUIId, QuestEnemyHuntRecord> HuntRecords { get; set; } = [];
         public QuestInstanceVars InstanceVars { get; set; }
+        // Rolled values for SetRandom result commands, keyed by randomNo. Populated lazily
+        // at block dispatch time; persists for the lifetime of this quest instance.
+        public Dictionary<int, int> RandomSlots { get; set; } = [];
+        // Expiry times for StartTimer result commands, keyed by timerNo. Set at block dispatch
+        // time; used by the server-side timer callback to skip stale firings.
+        public Dictionary<int, DateTimeOffset> TimerSlots { get; set; } = [];
+        // Live System.Threading.Timer handles for active StartTimer countdowns, keyed by timerNo.
+        // Holding these references here prevents the GC from collecting (and thus cancelling) the
+        // timer before it fires. Disposed when the quest ends via DisposeTimers().
+        public Dictionary<int, System.Threading.Timer> TimerHandles { get; set; } = [];
+
+        public void DisposeTimers()
+        {
+            foreach (var t in TimerHandles.Values)
+                t.Dispose();
+            TimerHandles.Clear();
+        }
 
         public QuestState()
         {
@@ -58,7 +75,9 @@ namespace Arrowgene.Ddon.GameServer.Quests
             InstanceVars = new QuestInstanceVars();
         }
 
-        public uint UpdateDeliveryRequest(ItemId itemId, uint amount)
+        // Validates the delivery and returns (remaining, newTotal) without mutating state.
+        // Call RestoreDeliveryAmount with newTotal after all side-effects (DB writes) succeed.
+        public (uint Remaining, uint NewTotal) ValidateDeliveryRequest(ItemId itemId, uint amount)
         {
             lock (DeliveryRecords)
             {
@@ -69,16 +88,37 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 }
 
                 var deliveryRecord = DeliveryRecords[itemId];
+                uint newTotal = deliveryRecord.AmountDelivered + amount;
 
-                deliveryRecord.AmountDelivered += amount;
-
-                if (deliveryRecord.AmountDelivered > deliveryRecord.AmountRequired)
+                if (newTotal > deliveryRecord.AmountRequired)
                 {
                     Logger.Error($"Delivery overage {itemId} for quest {QuestId}");
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_QUEST_OVERRUN_DELIVER_ITEM);
                 }
 
-                return deliveryRecord.AmountRequired - deliveryRecord.AmountDelivered;
+                return (deliveryRecord.AmountRequired - newTotal, newTotal);
+            }
+        }
+
+        public void RestoreDeliveryAmount(ItemId itemId, uint amountDelivered)
+        {
+            lock (DeliveryRecords)
+            {
+                if (DeliveryRecords.TryGetValue(itemId, out var record))
+                    record.AmountDelivered = amountDelivered;
+            }
+        }
+
+        public void ClearCompletedDeliveryRecords()
+        {
+            lock (DeliveryRecords)
+            {
+                var completed = DeliveryRecords
+                    .Where(kv => kv.Value.AmountDelivered >= kv.Value.AmountRequired)
+                    .Select(kv => kv.Key)
+                    .ToList();
+                foreach (var key in completed)
+                    DeliveryRecords.Remove(key);
             }
         }
 
@@ -86,6 +126,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
         {
             lock (DeliveryRecords)
             {
+                if (DeliveryRecords.TryGetValue(itemId, out var existing))
+                {
+                    Logger.Info($"Quest {QuestId} already has delivery item {itemId} registered at process {existing.ProcessNo}, block {existing.BlockNo}; overwriting with process {processNo}, block {blockNo}.");
+                }
+
                 DeliveryRecords[itemId] = new QuestDeliveryRecord()
                 {
                     ProcessNo = processNo,
@@ -176,8 +221,8 @@ namespace Arrowgene.Ddon.GameServer.Quests
 
         protected Dictionary<uint, QuestState> ActiveQuests { get; set; }
         private Dictionary<StageLayoutId, HashSet<uint>> QuestLookupTable { get; set; }
-        private List<QuestId> CompletedWorldQuests { get; set; }
-        private Dictionary<QuestAreaId, HashSet<uint>> RolledInstanceWorldQuests { get; set; }
+        protected List<QuestId> CompletedWorldQuests { get; set; }
+        protected Dictionary<QuestAreaId, HashSet<uint>> RolledInstanceWorldQuests { get; set; }
 
         // Deferred Generic Work to be triggered at various points
         public Dictionary<QuestProgressWorkType, List<QuestProgressWork>> ProgressWork { get; set; }
@@ -380,6 +425,9 @@ namespace Arrowgene.Ddon.GameServer.Quests
             var quest = GetQuest(questScheduleId);
             lock (ActiveQuests)
             {
+                if (ActiveQuests.TryGetValue(questScheduleId, out var questState))
+                    questState.DisposeTimers();
+
                 ActiveQuests.Remove(questScheduleId);
                 foreach (var location in quest.Locations)
                 {
@@ -423,6 +471,15 @@ namespace Arrowgene.Ddon.GameServer.Quests
         {
             var quest = GetQuest(questScheduleId);
             RemoveQuest(questScheduleId);
+
+            if (QuestManager.IsWorldQuest(quest))
+            {
+                lock (ActiveQuests)
+                {
+                    CompletedWorldQuests.Add(quest.QuestId);
+                    RolledInstanceWorldQuests[quest.QuestAreaId].Remove(questScheduleId);
+                }
+            }
         }
 
         public void CompleteQuest(uint questScheduleId)
@@ -529,6 +586,24 @@ namespace Arrowgene.Ddon.GameServer.Quests
             }
         }
 
+        protected virtual uint GetEffectiveAreaRank(Character character, QuestAreaId areaId)
+        {
+            return character.AreaRanks.TryGetValue(areaId, out var rank) ? rank.Rank : 0;
+        }
+
+        protected Quest RollEligibleQuestVariant(QuestId questId, Character leaderCharacter)
+        {
+            var candidates = QuestManager.GetQuestScheduleIdsForQuestId(questId)
+                .Select(id => QuestManager.GetQuestByScheduleId(id))
+                .Where(q => q != null && !q.OrderConditions.Any(c => c.Type == QuestOrderConditionType.AreaRank
+                    && (leaderCharacter == null
+                        || GetEffectiveAreaRank(leaderCharacter, (QuestAreaId)c.Param01) < (uint)c.Param02)))
+                .ToList();
+
+            if (candidates.Count == 0) return null;
+            return candidates[Random.Shared.Next(candidates.Count)];
+        }
+
         public QuestState GetQuestState(uint questScheduleId)
         {
             lock (ActiveQuests)
@@ -601,6 +676,15 @@ namespace Arrowgene.Ddon.GameServer.Quests
             }
         }
 
+        public void RestoreDeliveryProgress(uint questScheduleId, ItemId itemId, uint amountDelivered)
+        {
+            lock (ActiveQuests)
+            {
+                if (ActiveQuests.TryGetValue(questScheduleId, out var questState))
+                    questState.RestoreDeliveryAmount(itemId, amountDelivered);
+            }
+        }
+
         public abstract bool UpdateQuestProgress(uint questScheduleId, DbConnection? connectionIn = null);
         public abstract bool CompleteQuestProgress(uint questScheduleId, DbConnection? connectionIn = null);
         public abstract PacketQueue DistributeQuestRewards(uint questScheduleId, DbConnection? connectionIn = null);
@@ -645,30 +729,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 {
                     case PointType.ExperiencePoints:
                         packets.AddRange(server.ExpManager.AddExp(client, client.Character, amount, RewardSource.Quest, quest.QuestType, connectionIn));
-                        if (server.GameSettings.GameServerSettings.EnableMainPartyPawnsQuestRewards)
-                        {
-                            foreach (PartyMember member in client.Party.Members)
-                            {
-                                if (member is PawnPartyMember pawnMember && client.Character.Pawns.Contains(pawnMember.Pawn))
-                                {
-                                    var pawnAmount = server.ExpManager.GetAdjustedPointsForQuest(pointReward.Type, pointReward.Reward, quest.QuestType, client, pawnMember.Pawn);
-                                    packets.AddRange(server.ExpManager.AddExp(client, pawnMember.Pawn, pawnAmount, RewardSource.Quest, quest.QuestType, connectionIn));
-                                }
-                            }
-                        }
+                        AddMainPartyPawnQuestPointRewards(server, client, quest, pointReward, amount, packets, connectionIn);
                         break;
                     case PointType.JobPoints:
                         packets.AddRange(server.ExpManager.AddJp(client, client.Character, amount.BasePoints, RewardSource.Quest, quest.QuestType, connectionIn));
-                        if (server.GameSettings.GameServerSettings.EnableMainPartyPawnsQuestRewards)
-                        {
-                            foreach (PartyMember member in client.Party.Members)
-                            {
-                                if (member is PawnPartyMember pawnMember && client.Character.Pawns.Contains(pawnMember.Pawn))
-                                {
-                                    packets.AddRange(server.ExpManager.AddJp(client, pawnMember.Pawn, amount.BasePoints, RewardSource.Quest, quest.QuestType, connectionIn));
-                                }
-                            }
-                        }
+                        AddMainPartyPawnQuestPointRewards(server, client, quest, pointReward, amount, packets, connectionIn);
                         break;
                     case PointType.PlayPoints:
                         var ntc = server.PPManager.AddPlayPoint(client, amount, type: 1, connectionIn: connectionIn);
@@ -707,14 +772,181 @@ namespace Arrowgene.Ddon.GameServer.Quests
             return packets;
         }
 
+        /// <summary>
+        /// Sends reduced wallet and EXP rewards for a repeat world quest clear.
+        /// Uses quest-specific repeat rewards if defined; otherwise auto-nerfs the base rewards
+        /// per the WorldQuestRepeatClear* server settings.
+        /// </summary>
+        protected PacketQueue SendRepeatClearWalletRewards(DdonGameServer server, GameClient client, Quest quest, DbConnection? connectionIn = null)
+        {
+            PacketQueue packets = new();
+            var settings = server.GameSettings.GameServerSettings;
+
+            S2CItemUpdateCharacterItemNtc updateCharacterItemNtc = new S2CItemUpdateCharacterItemNtc()
+            {
+                UpdateType = ItemNoticeType.Quest
+            };
+
+            foreach (var walletReward in quest.GetRepeatClearScaledWalletRewards(settings))
+            {
+                updateCharacterItemNtc.UpdateWalletList.Add(server.WalletManager.AddToWallet(
+                    client.Character,
+                    walletReward.Type,
+                    walletReward.Value,
+                    connectionIn: connectionIn
+                ));
+            }
+
+            if (updateCharacterItemNtc.UpdateWalletList.Count > 0)
+            {
+                client.Enqueue(updateCharacterItemNtc, packets);
+            }
+
+            var scaledExpRewards = quest.GetRepeatClearScaledExpRewards(settings);
+            foreach (var pointReward in scaledExpRewards)
+            {
+                if (pointReward.Reward == 0)
+                    continue;
+
+                (uint BasePoints, uint BonusPoints) amount = server.ExpManager.GetAdjustedPointsForQuest(pointReward.Type, pointReward.Reward, quest.QuestType, client, client.Character);
+                switch (pointReward.Type)
+                {
+                    case PointType.ExperiencePoints:
+                        packets.AddRange(server.ExpManager.AddExp(client, client.Character, amount, RewardSource.Quest, quest.QuestType, connectionIn));
+                        AddMainPartyPawnQuestPointRewards(server, client, quest, pointReward, amount, packets, connectionIn);
+                        break;
+                    case PointType.JobPoints:
+                        packets.AddRange(server.ExpManager.AddJp(client, client.Character, amount.BasePoints, RewardSource.Quest, quest.QuestType, connectionIn));
+                        AddMainPartyPawnQuestPointRewards(server, client, quest, pointReward, amount, packets, connectionIn);
+                        break;
+                    case PointType.AreaPoints:
+                        var areaId = quest.QuestAreaId > 0 ? quest.QuestAreaId : (QuestAreaId)quest.LightQuestDetail.AreaId;
+                        packets.AddRange(server.AreaRankManager.AddAreaPoint(client, areaId, amount, connectionIn));
+                        break;
+                }
+            }
+
+            // Fallback AP for world quests that don't define their own AreaPoints reward on repeat clear
+            if (!scaledExpRewards.Exists(x => x.Type == PointType.AreaPoints) && QuestManager.IsWorldQuest(quest))
+            {
+                var areaId = quest.QuestAreaId;
+                var amount = server.ExpManager.GetAdjustedPointsForQuest(PointType.AreaPoints, AreaRankManager.GetAreaPointReward(quest), quest.QuestType);
+                packets.AddRange(server.AreaRankManager.AddAreaPoint(client, areaId, amount, connectionIn));
+            }
+
+            return packets;
+        }
+
+        protected PacketQueue SendWalletRewards(DdonGameServer server, GameClient client, Quest quest, QuestBoxRewardFlags rewardFlags, DbConnection? connectionIn = null)
+        {
+            if (rewardFlags == QuestBoxRewardFlags.None)
+                return SendWalletRewards(server, client, quest, connectionIn);
+
+            PacketQueue packets = new();
+            var settings = server.GameSettings.GameServerSettings;
+
+            S2CItemUpdateCharacterItemNtc updateCharacterItemNtc = new S2CItemUpdateCharacterItemNtc()
+            {
+                UpdateType = ItemNoticeType.Quest
+            };
+
+            foreach (var walletReward in quest.GetScaledWalletRewards(rewardFlags, settings))
+            {
+                updateCharacterItemNtc.UpdateWalletList.Add(server.WalletManager.AddToWallet(
+                    client.Character,
+                    walletReward.Type,
+                    walletReward.Value,
+                    connectionIn: connectionIn
+                ));
+            }
+
+            if (updateCharacterItemNtc.UpdateWalletList.Count > 0)
+            {
+                client.Enqueue(updateCharacterItemNtc, packets);
+            }
+
+            foreach (var pointReward in quest.GetScaledExpRewards(rewardFlags, settings))
+            {
+                if (pointReward.Reward == 0)
+                    continue;
+
+                (uint BasePoints, uint BonusPoints) amount = server.ExpManager.GetAdjustedPointsForQuest(pointReward.Type, pointReward.Reward, quest.QuestType, client, client.Character);
+                switch (pointReward.Type)
+                {
+                    case PointType.ExperiencePoints:
+                        packets.AddRange(server.ExpManager.AddExp(client, client.Character, amount, RewardSource.Quest, quest.QuestType, connectionIn));
+                        AddMainPartyPawnQuestPointRewards(server, client, quest, pointReward, amount, packets, connectionIn);
+                        break;
+                    case PointType.JobPoints:
+                        packets.AddRange(server.ExpManager.AddJp(client, client.Character, amount.BasePoints, RewardSource.Quest, quest.QuestType, connectionIn));
+                        AddMainPartyPawnQuestPointRewards(server, client, quest, pointReward, amount, packets, connectionIn);
+                        break;
+                    case PointType.PlayPoints:
+                        var ntc = server.PPManager.AddPlayPoint(client, amount, type: 1, connectionIn: connectionIn);
+                        client.Enqueue(ntc, packets);
+                        break;
+                    case PointType.AreaPoints:
+                        var areaId = quest.QuestAreaId > 0 ? quest.QuestAreaId : (QuestAreaId)quest.LightQuestDetail.AreaId;
+                        packets.AddRange(server.AreaRankManager.AddAreaPoint(client, areaId, amount, connectionIn));
+                        break;
+                }
+            }
+
+            return packets;
+        }
+
+        private void AddMainPartyPawnQuestPointRewards(
+            DdonGameServer server,
+            GameClient client,
+            Quest quest,
+            CDataQuestExp pointReward,
+            (uint BasePoints, uint BonusPoints) playerAmount,
+            PacketQueue packets,
+            DbConnection? connectionIn = null)
+        {
+            if (!server.GameSettings.GameServerSettings.EnableMainPartyPawnsQuestRewards)
+            {
+                return;
+            }
+
+            foreach (PartyMember member in client.Party.Members)
+            {
+                if (member is not PawnPartyMember pawnMember || !client.Character.Pawns.Contains(pawnMember.Pawn))
+                {
+                    continue;
+                }
+
+                switch (pointReward.Type)
+                {
+                    case PointType.ExperiencePoints:
+                        var pawnAmount = server.ExpManager.GetAdjustedPointsForQuest(pointReward.Type, pointReward.Reward, quest.QuestType, client, pawnMember.Pawn);
+                        packets.AddRange(server.ExpManager.AddExp(client, pawnMember.Pawn, pawnAmount, RewardSource.Quest, quest.QuestType, connectionIn));
+                        break;
+                    case PointType.JobPoints:
+                        packets.AddRange(server.ExpManager.AddJp(client, pawnMember.Pawn, playerAmount.BasePoints, RewardSource.Quest, quest.QuestType, connectionIn));
+                        break;
+                }
+            }
+        }
+
+        public virtual void EnforceInitialPoolEligibility() { }
+
+        protected virtual Quest RollQuestVariant(QuestId questId)
+        {
+            return QuestManager.RollQuestForQuestId(questId);
+        }
+
         public void ResetInstance()
         {
             lock (ActiveQuests)
             {
                 foreach (var questId in CompletedWorldQuests)
                 {
-                    var quest = QuestManager.RollQuestForQuestId(questId);
-                    RolledInstanceWorldQuests[quest.QuestAreaId].Add(quest.QuestScheduleId);
+                    var quest = RollQuestVariant(questId);
+                    if (quest != null)
+                    {
+                        RolledInstanceWorldQuests[quest.QuestAreaId].Add(quest.QuestScheduleId);
+                    }
                 }
                 CompletedWorldQuests.Clear();
             }
@@ -797,6 +1029,49 @@ namespace Arrowgene.Ddon.GameServer.Quests
         {
             return IsQuestAccepted(QuestManager.GetQuestByQuestId(questId).QuestScheduleId);
         }
+
+        public List<S2CQuestDeliverItemNtc> GetRestoredDeliveryNtcs(uint characterId)
+        {
+            var ntcs = new List<S2CQuestDeliverItemNtc>();
+            lock (ActiveQuests)
+            {
+                foreach (var (questScheduleId, questState) in ActiveQuests)
+                {
+                    var byProcess = new Dictionary<ushort, List<CDataDeliveredItem>>();
+                    lock (questState.DeliveryRecords)
+                    {
+                        foreach (var (itemId, record) in questState.DeliveryRecords)
+                        {
+                            if (record.AmountDelivered > 0)
+                            {
+                                if (!byProcess.ContainsKey(record.ProcessNo))
+                                    byProcess[record.ProcessNo] = new List<CDataDeliveredItem>();
+                                byProcess[record.ProcessNo].Add(new CDataDeliveredItem()
+                                {
+                                    ItemId = (uint)itemId,
+                                    ItemNum = (ushort)record.AmountDelivered,
+                                    NeedNum = (ushort)(record.AmountRequired - record.AmountDelivered)
+                                });
+                            }
+                        }
+                    }
+                    foreach (var (processNo, items) in byProcess)
+                    {
+                        ntcs.Add(new S2CQuestDeliverItemNtc()
+                        {
+                            DeliveredItemRecord = new CDataDeliveredItemRecord()
+                            {
+                                CharacterId = characterId,
+                                QuestScheduleId = questScheduleId,
+                                ProcessNo = processNo,
+                                DeliveredItemList = items
+                            }
+                        });
+                    }
+                }
+            }
+            return ntcs;
+        }
     }
 
     public class SharedQuestStateManager : QuestStateManager
@@ -810,6 +1085,146 @@ namespace Arrowgene.Ddon.GameServer.Quests
         {
             this.Party = party;
             this.Server = server;
+        }
+
+        public override void EnforceInitialPoolEligibility()
+        {
+            var settings = Server.GameSettings.GameServerSettings;
+
+            if (settings.WorldQuestSystem == WorldQuestSystemMode.ServerReset)
+            {
+                // Copy the server-wide pool and apply rank filter (no re-roll replacement).
+                ApplyServerPool(Server.WorldQuestManager.GetCurrentPool());
+                return;
+            }
+
+            // InstanceReset mode: re-roll ineligible slots for this party.
+            if (!settings.WorldQuestFilterByLeaderAreaRank) return;
+
+            var leaderCharacter = Party.Leader?.Client.Character;
+            if (leaderCharacter == null) return;
+
+            lock (ActiveQuests)
+            {
+                foreach (var (areaId, scheduleIds) in RolledInstanceWorldQuests)
+                {
+                    var ineligible = scheduleIds
+                        .Select(id => QuestManager.GetQuestByScheduleId(id))
+                        .Where(q => q != null && q.OrderConditions.Any(c => c.Type == QuestOrderConditionType.AreaRank
+                            && GetEffectiveAreaRank(leaderCharacter, (QuestAreaId)c.Param01) < (uint)c.Param02))
+                        .ToList();
+
+                    foreach (var quest in ineligible)
+                    {
+                        scheduleIds.Remove(quest.QuestScheduleId);
+                        var replacement = RollEligibleQuestVariant(quest.QuestId, leaderCharacter);
+                        if (replacement != null)
+                        {
+                            scheduleIds.Add(replacement.QuestScheduleId);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Replaces RolledInstanceWorldQuests with a copy of serverPool, then removes any quests
+        /// the party leader is not eligible for (no re-roll replacement - server pool is canonical).
+        /// </summary>
+        public void ApplyServerPool(Dictionary<QuestAreaId, HashSet<uint>> serverPool)
+        {
+            lock (ActiveQuests)
+            {
+                foreach (var (areaId, scheduleIds) in serverPool)
+                    RolledInstanceWorldQuests[areaId] = new HashSet<uint>(scheduleIds);
+
+                if (!Server.GameSettings.GameServerSettings.WorldQuestFilterByLeaderAreaRank) return;
+
+                var leaderCharacter = Party.Leader?.Client.Character;
+                if (leaderCharacter == null) return;
+
+                foreach (var (areaId, scheduleIds) in RolledInstanceWorldQuests)
+                {
+                    var ineligible = scheduleIds
+                        .Select(id => QuestManager.GetQuestByScheduleId(id))
+                        .Where(q => q != null && q.OrderConditions.Any(c => c.Type == QuestOrderConditionType.AreaRank
+                            && GetEffectiveAreaRank(leaderCharacter, (QuestAreaId)c.Param01) < (uint)c.Param02))
+                        .Select(q => q.QuestScheduleId)
+                        .ToList();
+                    foreach (var sid in ineligible)
+                        scheduleIds.Remove(sid);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when the server broadcasts a world quest reset. Drops all in-progress world quests,
+        /// clears the completed list, applies the new server pool, and notifies online clients.
+        /// </summary>
+        public void OnServerWorldQuestReset(Dictionary<QuestAreaId, HashSet<uint>> serverPool)
+        {
+            lock (ActiveQuests)
+            {
+                var toRemove = ActiveQuests.Values
+                    .Where(qs => QuestManager.IsWorldQuest(qs.QuestId))
+                    .Select(qs => qs.QuestScheduleId)
+                    .ToList();
+                foreach (var schedId in toRemove)
+                    RemoveQuest(schedId);
+
+                CompletedWorldQuests.Clear();
+            }
+
+            ApplyServerPool(serverPool);
+            SendWorldQuestListNtc();
+        }
+
+        private void SendWorldQuestListNtc()
+        {
+            var leaderCharacter = Party.Leader?.Client?.Character;
+            if (leaderCharacter == null) return;
+
+            var areaId = leaderCharacter.AreaId;
+            var questList = new List<CDataSetQuestList>();
+
+            foreach (var scheduleId in AreaQuests(areaId))
+            {
+                var quest = QuestManager.GetQuestByScheduleId(scheduleId);
+                if (quest == null || IsQuestActive(scheduleId) || IsCompletedWorldQuest(scheduleId))
+                    continue;
+
+                uint clearCount = leaderCharacter.GetQuestPeriodFirstClears(quest.QuestType).Contains(quest.QuestScheduleId) ? 1u : 0u;
+                questList.Add(quest.ToCDataSetQuestList(0, clearCount));
+            }
+
+            Party.SendToAll(new S2CQuestGetSetQuestListNtc
+            {
+                DistributeId = areaId,
+                SelectCharacterId = leaderCharacter.CharacterId,
+                SetQuestList = questList
+            });
+        }
+
+        protected override uint GetEffectiveAreaRank(Character character, QuestAreaId areaId)
+        {
+            if (!character.AreaRanks.ContainsKey(areaId)) return 0;
+            return Server.AreaRankManager.GetEffectiveRank(character, areaId);
+        }
+
+        protected override Quest RollQuestVariant(QuestId questId)
+        {
+            if (Server.GameSettings.GameServerSettings.WorldQuestSystem == WorldQuestSystemMode.ServerReset)
+            {
+                var pool = Server.WorldQuestManager.GetCurrentPool();
+                foreach (var scheduleId in QuestManager.GetQuestScheduleIdsForQuestId(questId))
+                {
+                    var quest = QuestManager.GetQuestByScheduleId(scheduleId);
+                    if (quest != null && pool.TryGetValue(quest.QuestAreaId, out var poolSet) && poolSet.Contains(scheduleId))
+                        return quest;
+                }
+                return null;
+            }
+            return RollEligibleQuestVariant(questId, Party.Leader?.Client.Character);
         }
 
         public override bool CompleteQuestProgress(uint questScheduleId, DbConnection? connectionIn = null)
@@ -848,6 +1263,12 @@ namespace Arrowgene.Ddon.GameServer.Quests
                     continue;
                 }
 
+                if (quest.QuestType == QuestType.Main
+                    && !QuestManager.IsClientAlignedForMainQuestProgress(Server, memberClient, quest, questState.Step, connectionIn))
+                {
+                    continue;
+                }
+
                 if (result.Step != questState.Step && !quest.SaveWorkAsStep)
                 {
                     continue;
@@ -878,6 +1299,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
                     uint clearCount = ++memberClient.Character.CompletedQuests[quest.QuestId].ClearCount;
                     Server.Database.UpdateCompletedQuest(memberClient.Character.CommonId, quest.QuestId, quest.QuestType, clearCount, connectionIn);
                 }
+
+                if (quest.QuestType == QuestType.Substory)
+                {
+                    QuestManager.AdvanceSubstoryProgress(Server, memberClient.Character, quest.QuestId, connectionIn);
+                }
             }
 
             // Remove the quest data from the party object
@@ -891,19 +1317,20 @@ namespace Arrowgene.Ddon.GameServer.Quests
             PacketQueue packets = new();
             Quest quest = GetQuest(questScheduleId);
 
+            bool isWorldQuest = QuestManager.IsWorldQuest(quest);
+            bool rewardSystemEnabled = Server.GameSettings.GameServerSettings.WorldQuestFirstClearRewards;
+            bool isExtremeMission = quest.QuestType == QuestType.ExtremeMission;
+            bool useExtremeMissionRewardBuckets = isExtremeMission && quest.HasCategorizedRewards();
+            bool partyHasFirstEverClear = useExtremeMissionRewardBuckets
+                && Party.Clients.Any(x => !x.Character.CompletedQuests.ContainsKey(quest.QuestId));
+
             var questState = GetQuestState(quest);
             foreach (var memberClient in Party.Clients)
             {
                 // If this is a main quest, check to see that the member is currently on this quest, otherwise don't reward
                 if (quest.QuestType == QuestType.Main)
                 {
-                    var result = Server.Database.GetQuestProgressByScheduleId(memberClient.Character.CommonId, quest.QuestScheduleId, connectionIn);
-                    if (result == null)
-                    {
-                        continue;
-                    }
-
-                    if (result.Step != questState.Step)
+                    if (!QuestManager.IsClientAlignedForMainQuestProgress(Server, memberClient, quest, questState.Step, connectionIn))
                     {
                         continue;
                     }
@@ -912,37 +1339,104 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 // Distribute any released content from the quest to the player
                 packets.AddRange(RewardReleasedContent(memberClient, quest, connectionIn));
 
-                // Check for Item Rewards
-                if (quest.HasRewards())
+                if (useExtremeMissionRewardBuckets)
                 {
-                    Server.RewardManager.AddQuestRewards(memberClient, quest, connectionIn);
+                    QuestBoxRewardFlags rewardFlags = GetExtremeMissionRewardFlags(memberClient, quest, partyHasFirstEverClear, connectionIn);
+                    if (quest.HasItemRewards(rewardFlags))
+                    {
+                        Server.RewardManager.AddQuestRewards(memberClient, quest, rewardFlags, connectionIn);
+                    }
+
+                    packets.AddRange(SendWalletRewards(Server, memberClient, quest, rewardFlags, connectionIn));
+                    continue;
                 }
+
+                bool isFirstClear = !isWorldQuest
+                    || !rewardSystemEnabled
+                    || !Server.Database.HasQuestPeriodFirstClear(memberClient.Character.CommonId, quest.QuestType, quest.QuestScheduleId, connectionIn);
+
+                if (isWorldQuest && rewardSystemEnabled && isFirstClear)
+                {
+                    Server.Database.InsertQuestPeriodFirstClear(memberClient.Character.CommonId, quest.QuestType, quest.QuestScheduleId, connectionIn);
+                    memberClient.Character.GetQuestPeriodFirstClears(quest.QuestType).Add(quest.QuestScheduleId);
+                }
+
+                if (isFirstClear)
+                {
+                    // Full first-clear rewards: fixed items, random items, and selectables
+                    if (quest.HasRewards())
+                    {
+                        Server.RewardManager.AddQuestRewards(memberClient, quest, connectionIn);
+                    }
 
 #if false
-                if (quest.QuestId == QuestId.TheShiningGate && !memberClient.Character.HasQuestCompleted(QuestId.TheShiningGate))
-                {
-                    packets.AddRange(Server.RewardManager.UnlockEM4Skills(memberClient, connectionIn));
-                }
+                    if (quest.QuestId == QuestId.TheShiningGate && !memberClient.Character.HasQuestCompleted(QuestId.TheShiningGate))
+                    {
+                        packets.AddRange(Server.RewardManager.UnlockEM4Skills(memberClient, connectionIn));
+                    }
 #endif
 
-                // Check for Exp, Rift and Gold Rewards
-                var ntcs = SendWalletRewards(Server, memberClient, quest, connectionIn);
-                packets.AddRange(ntcs);
+                    packets.AddRange(SendWalletRewards(Server, memberClient, quest, connectionIn));
+                }
+                else
+                {
+                    // Repeat-clear: diluted item pool (if defined) and nerfed wallet rewards
+                    if (quest.HasRepeatClearItemRewards())
+                    {
+                        Server.RewardManager.AddRepeatClearQuestRewards(memberClient, quest, connectionIn);
+                    }
+                    else if (rewardSystemEnabled && quest.HasRewards())
+                    {
+                        Server.RewardManager.AddAutoRepeatClearQuestRewards(memberClient, quest, connectionIn);
+                    }
+
+                    packets.AddRange(SendRepeatClearWalletRewards(Server, memberClient, quest, connectionIn));
+                }
             }
 
             return packets;
+        }
+
+        private QuestBoxRewardFlags GetExtremeMissionRewardFlags(GameClient client, Quest quest, bool partyHasFirstEverClear, DbConnection? connectionIn = null)
+        {
+            bool hasEverCleared = client.Character.CompletedQuests.ContainsKey(quest.QuestId);
+            bool hasPeriodClear = client.Character.GetQuestPeriodFirstClears(quest.QuestType).Contains(quest.QuestScheduleId)
+                || Server.Database.HasQuestPeriodFirstClear(client.Character.CommonId, quest.QuestType, quest.QuestScheduleId, connectionIn);
+
+            QuestBoxRewardFlags rewardFlags = QuestBoxRewardFlags.None;
+            if (!hasEverCleared)
+            {
+                rewardFlags |= QuestBoxRewardFlags.FirstClear;
+            }
+
+            if (!hasPeriodClear)
+            {
+                rewardFlags |= QuestBoxRewardFlags.PeriodFirstClear;
+                Server.Database.InsertQuestPeriodFirstClear(client.Character.CommonId, quest.QuestType, quest.QuestScheduleId, connectionIn);
+                client.Character.GetQuestPeriodFirstClears(quest.QuestType).Add(quest.QuestScheduleId);
+            }
+            else
+            {
+                rewardFlags |= QuestBoxRewardFlags.RepeatClear;
+            }
+
+            if (hasEverCleared && partyHasFirstEverClear)
+            {
+                rewardFlags |= QuestBoxRewardFlags.HelperBonus;
+            }
+
+            return rewardFlags;
         }
 
         public override PacketQueue UpdatePriorityQuestList(GameClient requestingClient, DbConnection? connectionIn = null)
         {
             PacketQueue packets = new();
 
-            if (Party.Leader is null || requestingClient != Party.Leader.Client)
+            var leaderClient = Party.Leader?.Client ?? (Party.IsSolo ? requestingClient : null);
+            if (leaderClient is null || requestingClient != leaderClient)
             {
                 return packets;
             }
-
-            var leaderClient = Party.Leader.Client;
 
             S2CQuestSetPriorityQuestNtc prioNtc = new S2CQuestSetPriorityQuestNtc()
             {
@@ -1004,14 +1498,22 @@ namespace Arrowgene.Ddon.GameServer.Quests
                     continue;
                 }
 
+                if (quest.QuestType == QuestType.Main
+                    && !QuestManager.IsClientAlignedForMainQuestProgress(Server, memberClient, quest, questState.Step, connectionIn))
+                {
+                    continue;
+                }
+
                 if (result.Step != questState.Step && !quest.SaveWorkAsStep)
                 {
                     continue;
                 }
 
                 Server.Database.UpdateQuestProgress(memberClient.Character.CommonId, questState.QuestScheduleId, questState.QuestType, questState.Step + 1, connectionIn);
+                Server.Database.DeleteQuestDeliveryProgress(memberClient.Character.CommonId, questState.QuestScheduleId, connectionIn);
             }
 
+            questState.ClearCompletedDeliveryRecords();
             questState.Step += 1;
 
             return true;
@@ -1052,7 +1554,9 @@ namespace Arrowgene.Ddon.GameServer.Quests
             }
 
             Server.Database.UpdateQuestProgress(Member.Client.Character.CommonId, questState.QuestScheduleId, questState.QuestType, questState.Step + 1, connectionIn);
+            Server.Database.DeleteQuestDeliveryProgress(Member.Client.Character.CommonId, questState.QuestScheduleId, connectionIn);
 
+            questState.ClearCompletedDeliveryRecords();
             questState.Step += 1;
 
             return true;
@@ -1096,6 +1600,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
             {
                 uint clearCount = ++Member.Client.Character.CompletedQuests[quest.QuestId].ClearCount;
                 Server.Database.ReplaceCompletedQuest(Member.Client.Character.CommonId, quest.QuestId, quest.QuestType, clearCount, connectionIn);
+            }
+
+            if (quest.QuestType == QuestType.Substory)
+            {
+                QuestManager.AdvanceSubstoryProgress(Server, Member.Client.Character, quest.QuestId, connectionIn);
             }
 
             CompleteQuest(quest.QuestScheduleId);

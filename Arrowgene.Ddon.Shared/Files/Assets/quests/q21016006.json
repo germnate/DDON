@@ -6,7 +6,9 @@
     "base_level": 75,
     "minimum_item_rank": 0,
     "discoverable": true,
-	"area_id": "MorrowForest",	
+    "area_id": "MorrowForest",
+    "news_image": 324,
+    "order_conditions": [{"type": "AreaRank", "Param1": 16, "Param2": 8}],
     "rewards": [
         {
             "type": "wallet",
@@ -20,63 +22,119 @@
         },
         {
             "type": "exp",
-            "amount": 4870
+            "amount": 5470
         },
         {
             "type": "select",
             "loot_pool": [
                 {
-                    "item_id": 15962,
+                    "item_id": "BronzeTailFeather",
                     "num": 3
                 },
-                {					
-                    "item_id": 9364,
+                {
+                    "item_id": "SuperiorStrongGalaExtract",
                     "num": 3
                 },
-                {				
-                    "item_id": 41,
-                    "num": 3					
+                {
+                    "item_id": "Panacea",
+                    "num": 3
                 }
             ]
         }
     ],
-    "blocks": [
+    "processes": [
         {
-            "type": "NpcTalkAndOrder",	
-            "stage_id": {
-                "id": 340,
-                "group_id": 1,
-                "layer_no": 1
-            },				
-            "npc_id": "Arthfael",
-            "message_id": 10800
-        },
-        {
-            "type": "DeliverItems",
-            "stage_id": {
-                "id": 340,
-                "group_id": 1
-            },
-            "npc_id": "Arthfael",
-            "announce_type": "Accept",
-            "items": [
+            "blocks": [
                 {
-                    "id": 15952,
-                    "amount": 5
+                    "type": "NpcTalkAndOrder",
+                    "stage_id": {
+                        "id": 340
+                    },
+                    "npc_id": "Arthfael",
+                    "message_id": 19684
+                },
+                {
+                    "type": "Raw",
+                    "announce_type": "Accept",
+                    "check_commands": [
+                        {"type": "StageNo", "Param1": 920},
+                        {"type": "WeatherEq", "Param1": 1}
+                    ],
+                    "result_commands": [
+                        {"type": "QstTalkChg", "Param1": 2600, "Param2": 19685}
+                    ]
+                },
+                {
+                    "type": "Raw",
+                    "announce_type": "CheckpointAndUpdate",
+                    "check_commands": [
+                        {"type": "TalkNpc", "Param1": 920, "Param2": 2600},
+                        {"type": "WeatherEq", "Param1": 1}
+                    ],
+                    "result_commands": [
+                        {"type": "QstTalkChg", "Param1": 2600, "Param2": 19686}
+                    ]
+                },
+                {
+                    "type": "Raw",
+                    "announce_type": "CheckpointAndUpdate",
+                    "result_commands": [
+                        {"type": "MyQstFlagOn", "Param1": 0},
+                        {"type": "QstTalkChg", "Param1": 2600, "Param2": 19687}
+                    ],
+                    "check_commands": [
+                        {"type": "HaveItemAllBag", "Param1": 15952, "Param2": 5}
+                    ]
+                },
+                {
+                    "type": "DeliverItems",
+                    "announce_type": "CheckpointAndUpdate",
+                    "stage_id": {
+                        "id": 340
+                    },
+                    "npc_id": "Arthfael",
+                    "items": [
+                        {
+                            "comment": "Wijnruit",
+                            "id": 15952,
+                            "amount": 5
+                        }
+                    ],
+                    "message_id": 19688
                 }
-            ],
-            "message_id": 10737
+            ]
         },
         {
-            "type": "TalkToNpc",
-            "stage_id": {
-                "id": 340,
-                "group_id": 1,
-                "layer_no": 1
-            },
-            "announce_type": "Update",
-            "npc_id": "Arthfael",
-            "message_id": 11842			
+            "blocks": [
+                {
+                    "type": "MyQstFlags",
+                    "check_flags": [0]
+                },
+                {
+                    "type": "Raw",
+                    "check_commands": [
+                        {"type": "WeatherEq", "Param1": 1},
+                        {"type": "StageNoWithoutMarker", "Param1": 123}
+                    ]
+                },
+                {
+                    "type": "Raw",
+                    "result_commands": [
+                        {"type": "QstLayoutFlagOn", "Param1": 4325},
+                        {"type": "CallMessage", "Param1": 1, "Param1": 19938}
+                    ],
+                    "check_commands": [
+                        {"type": "WeatherNotEq", "Param1": 1}
+                    ]
+                },
+                {
+                    "type": "Raw",
+                    "result_commands": [
+                        {"type": "QstLayoutFlagOff", "Param1": 4325},
+                        {"type": "CallMessage", "Param1": 1, "Param1": 19939}
+                    ]
+                }
+            ]
         }
     ]
 }

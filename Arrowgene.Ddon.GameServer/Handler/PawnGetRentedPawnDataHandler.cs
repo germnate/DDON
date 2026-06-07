@@ -2,6 +2,7 @@ using Arrowgene.Ddon.GameServer.Scripting.Interfaces;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
+using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Logging;
 using System.Collections.Generic;
@@ -37,23 +38,28 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 HashSet<uint> clanPawns = [.. Server.Database.SelectClanPawns(client.Character.ClanId, limit: 1000, connectionIn: connection)];
 
                 //S2C_PAWN_GET_PAWN_PROFILE_NTC
+                var ownerBaseInfo = pawn.IsOfficialPawn || pawn.OwningCharacterId == Character.ServerCharacterId
+                    ? new CDataCommunityCharacterBaseInfo { CharacterId = Character.ServerCharacterId, CharacterName = new CDataCharacterName { FirstName = Character.ServerCharacterFirstName } }
+                    : Server.Database.SelectCommunityCharacterBaseInfo(pawn.OwningCharacterId, connection);
                 var profileNtc = new S2CPawnGetPawnProfileNtc()
                 {
                     CharacterId = client.Character.CharacterId,
                     PawnId = pawn.PawnId,
-                    OwnerBaseInfo = Server.Database.SelectCommunityCharacterBaseInfo(pawn.OwningCharacterId, connection),
+                    OwnerBaseInfo = ownerBaseInfo,
                     PawnProfile = pawn.CharacterProfile.CDataArisenProfile,
                     Comment = pawn.CharacterProfile.Comment,
                     RentalCost = mixin.GetRentalCost(client, pawn.CDataRegisterdPawnList, clanPawns.Contains(pawn.PawnId))
                 };
                 client.Enqueue(profileNtc, queue);
 
+                bool isOfficialPawn = pawn.IsOfficialPawn || pawn.OwningCharacterId == Character.ServerCharacterId;
+
                 //S2C_PAWN_GET_PAWN_HISTORY_INFO_NTC
                 var historyNtc = new S2CPawnGetPawnHistoryInfoNtc()
                 {
                     CharacterId = client.Character.CharacterId,
                     PawnId = pawn.PawnId,
-                    PawnHistoryList = Server.Database.SelectPawnHistory(pawn.PawnId, connection)
+                    PawnHistoryList = isOfficialPawn ? [] : Server.Database.SelectPawnHistory(pawn.PawnId, connection)
                 };
                 client.Enqueue(historyNtc, queue);
 
@@ -62,7 +68,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     CharacterId = client.Character.CharacterId,
                     PawnId = pawn.PawnId,
-                    PawnTotalScore = Server.Database.SelectPawnTotalScore(pawn.PawnId, connection)
+                    PawnTotalScore = isOfficialPawn ? new CDataPawnTotalScore() : Server.Database.SelectPawnTotalScore(pawn.PawnId, connection)
                 };
                 client.Enqueue(scoreNtc, queue);
             });

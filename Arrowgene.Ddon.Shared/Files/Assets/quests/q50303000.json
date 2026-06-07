@@ -126,6 +126,78 @@
                     "is_boss": true,
                     "start_think_tbl_no": 1,
                     "montage_fix_no": 1
+                },
+                {
+                    "comment": "Blazing Boulder",
+                    "enemy_id": "0x030106",
+                    "level": 95,
+                    "exp": 0,
+                    "repop_count": 50,
+                    "is_required": false,
+                    "enemy_target_types_id": 1
+                },
+                {
+                    "comment": "Blazing Boulder",
+                    "enemy_id": "0x030106",
+                    "level": 95,
+                    "exp": 0,
+                    "repop_count": 50,
+                    "is_required": false,
+                    "enemy_target_types_id": 1
+                },
+                {
+                    "comment": "Blazing Boulder",
+                    "enemy_id": "0x030106",
+                    "level": 95,
+                    "exp": 0,
+                    "repop_count": 50,
+                    "is_required": false,
+                    "enemy_target_types_id": 1
+                },
+                {
+                    "comment": "Blazing Boulder",
+                    "enemy_id": "0x030106",
+                    "level": 95,
+                    "exp": 0,
+                    "repop_count": 50,
+                    "is_required": false,
+                    "enemy_target_types_id": 1
+                },
+                {
+                    "comment": "Blazing Boulder",
+                    "enemy_id": "0x030106",
+                    "level": 95,
+                    "exp": 0,
+                    "repop_count": 50,
+                    "is_required": false,
+                    "enemy_target_types_id": 1
+                },
+                {
+                    "comment": "Blazing Boulder",
+                    "enemy_id": "0x030106",
+                    "level": 95,
+                    "exp": 0,
+                    "repop_count": 50,
+                    "is_required": false,
+                    "enemy_target_types_id": 1
+                },
+                {
+                    "comment": "Blazing Boulder",
+                    "enemy_id": "0x030106",
+                    "level": 95,
+                    "exp": 0,
+                    "repop_count": 50,
+                    "is_required": false,
+                    "enemy_target_types_id": 1
+                },
+                {
+                    "comment": "Blazing Boulder",
+                    "enemy_id": "0x030106",
+                    "level": 95,
+                    "exp": 0,
+                    "repop_count": 50,
+                    "is_required": false,
+                    "enemy_target_types_id": 1
                 }
             ]
         },
@@ -137,28 +209,28 @@
             },
             "enemies": [
                 {
-                    "enemy_id": "0x010608",
-                    "level": 95,
-                    "exp": 0,
-                    "repop_count": 50,
-                    "repop_wait_second": 60,
-                    "enemy_target_types_id": 1
+                  "enemy_id": "0x010608",
+                  "level": 95,
+                  "exp": 0,
+                  "repop_count": 50,
+                  "repop_wait_second": 60,
+                  "enemy_target_types_id": 1
                 },
                 {
-                    "enemy_id": "0x010608",
-                    "level": 95,
-                    "exp": 0,
-                    "repop_count": 50,
-                    "repop_wait_second": 60,
-                    "enemy_target_types_id": 1
+                  "enemy_id": "0x010608",
+                  "level": 95,
+                  "exp": 0,
+                  "repop_count": 50,
+                  "repop_wait_second": 60,
+                  "enemy_target_types_id": 1
                 },
                 {
-                    "enemy_id": "0x010608",
-                    "level": 95,
-                    "exp": 0,
-                    "repop_count": 50,
-                    "repop_wait_second": 60,
-                    "enemy_target_types_id": 1
+                  "enemy_id": "0x010608",
+                  "level": 95,
+                  "exp": 0,
+                  "repop_count": 50,
+                  "repop_wait_second": 60,
+                  "enemy_target_types_id": 1
                 },
                 {
                   "enemy_id": "0x010608",
@@ -201,20 +273,6 @@
                   "enemy_target_types_id": 1
                 }
             ]
-        }
-    ],
-    "server_actions": [
-        {
-            "comment": "Detects when Ifirt destroys the stage, so the second form can come out.",
-            "action_type": "OmSetInstantValue",
-            "instant_value_action": "ResetGroup",
-            "stage_id": {
-                "id": 586,
-                "group_id": 1,
-                "layer_no": 0
-            },
-            "key": 9379,
-            "value": 8
         }
     ],
     "processes": [
@@ -231,13 +289,12 @@
                     "announce_type": "Start",
                     "groups": [0],
                     "check_commands": [
-                        {"type": "EmHpLess", "Param1": 138, "Param2": 1, "Param3": 0, "Param4": 85}
+                        {"type": "IsLinkageEnemyFlag", "Param1": 138, "Param2": 1, "Param3": 0, "Param4": 2}
                     ]
                 },
                 {
                     "type": "KillGroup",
                     "show_marker": false,
-                    "reset_group": false,
                     "groups": [1]
                 }
             ]

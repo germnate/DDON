@@ -1,14 +1,15 @@
 {
     "state_machine": "GenericStateMachine",
     "type": "World",
-    "comment": "The One Called ‘Knight-Devourer",
+    "comment": "The One Called Knight-Devourer (II)",
     "quest_id": 20090001,
     "base_level": 55,
     "minimum_item_rank": 0,
     "discoverable": true,
-    "area_id": "ZandoraWastelands",	
+    "area_id": "ZandoraWastelands", 
     "news_image": 181,
-	"variant_index": 1,
+    "order_conditions": [{"type": "AreaRank", "Param1": 10, "Param2": 6}],
+    "variant_index": 1,
     "rewards": [
         {
             "type": "exp",
@@ -28,35 +29,40 @@
             "type": "select",
             "loot_pool": [
                 {
+                    "comment": "Sinister Horn",
                     "item_id": 7748,
                     "num": 1
                 },
                 {
+                    "comment": "Strong Gala Extract",
                     "item_id": 9363,
                     "num": 3
                 },
                 {
+                    "comment": "Panacea",
                     "item_id": 41,
-                    "num": 1					
+                    "num": 1                    
                 }
             ]
-          },
+        },
+        {
+            "type": "random",
+            "loot_pool": [
                 {
-                    "type": "random",
-                    "loot_pool": [
-                      {
-                        "item_id": 7554,
-                        "num": 1,
-                        "chance": 0.6
-                      },
-                      {
-                        "item_id": 61,
-                        "num": 1,
-                        "chance": 0.6
-                      }
-                    ]
-                  }
-                ],
+                    "comment": "Healing Remedy",
+                    "item_id": 7554,
+                    "num": 1,
+                    "chance": 0.6
+                },
+                {
+                    "comment": "Superior Gala Extract",
+                    "item_id": 61,
+                    "num": 1,
+                    "chance": 0.6
+                }
+            ]
+        }
+    ],
     "enemy_groups" : [
         {
             "stage_id": {
@@ -66,38 +72,39 @@
             "placement_type": "manual",
             "enemies": [
                 {
+                    "comment": "Brutal Skull Lord",
+                    "enemy_id": "0x010313",
+                    "named_enemy_params_id": 54,
+                    "level": 55,
+                    "exp": 1280,
+                    "index": 0                  
+                },
+                {
+                    "comment": "Brutal Skull Lord",
+                    "enemy_id": "0x010313",
+                    "named_enemy_params_id": 54,
+                    "level": 55,
+                    "exp": 1280,
+                    "index": 1                  
+                },
+                {
+                    "comment": "Hundred Knight-Eater (Shadow Chimera)",
                     "enemy_id": "0x015203",
+                    "named_enemy_params_id": 60,
                     "start_think_tbl_no": 1,
-                    "named_enemy_params_id": 914,
                     "level": 55,
-                    "exp": 19700,
+                    "exp": 5440,
                     "is_boss": true,
-                    "index": 3					
-                },
-                {
-                    "enemy_id": "0x010313",
-                    "start_think_tbl_no": 0,
-                    "level": 55,
-                    "exp": 6476,
-                    "is_boss": false,
-                    "index": 2					
-                },
-                {
-                    "enemy_id": "0x010313",
-                    "start_think_tbl_no": 0,
-                    "level": 55,
-                    "exp": 6476,
-                    "is_boss": false,
-                    "index": 4					
+                    "index": 3                  
                 }
             ]
         }
-    ],	
+    ],  
     "blocks": [
         {
             "type": "NewNpcTalkAndOrder",
             "flags": [
-                {"type": "QstLayout", "action": "Set", "value": 1076, "comment": "Spawns WhiteKnight1 NPC"}				
+                {"type": "QstLayout", "action": "Set", "value": 1076, "comment": "Spawns WhiteKnight1 NPC"}             
             ],
             "stage_id": {
                 "id": 1,
@@ -105,11 +112,19 @@
                 "layer_no": 1
             },
             "npc_id": "WhiteKnight1",
-            "message_id": 11372
+            "message_id": 11304
         },
         {
             "type": "SeekOutEnemiesAtMarkedLocation",
             "announce_type": "Accept",
+            "result_commands": [
+               {
+                    "comment": "Idle dialogue",
+                    "type": "QstTalkChg",
+                    "Param1": 505,
+                    "Param2": 11310
+               }
+           ],
             "groups": [0]
         },
         {
@@ -118,7 +133,7 @@
             "reset_group": false,
             "groups": [0]
         },
-        {		
+        {       
             "type": "NewTalkToNpc",
             "stage_id": {
                 "id": 1,
@@ -127,7 +142,7 @@
             },
             "announce_type": "Update",
             "npc_id": "WhiteKnight1",
-            "message_id": 11842
+            "message_id": 11307
         }
     ]
 }

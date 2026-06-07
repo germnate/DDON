@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class ChatCommand : IChatCommand
 {
-    public override AccountStateType AccountState => AccountStateType.Admin;
+    public override AccountStateType AccountState => AccountStateType.GameMaster;
     public override string CommandName => "finishquesttype";
     public override string HelpText => "usage: `/finishquesttype [type]` - Finish all quests.";
 
@@ -25,6 +25,7 @@ public class ChatCommand : IChatCommand
                     if (!client.Character.HasQuestCompleted(quest.QuestId))
                     {
                         server.Database.InsertCompletedQuest(client.Character.CommonId, quest.QuestId, quest.QuestType, connection);
+                        server.Database.RemoveQuestProgress(client.Character.CommonId, quest.QuestScheduleId, quest.QuestType, connection);
                     }
                 }
             });

@@ -98,35 +98,18 @@ namespace Arrowgene.Ddon.Shared.AssetReader
 
                         if (conditionType == JobOrderCondType.Hunt)
                         {
-                            var enemyId = EnemyId.None;
-
-                            var enemyType = jTask.GetProperty("enemy_type").GetString();
-                            if (enemyType == "OrbEnemy")
+                            if (!TryReadEnemyUIId(jTask, out var enemyUIId))
                             {
-                                condition.ConditionType = JobOrderCondType.BloodOrbEnemies;
-                            }
-                            else
-                            {
-                                if (!Enum.TryParse(enemyType, true, out enemyId))
-                                {
-                                    if (!Enum.TryParse($"{enemyType}0", true, out enemyId))
-                                    {
-                                        if (!UniqueNameReplacements.ContainsKey(enemyType))
-                                        {
-                                            Logger.Error($"Failed to parse EnemyId={enemyType}. Skipping.");
-                                            continue;
-                                        }
-                                        enemyId = UniqueNameReplacements[enemyType];
-                                    }
-                                }
+                                Logger.Error($"Failed to parse EnemyUIId. Skipping.");
+                                continue;
                             }
 
-                            condition.TargetId = (uint)enemyId.GetUIId();
-                            if (condition.TargetId == 0 && condition.ConditionType != JobOrderCondType.BloodOrbEnemies)
-                            {
-                                Logger.Error($"Something went wrong with {jobId}, {releaseId}");
-                            }
-
+                            condition.TargetId = (uint)enemyUIId;
+                            condition.TargetRank = jTask.GetProperty("enemy_level").GetUInt32();
+                            condition.TargetNum = jTask.GetProperty("enemy_count").GetUInt32();
+                        }
+                        else if (conditionType == JobOrderCondType.BloodOrbEnemies)
+                        {
                             condition.TargetRank = jTask.GetProperty("enemy_level").GetUInt32();
                             condition.TargetNum = jTask.GetProperty("enemy_count").GetUInt32();
                         }
@@ -155,24 +138,41 @@ namespace Arrowgene.Ddon.Shared.AssetReader
             return asset;
         }
 
-        private static readonly Dictionary<string, EnemyId> UniqueNameReplacements = new Dictionary<string, EnemyId>()
+        private static bool TryReadEnemyUIId(JsonElement jTask, out EnemyUIId enemyUIId)
         {
-            ["CorpsePunisher"] = EnemyId.BoltCorpsePunisher,
-            ["DamnedSlingGoblin"] = EnemyId.DamnedSlingGoblinFlask,
-            ["EvilDragon"] = EnemyId.TheEvilDragon0,
-            ["GreaterGoblin"] = EnemyId.GreaterGoblinSword,
-            ["Ifrit"] = EnemyId.Ifrit2ndForm,
-            ["PhantasmicGreatDragon"] = EnemyId.WhiteDragon,
-            ["RogueGuardian"] = EnemyId.RogueDefender,
-            ["SlingGoblin"] = EnemyId.SlingGoblinTorch,
-            ["SlingHobgoblin"] = EnemyId.SlingHobgoblinTorch,
-            ["Undead"] = EnemyId.UndeadMale,
-            ["WarReadyGorecyclops"] = EnemyId.WarReadyGorecyclopsLightArmor0,
-            ["WarReadyGoremanticore"] = EnemyId.WarReadyGoremanticoreLightArmor,
-            ["WarReadyGrimwarg"] = EnemyId.WarReadyGrimwargLightArmor,
-            ["WarReadyNightmare"] = EnemyId.WarReadyNightmareLightArmor,
-            ["WarReadyOgre"] = EnemyId.WarReadyOgreLightArmor,
-            ["WarReadySaurian"] = EnemyId.WarReadySaurianLightArmor,
-        };
+            enemyUIId = EnemyUIId.None;
+            return jTask.TryGetProperty("enemy_ui_id", out var enemyUIIdElement)
+                && TryReadEnemyUIIdValue(enemyUIIdElement, out enemyUIId);
+        }
+
+        private static bool TryReadEnemyUIIdValue(JsonElement element, out EnemyUIId enemyUIId)
+        {
+            enemyUIId = EnemyUIId.None;
+
+            if (element.ValueKind == JsonValueKind.Number)
+            {
+                if (!element.TryGetUInt32(out var value))
+                {
+                    return false;
+                }
+
+                enemyUIId = (EnemyUIId)value;
+                return Enum.IsDefined(typeof(EnemyUIId), enemyUIId);
+            }
+
+            if (element.ValueKind != JsonValueKind.String)
+            {
+                return false;
+            }
+
+            var valueText = element.GetString();
+            if (uint.TryParse(valueText, out var numericValue))
+            {
+                enemyUIId = (EnemyUIId)numericValue;
+                return Enum.IsDefined(typeof(EnemyUIId), enemyUIId);
+            }
+
+            return Enum.TryParse(valueText, true, out enemyUIId);
+        }
     }
 }

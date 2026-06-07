@@ -43,6 +43,10 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 Logger.Error(client, $"AccountId:{token.AccountId} not found");
                 throw new ResponseErrorException(ErrorCode.ERROR_CODE_FAIL);
             }
+            else if (account.State == AccountStateType.Banned)
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_GM_BAN);
+            }
 
             DateTime now = DateTime.UtcNow;
 
@@ -65,11 +69,22 @@ namespace Arrowgene.Ddon.GameServer.Handler
             // registering the connection
             client.Account = account;
 
-            Connection connection = new Connection();
-            connection.ServerId = Server.Id;
-            connection.AccountId = account.Id;
-            connection.Type = ConnectionType.GameServer;
-            connection.Created = now;
+            Connection connection = new Connection
+            {
+                ServerId = Server.Id,
+                AccountId = account.Id,
+                Type = ConnectionType.GameServer,
+                Created = now,
+                CharacterId = token.CharacterId
+            };
+
+#if DEBUG
+            if (client.Identity.Contains("127.0.0.1"))
+            {
+                client.Account.State = AccountStateType.GameMaster;
+            }
+#endif
+
             if (!Database.InsertConnection(connection))
             {
                 Logger.Error(client, $"Failed to register game connection");
@@ -85,8 +100,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             Logger.Info(client, "Logged Into GameServer");
 
-            // update login token for client
-            // client.Account.LoginToken = GameToken.GenerateLoginToken();
             client.Account.LoginTokenCreated = now;
             if (!Database.UpdateAccount(client.Account))
             {

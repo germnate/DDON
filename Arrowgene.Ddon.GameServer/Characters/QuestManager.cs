@@ -8,6 +8,7 @@ using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Characters
@@ -27,13 +28,21 @@ namespace Arrowgene.Ddon.GameServer.Characters
          * A QuestScheduleId should always get us back to a unique quest object.
          * A QuestId can return us a list of related QuestScheduleIds which all use the same QuestId.
          */
-        private static Dictionary<uint, Quest> gQuests = new Dictionary<uint, Quest>();
-        private static readonly Dictionary<QuestId, HashSet<uint>> gVariantQuests = new();
+        private static Dictionary<uint, Quest> gQuests = new();
+        private static Dictionary<QuestId, HashSet<uint>> gVariantQuests = new();
 
-        private static Dictionary<uint, HashSet<uint>> gTutorialQuests = new Dictionary<uint, HashSet<uint>>();
+        // Prevents two concurrent JSON reloads from interleaving their swaps.
+        // Readers never acquire this lock; they are safe because the swap replaces
+        // collection references rather than mutating live collections, so any reader
+        // that captured a reference before the swap iterates the old, immutable dict.
+        private static readonly object _reloadLock = new();
+
+        private static Dictionary<QuestType, Dictionary<uint, HashSet<uint>>> QuestByStageNo = new();
         private static Dictionary<QuestAreaId, HashSet<QuestId>> gWorldQuests = new Dictionary<QuestAreaId, HashSet<QuestId>>();
         private static Dictionary<QuestAdventureGuideCategory, HashSet<uint>> gAdventureGuideCategories = new Dictionary<QuestAdventureGuideCategory, HashSet<uint>>();
         private static Dictionary<QuestAreaId, Dictionary<uint,uint>> gAreaTrialRanks = new Dictionary<QuestAreaId, Dictionary<uint, uint>>();
+
+        private static Dictionary<QuestId, (QuestSubstoryGroupId SubstoryGroupId, uint SeqNo)> gSubstoryLookup = new();
 
         /// <summary>
         /// QuestScheduleIds that are requested as part of World Manage Quests from pcaps.
@@ -47,48 +56,83 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         private static void AddQuestToCategory(Quest quest)
         {
-            if (!gVariantQuests.ContainsKey(quest.QuestId))
-            {
-                gVariantQuests[quest.QuestId] = new HashSet<uint>();
-            }
-            gVariantQuests[quest.QuestId].Add(quest.QuestScheduleId);
+            AddQuestToCollections(quest, gVariantQuests, QuestByStageNo, gWorldQuests, gAdventureGuideCategories, gAreaTrialRanks);
+        }
 
-            if (quest.QuestType == QuestType.Tutorial)
+        // Populates the supplied index collections with the quest. Callers pass either the
+        // live static dicts (initial load / scripted hotload) or freshly allocated locals
+        // (JSON hotload build-then-swap path).
+        private static void AddQuestToCollections(
+            Quest quest,
+            Dictionary<QuestId, HashSet<uint>> variantQuests,
+            Dictionary<QuestType, Dictionary<uint, HashSet<uint>>> questByStageNo,
+            Dictionary<QuestAreaId, HashSet<QuestId>> worldQuests,
+            Dictionary<QuestAdventureGuideCategory, HashSet<uint>> adventureGuideCategories,
+            Dictionary<QuestAreaId, Dictionary<uint, uint>> areaTrialRanks)
+        {
+            if (!variantQuests.ContainsKey(quest.QuestId))
+                variantQuests[quest.QuestId] = new HashSet<uint>();
+            variantQuests[quest.QuestId].Add(quest.QuestScheduleId);
+
+            if (quest.QuestType == QuestType.Tutorial || quest.QuestType == QuestType.Substory)
             {
                 uint stageNo = (uint)StageManager.ConvertIdToStageNo(quest.StageId);
-                if (!gTutorialQuests.ContainsKey(stageNo))
-                {
-                    gTutorialQuests[stageNo] = new HashSet<uint>();
-                }
-                gTutorialQuests[stageNo].Add(quest.QuestScheduleId);
+                if (!questByStageNo.ContainsKey(quest.QuestType))
+                    questByStageNo[quest.QuestType] = new();
+                var questDict = questByStageNo[quest.QuestType];
+                if (!questDict.ContainsKey(stageNo))
+                    questDict[stageNo] = new HashSet<uint>();
+                questDict[stageNo].Add(quest.QuestScheduleId);
             }
             else if (quest.QuestType == QuestType.World)
             {
-                if (!gWorldQuests.ContainsKey(quest.QuestAreaId))
-                {
-                    gWorldQuests[quest.QuestAreaId] = new HashSet<QuestId>();
-                }
-                gWorldQuests[quest.QuestAreaId].Add(quest.QuestId);
+                if (!worldQuests.ContainsKey(quest.QuestAreaId))
+                    worldQuests[quest.QuestAreaId] = new HashSet<QuestId>();
+                worldQuests[quest.QuestAreaId].Add(quest.QuestId);
             }
 
-            if (!gAdventureGuideCategories.ContainsKey(quest.AdventureGuideCategory))
-            {
-                gAdventureGuideCategories[quest.AdventureGuideCategory] = new HashSet<uint>();
-            }
-            gAdventureGuideCategories[quest.AdventureGuideCategory].Add(quest.QuestScheduleId);
+            if (!adventureGuideCategories.ContainsKey(quest.AdventureGuideCategory))
+                adventureGuideCategories[quest.AdventureGuideCategory] = new HashSet<uint>();
+            adventureGuideCategories[quest.AdventureGuideCategory].Add(quest.QuestScheduleId);
 
             // Build a ranking list for quests for area trials
             // TODO: This should probably be done in quest scripts, but who wants to rewrite 70+ quests?
             if (quest.AdventureGuideCategory == QuestAdventureGuideCategory.AreaTrialOrMission)
             {
-                if (!gAreaTrialRanks.ContainsKey(quest.QuestAreaId))
+                // Search all process states for a CheckAreaRank command rather than assuming
+                // it is always the very first command - JSON quests and scripted .csx quests
+                // serialize their process state lists differently, so .First() is unreliable.
+                var questData = quest.ToCDataQuestList(0);
+                uint requiredRank = 0;
+                QuestAreaId areaId = quest.QuestAreaId;
+                bool found = false;
+
+                foreach (var processState in questData.QuestProcessStateList)
                 {
-                    gAreaTrialRanks[quest.QuestAreaId] = new Dictionary<uint, uint>();
+                    foreach (var checkCmdGroup in processState.CheckCommandList)
+                    {
+                        foreach (var cmd in checkCmdGroup.ResultCommandList)
+                        {
+                            if (cmd.Command == (ushort)QuestCheckCommand.CheckAreaRank)
+                            {
+                                requiredRank = (uint)cmd.Param02;
+                                if (areaId == QuestAreaId.None)
+                                    areaId = (QuestAreaId)cmd.Param01;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found) break;
+                    }
+                    if (found) break;
                 }
 
-                // Nightmarish
-                var requiredRank = quest.ToCDataQuestList(0).QuestProcessStateList.First().CheckCommandList.First().ResultCommandList.First().Param02;
-                gAreaTrialRanks[quest.QuestAreaId][quest.QuestScheduleId] = (uint) requiredRank;
+                if (found)
+                {
+                    if (!areaTrialRanks.ContainsKey(areaId))
+                        areaTrialRanks[areaId] = new Dictionary<uint, uint>();
+                    areaTrialRanks[areaId][quest.QuestScheduleId] = requiredRank;
+                }
             }
         }
 
@@ -100,6 +144,86 @@ namespace Arrowgene.Ddon.GameServer.Characters
             {
                 AddQuestToCategory(quest);
             }
+        }
+
+        private static void ComputeSubstoryLookups(DdonGameServer server)
+        {
+            var substoryMissionMap = server.GameSettings.Get<Dictionary<QuestSubstoryGroupId, Dictionary<uint, List<QuestId>>>>("substory", "SubstoryMissionMap") ??
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_SERVER_CONFIG_ERROR);
+
+            gSubstoryLookup.Clear();
+            foreach (var (substoryGroupId, data) in substoryMissionMap)
+            {
+                foreach (var (seqNo, questIds) in data)
+                {
+                    foreach (var questId in questIds)
+                    {
+                        gSubstoryLookup[questId] = (substoryGroupId, seqNo);
+                    }
+                }
+            }
+            server.GameSettings.Set<bool>("substory", "RecomputeSubstoryLookups", false);
+        }
+
+        public static (QuestSubstoryGroupId SubstoryGroupId, uint SeqNo) GetSubstoryQuestProperties(DdonGameServer server, QuestId questId)
+        {
+            if (server.GameSettings.Get<bool>("substory", "RecomputeSubstoryLookups"))
+            {
+                ComputeSubstoryLookups(server);
+            }
+
+            if (!gSubstoryLookup.ContainsKey(questId))
+            {
+                return (QuestSubstoryGroupId.Invalid, 0);
+            }
+            return gSubstoryLookup[questId];
+        }
+
+        /// <summary>
+        /// Called after a substory quest completes. If all quests in the current sequence are done,
+        /// advances the sequence step (or marks the group complete). Persists to DB if changed.
+        /// </summary>
+        public static void AdvanceSubstoryProgress(DdonGameServer server, Character character, QuestId completedQuestId, DbConnection? connectionIn = null)
+        {
+            var props = GetSubstoryQuestProperties(server, completedQuestId);
+            if (props.SubstoryGroupId == QuestSubstoryGroupId.Invalid) return;
+
+            var substorySequenceSettings = server.GameSettings.Get<Dictionary<QuestSubstoryGroupId, List<uint>>>("substory", "SubstorySequence");
+            var substoryMissionMap = server.GameSettings.Get<Dictionary<QuestSubstoryGroupId, Dictionary<uint, List<QuestId>>>>("substory", "SubstoryMissionMap");
+            if (substorySequenceSettings == null || substoryMissionMap == null) return;
+            if (!substorySequenceSettings.ContainsKey(props.SubstoryGroupId)) return;
+
+            if (!character.SubstoryProgress.ContainsKey(props.SubstoryGroupId))
+            {
+                character.SubstoryProgress[props.SubstoryGroupId] = new SubstoryProgress
+                {
+                    SubstoryGroupId = props.SubstoryGroupId,
+                    SequenceStep = 0,
+                    IsComplete = false
+                };
+            }
+
+            var progress = character.SubstoryProgress[props.SubstoryGroupId];
+            if (progress.IsComplete) return;
+
+            var sequences = substorySequenceSettings[props.SubstoryGroupId];
+            if (progress.SequenceStep >= sequences.Count) return;
+
+            var currentSeqNo = sequences[progress.SequenceStep];
+            if (!substoryMissionMap[props.SubstoryGroupId].ContainsKey(currentSeqNo)) return;
+
+            // Check if every quest in the current sequence is now completed
+            var sequenceQuests = substoryMissionMap[props.SubstoryGroupId][currentSeqNo];
+            bool allDone = sequenceQuests.TrueForAll(qid => character.CompletedQuests.ContainsKey(qid));
+            if (!allDone) return;
+
+            progress.SequenceStep += 1;
+            if (progress.SequenceStep >= sequences.Count)
+            {
+                progress.IsComplete = true;
+            }
+
+            server.Database.UpsertSubstoryProgress(character.CharacterId, progress, connectionIn);
         }
 
         public static void LoadQuests(DdonGameServer server)
@@ -117,6 +241,59 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             LoadLightQuests(server);
+
+            ComputeSubstoryLookups(server);
+        }
+
+        public static void ReloadJsonQuests(DdonGameServer server)
+        {
+            Logger.Info($"Hotloading JSON quests...");
+
+            // Build entirely new index collections without touching live state.
+            // Scripted quests are preserved by copying them from a snapshot of the
+            // current live collections; JSON quests are discarded and rebuilt from
+            // the freshly loaded asset data.
+            var newQuests = new Dictionary<uint, Quest>();
+            var newVariantQuests = new Dictionary<QuestId, HashSet<uint>>();
+            var newQuestByStageNo = new Dictionary<QuestType, Dictionary<uint, HashSet<uint>>>();
+            var newWorldQuests = new Dictionary<QuestAreaId, HashSet<QuestId>>();
+            var newAdventureGuideCategories = new Dictionary<QuestAdventureGuideCategory, HashSet<uint>>();
+            var newAreaTrialRanks = new Dictionary<QuestAreaId, Dictionary<uint, uint>>();
+
+            // Snapshot current reference so we iterate a stable collection.
+            var currentQuests = gQuests;
+            foreach (var (scheduleId, quest) in currentQuests)
+            {
+                if (quest.QuestSource == QuestSource.Json)
+                    continue;
+                newQuests[scheduleId] = quest;
+                AddQuestToCollections(quest, newVariantQuests, newQuestByStageNo, newWorldQuests, newAdventureGuideCategories, newAreaTrialRanks);
+            }
+
+            foreach (var questAsset in server.AssetRepository.QuestAssets.Quests)
+            {
+                var quest = GenericQuest.FromAsset(server, questAsset);
+                newQuests[quest.QuestScheduleId] = quest;
+                if (quest.Enabled)
+                    AddQuestToCollections(quest, newVariantQuests, newQuestByStageNo, newWorldQuests, newAdventureGuideCategories, newAreaTrialRanks);
+            }
+
+            // Atomically swap all references under a lock to prevent two concurrent
+            // reloads from interleaving. Readers never acquire this lock; they are
+            // safe because swapping the reference (not mutating the dict) means any
+            // reader that already holds a reference to the old collection will
+            // finish iterating it without a "Collection was modified" exception.
+            lock (_reloadLock)
+            {
+                gQuests = newQuests;
+                gVariantQuests = newVariantQuests;
+                QuestByStageNo = newQuestByStageNo;
+                gWorldQuests = newWorldQuests;
+                gAdventureGuideCategories = newAdventureGuideCategories;
+                gAreaTrialRanks = newAreaTrialRanks;
+            }
+
+            Logger.Info($"JSON quest file reloaded. {server.AssetRepository.QuestAssets.Quests.Count} JSON quests total in memory.");
         }
 
         public static void LoadLightQuests(DdonGameServer server)
@@ -155,12 +332,8 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public static HashSet<QuestId> GetWorldQuestIdsByAreaId(QuestAreaId areaId)
         {
-            if (!gWorldQuests.ContainsKey(areaId))
-            {
-                return new HashSet<QuestId>();
-            }
-
-            return gWorldQuests[areaId];
+            var snapshot = gWorldQuests;
+            return snapshot.TryGetValue(areaId, out var ids) ? ids : new HashSet<QuestId>();
         }
 
         public static Quest GetQuestByBoardId(ulong boardId)
@@ -169,14 +342,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return GetQuestByScheduleId(questId);
         }
 
-        public static HashSet<uint> GetTutorialQuestsByStageNo(uint stageNo)
+        public static HashSet<uint> GetQuestByStageNo(QuestType questType, uint stageNo)
         {
-            if (!gTutorialQuests.ContainsKey(stageNo))
-            {
-                return new HashSet<uint>();
-            }
-
-            return gTutorialQuests[stageNo];
+            var snapshot = QuestByStageNo;
+            if (!snapshot.TryGetValue(questType, out var byStage))
+                return new();
+            return byStage.TryGetValue(stageNo, out var ids) ? ids : new();
         }
 
         public static bool IsVariantQuest(QuestId baseQuestId)
@@ -186,17 +357,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public static Quest GetQuestByScheduleId(uint questScheduleId)
         {
-            if (!gQuests.ContainsKey(questScheduleId))
-            {
-                if (!KnownBadQuestScheduleIds.Contains(questScheduleId) && !IsBoardQuest(questScheduleId))
-                {
-                    Logger.Error($"GetQuestByScheduleId: Invalid questScheduleId {questScheduleId}");
-                }
-
-                return null;
-            }
-
-            return gQuests[questScheduleId];
+            var snapshot = gQuests;
+            if (snapshot.TryGetValue(questScheduleId, out var quest))
+                return quest;
+            if (!KnownBadQuestScheduleIds.Contains(questScheduleId) && !IsBoardQuest(questScheduleId))
+                Logger.Error($"GetQuestByScheduleId: Invalid questScheduleId {questScheduleId}");
+            return null;
         }
 
         public static Quest GetQuestByQuestId(QuestId questId)
@@ -220,27 +386,22 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public static HashSet<uint> GetQuestScheduleIdsForQuestId(QuestId questId)
         {
-            if (gVariantQuests.ContainsKey(questId))
-            {
-                return gVariantQuests[questId];
-            }
-            return new HashSet<uint>();
+            var snapshot = gVariantQuests;
+            return snapshot.TryGetValue(questId, out var ids) ? ids : new HashSet<uint>();
         }
 
         public static Quest RollQuestForQuestId(QuestId questId)
         {
             var quests = GetQuestScheduleIdsForQuestId(questId);
             var questScheduleId = quests.ElementAt(Random.Shared.Next(0, quests.Count));
-            return gQuests[questScheduleId];
+            var snapshot = gQuests;
+            return snapshot.TryGetValue(questScheduleId, out var quest) ? quest : null;
         }
 
         public static HashSet<uint> GetQuestsByAdventureGuideCategory(QuestAdventureGuideCategory category)
         {
-            if (!gAdventureGuideCategories.ContainsKey(category))
-            {
-                return new();
-            }
-            return gAdventureGuideCategories[category].ToHashSet();
+            var snapshot = gAdventureGuideCategories;
+            return snapshot.TryGetValue(category, out var ids) ? ids.ToHashSet() : new();
         }
 
         public static bool IsQuestEnabled(uint questScheduleId)
@@ -259,6 +420,22 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return GetQuestStateManager(client, QuestManager.GetQuestByScheduleId(questScheduleId));
         }
 
+        public static bool IsClientAlignedForMainQuestProgress(DdonGameServer server, GameClient client, Quest quest, uint step, DbConnection? connectionIn = null)
+        {
+            if (quest.QuestType != QuestType.Main)
+            {
+                return true;
+            }
+
+            if (client.Character.HasQuestCompleted(quest.QuestId))
+            {
+                return false;
+            }
+
+            var progress = server.Database.GetQuestProgressByScheduleId(client.Character.CommonId, quest.QuestScheduleId, connectionIn);
+            return progress != null && (quest.SaveWorkAsStep || progress.Step == step);
+        }
+
         public static HashSet<uint> CollectQuestScheduleIds(GameClient client, StageLayoutId stageId)
         {
             var questScheduleIds = new HashSet<uint>();
@@ -275,18 +452,16 @@ namespace Arrowgene.Ddon.GameServer.Characters
         public static void PurgeUnstartedTutorialQuests(GameClient client)
         {
             var unstartedTutorialQuests = client.QuestState.GetActiveQuestScheduleIds()
-                .Where(x => QuestManager.GetQuestByScheduleId(x).QuestType == QuestType.Tutorial)
-                .Where(x => QuestManager.GetQuestStateManager(client, x).GetQuestState(x).State == QuestProgressState.Unknown)
                 .Select(x => QuestManager.GetQuestByScheduleId(x))
+                .Where(x => x != null && x.QuestType == QuestType.Tutorial)
+                .Where(x => {
+                    var mgr = QuestManager.GetQuestStateManager(client, x);
+                    return mgr != null && mgr.GetQuestState(x.QuestScheduleId)?.State == QuestProgressState.Unknown;
+                })
                 .ToList();
 
             foreach (var quest in unstartedTutorialQuests)
             {
-                if (quest == null)
-                {
-                    continue;
-                }
-
                 var questStateManager = QuestManager.GetQuestStateManager(client, quest);
                 if (questStateManager != null)
                 {
@@ -316,6 +491,16 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 return new();
             }
             return gAreaTrialRanks[areaId];
+        }
+
+        public static QuestAreaId GetAreaIdForTrial(uint questScheduleId)
+        {
+            foreach (var (areaId, rankings) in gAreaTrialRanks)
+            {
+                if (rankings.ContainsKey(questScheduleId))
+                    return areaId;
+            }
+            return QuestAreaId.None;
         }
 
         public static uint GetScheduleId(DdonGameServer server, QuestId questId, uint variantNumber)
@@ -2449,6 +2634,266 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
 
             /**
+             * @brief
+             */
+            public static CDataQuestCommand TalkNpcChoice(int stageNo, NpcId npcId, int choice, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.TalkNpcChoice, Param01 = stageNo, Param02 = (int) npcId, Param03 = choice, Param04 = param04 };
+            }
+
+            public static CDataQuestCommand OmSetTouchRadius(int stageNo, int groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.OmSetTouchRadius, Param01 = stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            public static CDataQuestCommand OmReleaseTouchRadius(int stageNo, int groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.OmReleaseTouchRadius, Param01 = stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            // Ghidra-discovered check commands (IDs 211–256)
+
+            /** @brief Returns bit 18 of the substory state word at ctx+0x5c+0x20c. */
+            public static CDataQuestCommand IsSubstoryStateBit18(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsSubstoryStateBit18, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Side-effect writer: reads bit 17 of ctx+0x5c+0x20c, inverts it, stores to DAT_021c06b8+0x263. No quest params. */
+            public static CDataQuestCommand StoreLinkageEnemyFlagGlobal(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.StoreLinkageEnemyFlagGlobal, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Sets byte +0x11 on an NPC object matching npcLookupId, stores storeVal at ctx+0x5c+0x24c, returns bit 18 of ctx+0x5c+0x220. */
+            public static CDataQuestCommand NpcPreTalkAndOrderUi(int stageNo, int npcId, int noOrderGroupSerial, int storeVal)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.NpcPreTalkAndOrderUi, Param01 = stageNo, Param02 = npcId, Param03 = noOrderGroupSerial, Param04 = storeVal };
+            }
+
+            /** @brief Checks if substory enemy's HP% >= hpRatePercent. */
+            public static CDataQuestCommand SubstoryEnemyHpNotLess(int substoryId, int hpRatePercent, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.SubstoryEnemyHpNotLess, Param01 = substoryId, Param02 = hpRatePercent, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if substory enemy's HP% < hpRatePercent. Inverse of SubstoryEnemyHpNotLess. */
+            public static CDataQuestCommand SubstoryEnemyHpLess(int substoryId, int hpRatePercent, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.SubstoryEnemyHpLess, Param01 = substoryId, Param02 = hpRatePercent, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if average HP% across all substory NPCs >= hpRatePercent. */
+            public static CDataQuestCommand SubstoryAvgEnemyHpNotLess(int param01, int hpRatePercent, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.SubstoryAvgEnemyHpNotLess, Param01 = param01, Param02 = hpRatePercent, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if average HP% across all substory NPCs < hpRatePercent. */
+            public static CDataQuestCommand SubstoryAvgEnemyHpLess(int param01, int hpRatePercent, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.SubstoryAvgEnemyHpLess, Param01 = param01, Param02 = hpRatePercent, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if an OM's behavior state enum matches behaviorState. */
+            public static CDataQuestCommand IsOmBehaviorState(uint stageNo, int groupNo, int setNo, int behaviorState)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsOmBehaviorState, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = behaviorState };
+            }
+
+            /** @brief Checks if a specific enemy group has spawned in a monster gathering spot. */
+            public static CDataQuestCommand MonsterGatheringSpotState(uint stageNo, int spotId, int spotState, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.MonsterGatheringSpotState, Param01 = (int)stageNo, Param02 = spotId, Param03 = spotState, Param04 = param04 };
+            }
+
+            /** @brief Checks if an OM has finished its animation. */
+            public static CDataQuestCommand OmEndAnimation(uint stageNo, int groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.OmEndAnimation, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            /** @brief Variant of OmEndAnimation without a marker. */
+            public static CDataQuestCommand OmEndAnimationNoMarker(uint stageNo, int groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.OmEndAnimationNoMarker, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            /** @brief Checks if a player has interacted with a quest-spawned OM and its animation has played out completely. */
+            public static CDataQuestCommand QuestOmEndAnimation(uint stageNo, int groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.QuestOmEndAnimation, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            /** @brief Variant of QuestOmEndAnimation (223) without quest markers. */
+            public static CDataQuestCommand QuestOmEndAnimationNoMarker(uint stageNo, int groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.QuestOmEndAnimationNoMarker, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            /** @brief Reward point check guarded on playerId. Checks flag at +0x274 (param03 < 0) or queues collection action. */
+            public static CDataQuestCommand IsRewardPointNotLess(int playerId, int rewardId, int expectedValue, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsRewardPointNotLess, Param01 = playerId, Param02 = rewardId, Param03 = expectedValue, Param04 = param04 };
+            }
+
+            /** @brief Checks if an NPC interaction with a specific choice/event has completed. */
+            public static CDataQuestCommand QuestTalkNpcRadius(uint stageNo, uint groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.QuestTalkNpcRadius, Param01 = (int)stageNo, Param02 = (int)groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            /** @brief Checks if the OM matching (stageNo, groupNo, setNo) is broken in the current phase. */
+            public static CDataQuestCommand IsOmBrokenInCurrentPhase(uint stageNo, int groupNo, int setNo, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsOmBrokenInCurrentPhase, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            /** @brief Places a radius marker on an enemy group; progresses when the player discovers the enemy. setNo=-1 matches any. Must be followed by a kill command. */
+            public static CDataQuestCommand IsEnemyFoundRadius(uint stageNo, int groupNo, int setNo = -1, int markerFlag = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsEnemyFoundRadius, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = markerFlag };
+            }
+
+            /** @brief No-marker, lock-guarded variant of IsEnemyFoundForOrderRadius. markerFlag always 0 internally. setNo=-1 matches any. */
+            public static CDataQuestCommand IsEnemyFoundForOrderRadius(uint stageNo, int groupNo, int setNo = -1, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsEnemyFoundForOrderRadius, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = param04 };
+            }
+
+            /** @brief Checks if player has an achievement from a given category. */
+            public static CDataQuestCommand HasAchievement(int categoryNo, int achievementId, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.HasAchievement, Param01 = categoryNo, Param02 = achievementId, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Returns bit 19 of the substory state word at ctx+0x5c+0x20c. */
+            public static CDataQuestCommand IsSubstoryStateBit19(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsSubstoryStateBit19, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if any party member has an item from the list at PTR_LAB_02141040[itemListIdx]. */
+            public static CDataQuestCommand IsPartyMemberHasItem(int itemListIdx, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsPartyMemberHasItem, Param01 = itemListIdx, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Returns bit 20 of the substory state word at ctx+0x5c+0x20c. */
+            public static CDataQuestCommand IsSubstoryStateBit20(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsSubstoryStateBit20, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Returns bit 21 of the substory state word at ctx+0x5c+0x20c. */
+            public static CDataQuestCommand IsSubstoryStateBit21(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsSubstoryStateBit21, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Returns bit 22 of the substory state word at ctx+0x5c+0x20c. */
+            public static CDataQuestCommand IsSubstoryStateBit22(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsSubstoryStateBit22, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Returns bit 23 of the substory state word at ctx+0x5c+0x20c. */
+            public static CDataQuestCommand IsSubstoryStateBit23(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsSubstoryStateBit23, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if an FSM NPC talk event is complete. Validates against the completed-talk-NPC list. */
+            public static CDataQuestCommand IsFsmNpcTalkComplete(int npcId, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsFsmNpcTalkComplete, Param01 = npcId, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if the substory clock is within [minHour, maxHour]. Min/max order does not matter. */
+            public static CDataQuestCommand IsSubstoryIngameHourInRange(int minHour, int maxHour, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsSubstoryIngameHourInRange, Param01 = minHour, Param02 = maxHour, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Kill-group completion check gated on content mode. Marker vs no-marker determined by this+0x82 at runtime. */
+            public static CDataQuestCommand IsKilledTargetEnemySetGroupMode15(int flagNo, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsKilledTargetEnemySetGroupMode15, Param01 = flagNo, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Identical to IsKilledTargetEnemySetGroupMode15; no-marker variant determined at runtime via this+0x82. */
+            public static CDataQuestCommand IsKilledTargetEnemySetGroupMode15NoMarker(int flagNo, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsKilledTargetEnemySetGroupMode15NoMarker, Param01 = flagNo, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if a contents timer (Timer List B) has elapsed past its stored boundary. */
+            public static CDataQuestCommand IsContentsTimerBElapsed(int timerNo, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsContentsTimerBElapsed, Param01 = timerNo, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if the quest clear count has reached a threshold. */
+            public static CDataQuestCommand IsQuestClearCountNotLess(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsQuestClearCountNotLess, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief S3-only: checks if the contents mode elapsed timer >= timeSec. */
+            public static CDataQuestCommand IsContentsModeTimerNotLess(int timeSec, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsContentsModeTimerNotLess, Param01 = timeSec, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Fire-once trigger: reads and clears a byte flag at DAT_021af4f4+0xEEA. Returns 1 if flag was set. */
+            public static CDataQuestCommand IsTriggerFlagSetAndClear(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsTriggerFlagSetAndClear, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Direct kill-group completion check (no content-mode guard). Checks flagNo against kill-group list entry+0x14. */
+            public static CDataQuestCommand IsKillGroupCompleteInRadius(int flagNo, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsKillGroupCompleteInRadius, Param01 = flagNo, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if a player has reached a chain number from a Chain Dungeon (Extreme Mission). */
+            public static CDataQuestCommand ChainNotLess(int chainNo, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.ChainNotLess, Param01 = chainNo, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if a Timer List A entry's state value equals zero. Content-mode gated. */
+            public static CDataQuestCommand IsContentsTimerAZero(int timerNo, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsContentsTimerAZero, Param01 = timerNo, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Wild Hunt system: checks if a target enemy in the zone-entry list has been killed. markerFlag is passed to the kill checker. */
+            public static CDataQuestCommand IsWildHuntTargetEnemyKilled(int zoneLinkageId, int param02 = 0, int param03 = 0, int markerFlag = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsWildHuntTargetEnemyKilled, Param01 = zoneLinkageId, Param02 = param02, Param03 = param03, Param04 = markerFlag };
+            }
+
+            /** @brief Checks if contents/dungeon mode is active (area context mode 0xc, byte at +0x3b non-zero). */
+            public static CDataQuestCommand IsContentsModeStateFlag(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsContentsModeStateFlag, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if a quest layout's HP-lost% <= hpLostPct (i.e., layout HP >= threshold). */
+            public static CDataQuestCommand IsQuestLayoutHpNotGreater(uint stageNo, int groupNo, int setNo, int hpLostPct)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsQuestLayoutHpNotGreater, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = hpLostPct };
+            }
+
+            /** @brief Checks if a player has cleared a specific Extreme Mission/Grand Mission/Chain Dungeon (category 9 quests). questId matched against entry+4. */
+            public static CDataQuestCommand IsExtremeMissionClear(int questId, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestCheckCommand.IsExtremeMissionClear, Param01 = questId, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /**
              * @brief Used when command is unknown but seen in packet captures.
              */
             public static CDataQuestCommand Unknown(ushort commandId, int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
@@ -3372,6 +3817,170 @@ namespace Arrowgene.Ddon.GameServer.Characters
             public static CDataQuestCommand LinkageEnemyFlagOff(uint stageNo, int groupNo, int setNo, int flagId)
             {
                 return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.LinkageEnemyFlagOff, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = flagId };
+            }
+
+            // Ghidra-discovered result commands (IDs 99–134)
+
+            /** @brief Adds a signed delta to the current substory progress value. Baked context, no subid params. */
+            public static CDataQuestCommand SubstoryProgress(int delta, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SubstoryProgress, Param01 = delta, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Finds a substory entry by substoryId and adds progressDelta to its progress, clamped to [0,100]. */
+            public static CDataQuestCommand AddSubstoryProgress(int substoryId, int progressDelta, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.AddSubstoryProgress, Param01 = substoryId, Param02 = progressDelta, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Triggers a substory event sequence. Checks mode; if mode==0xb fires substory FSM transition. */
+            public static CDataQuestCommand TriggerSubstoryEvent(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.TriggerSubstoryEvent, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Triggers display of the substory UI element. No command params used; value read from baked quest context. */
+            public static CDataQuestCommand EnableSubstoryUIElement(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.EnableSubstoryUIElement, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Disables the substory UI element (+0x44 reference cleared). */
+            public static CDataQuestCommand DisableSubstoryUIElement(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.DisableSubstoryUIElement, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Redirects NPC talk for a substory context via FUN_009ce930(param01, param02). */
+            public static CDataQuestCommand QstTalkChgFsm(NpcId npcId, int msgNo = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.QstTalkChgFsm, Param01 = (int) npcId, Param02 = msgNo, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Sets invincibility on a substory enemy group. param02=1 sets invincible. */
+            public static CDataQuestCommand SetSubstoryEnemyInvincible(int enemyGroupFlag, int invincible, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetSubstoryEnemyInvincible, Param01 = enemyGroupFlag, Param02 = invincible, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Adds an NPC to the FSM talk NPC list. Validates FSM mode first. */
+            public static CDataQuestCommand AddFsmTalkNpc(int npcId, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.AddFsmTalkNpc, Param01 = npcId, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Displays an achievement banner from a given category. Only category 6 (Great Purpose) has banners to display. */
+            public static CDataQuestCommand AchievementBanner(int categoryNo, int bannerNo, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.AchievementBanner, Param01 = categoryNo, Param02 = bannerNo, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Enables substory element variant B. Sets +0x4c reference via FUN_00598860. */
+            public static CDataQuestCommand EnableSubstoryElementB(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.EnableSubstoryElementB, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Disables substory element variant B. Clears +0x4c reference via FUN_005986A0. */
+            public static CDataQuestCommand DisableSubstoryElementB(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.DisableSubstoryElementB, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Enables a world-management barrier via FUN_00c19920 and sets bit 0 of the barrier flag. */
+            public static CDataQuestCommand SetWorldManageBarrierOn(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetWorldManageBarrierOn, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Disables the world-management barrier via FUN_00c1baa0 and clears the barrier flag bit. */
+            public static CDataQuestCommand SetWorldManageBarrierOff(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetWorldManageBarrierOff, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Schedules an FSM NPC behavior by calling FUN_009d1a60(scheduleId). scheduleId = param04. */
+            public static CDataQuestCommand SetFsmNpcSchedule(int param01 = 0, int param02 = 0, int param03 = 0, int scheduleId = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetFsmNpcSchedule, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = scheduleId };
+            }
+
+            /** @brief Sets the level of a quest enemy group (type 3) via FUN_00bc0670. Phase-gated. */
+            public static CDataQuestCommand SetQuestEnemyLevel(uint stageNo, int groupNo, int setNo, int level)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestEnemyLevel, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = level };
+            }
+
+            /** @brief Area-aware variant of SetQuestEnemyLevel using FUN_00a41890. */
+            public static CDataQuestCommand SetQuestEnemyLevelEx(uint stageNo, int groupNo, int setNo, int level)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestEnemyLevelEx, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = level };
+            }
+
+            /** @brief Sets the danger tier (bits 23-21) of a quest enemy group via FUN_00bc0720. Phase-gated. */
+            public static CDataQuestCommand SetQuestEnemyTierUp(uint stageNo, int groupNo, int setNo, int tier)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestEnemyTierUp, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = tier };
+            }
+
+            /** @brief Area-aware variant of SetQuestEnemyTierUp. */
+            public static CDataQuestCommand SetQuestEnemyTierUpEx(uint stageNo, int groupNo, int setNo, int tier)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestEnemyTierUpEx, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = tier };
+            }
+
+            /** @brief Sets a body/stance pose (1-6) on a quest NPC/enemy via FUN_00bbf670. */
+            public static CDataQuestCommand SetQuestOmMontageFix(uint stageNo, int groupNo, int setNo, int montagueNo)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestOmMontageFix, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = montagueNo };
+            }
+
+            /** @brief Area-aware variant of AddResultCmdSetQuestOmMontageFix. */
+            public static CDataQuestCommand SetQuestOmMontageFixEx(uint stageNo, int groupNo, int setNo, int montagueNo)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestOmMontageFixEx, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = montagueNo };
+            }
+
+            /** @brief Sets the level of a layout enemy (type 2) by queuing it into a critical-section-guarded buffer. */
+            public static CDataQuestCommand SetQuestLayoutEnemyLevel(uint stageNo, int groupNo, int setNo, int level)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestLayoutEnemyLevel, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = level };
+            }
+
+            /** @brief Removes an FSM NPC entry from the process list via FUN_0063dda0(param01). */
+            public static CDataQuestCommand RemoveFsmNpcFromSchedule(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.RemoveFsmNpcFromSchedule, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Controls enemy expedition state. mode=2: starts; mode=3: iterates party members and fires expedition signal. */
+            public static CDataQuestCommand SetEnemyExpeditionState(int mode, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetEnemyExpeditionState, Param01 = mode, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Fires a substory ending sequence: calls FUN_00be9960, FUN_00b85670, and sends messages 0x25f/0x260. */
+            public static CDataQuestCommand TriggerSubstoryEndSequence(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.TriggerSubstoryEndSequence, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Checks if a pawn has OM state == 4 and a specific animation condition via FUN_0087dc50. */
+            public static CDataQuestCommand CheckSubstoryCondition(int param01 = 0, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.CheckSubstoryCondition, Param01 = param01, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Controls pawn expedition. mode=1: starts; mode=2: stops. */
+            public static CDataQuestCommand SetPawnExpeditionFlag(int mode, int param02 = 0, int param03 = 0, int param04 = 0)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetPawnExpeditionFlag, Param01 = mode, Param02 = param02, Param03 = param03, Param04 = param04 };
+            }
+
+            /** @brief Sets a body/pose mode on a layout enemy (type 2) via FUN_005be380(poseId). */
+            public static CDataQuestCommand SetQuestLayoutEnemyBodyPose(uint stageNo, int groupNo, int setNo, int poseId)
+            {
+                return new CDataQuestCommand() { Command = (ushort)QuestResultCommand.SetQuestLayoutEnemyBodyPose, Param01 = (int)stageNo, Param02 = groupNo, Param03 = setNo, Param04 = poseId };
             }
 
             /**

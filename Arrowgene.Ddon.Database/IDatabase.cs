@@ -1,18 +1,17 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
 using Arrowgene.Ddon.Database.Model;
 using Arrowgene.Ddon.Database.Sql.Core.Migration;
 using Arrowgene.Ddon.Shared.Entity;
-using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.BattleContent;
 using Arrowgene.Ddon.Shared.Model.Clan;
 using Arrowgene.Ddon.Shared.Model.Quest;
+using Arrowgene.Ddon.Shared.Model.Rpc;
 using Arrowgene.Ddon.Shared.Model.Scheduler;
+using System;
+using System.Collections.Generic;
+using System.Data.Common;
 
 namespace Arrowgene.Ddon.Database;
 
@@ -65,12 +64,20 @@ public interface IDatabase
     DatabaseMeta GetMeta();
 
     // Account
-    Account? CreateAccount(string name, string mail, string hash);
+    Account? CreateAccount(string name, string mail, string hash, string mailToken);
     Account SelectAccountById(int accountId);
     Account? SelectAccountByName(string accountName);
+    Account? SelectAccountByEmail(string email);
     Account? SelectAccountByLoginToken(string loginToken);
+    Account? SelectAccountByPasswordTokenAndName(string accountName, string passwordToken);
+    Account? SelectAccountByMailTokenAndName(string accountName, string mailToken);
+    Account? SelectAccountByEmailAndName(string accountName, string email);
+
     bool UpdateAccount(Account account);
     bool DeleteAccount(int accountId);
+    bool CheckBannedIp(string addr);
+    bool InsertBannedIp(string addr);
+    bool DeleteBannedIp(string addr);
     Storages SelectAllStoragesByCharacterId(uint characterId);
 
     // CharacterCommon
@@ -94,6 +101,7 @@ public interface IDatabase
     bool UpdateCharacterBinaryData(uint characterId, byte[] data);
     void CreateItems(DbConnection conn, Character character);
     void CreateListItems(DbConnection conn, Character character, StorageType storageType, List<(uint ItemId, uint Amount)> itemList);
+    Dictionary<ushort, List<RpcCharacterData>> SelectCharacterTrackingList(DbConnection? connectionIn = null);
 
     CDataCharacterSearchParam SelectCharacterNameById(uint characterId);
 
@@ -249,6 +257,8 @@ public interface IDatabase
     bool UpdateCommunicationShortcut(uint characterId, uint oldPageNo, uint oldButtonNo, CDataCommunicationShortCut updatedCommunicationShortcut, DbConnection? connectionIn = null);
 
     bool DeleteCommunicationShortcut(uint characterId, uint pageNo, uint buttonNo);
+    int UpsertCommunicationSet(uint characterId, List<CDataCharacterMsgSet> messages, DbConnection? connectionIn = null);
+    List<CDataCharacterMsgSet> SelectCommunicationSet(uint characterId, DbConnection? connectionIn = null);
 
     // GameToken
     bool SetToken(GameToken token);
@@ -277,6 +287,11 @@ public interface IDatabase
     ContactListEntity SelectContactListById(uint id);
     List<(ContactListEntity, CDataCharacterListElement)> SelectFullContactListByCharacterId(uint characterId, DbConnection? connectionIn = null);
 
+    HashSet<uint> SelectBlackList(uint characterId, DbConnection? connectionIn = null);
+    bool DeleteBlackList(uint characterId, uint targetId, DbConnection? connectionIn = null);
+    bool InsertBlackList(uint characterId, uint targetId, DbConnection? connectionIn = null);
+    List<CDataCommunityCharacterBaseInfo> SelectBlackListFull(uint characterId, DbConnection? connectionIn = null);
+
     // Dragon Force Augmentation
     bool InsertIfNotExistsDragonForceAugmentation(uint commonId, uint elementId, uint pageNo, uint groupNo, uint indexNo, DbConnection? connectionIn = null);
 
@@ -289,11 +304,11 @@ public interface IDatabase
     CDataOrbGainExtendParam SelectOrbGainExtendParam(uint commonId, DbConnection? connectionIn = null);
 
     // Bazaar
-    ulong InsertBazaarExhibition(BazaarExhibition exhibition);
-    int UpdateBazaarExhibiton(BazaarExhibition exhibition);
-    int DeleteBazaarExhibition(ulong bazaarId);
-    BazaarExhibition SelectBazaarExhibitionByBazaarId(ulong bazaarId);
-    List<BazaarExhibition> FetchCharacterBazaarExhibitions(uint characterId);
+    ulong InsertBazaarExhibition(BazaarExhibition exhibition, DbConnection? connectionIn = null);
+    int UpdateBazaarExhibiton(BazaarExhibition exhibition, DbConnection? connectionIn = null);
+    int DeleteBazaarExhibition(ulong bazaarId, DbConnection? connectionIn = null);
+    BazaarExhibition SelectBazaarExhibitionByBazaarId(ulong bazaarId, DbConnection? connectionIn = null);
+    List<BazaarExhibition> FetchCharacterBazaarExhibitions(uint characterId, DbConnection? connectionIn = null);
 
     List<BazaarExhibition> SelectActiveBazaarExhibitionsByItemIdExcludingOwn(uint itemId, uint excludedCharacterId, DbConnection? connectionIn = null);
 
@@ -301,8 +316,20 @@ public interface IDatabase
 
     // Rewards
     bool InsertBoxRewardItems(uint commonId, QuestBoxRewards rewards, DbConnection? connectionIn = null);
+    bool InsertBoxRewardItem(uint uniqRewardId, CDataRewardBoxItem reward, DbConnection? connectionIn = null);
     bool DeleteBoxRewardItem(uint commonId, uint uniqId, DbConnection? connectionIn = null);
     List<QuestBoxRewards> SelectBoxRewardItems(uint commonId, DbConnection? connectionIn = null);
+    bool InsertStagedItem(StagedRewardItem item, DbConnection? connectionIn = null);
+    bool InsertStagedItemCrest(StagedRewardItemCrest crest, DbConnection? connectionIn = null);
+    StagedRewardItem? SelectStagedItem(string uid, DbConnection? connectionIn = null);
+    bool DeleteStagedItem(string uid, DbConnection? connectionIn = null);
+
+    // Quest Period First Clear
+    bool InsertQuestPeriodFirstClear(uint commonId, QuestType questType, uint questScheduleId, DbConnection? connectionIn = null);
+    bool HasQuestPeriodFirstClear(uint commonId, QuestType questType, uint questScheduleId, DbConnection? connectionIn = null);
+    bool DeleteQuestPeriodFirstClears(QuestType questType, DbConnection? connectionIn = null);
+    Dictionary<QuestType, HashSet<uint>> SelectQuestPeriodFirstClears(uint commonId, DbConnection? connectionIn = null);
+    HashSet<uint> SelectQuestPeriodFirstClears(uint commonId, QuestType questType, DbConnection? connectionIn = null);
 
     // Completed Quests
     List<CompletedQuest> GetCompletedQuestsByType(uint characterCommonId, QuestType questType, DbConnection? connectionIn = null);
@@ -317,8 +344,14 @@ public interface IDatabase
     bool InsertQuestProgress(uint characterCommonId, uint questScheduleId, QuestType questType, uint step, DbConnection? connectionIn = null);
     bool UpdateQuestProgress(uint characterCommonId, uint questScheduleId, QuestType questType, uint step, DbConnection? connectionIn = null);
     bool RemoveQuestProgress(uint characterCommonId, uint questScheduleId, QuestType questType, DbConnection? connectionIn = null);
+    bool RemoveAllQuestProgressByType(QuestType questType, DbConnection? connectionIn = null);
     List<QuestProgress> GetQuestProgressByType(uint characterCommonId, QuestType questType, DbConnection? connectionIn = null);
     QuestProgress GetQuestProgressByScheduleId(uint characterCommonId, uint questScheduleId, DbConnection? connectionIn = null);
+
+    // Quest Delivery Progress
+    bool UpsertQuestDeliveryProgress(uint characterCommonId, uint questScheduleId, uint itemId, uint amountDelivered, DbConnection? connectionIn = null);
+    bool DeleteQuestDeliveryProgress(uint characterCommonId, uint questScheduleId, DbConnection? connectionIn = null);
+    List<QuestDeliveryProgress> GetAllQuestDeliveryProgress(uint characterCommonId, DbConnection? connectionIn = null);
 
     // Quest Priority
     bool InsertPriorityQuest(uint characterCommonId, uint questScheduleId, DbConnection? connectionIn = null);
@@ -328,10 +361,10 @@ public interface IDatabase
     // System mail
     long InsertSystemMailAttachment(SystemMailAttachment attachment);
     long InsertSystemMailAttachment(DbConnection connection, SystemMailAttachment attachment);
-    long InsertSystemMailMessage(SystemMailMessage message);
-    long InsertSystemMailMessage(DbConnection connection, SystemMailMessage message);
-    List<SystemMailMessage> SelectSystemMailMessages(uint characterId);
-    SystemMailMessage SelectSystemMailMessage(ulong messageId);
+    long InsertSystemMailMessage(MailMessage message);
+    long InsertSystemMailMessage(DbConnection connection, MailMessage message);
+    List<MailMessage> SelectSystemMailMessages(uint characterId);
+    MailMessage SelectSystemMailMessage(ulong messageId);
     bool UpdateSystemMailMessageState(ulong messageId, MailState messageState);
     bool DeleteSystemMailMessage(ulong messageId);
 
@@ -345,7 +378,27 @@ public interface IDatabase
     );
 
     bool DeleteSystemMailAttachment(ulong messageId);
-    
+
+    // Player Mail
+    long InsertMailMessage(MailMessage message, DbConnection? connectionIn = null);
+    List<MailMessage> SelectMailMessages(uint characterId, DbConnection? connectionIn = null);
+    MailMessage SelectMailMessage(ulong messageId, DbConnection? connectionIn = null);
+    bool UpdateMailMessageState(ulong messageId, MailState messageState, DbConnection? connectionIn = null);
+    bool DeleteMailMessage(ulong messageId, DbConnection? connectionIn = null);
+
+    // Group Chat
+    ulong SelectNextGroupChatId(DbConnection? connectionIn = null);
+    (ulong Id, string Name) SelectGroupChatId(uint characterId, DbConnection? connectionIn = null);
+    (ulong Id, string Name) SelectGroupChatName(string groupName, DbConnection? connectionIn = null);
+    List<CDataCharacterListElement> SelectGroupChatMembers(ulong groupId, DbConnection? connectionIn = null);
+    bool InsertGroupChatMember(uint characterId, ulong groupId, DbConnection? connectionIn = null);
+    bool DeleteGroupChatMember(uint characterId, DbConnection? connectionIn = null);
+    bool DisbandGroupChat(ulong groupId, DbConnection? connectionIn = null);
+    long InsertGroupChatGroup(string groupName, string groupDesc, DbConnection? connectionIn = null);
+    int PruneGroupChatGroups(DbConnection? connectionIn = null);
+    Dictionary<string, (ulong Id, uint Count, uint CountTotal, string Desc)> SelectGroupChatGroups(DbConnection? connectionIn = null);
+
+
     // Play points
     bool ReplaceCharacterPlayPointData(
         uint id,
@@ -356,8 +409,9 @@ public interface IDatabase
     bool UpdateCharacterPlayPointData(uint id, CDataJobPlayPoint updatedCharacterPlayPointData, DbConnection? connectionIn = null);
 
     // Stamps
-    public bool InsertCharacterStampData(uint id, CharacterStampBonus stampData);
-    public bool UpdateCharacterStampData(uint id, CharacterStampBonus stampData);
+    public bool InsertCharacterStampData(uint id, CharacterStampBonus stampData, DbConnection? connectionIn = null);
+    public bool UpdateCharacterStampData(uint id, CharacterStampBonus stampData, DbConnection? connectionIn = null);
+    public int ResetCharacterStamps(DbConnection? connectionIn = null);
 
     // Crests
     bool InsertCrest(
@@ -449,7 +503,7 @@ public interface IDatabase
 
     // Scheduler
     Dictionary<TaskType, SchedulerTaskEntry> SelectAllTaskEntries();
-    bool UpdateScheduleInfo(TaskType type, long timestamp);
+    bool UpsertScheduleInfo(TaskType type, long timestamp);
 
     // Area Rank
     bool InsertAreaRank(uint characterId, AreaRank areaRank, DbConnection? connectionIn = null);
@@ -462,6 +516,10 @@ public interface IDatabase
     Dictionary<QuestAreaId, List<CDataRewardItemInfo>> SelectAreaRankSupply(uint characterId, DbConnection? connectionIn = null);
     List<CDataRewardItemInfo> SelectAreaRankSupply(uint characterId, QuestAreaId areaId, DbConnection? connectionIn = null);
     bool DeleteAreaRankSupply(DbConnection? connectionIn = null);
+
+    // Substory Progress
+    Dictionary<QuestSubstoryGroupId, SubstoryProgress> SelectSubstoryProgress(uint characterId, DbConnection? connectionIn = null);
+    bool UpsertSubstoryProgress(uint characterId, SubstoryProgress progress, DbConnection? connectionIn = null);
 
     // Rank Boards
     bool InsertRankRecord(uint characterId, uint questId, long score, DbConnection? connectionIn = null);
@@ -552,6 +610,8 @@ public interface IDatabase
     bool InsertLightQuestRecord(LightQuestRecord lightQuestRecord, DbConnection? connectionIn = null);
     List<LightQuestRecord> SelectLightQuestRecords(DbConnection? connectionIn = null);
     bool DeleteLightQuestRecord(uint scheduleId, DbConnection? connectionIn = null);
+    int DeleteLightQuestCompletion(DbConnection? connectionIn = null);
+
 
     // Pawn Favorites
     bool InsertPawnFavorite(uint characterId, uint pawnId, DbConnection? connectionIn = null);
@@ -562,6 +622,7 @@ public interface IDatabase
     bool ReplacePawnCraftProgress(CraftProgress craftProgress, DbConnection? connectionIn = null);
     bool InsertPawnCraftProgress(CraftProgress craftProgress, DbConnection? connectionIn = null);
     bool UpdatePawnCraftProgress(CraftProgress craftProgress, DbConnection? connectionIn = null);
+    bool UpdatePawnCraftFinishTime(uint craftCharacterId, uint craftLeadPawnId, long finishAt, DbConnection? connectionIn = null);
     bool DeletePawnCraftProgress(uint craftCharacterId, uint craftLeadPawnId, DbConnection? connectionIn = null);
     CraftProgress? SelectPawnCraftProgress(uint craftCharacterId, uint craftLeadPawnId, DbConnection? connectionIn = null);
 

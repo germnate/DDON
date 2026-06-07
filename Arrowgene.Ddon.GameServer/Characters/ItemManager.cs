@@ -1,6 +1,5 @@
 #nullable enable
 using Arrowgene.Ddon.Database;
-using Arrowgene.Ddon.Database.Model;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
@@ -91,6 +90,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
             {ItemId.ExperienceCrystal0, (PointType.ExperiencePoints, 10)},
             {ItemId.ExperienceCrystal1, (PointType.ExperiencePoints, 10000)},
             {ItemId.ExperienceCrystal2, (PointType.ExperiencePoints, 63000)},
+            {ItemId.JobPoint, (PointType.JobPoints, 10)}
         };
 
         private static readonly Dictionary<ItemId, uint> AbilityItems = new Dictionary<ItemId, uint>()
@@ -215,17 +215,17 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return ItemIdWalletTypeAndQuantity[itemId];
         }
 
-        public (PacketQueue queue, bool IsSpecial) HandleSpecialItem(GameClient client, S2CItemUpdateCharacterItemNtc ntc, ItemId item, uint count, bool isOnUse, DbConnection? connectionIn = null)
+
+        public (PacketQueue queue, bool IsSpecial) HandleSpecialItem(GameClient client, S2CItemUpdateCharacterItemNtc ntc, ItemId item, uint count, SpecialItemMode mode = SpecialItemMode.OnAcquire, DbConnection? connectionIn = null)
         {
             var itemInfo = _Server.AssetRepository.ClientItemInfos[item];
-            if (ItemIdWalletTypeAndQuantity.ContainsKey(item))
+            if (ItemIdWalletTypeAndQuantity.TryGetValue(item, out (WalletType Type, uint Quantity) value))
             {
-                var walletTypeAndQuantity = ItemIdWalletTypeAndQuantity[item];
-                uint totalQuantityToAdd = walletTypeAndQuantity.Quantity * count;
+                var (walletType, quantity) = value;
+                uint totalQuantityToAdd = quantity * count;
 
-                
                 ntc.UpdateWalletList.Add(
-                    _Server.WalletManager.AddToWallet(client.Character, walletTypeAndQuantity.Type, totalQuantityToAdd, 0, connectionIn
+                    _Server.WalletManager.AddToWallet(client.Character, walletType, totalQuantityToAdd, 0, connectionIn
                 ));
                 return (new(), true);
             }
@@ -233,11 +233,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
             {
                 return (_Server.AreaRankManager.AddAreaPoint(client, pointArea, (10 * count, 0), connectionIn), true);
             }
-            else if (isOnUse && PointItems.ContainsKey(item))
+            else if ((mode == SpecialItemMode.OnUse || mode == SpecialItemMode.OnSell) && PointItems.TryGetValue(item, out (PointType PointType, uint Quantity) pointItem))
             {
                 PacketQueue queue = new();
-                var pointItem = PointItems[item];
-
                 var gainedPoints = (pointItem.Quantity * count, 0U);
                 switch (pointItem.PointType)
                 {
@@ -246,6 +244,9 @@ namespace Arrowgene.Ddon.GameServer.Characters
                         break;
                     case PointType.PlayPoints:
                         queue.Enqueue(client, _Server.PPManager.AddPlayPoint(client, gainedPoints, connectionIn: connectionIn));
+                        break;
+                    case PointType.JobPoints:
+                        queue.AddRange(_Server.ExpManager.AddJp(client, client.Character, gainedPoints.Item1, RewardSource.Enemy, connectionIn: connectionIn));
                         break;
                 }
                 return (queue, true);
@@ -273,7 +274,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         public PacketQueue GatherItem(GameClient client, S2CItemUpdateCharacterItemNtc ntc, InstancedGatheringItem gatheringItem, uint pickedGatherItems, DbConnection? connectionIn = null)
         {
-            var (queue, isSpecial) = HandleSpecialItem(client, ntc, gatheringItem.ItemId, pickedGatherItems, false, connectionIn);
+            var (queue, isSpecial) = HandleSpecialItem(client, ntc, gatheringItem.ItemId, pickedGatherItems, SpecialItemMode.OnAcquire, connectionIn);
             if (!isSpecial)
             {
                 List<CDataItemUpdateResult> results = AddItem(_Server, client.Character, true, (uint)gatheringItem.ItemId, pickedGatherItems, connectionIn: connectionIn);
@@ -550,8 +551,31 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return freeSlots >= slotsRequired;
         }
 
+        private bool CanAddItem(Character character, StorageType destinationStorageType, uint itemId, long num, uint stackLimit, byte plusvalue = 0)
+        {
+            Storage storage = character.Storage.GetStorage(destinationStorageType);
+
+            long existingAvailableStackSlots = storage.Items
+                .Where(x => x != null && x.Item1.ItemId == itemId && x.Item1.PlusValue == plusvalue && x.Item2 < stackLimit)
+                .Sum(x => stackLimit - x!.Item2);
+
+            if (num <= existingAvailableStackSlots)
+            {
+                return true;
+            }
+
+            long requiredFreeStacks = num - existingAvailableStackSlots;
+            uint slotsRequired = (uint)Math.Ceiling(((double)requiredFreeStacks) / stackLimit);
+            return storage.EmptySlots() >= slotsRequired;
+        }
+
         private List<CDataItemUpdateResult> DoAddItem(IDatabase database, Character character, StorageType destinationStorageType, uint itemId, uint num, uint stackLimit = UInt32.MaxValue, byte plusvalue = 0, DbConnection? connectionIn = null)
         {
+            if (!CanAddItem(character, destinationStorageType, itemId, num, stackLimit, plusvalue))
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_STORAGE_OVERFLOW);
+            }
+
             // Add to existing stacks or make new stacks until there are no more items to add
             // The stack limit is specified by the stackLimit arg
             List<CDataItemUpdateResult> results = new List<CDataItemUpdateResult>();
@@ -629,6 +653,11 @@ namespace Arrowgene.Ddon.GameServer.Characters
         // TODO: Maybe make this more smoothly a part of the existing DoAddItem.
         private List<CDataItemUpdateResult> DoAddItemNoStack(IDatabase database, Character character, StorageType destinationStorageType, uint itemId, uint num, byte plusvalue = 0, DbConnection? connectionIn = null)
         {
+            if (character.Storage.GetStorage(destinationStorageType).EmptySlots() == 0)
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_STORAGE_OVERFLOW);
+            }
+
             // Add to existing stacks or make new stacks until there are no more items to add
             // The stack limit is specified by the stackLimit arg
             List<CDataItemUpdateResult> results = new List<CDataItemUpdateResult>();
@@ -704,6 +733,60 @@ namespace Arrowgene.Ddon.GameServer.Characters
         {
             storage.SetItem(item, num, slotNo);
             server.Database.UpdateStorageItem(character.ContentCharacterId, storage.Type, slotNo, num, item, connectionIn);
+        }
+
+        public CDataItemUpdateResult? MaterializeStagedItem(DdonServer<GameClient> server, Character character, string uid, StorageType destinationStorage, DbConnection? connectionIn = null)
+        {
+            var staged = server.Database.SelectStagedItem(uid, connectionIn);
+            if (staged == null) return null;
+
+            var item = new Item
+            {
+                UId = staged.Uid,
+                ItemId = staged.ItemId,
+                Color = (byte)staged.Color,
+                PlusValue = (byte)staged.PlusValue,
+                SafetySetting = (byte)staged.SafetySetting,
+                EquipPoints = 0,
+                EquipElementParamList = new List<CDataEquipElementParam>(),
+                AddStatusParamList = new List<CDataAddStatusParam>(),
+                EquipStatParamList = new List<CDataEquipStatParam>(),
+            };
+
+            Storage storage = character.Storage.GetStorage(destinationStorage);
+            ushort slotNo = storage.AddItem(item, staged.Num);
+
+            server.Database.InsertStorageItem(character.ContentCharacterId, destinationStorage, slotNo, staged.Num, item, connectionIn);
+
+            foreach (var crest in staged.Crests)
+            {
+                server.Database.InsertCrest(character.CommonId, item.UId, crest.Slot, crest.CrestId, crest.Level, connectionIn);
+                item.EquipElementParamList.Add(new CDataEquipElementParam
+                {
+                    SlotNo = (byte)crest.Slot,
+                    CrestId = crest.CrestId,
+                    Add = (ushort) crest.Level,
+                });
+            }
+
+            var result = new CDataItemUpdateResult();
+            result.ItemList.ItemUId = item.UId;
+            result.ItemList.ItemId = item.ItemId;
+            result.ItemList.ItemNum = staged.Num;
+            result.ItemList.SafetySetting = item.SafetySetting;
+            result.ItemList.StorageType = destinationStorage;
+            result.ItemList.SlotNo = slotNo;
+            result.ItemList.Color = item.Color;
+            result.ItemList.PlusValue = item.PlusValue;
+            result.ItemList.Bind = false;
+            result.ItemList.EquipPoint = item.EquipPoints;
+            result.ItemList.EquipCharacterID = 0;
+            result.ItemList.EquipPawnID = 0;
+            result.ItemList.EquipElementParamList = item.EquipElementParamList;
+            result.ItemList.AddStatusParamList = item.AddStatusParamList;
+            result.ItemList.EquipStatParamList = item.EquipStatParamList;
+            result.UpdateItemNum = (int)staged.Num;
+            return result;
         }
 
         private void InsertItem(DdonServer<GameClient> server, Character character, Item item, Storage storage, ushort slotNo, uint num, DbConnection? connectionIn = null)
@@ -1160,6 +1243,13 @@ namespace Arrowgene.Ddon.GameServer.Characters
         }
 
         #endregion
+    }
+
+    public enum SpecialItemMode
+    {
+        OnAcquire,
+        OnUse,
+        OnSell,
     }
 
     [Serializable]

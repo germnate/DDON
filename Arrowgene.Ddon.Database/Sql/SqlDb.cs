@@ -1,9 +1,5 @@
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
 using Arrowgene.Ddon.Database.Model;
 using Arrowgene.Ddon.Database.Sql.Core.Migration;
 using Arrowgene.Ddon.Shared.Entity;
@@ -12,7 +8,12 @@ using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.BattleContent;
 using Arrowgene.Ddon.Shared.Model.Clan;
 using Arrowgene.Ddon.Shared.Model.Quest;
+using Arrowgene.Ddon.Shared.Model.Rpc;
 using Arrowgene.Ddon.Shared.Model.Scheduler;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 
 namespace Arrowgene.Ddon.Database.Sql;
 
@@ -199,6 +200,11 @@ public abstract class SqlDb : IDatabase
         AddParameter(command, name, (int)value, DbType.Int32);
     }
 
+    public virtual void AddParameter(DbCommand command, string name, uint? value)
+    {
+        AddParameter(command, name, value, DbType.Int32);
+    }
+
     public virtual void AddParameter(DbCommand command, string name, byte[] value)
     {
         AddParameter(command, name, value, DbType.Binary);
@@ -207,6 +213,32 @@ public abstract class SqlDb : IDatabase
     public virtual void AddParameter(DbCommand command, string name, bool value)
     {
         AddParameter(command, name, value, DbType.Boolean);
+    }
+
+    /// <summary>
+    /// Prepares an array of string values for use in a batch WHERE clause.
+    /// Returns the SQL fragment to embed (e.g. "IN (@uids_0, @uids_1)") and an action
+    /// that binds the parameters to a command. Call-site usage:
+    /// <code>
+    ///   var (clause, bind) = PrepareArrayParameter("uids", values);
+    ///   string sql = $"SELECT ... WHERE \"col\" {clause}";
+    ///   ExecuteReader(conn, sql, cmd => bind(cmd), reader => { ... });
+    /// </code>
+    /// Postgres overrides this to use the more efficient "= ANY(@uids)" array syntax.
+    /// </summary>
+    public virtual (string SqlFragment, Action<DbCommand> Bind) PrepareArrayParameter(string paramName, string[] values)
+    {
+        string[] names = new string[values.Length];
+        for (int i = 0; i < values.Length; i++)
+            names[i] = $"@{paramName}_{i}";
+        return (
+            $"IN ({string.Join(", ", names)})",
+            cmd =>
+            {
+                for (int i = 0; i < values.Length; i++)
+                    AddParameter(cmd, names[i], values[i]);
+            }
+        );
     }
 
     public virtual string? GetStringNullable(DbDataReader reader, int ordinal)
@@ -299,12 +331,19 @@ public abstract class SqlDb : IDatabase
     public abstract bool CreateMeta(DatabaseMeta meta);
 
     public abstract DatabaseMeta GetMeta();
-    public abstract Account? CreateAccount(string name, string mail, string hash);
+    public abstract Account? CreateAccount(string name, string mail, string hash, string mailToken);
     public abstract Account SelectAccountById(int accountId);
     public abstract Account? SelectAccountByName(string accountName);
+    public abstract Account? SelectAccountByEmail(string email);
     public abstract Account? SelectAccountByLoginToken(string loginToken);
+    public abstract Account? SelectAccountByPasswordTokenAndName(string accountName, string passwordToken);
+    public abstract Account? SelectAccountByMailTokenAndName(string accountName, string mailToken);
+    public abstract Account? SelectAccountByEmailAndName(string accountName, string email);
     public abstract bool UpdateAccount(Account account);
     public abstract bool DeleteAccount(int accountId);
+    public abstract bool CheckBannedIp(string addr);
+    public abstract bool InsertBannedIp(string addr);
+    public abstract bool DeleteBannedIp(string addr);
     public abstract Storages SelectAllStoragesByCharacterId(uint characterId);
     public abstract bool UpdateCharacterCommonBaseInfo(CharacterCommon common, DbConnection? connectionIn = null);
     public abstract bool UpdateEditInfo(CharacterCommon character);
@@ -321,6 +360,7 @@ public abstract class SqlDb : IDatabase
     public abstract bool UpdateMyPawnSlot(uint characterId, uint num, DbConnection? connectionIn = null);
     public abstract bool UpdateRentalPawnSlot(uint characterId, uint num, DbConnection? connectionIn = null);
     public abstract bool UpdateCharacterBinaryData(uint characterId, byte[] data);
+    public abstract Dictionary<ushort, List<RpcCharacterData>> SelectCharacterTrackingList(DbConnection? connectionIn = null);
     public abstract void CreateItems(DbConnection conn, Character character);
     public abstract void CreateListItems(DbConnection conn, Character character, StorageType storageType, List<(uint ItemId, uint Amount)> itemList);
     public abstract CDataCharacterSearchParam SelectCharacterNameById(uint characterId);
@@ -345,6 +385,7 @@ public abstract class SqlDb : IDatabase
     public abstract bool ReplacePawnCraftProgress(CraftProgress craftProgress, DbConnection? connectionIn = null);
     public abstract bool InsertPawnCraftProgress(CraftProgress craftProgress, DbConnection? connectionIn = null);
     public abstract bool UpdatePawnCraftProgress(CraftProgress craftProgress, DbConnection? connectionIn = null);
+    public abstract bool UpdatePawnCraftFinishTime(uint craftCharacterId, uint craftLeadPawnId, long finishAt, DbConnection? connectionIn = null);
     public abstract bool DeletePawnCraftProgress(uint craftCharacterId, uint craftLeadPawnId, DbConnection? connectionIn = null);
     public abstract CraftProgress? SelectPawnCraftProgress(uint craftCharacterId, uint craftLeadPawnId, DbConnection? connectionIn = null);
     public abstract bool InsertSpSkill(uint pawnId, JobId job, CDataSpSkill spSkill);
@@ -413,6 +454,9 @@ public abstract class SqlDb : IDatabase
     public abstract bool ReplaceCommunicationShortcut(uint characterId, CDataCommunicationShortCut communicationShortcut, DbConnection? connectionIn = null);
     public abstract bool UpdateCommunicationShortcut(uint characterId, uint oldPageNo, uint oldButtonNo, CDataCommunicationShortCut updatedCommunicationShortcut, DbConnection? connectionIn = null);
     public abstract bool DeleteCommunicationShortcut(uint characterId, uint pageNo, uint buttonNo);
+    public abstract int UpsertCommunicationSet(uint characterId, List<CDataCharacterMsgSet> messages, DbConnection? connectionIn = null);
+    public abstract List<CDataCharacterMsgSet> SelectCommunicationSet(uint characterId, DbConnection? connectionIn = null);
+
     public abstract bool SetToken(GameToken token);
     public abstract GameToken SelectTokenByAccountId(int accountId);
     public abstract GameToken SelectToken(string tokenStr);
@@ -437,21 +481,37 @@ public abstract class SqlDb : IDatabase
     public abstract ContactListEntity SelectContactsByCharacterId(uint characterId1, uint characterId2);
     public abstract ContactListEntity SelectContactListById(uint id);
     public abstract List<(ContactListEntity, CDataCharacterListElement)> SelectFullContactListByCharacterId(uint characterId, DbConnection? connectionIn = null);
+
+    public abstract HashSet<uint> SelectBlackList(uint characterId, DbConnection? connectionIn = null);
+    public abstract bool DeleteBlackList(uint characterId, uint targetId, DbConnection? connectionIn = null);
+    public abstract bool InsertBlackList(uint characterId, uint targetId, DbConnection? connectionIn = null);
+    public abstract List<CDataCommunityCharacterBaseInfo> SelectBlackListFull(uint characterId, DbConnection? connectionIn = null);
+
     public abstract bool InsertIfNotExistsDragonForceAugmentation(uint commonId, uint elementId, uint pageNo, uint groupNo, uint indexNo, DbConnection? connectionIn = null);
     public abstract List<CDataReleaseOrbElement> SelectOrbReleaseElementFromDragonForceAugmentation(uint commonId, DbConnection? connectionIn = null);
     public abstract bool InsertGainExtendParam(uint commonId, CDataOrbGainExtendParam Param);
     public abstract bool UpdateOrbGainExtendParam(uint commonId, CDataOrbGainExtendParam param, DbConnection? connectionIn = null);
     public abstract CDataOrbGainExtendParam SelectOrbGainExtendParam(uint commonId, DbConnection? connectionIn = null);
-    public abstract ulong InsertBazaarExhibition(BazaarExhibition exhibition);
-    public abstract int UpdateBazaarExhibiton(BazaarExhibition exhibition);
-    public abstract int DeleteBazaarExhibition(ulong bazaarId);
-    public abstract BazaarExhibition SelectBazaarExhibitionByBazaarId(ulong bazaarId);
-    public abstract List<BazaarExhibition> FetchCharacterBazaarExhibitions(uint characterId);
+    public abstract ulong InsertBazaarExhibition(BazaarExhibition exhibition, DbConnection? connectionIn = null);
+    public abstract int UpdateBazaarExhibiton(BazaarExhibition exhibition, DbConnection? connectionIn = null);
+    public abstract int DeleteBazaarExhibition(ulong bazaarId, DbConnection? connectionIn = null);
+    public abstract BazaarExhibition SelectBazaarExhibitionByBazaarId(ulong bazaarId, DbConnection? connectionIn = null);
+    public abstract List<BazaarExhibition> FetchCharacterBazaarExhibitions(uint characterId, DbConnection? connectionIn = null);
     public abstract List<BazaarExhibition> SelectActiveBazaarExhibitionsByItemIdExcludingOwn(uint itemId, uint excludedCharacterId, DbConnection? connectionIn = null);
     public abstract List<BazaarExhibition> SelectActiveBazaarExhibitionsByItemIdsExcludingOwn(List<uint> itemIds, uint excludedCharacterId, DbConnection? connectionIn = null);
     public abstract bool InsertBoxRewardItems(uint commonId, QuestBoxRewards rewards, DbConnection? connectionIn = null);
+    public abstract bool InsertBoxRewardItem(uint uniqRewardId, CDataRewardBoxItem reward, DbConnection? connectionIn = null);
     public abstract bool DeleteBoxRewardItem(uint commonId, uint uniqId, DbConnection? connectionIn = null);
     public abstract List<QuestBoxRewards> SelectBoxRewardItems(uint commonId, DbConnection? connectionIn = null);
+    public abstract bool InsertStagedItem(StagedRewardItem item, DbConnection? connectionIn = null);
+    public abstract bool InsertStagedItemCrest(StagedRewardItemCrest crest, DbConnection? connectionIn = null);
+    public abstract StagedRewardItem? SelectStagedItem(string uid, DbConnection? connectionIn = null);
+    public abstract bool DeleteStagedItem(string uid, DbConnection? connectionIn = null);
+    public abstract bool InsertQuestPeriodFirstClear(uint commonId, QuestType questType, uint questScheduleId, DbConnection? connectionIn = null);
+    public abstract bool HasQuestPeriodFirstClear(uint commonId, QuestType questType, uint questScheduleId, DbConnection? connectionIn = null);
+    public abstract bool DeleteQuestPeriodFirstClears(QuestType questType, DbConnection? connectionIn = null);
+    public abstract Dictionary<QuestType, HashSet<uint>> SelectQuestPeriodFirstClears(uint commonId, DbConnection? connectionIn = null);
+    public abstract HashSet<uint> SelectQuestPeriodFirstClears(uint commonId, QuestType questType, DbConnection? connectionIn = null);
     public abstract List<CompletedQuest> GetCompletedQuestsByType(uint characterCommonId, QuestType questType, DbConnection? connectionIn = null);
     public abstract CompletedQuest GetCompletedQuestsById(uint characterCommonId, QuestId questId, DbConnection? connectionIn = null);
     public abstract bool InsertCompletedQuest(uint characterCommonId, QuestId questId, QuestType questType, DbConnection? connectionIn = null);
@@ -459,26 +519,46 @@ public abstract class SqlDb : IDatabase
     public abstract bool InsertQuestProgress(uint characterCommonId, uint questScheduleId, QuestType questType, uint step, DbConnection? connectionIn = null);
     public abstract bool UpdateQuestProgress(uint characterCommonId, uint questScheduleId, QuestType questType, uint step, DbConnection? connectionIn = null);
     public abstract bool RemoveQuestProgress(uint characterCommonId, uint questScheduleId, QuestType questType, DbConnection? connectionIn = null);
+    public abstract bool RemoveAllQuestProgressByType(QuestType questType, DbConnection? connectionIn = null);
     public abstract List<QuestProgress> GetQuestProgressByType(uint characterCommonId, QuestType questType, DbConnection? connectionIn = null);
     public abstract QuestProgress GetQuestProgressByScheduleId(uint characterCommonId, uint questScheduleId, DbConnection? connectionIn = null);
+    public abstract bool UpsertQuestDeliveryProgress(uint characterCommonId, uint questScheduleId, uint itemId, uint amountDelivered, DbConnection? connectionIn = null);
+    public abstract bool DeleteQuestDeliveryProgress(uint characterCommonId, uint questScheduleId, DbConnection? connectionIn = null);
+    public abstract List<QuestDeliveryProgress> GetAllQuestDeliveryProgress(uint characterCommonId, DbConnection? connectionIn = null);
     public abstract bool InsertPriorityQuest(uint characterCommonId, uint questScheduleId, DbConnection? connectionIn = null);
     public abstract List<uint> GetPriorityQuestScheduleIds(uint characterCommonId, DbConnection? connectionIn = null);
     public abstract bool DeletePriorityQuest(uint characterCommonId, uint questScheduleId, DbConnection? connectionIn = null);
     public abstract long InsertSystemMailAttachment(SystemMailAttachment attachment);
     public abstract long InsertSystemMailAttachment(DbConnection connection, SystemMailAttachment attachment);
-    public abstract long InsertSystemMailMessage(SystemMailMessage message);
-    public abstract long InsertSystemMailMessage(DbConnection connection, SystemMailMessage message);
-    public abstract List<SystemMailMessage> SelectSystemMailMessages(uint characterId);
-    public abstract SystemMailMessage SelectSystemMailMessage(ulong messageId);
+    public abstract long InsertSystemMailMessage(MailMessage message);
+    public abstract long InsertSystemMailMessage(DbConnection connection, MailMessage message);
+    public abstract List<MailMessage> SelectSystemMailMessages(uint characterId);
+    public abstract MailMessage SelectSystemMailMessage(ulong messageId);
     public abstract bool UpdateSystemMailMessageState(ulong messageId, MailState messageState);
     public abstract bool DeleteSystemMailMessage(ulong messageId);
     public abstract List<SystemMailAttachment> SelectAttachmentsForSystemMail(ulong messageId);
     public abstract bool UpdateSystemMailAttachmentReceivedStatus(ulong messageId, ulong attachmentId, bool isReceived);
     public abstract bool DeleteSystemMailAttachment(ulong messageId);
+    public abstract long InsertMailMessage(MailMessage message, DbConnection? connectionIn = null);
+    public abstract List<MailMessage> SelectMailMessages(uint characterId, DbConnection? connectionIn = null);
+    public abstract MailMessage SelectMailMessage(ulong messageId, DbConnection? connectionIn = null);
+    public abstract bool UpdateMailMessageState(ulong messageId, MailState messageState, DbConnection? connectionIn = null);
+    public abstract bool DeleteMailMessage(ulong messageId, DbConnection? connectionIn = null);
+    public abstract ulong SelectNextGroupChatId(DbConnection? connectionIn = null);
+    public abstract (ulong Id, string Name) SelectGroupChatId(uint characterId, DbConnection? connectionIn = null);
+    public abstract (ulong Id, string Name) SelectGroupChatName(string groupName, DbConnection? connectionIn = null);
+    public abstract List<CDataCharacterListElement> SelectGroupChatMembers(ulong groupId, DbConnection? connectionIn = null);
+    public abstract bool InsertGroupChatMember(uint characterId, ulong groupId, DbConnection? connectionIn = null);
+    public abstract bool DeleteGroupChatMember(uint characterId, DbConnection? connectionIn = null);
+    public abstract bool DisbandGroupChat(ulong groupId, DbConnection? connectionIn = null);
+    public abstract long InsertGroupChatGroup(string groupName, string groupDesc, DbConnection? connectionIn = null);
+    public abstract int PruneGroupChatGroups(DbConnection? connectionIn = null);
+    public abstract Dictionary<string, (ulong Id, uint Count, uint CountTotal, string Desc)> SelectGroupChatGroups(DbConnection? connectionIn = null);
     public abstract bool ReplaceCharacterPlayPointData(uint id, CDataJobPlayPoint updatedCharacterPlayPointData, DbConnection? connectionIn = null);
     public abstract bool UpdateCharacterPlayPointData(uint id, CDataJobPlayPoint updatedCharacterPlayPointData, DbConnection? connectionIn = null);
-    public abstract bool InsertCharacterStampData(uint id, CharacterStampBonus stampData);
-    public abstract bool UpdateCharacterStampData(uint id, CharacterStampBonus stampData);
+    public abstract bool InsertCharacterStampData(uint id, CharacterStampBonus stampData, DbConnection? connectionIn = null);
+    public abstract bool UpdateCharacterStampData(uint id, CharacterStampBonus stampData, DbConnection? connectionIn = null);
+    public abstract int ResetCharacterStamps(DbConnection? connectionIn = null);
     public abstract bool InsertCrest(uint characterCommonId, string itemUId, uint slot, uint crestId, uint crestAmount, DbConnection? connectionIn = null);
     public abstract bool UpdateCrest(uint characterCommonId, string itemUId, uint slot, uint crestId, uint crestAmount, DbConnection? ConnectionIn = null);
     public abstract bool RemoveCrest(uint characterCommonId, string itemUId, uint slot, DbConnection? connectionIn = null);
@@ -525,7 +605,7 @@ public abstract class SqlDb : IDatabase
     public abstract HashSet<uint> GetEpitaphClaimedWeeklyRewards(uint characterId, DbConnection? connectionIn = null);
     public abstract void DeleteWeeklyEpitaphClaimedRewards(DbConnection? connectionIn = null);
     public abstract Dictionary<TaskType, SchedulerTaskEntry> SelectAllTaskEntries();
-    public abstract bool UpdateScheduleInfo(TaskType type, long timestamp);
+    public abstract bool UpsertScheduleInfo(TaskType type, long timestamp);
     public abstract bool InsertAreaRank(uint characterId, AreaRank areaRank, DbConnection? connectionIn = null);
     public abstract bool UpdateAreaRank(uint characterId, AreaRank areaRank, DbConnection? connectionIn = null);
     public abstract Dictionary<QuestAreaId, AreaRank> SelectAreaRank(uint characterId, DbConnection? connectionIn = null);
@@ -536,6 +616,11 @@ public abstract class SqlDb : IDatabase
     public abstract Dictionary<QuestAreaId, List<CDataRewardItemInfo>> SelectAreaRankSupply(uint characterId, DbConnection? connectionIn = null);
     public abstract List<CDataRewardItemInfo> SelectAreaRankSupply(uint characterId, QuestAreaId areaId, DbConnection? connectionIn = null);
     public abstract bool DeleteAreaRankSupply(DbConnection? connectionIn = null);
+
+    // Substory Progress
+    public abstract Dictionary<QuestSubstoryGroupId, SubstoryProgress> SelectSubstoryProgress(uint characterId, DbConnection? connectionIn = null);
+    public abstract bool UpsertSubstoryProgress(uint characterId, SubstoryProgress progress, DbConnection? connectionIn = null);
+
     public abstract bool InsertRankRecord(uint characterId, uint questId, long score, DbConnection? connectionIn = null);
     public abstract List<uint> SelectUsedRankingBoardQuests(DbConnection? connectionIn = null);
     public abstract List<CDataRankingData> SelectRankingDataByCharacterId(uint characterId, uint questId, uint limit = 1000, DbConnection? connectionIn = null);
@@ -604,6 +689,8 @@ public abstract class SqlDb : IDatabase
     public abstract bool InsertLightQuestRecord(LightQuestRecord lightQuestRecord, DbConnection? connectionIn = null);
     public abstract List<LightQuestRecord> SelectLightQuestRecords(DbConnection? connectionIn = null);
     public abstract bool DeleteLightQuestRecord(uint scheduleId, DbConnection? connectionIn = null);
+    public abstract int DeleteLightQuestCompletion(DbConnection? connectionIn = null);
+
 
     public abstract bool SetMeta(DatabaseMeta meta);
 

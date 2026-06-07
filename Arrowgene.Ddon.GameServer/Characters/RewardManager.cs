@@ -25,7 +25,17 @@ namespace Arrowgene.Ddon.GameServer.Characters
         public bool AddQuestRewards(GameClient client, Quest quest, DbConnection? connectionIn = null)
         {
             var rewards = quest.GenerateBoxRewards();
+            return AddQuestRewards(client, rewards, connectionIn);
+        }
 
+        public bool AddQuestRewards(GameClient client, Quest quest, QuestBoxRewardFlags rewardFlags, DbConnection? connectionIn = null)
+        {
+            var rewards = quest.GenerateBoxRewards(rewardFlags);
+            return AddQuestRewards(client, rewards, connectionIn);
+        }
+
+        private bool AddQuestRewards(GameClient client, QuestBoxRewards rewards, DbConnection? connectionIn = null)
+        {
             var currentRewards = GetQuestBoxRewards(client, connectionIn);
             if (currentRewards.Count >= Server.GameSettings.GameServerSettings.RewardBoxMax)
             {
@@ -35,14 +45,57 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return Server.Database.InsertBoxRewardItems(client.Character.CommonId, rewards, connectionIn);
         }
 
+        public bool AddRepeatClearQuestRewards(GameClient client, Quest quest, DbConnection? connectionIn = null)
+        {
+            var rewards = quest.GenerateRepeatClearBoxRewards();
+
+            return AddQuestRewards(client, rewards, connectionIn);
+        }
+
+        public bool AddAutoRepeatClearQuestRewards(GameClient client, Quest quest, DbConnection? connectionIn = null)
+        {
+            var rewards = quest.GenerateAutoRepeatClearBoxRewards();
+            if (rewards.NumRandomRewards == 0)
+            {
+                return true;
+            }
+
+            return AddQuestRewards(client, rewards, connectionIn);
+        }
+
         public List<QuestBoxRewards> GetQuestBoxRewards(GameClient client, DbConnection? connectionIn = null)
         {
-            return Server.Database.SelectBoxRewardItems(client.Character.CommonId, connectionIn);
+            var rewards = Server.Database.SelectBoxRewardItems(client.Character.CommonId, connectionIn);
+            MaterializeLegacyRewardBoxItems(rewards, connectionIn);
+            return rewards;
         }
 
         public bool DeleteQuestBoxReward(GameClient client, uint uniqId, DbConnection? connectionIn = null)
         {
             return Server.Database.DeleteBoxRewardItem(client.Character.CommonId, uniqId, connectionIn);
+        }
+
+        private void MaterializeLegacyRewardBoxItems(List<QuestBoxRewards> boxRewards, DbConnection? connectionIn = null)
+        {
+            foreach (var boxReward in boxRewards)
+            {
+                if (boxReward.RewardItemList.Count > 0)
+                {
+                    continue;
+                }
+
+                var rewardItems = Quest.AsCDataRewardBoxItems(boxReward);
+                if (rewardItems.Count == 0)
+                {
+                    continue;
+                }
+
+                boxReward.RewardItemList = rewardItems;
+                foreach (var rewardItem in rewardItems)
+                {
+                    Server.Database.InsertBoxRewardItem(boxReward.UniqRewardId, rewardItem, connectionIn);
+                }
+            }
         }
 
         public PacketQueue UnlockEM4Skills(GameClient client, DbConnection? connectionIn = null)

@@ -22,7 +22,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             {
                 LayoutId = request.LayoutId,
                 PosId = request.PosId,
-                State = SoulOrdealOmState.RewardReceived
+                State = SeasonDungeonOmState.RewardReceived
             });
 
             S2CItemUpdateCharacterItemNtc updateCharacterItemNtc = new S2CItemUpdateCharacterItemNtc()

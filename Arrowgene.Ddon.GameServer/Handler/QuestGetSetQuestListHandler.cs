@@ -3,9 +3,11 @@ using Arrowgene.Ddon.GameServer.Quests;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
+using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -19,8 +21,6 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         public override S2CQuestGetSetQuestListRes Handle(GameClient client, C2SQuestGetSetQuestListReq request)
         {
-            // client.Send(GameFull.Dump_132);
-
             client.Character.AreaId = request.DistributeId;
 
             S2CQuestGetSetQuestListRes res = new S2CQuestGetSetQuestListRes()
@@ -28,19 +28,71 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 DistributeId = request.DistributeId
             };
 
-            // Remove all world quests which have no progress made
+            // If shared QuestState is empty and this client is the leader, reload their quest
+            // progress from DB into shared state.
+            if (client.Party.Leader?.Client == client && client.Party.QuestState.GetActiveQuestScheduleIds().Count == 0)
+            {
+                var progress = Server.Database.GetQuestProgressByType(client.Character.CommonId, QuestType.All);
+                var deliveryProgressByQuest = Server.Database.GetAllQuestDeliveryProgress(client.Character.CommonId)
+                    .GroupBy(x => x.QuestScheduleId)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+                foreach (var questProgress in progress)
+                {
+                    var quest = QuestManager.GetQuestByScheduleId(questProgress.QuestScheduleId);
+                    if (quest is null) continue;
+                    QuestStateManager questStateManager = QuestManager.GetQuestStateManager(client, quest);
+                    questStateManager.AddNewQuest(questProgress.QuestScheduleId, questProgress.Step);
+
+                    if (deliveryProgressByQuest.TryGetValue(questProgress.QuestScheduleId, out var deliveryItems))
+                    {
+                        foreach (var dp in deliveryItems)
+                            questStateManager.RestoreDeliveryProgress(questProgress.QuestScheduleId, (ItemId)dp.ItemId, dp.AmountDelivered);
+                    }
+                }
+                Logger.Info(client, $"[QuestGetSetQuestList] Reloaded quest state for promoted leader {client.Character.CharacterId}");
+            }
+
+            // Remove all world quests which have no progress made.
             client.Party.QuestState.RemoveInactiveWorldQuests();
 
-            if (QuestManager.HasWorldQuestAreaReleased(client.Character, request.DistributeId))
-            {
-                /**
-                 * World quests get added here instead of QuestGetWorldManageQuestListHandler because
-                 * "World Manage Quests" are different from "World Quests". World manage quests appear
-                 * to control the state of the game world (doors, paths, gates, etc.). World quests
-                 * are random fetch, deliver and kill type quests.
-                 */
+            // Build the NTC, mutating path
+            S2CQuestGetSetQuestListNtc ntc = BuildQuestListNtc(client, request.DistributeId, mutating: true);
+            res.SetQuestList = ntc.SetQuestList;
 
-                // Populate state for all quests currently in progress by the player
+            // Only broadcast to all if the requesting client is the leader.
+            // Non-leader area entry should not overwrite other members' displayed quest state.
+            if (client.Party.Leader?.Client == client)
+            {
+                client.Party.SendToAll(ntc);
+            }
+            else
+            {
+                client.Send(ntc);
+            }
+
+            // Resync the client's delivery UI with any partial deliveries already in memory.
+            uint charId = client.Character.CharacterId;
+            foreach (var deliveryNtc in client.QuestState.GetRestoredDeliveryNtcs(charId))
+                client.Send(deliveryNtc);
+            foreach (var deliveryNtc in client.Party.QuestState.GetRestoredDeliveryNtcs(charId))
+                client.Send(deliveryNtc);
+
+            return res;
+        }
+
+        public static S2CQuestGetSetQuestListNtc BuildQuestListNtc(GameClient client, QuestAreaId areaId, bool mutating = false)
+        {
+            var leaderCharacter = client.Party.Leader?.Client?.Character;
+
+            var ntc = new S2CQuestGetSetQuestListNtc()
+            {
+                DistributeId = areaId,
+                SelectCharacterId = leaderCharacter?.CharacterId ?? client.Character.CharacterId,
+                SetQuestList = new List<CDataSetQuestList>()
+            };
+
+            if (QuestManager.HasWorldQuestAreaReleased(client.Character, areaId))
+            {
                 foreach (var questScheduleId in client.Party.QuestState.GetActiveQuestScheduleIds())
                 {
                     Quest quest = client.Party.QuestState.GetQuest(questScheduleId);
@@ -49,12 +101,12 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         continue;
                     }
 
-                    CompletedQuest questStats = client.Party.Leader?.Client.Character.CompletedQuests.GetValueOrDefault(quest.QuestId);
                     QuestState questState = client.Party.QuestState.GetQuestState(quest);
-                    res.SetQuestList.Add(quest.ToCDataSetQuestList(questState?.Step ?? 0, questStats?.ClearCount ?? 0));
+                    uint clearCount = leaderCharacter?.GetQuestPeriodFirstClears(quest.QuestType).Contains(quest.QuestScheduleId) == true ? 1u : 0u;
+                    ntc.SetQuestList.Add(quest.ToCDataSetQuestList(questState?.Step ?? 0, clearCount));
                 }
 
-                foreach (var questScheduleId in client.Party.QuestState.AreaQuests(request.DistributeId))
+                foreach (var questScheduleId in client.Party.QuestState.AreaQuests(areaId))
                 {
                     Quest quest = QuestManager.GetQuestByScheduleId(questScheduleId);
 
@@ -62,38 +114,36 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         || client.Party.QuestState.IsQuestActive(questScheduleId)
                         || client.Party.QuestState.IsCompletedWorldQuest(questScheduleId))
                     {
-                        // Skip quests already populated or completed
                         continue;
                     }
 
-                    CompletedQuest questStats = client.Party.Leader?.Client.Character.CompletedQuests.GetValueOrDefault(quest.QuestId);
-                    res.SetQuestList.Add(quest.ToCDataSetQuestList(0, questStats?.ClearCount ?? 0));
-                    client.Party.QuestState.AddNewQuest(quest, 0);
+                    uint clearCount = leaderCharacter?.GetQuestPeriodFirstClears(quest.QuestType).Contains(quest.QuestScheduleId) == true ? 1u : 0u;
+                    ntc.SetQuestList.Add(quest.ToCDataSetQuestList(0, clearCount));
+
+                    if (mutating)
+                    {
+                        client.Party.QuestState.AddNewQuest(quest, 0);
+                        // Enemy requests arrive before the quest list, so loaded groups may have generic enemies. Reset them.
+                        quest.ResetEnemiesForStage(client, client.Character.Stage, onlyLoaded: true);
+                    }
                 }
             }
 
-            // Add Debug Quest
             var debugQuest = QuestManager.GetQuestByQuestId((QuestId)70000001);
-            res.SetQuestList.Add(new CDataSetQuestList()
+            if (debugQuest != null)
             {
-                Detail = new CDataSetQuestDetail()
+                ntc.SetQuestList.Add(new CDataSetQuestList()
                 {
-                    IsDiscovery = false,
-                    ClearCount = 0
-                },
-                Param = debugQuest.ToCDataQuestList(0),
-            });
+                    Detail = new CDataSetQuestDetail()
+                    {
+                        IsDiscovery = false,
+                        ClearCount = 0
+                    },
+                    Param = debugQuest.ToCDataQuestList(0),
+                });
+            }
 
-            S2CQuestGetSetQuestListNtc ntc = new S2CQuestGetSetQuestListNtc()
-            {
-                DistributeId = request.DistributeId,
-                SelectCharacterId = client.Party.Leader.Client.Character.CharacterId,
-                SetQuestList = res.SetQuestList
-            };
-
-            client.Party.SendToAll(ntc);
-
-            return res;
+            return ntc;
         }
     }
 }

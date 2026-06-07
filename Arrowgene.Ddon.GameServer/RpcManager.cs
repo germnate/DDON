@@ -286,30 +286,16 @@ namespace Arrowgene.Ddon.GameServer
     
         public void AnnouncePlayerList(Character exception = null)
         {
-            List<RpcCharacterData> rpcCharacterDatas = new List<RpcCharacterData>();
-            foreach (var character in Server.ClientLookup.GetAllCharacter())
-            {
-                if (character == exception) continue;
-                rpcCharacterDatas.Add(new(character));
-            }
-            Logger.Info($"Announcing player list for channel {Server.Id} with {rpcCharacterDatas.Count} players over RPC.");
-            AnnounceOthers("internal/command", RpcInternalCommand.NotifyPlayerList, rpcCharacterDatas);
-            CharacterTrackingMap[(ushort) Server.Id] = new RpcTrackingMap((ushort) Server.Id, rpcCharacterDatas);
+            UpdatePlayerList(exception);
+            AnnounceOthers("internal/command", RpcInternalCommand.NotifyPlayerList, null);
         }
 
-        public void ReceivePlayerList(ushort channelId, DateTime timestamp, List<RpcCharacterData> characterDatas)
+        public void UpdatePlayerList(Character exception = null)
         {
-            Logger.Info($"Recieving player list from channel {channelId} with {characterDatas.Count} players.");
-            if (CharacterTrackingMap.ContainsKey(channelId))
+            var trackingData = Server.Database.SelectCharacterTrackingList();
+            foreach (var item in trackingData)
             {
-                if (timestamp > CharacterTrackingMap[channelId].TimeStamp)
-                {
-                    CharacterTrackingMap[channelId] = new RpcTrackingMap(channelId, characterDatas, timestamp);
-                }
-                else
-                {
-                    Logger.Error($"Out of date character list discarded for channel ID {channelId}");
-                }
+                CharacterTrackingMap[item.Key] = new RpcTrackingMap(item.Key, [.. item.Value.Where(x => x.CharacterId != exception?.CharacterId)]);
             }
         }
 
@@ -336,7 +322,7 @@ namespace Arrowgene.Ddon.GameServer
         {
             RpcChatData chatData = new RpcChatData()
             {
-                HandleId = 0,
+                HandleId = (uint)client.Account.State,
                 Type = LobbyChatMsgType.Shout,
                 MessageFlavor = chatResponse.MessageFlavor,
                 PhrasesCategory = chatResponse.PhrasesCategory,
@@ -378,7 +364,7 @@ namespace Arrowgene.Ddon.GameServer
 
             RpcChatData chatData = new RpcChatData()
             {
-                HandleId = 0,
+                HandleId = (uint)client.Account.State,
                 Type = LobbyChatMsgType.Tell,
                 MessageFlavor = request.MessageFlavor,
                 PhrasesCategory = request.PhrasesCategory,
@@ -396,7 +382,75 @@ namespace Arrowgene.Ddon.GameServer
 
             AnnounceAsync(targetServer, "internal/chat", RpcInternalCommand.SendTellMessage, chatData);
         }
+
+        public void AnnounceMail(GameClient client, MailMessage mail)
+        {
+            var targetServer = FindPlayerById(mail.CharacterId);
+
+            // If the target is offline, we don't actually need to announce anything.
+            if (targetServer == 0) return;
+            if (targetServer == Server.Id) return;
+
+            RpcChatData chatData = new RpcChatData()
+            {
+                HandleId = (uint)mail.MessageId, // This is bad, but do we expect people to send 4 billion mails?
+                Type = LobbyChatMsgType.Say,
+                MessageFlavor = 0,
+                PhrasesCategory = 0,
+                PhrasesIndex = 0,
+                Message = mail.Body,
+                Deliver = false,
+                SourceData = new RpcCharacterData(client.Character),
+                TargetData = new RpcCharacterData()
+                {
+                    CharacterId = mail.CharacterId
+                }
+            };
+
+            AnnounceAsync(targetServer, "internal/chat", RpcInternalCommand.SendMail, chatData);
+        }
+
+        public void AnnounceGroupChat(GameClient client, ChatResponse chatResponse)
+        {
+            if (client.Character.GroupChatId == 0) return;
+
+            RpcChatData chatData = new RpcChatData()
+            { 
+                HandleId = (uint)client.Character.GroupChatId, // TODO: This is the same problem as mails.
+                Type = LobbyChatMsgType.Group,
+                MessageFlavor = chatResponse.MessageFlavor,
+                PhrasesCategory = chatResponse.PhrasesCategory,
+                PhrasesIndex = chatResponse.PhrasesIndex,
+                Message = chatResponse.Message,
+                Deliver = false,
+                SourceData = new RpcCharacterData(client.Character)
+            };
+
+            AnnounceOthers("internal/chat", RpcInternalCommand.SendGroupMessage, chatData);
+        }
         #endregion
+
+
+        public void AnnounceCharacterPacket<T>(T packet, uint characterId)
+            where T : class, IPacketStructure, new()
+        {
+            RpcPacketData data = new()
+            {
+                GroupId = packet.Id.GroupId,
+                HandlerId = packet.Id.HandlerId,
+                HandlerSubId = packet.Id.HandlerSubId,
+                CharacterId = characterId,
+                Data = EntitySerializer.Get<T>().Write(packet)
+            };
+
+            foreach(var (serverId, charMap) in CharacterTrackingMap)
+            {
+                if (charMap.TryGetValue(characterId, out _))
+                {
+                    Announce(serverId, "internal/packet", RpcInternalCommand.AnnouncePacketAll, data);
+                }
+            }
+        }
 
         public void AnnounceAllPacket<T>(T packet, uint characterId = 0)
             where T : class, IPacketStructure, new()

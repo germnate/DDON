@@ -222,9 +222,41 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         HerosRestRathniteRegion = 60300020,
         HerosRestFeryanaRegion = 60300021,
 
+        SaveTheRoyalFamilyCook = 60300030,
+        RescueTheGeniusCommander = 60300031,
+        ExposeTheDarkSideToTheOneOperatingBehindTheScenes = 60300032,
+
         SummerBeachFestival1 = 60200033,
         SummerBeachFestival2 = 60200034,
         SummerBeachFestivalDecorations = 60200035,
+
+        // Substory Quests
+        TasteOfBitterMemories = 10300100,
+        FortThinesFoodProcurement = 10300101,
+        CarrieTheCookDespairs = 10300102,
+        PathToFoodProcurement = 10300103,
+        CarriesWorry = 10300104,
+        FirstStepToRestoringTheGreatDiningHallKitchen = 10300200,
+        SecondStepToRestoringTheGreatDiningHallCookStove = 10300201,
+        ThirdStepToRestoringTheGreatDiningHallWaterWell = 10300202,
+        FourthStepToRestoringTheGreatDiningHallWineBarrel = 10300203,
+        SignsOfRestoringTheGreatDiningHall = 10300204,
+        SweetFoodForPiremoth = 10300300,
+        HungryGoblin = 10300301,
+        FoodForPiremoth = 10300302,
+        ToTheEndOfThePursuit = 10300303,
+        SweetFoodForTheBanditGroupHideout = 10300400,
+        BewareTheWaterside = 10300401,
+        FoodForTheBanditGroupHideout = 10300402,
+        ChasingAfterThePhantomIngredient = 10300403,
+        FarewellHungry = 10300500,
+        FortThinesGreatDiningHall = 10300600,
+        ProcurementCooperationBrad = 10300700,
+        ProcurementCooperationLorna = 10300701,
+        ProcurementCooperationHeather = 10300702,
+        ProcurementCooperationSneaker = 10300703,
+        ProcurementCooperationAidan = 10300704,
+        RequestForGoblinFamilyCooperationCarrie = 10300705,
 
         // World Manage Quests
         /// Season 1?

@@ -141,7 +141,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 changeJobNotice.LearnNormalSkillParamList = normalSkills;
                 changeJobNotice.EquipJobItemList = jobItems;
                 // TODO: Unk0
-                
+
                 updateCharacterItemNtc.UpdateType = ItemNoticeType.ChangeJob;
 
                 S2CJobChangeJobRes changeJobResponse = new S2CJobChangeJobRes();

@@ -53,7 +53,10 @@ namespace Arrowgene.Ddon.GameServer.Scripting
                 .AddImports("Arrowgene.Ddon.Shared.Entity.PacketStructure")
                 .AddImports("Arrowgene.Ddon.Shared.Entity.Structure")
                 .AddImports("Arrowgene.Ddon.Shared.Model")
-                .AddImports("Arrowgene.Ddon.Shared.Model.Quest");
+                .AddImports("Arrowgene.Ddon.Shared.Model.Quest")
+                .AddImports("Arrowgene.Ddon.Shared.Model.Rpc")
+                .AddImports("Arrowgene.Ddon.Shared.Model.Scheduler")
+                .AddImports("Arrowgene.Ddon.GameServer.Tasks");
         }
     }
 }

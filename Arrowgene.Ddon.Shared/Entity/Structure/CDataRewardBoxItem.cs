@@ -1,5 +1,6 @@
 using Arrowgene.Buffers;
 using Arrowgene.Ddon.Shared.Model;
+using Arrowgene.Ddon.Shared.Model.Quest;
 using System;
 
 namespace Arrowgene.Ddon.Shared.Entity.Structure;
@@ -17,6 +18,12 @@ public class CDataRewardBoxItem
     public byte Type { get; set; }
     public bool IsCharge {  get; set; }
     public bool IsHelp { get; set; }
+    public uint SelectGroupId { get; set; }
+
+    // Server-side only - not serialized to the client
+    public long RewardBoxItemId { get; set; }
+    public bool IsInstance { get; set; }
+    public StagedRewardItem? StagedItem { get; set; }
 
     public class Serializer : EntitySerializer<CDataRewardBoxItem>
     {

@@ -1,8 +1,9 @@
 using System.Collections;
+using static Arrowgene.Ddon.GameServer.Characters.ItemManager;
 
 public class ChatCommand : IChatCommand
 {
-    public override AccountStateType AccountState => AccountStateType.Admin;
+    public override AccountStateType AccountState => AccountStateType.GameMaster;
     public override string CommandName            => "giveitem";
     public override string HelpText               => "usage: `/giveitem <itemid> [amount?] [force?]` - Obtain items.";
 
@@ -67,10 +68,28 @@ public class ChatCommand : IChatCommand
             UpdateType = ItemNoticeType.Gather
         };
 
-        var (queue, isSpecial) = server.ItemManager.HandleSpecialItem(client, ntc, (ItemId)itemId, amount, false);
+        var (queue, isSpecial) = server.ItemManager.HandleSpecialItem(client, ntc, (ItemId)itemId, amount);
         if (!isSpecial)
         {
-            ntc.UpdateItemList.AddRange(server.ItemManager.AddItem(server, client.Character, true, itemId, amount));
+            var itemInfo = server.AssetRepository.ClientItemInfos[itemId];
+            var destinationStorage = force ? StorageType.StorageBoxNormal : itemInfo.StorageType;
+            if (!server.ItemManager.CanAddItem(client.Character, destinationStorage, itemId, amount))
+            {
+                string hint = force
+                    ? "Storage is also full."
+                    : $"Use `/giveitem {itemId} {amount} true` to send regular items to storage.";
+                responses.Add(ChatResponse.CommandError(client, $"Not enough room in {destinationStorage} for {itemInfo.Name} x{amount}. {hint}"));
+                return;
+            }
+
+            if (force)
+            {
+                ntc.UpdateItemList.AddRange(server.ItemManager.AddItem(server, client.Character, StorageType.StorageBoxNormal, itemId, amount));
+            }
+            else
+            {
+                ntc.UpdateItemList.AddRange(server.ItemManager.AddItem(server, client.Character, true, itemId, amount));
+            }
         }
 
         queue.Send();

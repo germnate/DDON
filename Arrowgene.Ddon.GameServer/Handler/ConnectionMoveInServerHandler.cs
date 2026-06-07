@@ -4,7 +4,6 @@ using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Logging;
 using System;
-using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -36,6 +35,13 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 throw new ResponseErrorException(ErrorCode.ERROR_CODE_FAIL);
             }
             client.Account = account;
+
+#if DEBUG
+            if (client.Identity.Contains("127.0.0.1"))
+            {
+                client.Account.State = AccountStateType.GameMaster;
+            }
+#endif
 
             Character character = Server.CharacterManager.SelectCharacter(client, token.CharacterId);
             if (character == null)

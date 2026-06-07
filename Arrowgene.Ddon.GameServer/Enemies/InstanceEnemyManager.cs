@@ -145,6 +145,14 @@ public class InstanceEnemyManager : InstanceAssetManager<Enemy, InstancedEnemy>
         }
     }
 
+    public bool HasEnemyGroup(StageLayoutId stageId)
+    {
+        lock (_EnemyData)
+        {
+            return _EnemyData.ContainsKey(stageId);
+        }
+    }
+
     public void ResetEnemyNode(StageLayoutId stageId)
     {
         lock (_EnemyData)

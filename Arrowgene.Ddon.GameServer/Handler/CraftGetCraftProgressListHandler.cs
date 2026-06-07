@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Arrowgene.Ddon.GameServer.Party;
@@ -35,21 +36,20 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 CraftProgress? craftProgress = Server.Database.SelectPawnCraftProgress(client.Character.CharacterId, pawn.PawnId);
                 if (craftProgress != null)
                 {
-                    CDataCraftPawnInfo leadPawn = GetPawnCraftInfo(pawn.PawnId);
+                    CDataCraftPawnInfo leadPawn = GetPawnCraftInfo(pawn);
                     List<CDataCraftPawnInfo> supportPawns = new List<CDataCraftPawnInfo>();
-                    if (craftProgress.CraftSupportPawnId1 > 0)
-                    {
-                        supportPawns.Add(GetPawnCraftInfo(craftProgress.CraftSupportPawnId1));
-                    }
+                    AddSupportPawnCraftInfo(client, supportPawns, craftProgress.CraftSupportPawnId1);
+                    AddSupportPawnCraftInfo(client, supportPawns, craftProgress.CraftSupportPawnId2);
+                    AddSupportPawnCraftInfo(client, supportPawns, craftProgress.CraftSupportPawnId3);
 
-                    if (craftProgress.CraftSupportPawnId2 > 0)
-                    {
-                        supportPawns.Add(GetPawnCraftInfo(craftProgress.CraftSupportPawnId2));
-                    }
+                    long currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                    long finishAt = craftProgress.FinishAt;
+                    long diff = finishAt - currentTime;
 
-                    if (craftProgress.CraftSupportPawnId3 > 0)
+                    uint displayTime = 0;
+                    if (diff > 0)
                     {
-                        supportPawns.Add(GetPawnCraftInfo(craftProgress.CraftSupportPawnId3));
+                        displayTime = (uint)diff;
                     }
 
                     CDataCraftProgress CDataCraftProgress = new CDataCraftProgress()
@@ -63,22 +63,20 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         ItemId = craftProgress.ItemId,
                         ToppingId = 0,
                         AdditionalStatusId = craftProgress.AdditionalStatusId,
-                        RemainTime = craftProgress.RemainTime,
+                        RemainTime = displayTime,
                         ExpBonus = craftProgress.ExpBonus,
-                        CreateCount = craftProgress.CreateCount
+                        CreateCount = craftProgress.CreateCount,
                     };
                     // Number of elements determines number icon pop up on Production Status 
                     res.CraftProgressList.Add(CDataCraftProgress);
-                    if (craftProgress.RemainTime == 0)
+
+                    if (displayTime == 0)
                     {
                         createdRecipes.Add(CDataCraftProgress.RecipeId);
-                    }
-                    else
-                    {
-                        // TODO: this needs to be sent by some background thread which periodically deducts time => triggers mypawn/progress req/res, can infinitely loop if sent at the wrong time
-                        craftProgress.RemainTime = 0;
-                        Server.Database.UpdatePawnCraftProgress(craftProgress);
-                        client.Send(new S2CCraftFinishCraftNtc { PawnId = leadPawn.PawnId });
+                        // TODO: We could clean up the status in the DB here,
+                        // but for now it is more than enough if the UI sees 0.
+                        // Therefor, we keep the Item in the DB,
+                        // until the User retrieves it (RequestCraftProduct).
                     }
                 }
                 else
@@ -116,13 +114,30 @@ namespace Arrowgene.Ddon.GameServer.Handler
             return res;
         }
 
-        private CDataCraftPawnInfo GetPawnCraftInfo(uint pawnId)
+        private void AddSupportPawnCraftInfo(GameClient client, List<CDataCraftPawnInfo> supportPawns, uint pawnId)
         {
-            Pawn supportPawn = Server.Database.SelectPawn(pawnId);
+            if (pawnId == 0)
+            {
+                return;
+            }
+
+            Pawn? pawn = client.Character.Pawns.FirstOrDefault(p => p.PawnId == pawnId)
+                ?? client.Character.RentedPawns.FirstOrDefault(p => p.PawnId == pawnId);
+            if (pawn == null)
+            {
+                Logger.Error(client, $"Craft progress references support pawn ID {pawnId} that is not currently owned or rented; omitting it from the response.");
+                return;
+            }
+
+            supportPawns.Add(GetPawnCraftInfo(pawn));
+        }
+
+        private CDataCraftPawnInfo GetPawnCraftInfo(Pawn pawn)
+        {
             return new CDataCraftPawnInfo()
             {
-                PawnId = supportPawn.PawnId,
-                Name = supportPawn.Name
+                PawnId = pawn.PawnId,
+                Name = pawn.Name
             };
         }
     }

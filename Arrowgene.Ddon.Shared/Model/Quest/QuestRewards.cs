@@ -5,6 +5,25 @@ using System.Security.Cryptography;
 
 namespace Arrowgene.Ddon.Shared.Model.Quest
 {
+    [Flags]
+    public enum QuestBoxRewardFlags : uint
+    {
+        None = 0,
+        RepeatClear = 1 << 0,
+        FirstClear = 1 << 1,
+        PeriodFirstClear = 1 << 2,
+        HelperBonus = 1 << 3,
+    }
+
+    public enum QuestRewardBucket
+    {
+        Normal,
+        RepeatClear,
+        FirstClear,
+        PeriodFirstClear,
+        Helper,
+    }
+
     public abstract class LootPoolItem
     {
         public ushort Num { get; set; }
@@ -12,9 +31,37 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
 
         public virtual string GetUID()
         {
+            return CreateUID(ItemId, Num);
+        }
+
+        public virtual string GetUID(QuestRewardType rewardType, bool isHelp = false, uint selectGroupId = 0)
+        {
+            return CreateUID(ItemId, Num, rewardType, isHelp, selectGroupId);
+        }
+
+        public static string CreateUID(ItemId itemId, ushort num)
+        {
+            return CreateUIDInternal(itemId, num, null, false, 0);
+        }
+
+        public static string CreateUID(ItemId itemId, ushort num, QuestRewardType rewardType, bool isHelp = false, uint selectGroupId = 0)
+        {
+            return CreateUIDInternal(itemId, num, rewardType, isHelp, selectGroupId);
+        }
+
+        private static string CreateUIDInternal(ItemId itemId, ushort num, QuestRewardType? rewardType, bool isHelp, uint selectGroupId)
+        {
             IncrementalHash hash = IncrementalHash.CreateHash(HashAlgorithmName.MD5);
-            hash.AppendData(BitConverter.GetBytes((uint) ItemId));
-            hash.AppendData(BitConverter.GetBytes(Num));
+            hash.AppendData(BitConverter.GetBytes((uint)itemId));
+            hash.AppendData(BitConverter.GetBytes(num));
+
+            if (rewardType != null || isHelp || selectGroupId != 0)
+            {
+                hash.AppendData(BitConverter.GetBytes((uint)(rewardType ?? QuestRewardType.Unknown)));
+                hash.AppendData(BitConverter.GetBytes(isHelp));
+                hash.AppendData(BitConverter.GetBytes(selectGroupId));
+            }
+
             return BitConverter.ToString(hash.GetHashAndReset()).Replace("-", string.Empty).Substring(0, 8);
         }
     }
@@ -88,7 +135,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             return rewards;
         }
 
-        public virtual List<CDataRewardBoxItem> AsCDataRewardBoxItems()
+        public virtual List<CDataRewardBoxItem> AsCDataRewardBoxItems(QuestRewardType? rewardTypeOverride = null, bool isHelp = false, uint selectGroupId = 0)
         {
             List<CDataRewardBoxItem> rewards = new List<CDataRewardBoxItem>();
             foreach (var item in LootPool)
@@ -97,8 +144,10 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
                 {
                     ItemId = item.ItemId,
                     Num = item.Num,
-                    Type = (byte)RewardType,
-                    UID = item.GetUID()
+                    Type = (byte)(rewardTypeOverride ?? RewardType),
+                    IsHelp = isHelp,
+                    SelectGroupId = selectGroupId,
+                    UID = item.GetUID(rewardTypeOverride ?? RewardType, isHelp, selectGroupId)
                 });
             }
             return rewards;
@@ -136,36 +185,40 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             ItemIndex = itemIndex;
         }
 
-        public override List<CDataRewardBoxItem> AsCDataRewardBoxItems()
+        public override List<CDataRewardBoxItem> AsCDataRewardBoxItems(QuestRewardType? rewardTypeOverride = null, bool isHelp = false, uint selectGroupId = 0)
         {
             return new List<CDataRewardBoxItem>()
             {
-                AsCDataRewardBoxItem()
+                AsCDataRewardBoxItem(rewardTypeOverride, isHelp, selectGroupId)
             };
         }
 
-        public CDataRewardBoxItem AsCDataRewardBoxItem()
+        public virtual CDataRewardBoxItem AsCDataRewardBoxItem(QuestRewardType? rewardTypeOverride = null, bool isHelp = false, uint selectGroupId = 0)
         {
 
             var item = LootPool[ItemIndex];
             return new CDataRewardBoxItem()
             {
-                UID = item.GetUID(),
                 ItemId = item.ItemId,
                 Num = item.Num,
-                Type = (byte)RewardType
+                Type = (byte)(rewardTypeOverride ?? RewardType),
+                IsHelp = isHelp,
+                SelectGroupId = selectGroupId,
+                UID = item.GetUID(rewardTypeOverride ?? RewardType, isHelp, selectGroupId),
             };
         }
 
-        public CDataRewardBoxItem AsCDataRewardBoxItem(int index)
+        public virtual CDataRewardBoxItem AsCDataRewardBoxItem(int index, QuestRewardType? rewardTypeOverride = null, bool isHelp = false, uint selectGroupId = 0)
         {
             var item = LootPool[index];
             return new CDataRewardBoxItem()
             {
-                UID = item.GetUID(),
                 ItemId = item.ItemId,
                 Num = item.Num,
-                Type = (byte)RewardType
+                Type = (byte)(rewardTypeOverride ?? RewardType),
+                IsHelp = isHelp,
+                SelectGroupId = selectGroupId,
+                UID = item.GetUID(rewardTypeOverride ?? RewardType, isHelp, selectGroupId),
             };
         }
 
@@ -269,10 +322,14 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         public uint QuestScheduleId { get; set; }
         public int NumRandomRewards { get; set; }
         public List<int> RandomRewardIndices { get; set; }
+        public bool IsRepeatReward { get; set; }
+        public QuestBoxRewardFlags RewardFlags { get; set; }
+        public List<CDataRewardBoxItem> RewardItemList { get; set; }
 
         public QuestBoxRewards()
         {
             RandomRewardIndices = new List<int>();
+            RewardItemList = new List<CDataRewardBoxItem>();
         }
     }
 }

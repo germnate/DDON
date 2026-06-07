@@ -1,5 +1,6 @@
 using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.GameServer.Quests.Extensions;
+using Arrowgene.Ddon.GameServer.Quests.Work;
 using Arrowgene.Ddon.GameServer.Scripting.Interfaces;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
@@ -12,6 +13,7 @@ using Arrowgene.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Arrowgene.Ddon.GameServer.Quests
 {
@@ -88,6 +90,43 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 }
             }
 
+            // Repeat-clear rewards from script
+            foreach (var pointReward in questAsset.RepeatClearPointRewards)
+                quest.AddRepeatClearExpReward(pointReward.PointType, pointReward.Amount);
+
+            foreach (var walletReward in questAsset.RepeatClearRewardCurrency)
+                quest.AddRepeatClearWalletReward(walletReward.WalletType, walletReward.Amount);
+
+            foreach (var rewardItem in questAsset.RepeatClearRewardItems)
+                quest.AddRepeatClearItemReward(rewardItem);
+
+            foreach (var pointReward in questAsset.FirstClearPointRewards)
+                quest.AddFirstClearExpReward(pointReward.PointType, pointReward.Amount);
+
+            foreach (var walletReward in questAsset.FirstClearRewardCurrency)
+                quest.AddFirstClearWalletReward(walletReward.WalletType, walletReward.Amount);
+
+            foreach (var rewardItem in questAsset.FirstClearRewardItems)
+                quest.AddFirstClearItemReward(rewardItem);
+
+            foreach (var pointReward in questAsset.PeriodFirstClearPointRewards)
+                quest.AddPeriodFirstClearExpReward(pointReward.PointType, pointReward.Amount);
+
+            foreach (var walletReward in questAsset.PeriodFirstClearRewardCurrency)
+                quest.AddPeriodFirstClearWalletReward(walletReward.WalletType, walletReward.Amount);
+
+            foreach (var rewardItem in questAsset.PeriodFirstClearRewardItems)
+                quest.AddPeriodFirstClearItemReward(rewardItem);
+
+            foreach (var pointReward in questAsset.HelperPointRewards)
+                quest.AddHelperExpReward(pointReward.PointType, pointReward.Amount);
+
+            foreach (var walletReward in questAsset.HelperRewardCurrency)
+                quest.AddHelperWalletReward(walletReward.WalletType, walletReward.Amount);
+
+            foreach (var rewardItem in questAsset.HelperRewardItems)
+                quest.AddHelperItemReward(rewardItem);
+
             foreach (var (_, enemyGroup) in questAsset.EnemyGroups)
             {
                 quest.UniqueEnemyGroups.Add(enemyGroup.StageLayoutId);
@@ -106,6 +145,21 @@ namespace Arrowgene.Ddon.GameServer.Quests
                     quest.ContentsRelease.UnionWith(block.ContentsReleased);
                     quest.AddWorldManageUnlock(block.WorldManageUnlocks);
                     quest.AddProgressWorkItems(block.QuestProgressWork);
+
+                    // Scan for SetQuestClearNum check commands and synthesize matching
+                    // WorldQuestClearedProgressWork items after BlockNo is finalised.
+                    foreach (var cmdGroup in block.CheckCommands)
+                    {
+                        foreach (var cmd in cmdGroup)
+                        {
+                            if (cmd.Command == (ushort)QuestCheckCommand.SetQuestClearNum)
+                            {
+                                var areaId = (QuestAreaId)cmd.Param02;
+                                var amount = (uint)cmd.Param01;
+                                quest.AddProgressWorkItem(new WorldQuestClearedProgressWork(block, areaId, amount));
+                            }
+                        }
+                    }
 
                     switch (block.BlockType)
                     {
@@ -340,7 +394,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 {
                     questProcessState.ResultCommandList.AddRange(cbParam.ResultCommands);
                 }
-                
+
                 if (cbParam.CheckCommands.Count > 0)
                 {
                     questProcessState.CheckCommandList = QuestManager.CheckCommand.AppendCheckCommands(questProcessState.CheckCommandList, cbParam.CheckCommands);
@@ -351,10 +405,129 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 questProcessState = questBlock.QuestProcessState;
             }
 
+            PatchRandomCommands(ref questProcessState, questState);
+            PatchRandomLayoutCommands(ref questProcessState);
+            PatchTimerCommands(questProcessState, questState, client);
+
             return new List<CDataQuestProcessState>()
             {
                 questProcessState
             };
+        }
+
+        // For any SetRandom result commands in the block, roll the value once per slot per quest
+        // instance and substitute it into param_4 before the state is sent to the client.
+        // The client stores param_4 and evaluates RandomEq/RandomLess/etc. locally.
+        private static void PatchRandomCommands(ref CDataQuestProcessState processState, QuestState questState)
+        {
+            bool hasSetRandom = processState.ResultCommandList
+                .Any(c => c.Command == (ushort)QuestResultCommand.SetRandom);
+            if (!hasSetRandom)
+            {
+                return;
+            }
+
+            // Always copy before mutating - processState may be the shared static block state
+            // (assigned directly from questBlock.QuestProcessState) or already a per-dispatch copy
+            // (created by the callback path). Either way a fresh copy is safe and correct.
+            processState = new CDataQuestProcessState(processState);
+
+            foreach (var cmd in processState.ResultCommandList)
+            {
+                if (cmd.Command != (ushort)QuestResultCommand.SetRandom)
+                {
+                    continue;
+                }
+
+                int slot = cmd.Param01;
+                int min  = cmd.Param02;
+                int max  = cmd.Param03;
+
+                if (!questState.RandomSlots.ContainsKey(slot))
+                {
+                    questState.RandomSlots[slot] = Random.Shared.Next(min, max + 1);
+                }
+
+                cmd.Param04 = questState.RandomSlots[slot];
+            }
+        }
+
+        private void PatchRandomLayoutCommands(ref CDataQuestProcessState processState)
+        {
+            bool hasLayoutFlagRandomOn = processState.ResultCommandList
+                .Any(c => c.Command == (ushort)QuestResultCommand.LayoutFlagRandomOn);
+            if (!hasLayoutFlagRandomOn)
+            {
+                return;
+            }
+
+            processState = new CDataQuestProcessState(processState);
+
+            foreach (var cmd in processState.ResultCommandList)
+            {
+                if (cmd.Command != (ushort)QuestResultCommand.LayoutFlagRandomOn)
+                {
+                    continue;
+                }
+
+                List<int> flags = new List<int> { cmd.Param01, cmd.Param02, cmd.Param03 }
+                    .Where(p => p >= 0).ToList();
+                if (flags.Count > 0)
+                {
+                    cmd.Param04 = flags[Random.Shared.Next(0, flags.Count)];
+                }
+            }
+        }
+
+        // For any StartTimer result commands in the block, record the expiry time and schedule
+        // a one-shot callback that sends S2CQuestQuestProgressWorkSaveNtc so the client
+        // re-evaluates its IsEndTimer check command when the timer elapses.
+        private void PatchTimerCommands(CDataQuestProcessState processState, QuestState questState, GameClient client)
+        {
+            bool hasStartTimer = processState.ResultCommandList
+                .Any(c => c.Command == (ushort)QuestResultCommand.StartTimer);
+            if (!hasStartTimer)
+                return;
+
+            foreach (var cmd in processState.ResultCommandList)
+            {
+                if (cmd.Command != (ushort)QuestResultCommand.StartTimer)
+                    continue;
+
+                int timerNo = cmd.Param01;
+                int sec     = cmd.Param02;
+
+                // Skip if this timer was already started (re-dispatch of same block).
+                if (questState.TimerSlots.ContainsKey(timerNo))
+                    continue;
+
+                var expiry = DateTimeOffset.UtcNow.AddSeconds(sec);
+                questState.TimerSlots[timerNo] = expiry;
+
+                // Capture locals for the closure.
+                uint capturedScheduleId = QuestScheduleId;
+                bool personal = IsPersonal;
+                GameClient capturedClient = client;
+
+                int capturedTimerNo = timerNo;
+                var handle = new Timer(_ =>
+                {
+                    questState.TimerHandles.Remove(capturedTimerNo);
+
+                    var ntc = new S2CQuestTimerNtc()
+                    {
+                        QuestScheduleId = capturedScheduleId,
+                        TimerNo = (byte) capturedTimerNo
+                    };
+
+                    if (personal)
+                        capturedClient.Send(ntc);
+                    else
+                        capturedClient.Party.SendToAll(ntc);
+                }, null, TimeSpan.FromSeconds(sec), Timeout.InfiniteTimeSpan);
+
+                questState.TimerHandles[timerNo] = handle;
+            }
         }
 
         private static CDataQuestProcessState BlockAsCDataQuestProcessState(GenericQuest quest, QuestBlock questBlock)
@@ -406,10 +579,16 @@ namespace Arrowgene.Ddon.GameServer.Quests
                         resultCommands.Add(QuestManager.ResultCommand.UpdateAnnounce());
                         break;
                     case QuestAnnounceType.Start:
-                        // resultCommands.Add(QuestManager.ResultCommand.SetAnnounce(QuestAnnounceType.Start));
-                        resultCommands.Add(QuestManager.ResultCommand.StartMissionAnnounce());
-                        resultCommands.Add(QuestManager.ResultCommand.Unknown(127));
-                        resultCommands.Add(QuestManager.ResultCommand.StartContentsTimer());
+                        if (quest.QuestType == QuestType.ExtremeMission)
+                        {
+                            resultCommands.Add(QuestManager.ResultCommand.StartMissionAnnounce());
+                            resultCommands.Add(QuestManager.ResultCommand.Unknown(127));
+                            resultCommands.Add(QuestManager.ResultCommand.StartContentsTimer());
+                        }
+                        else
+                        {
+                            resultCommands.Add(QuestManager.ResultCommand.SetAnnounce(QuestAnnounceType.Start));
+                        }
                         break;
                     default:
                         resultCommands.Add(QuestManager.ResultCommand.SetAnnounce(questBlock.AnnounceType));

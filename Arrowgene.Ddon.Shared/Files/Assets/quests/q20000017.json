@@ -26,10 +26,12 @@
       "type": "select",
       "loot_pool": [
         {
+          "comment": "Green Grass Ring",
           "item_id": 8928,
           "num": 1
         },
         {
+          "comment": "Gala Extract",
           "item_id": 36,
           "num": 2
         }
@@ -54,8 +56,17 @@
       },
       "npc_id": "Fabio0",
       "announce_type": "Accept",
+      "result_commands": [
+        {
+          "comment": "Idle dialogue",
+          "type": "QstTalkChg",
+          "Param1": 12,
+          "Param2": 11856
+        }
+      ],
       "items": [
         {
+          "comment": "Bronze Ore",
           "id": 7858,
           "amount": 2
         }
@@ -69,9 +80,18 @@
         "group_id": 0
       },
       "npc_id": "Fabio0",
-      "announce_type": "Update",
+      "announce_type": "CheckpointAndUpdate",
+      "result_commands": [
+        {
+          "comment": "Idle dialogue",
+          "type": "QstTalkChg",
+          "Param1": 12,
+          "Param2": 11856
+        }
+      ],
       "items": [
         {
+          "comment": "Fluorite",
           "id": 7893,
           "amount": 2
         }
@@ -85,9 +105,18 @@
         "group_id": 0
       },
       "npc_id": "Fabio0",
-      "announce_type": "Update",
+      "announce_type": "CheckpointAndUpdate",
+      "result_commands": [
+        {
+          "comment": "Idle dialogue",
+          "type": "QstTalkChg",
+          "Param1": 12,
+          "Param2": 11856
+        }
+      ],
       "items": [
         {
+          "comment": "Copper Ore",
           "id": 7854,
           "amount": 2
         }

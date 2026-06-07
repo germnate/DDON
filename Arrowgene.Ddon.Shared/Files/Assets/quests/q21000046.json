@@ -6,7 +6,8 @@
     "base_level": 63,
     "minimum_item_rank": 0,
     "discoverable": true,
-	"area_id": "BloodbaneIsle",	
+    "area_id": "BloodbaneIsle",
+    "news_image": 92,
     "rewards": [
         {
             "type": "wallet",
@@ -26,20 +27,20 @@
             "type": "select",
             "loot_pool": [
                 {
-                    "item_id": 7948,
+                    "item_id": "CursedCloth",
                     "num": 2
                 },
-                {					
-                    "item_id": 7848,
+                {
+                    "item_id": "BlueAlluvialGold",
                     "num": 3
                 },
-                {				
-                    "item_id": 41,
-                    "num": 3					
+                {
+                    "item_id": "Panacea",
+                    "num": 3
                 }
             ]
         }
-    ],	
+    ],
     "blocks": [
     {
       "type": "NpcTalkAndOrder",
@@ -47,23 +48,23 @@
         "id": 317
       },
       "npc_id": "Gunther",
-      "message_id": 10800
+      "message_id": 17164
     },
     {
       "type": "DeliverItems",
       "stage_id": {
-        "id": 44,
-        "group_id": 1
+        "id": 44
       },
       "npc_id": "Kennec",
       "announce_type": "Accept",
-      "items": [
-        {
-          "id": 11770,
-          "amount": 6
-        }
+      "result_commands": [
+        {"type": "QstTalkChg", "Param1": 2401, "Param2": 17165, "comment": "Extra dialogue - Gunther"},
+        {"type": "QstTalkChg", "Param1": 1605, "Param2": 17166, "comment": "Extra dialogue - Kennec"}
       ],
-      "message_id": 10737		
+      "items": [
+        {"id": 11770, "amount": 6, "comment": "Volden Quality Coal"}
+      ],
+      "message_id": 17167
     }
   ]
 }

@@ -28,5 +28,10 @@ namespace Arrowgene.Ddon.Server
         {
             return SettingsData.Get<T>(scriptName, variableName);
         }
+
+        public void Set<T>(string scriptName, string variableName, T value)
+        {
+            SettingsData.Set<T>(scriptName, variableName, value);
+        }
     }
 }

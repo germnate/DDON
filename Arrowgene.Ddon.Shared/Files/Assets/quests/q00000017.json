@@ -60,6 +60,13 @@
         {
             "type": "TalkToNpc",
             "announce_type": "Accept",
+            "result_commands": [
+                {"type": "QstTalkChg", "Param1": 2, "Param2": 13556, "comment": "Mysial extra dialogue"},
+                {"type": "QstTalkChg", "Param1": 3, "Param2": 13557, "comment": "Klaus extra dialogue"}
+            ],
+            "consume_items": [
+                {"id": 1050, "amount": 1, "comment": "Kieshildt's Vessel of Life"}
+            ],
             "flags": [
                 {"type": "WorldManageLayout", "action": "Clear", "value": 1294, "quest_id": 70000001, "comment": "The White Dragon (Less Dead)"},
                 {"type": "WorldManageLayout", "action": "Set", "value": 7389, "quest_id": 70032001, "comment": "The White Dragon (Less Less Dead)"}
