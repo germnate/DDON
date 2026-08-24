@@ -39,16 +39,39 @@
       "LogIncomingPacketPayload": false,
       "LogIncomingPacketStructure": false,
       "LogOutgoingPacketStructure": false,
-      "ServerSocketSettings": {
+      "ConsumerQueueCapacityPerLane": 100000,
+      "TcpServerSettings": {
         "Identity": "Game",
         "MaxConnections": 100,
-        "NumSimultaneouslyWriteOperations": 100,
+        "ConcurrentAccepts": 100,
         "BufferSize": 2000,
-        "Retries": 10,
-        "MaxUnitOfOrder": 1,
-        "MaxSimultaneousSendsPerClient": 1,
-        "SocketTimeoutSeconds": -1,
-        "SocketSettings": {
+        "ListenSocketRetries": 10,
+        "OrderingLaneCount": 1,
+        "MaxQueuedSendBytes": 8388608,
+        "ClientSocketTimeoutSeconds": -1,
+        "ListenSocketSettings": {
+          "Backlog": 5,
+          "DontFragment": true,
+          "DualMode": false,
+          "ExclusiveAddressUse": false,
+          "NoDelay": false,
+          "UseOnlyOverlappedIo": false,
+          "ReceiveBufferSize": 8192,
+          "ReceiveTimeout": 0,
+          "SendBufferSize": 8192,
+          "SendTimeout": 0,
+          "Ttl": 32,
+          "LingerEnabled": false,
+          "LingerTime": 30,
+          "SocketOptions": [
+            {
+              "Level": "Socket",
+              "Name": 4,
+              "Value": false
+            }
+          ]
+        },
+        "ClientSocketSettings": {
           "Backlog": 5,
           "DontFragment": true,
           "DualMode": false,
@@ -87,16 +110,39 @@
       "LogIncomingPacketPayload": false,
       "LogIncomingPacketStructure": false,
       "LogOutgoingPacketStructure": false,
-      "ServerSocketSettings": {
+      "ConsumerQueueCapacityPerLane": 100000,
+      "TcpServerSettings": {
         "Identity": "Login",
         "MaxConnections": 100,
-        "NumSimultaneouslyWriteOperations": 100,
+        "ConcurrentAccepts": 100,
         "BufferSize": 2000,
-        "Retries": 10,
-        "MaxUnitOfOrder": 1,
-        "MaxSimultaneousSendsPerClient": 1,
-        "SocketTimeoutSeconds": -1,
-        "SocketSettings": {
+        "ListenSocketRetries": 10,
+        "OrderingLaneCount": 1,
+        "MaxQueuedSendBytes": 8388608,
+        "ClientSocketTimeoutSeconds": -1,
+        "ListenSocketSettings": {
+          "Backlog": 5,
+          "DontFragment": true,
+          "DualMode": false,
+          "ExclusiveAddressUse": false,
+          "NoDelay": false,
+          "UseOnlyOverlappedIo": false,
+          "ReceiveBufferSize": 8192,
+          "ReceiveTimeout": 0,
+          "SendBufferSize": 8192,
+          "SendTimeout": 0,
+          "Ttl": 32,
+          "LingerEnabled": false,
+          "LingerTime": 30,
+          "SocketOptions": [
+            {
+              "Level": "Socket",
+              "Name": 4,
+              "Value": false
+            }
+          ]
+        },
+        "ClientSocketSettings": {
           "Backlog": 5,
           "DontFragment": true,
           "DualMode": false,

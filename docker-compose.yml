@@ -7,6 +7,7 @@ networks:
 services:
   app:
     container_name: ddon-server
+    user: "0:0"
     build: 
       context: .
       args:
@@ -37,4 +38,4 @@ services:
       - ./Arrowgene.Ddon.Scripts/scripts:/var/ddon/server/Files/Assets/scripts
     networks:
       - ddon-network
-    command: /var/ddon/server/Arrowgene.Ddon.Cli server --server start
+    command: ["dotnet", "/var/ddon/server/Arrowgene.Ddon.Cli.dll", "server", "start", "--service"]

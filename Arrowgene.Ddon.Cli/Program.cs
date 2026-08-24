@@ -147,11 +147,18 @@ namespace Arrowgene.Ddon.Cli
 
             if (result != CommandResultType.Exit)
             {
-                Logger.Info("Type 'e' and press enter to exit.");
-                int input = Console.Read();
-                while (char.ToLower((char)input) != 'e')
+                if (!Console.IsInputRedirected)
                 {
-                    input = Console.Read();
+                    Logger.Info("Type 'e' and press enter to exit.");
+                    int input = Console.Read();
+                    while (input >= 0 && char.ToLower((char)input) != 'e')
+                    {
+                        input = Console.Read();
+                    }
+                }
+                else
+                {
+                    Logger.Info("Standard input is redirected; exiting without interactive prompt.");
                 }
             }
 

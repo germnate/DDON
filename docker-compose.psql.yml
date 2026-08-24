@@ -7,6 +7,7 @@ networks:
 services:
   app:
     container_name: ddon-server
+    user: "0:0"
     build: 
       dockerfile: psql.Dockerfile
       context: .
@@ -43,7 +44,7 @@ services:
     depends_on:  
       db:
         condition: service_healthy
-    command: /var/ddon/server/Arrowgene.Ddon.Cli server --service start
+    command: ["/var/ddon/server/Arrowgene.Ddon.Cli", "server", "start", "--service"]
 
   db:
     container_name: ddon-db

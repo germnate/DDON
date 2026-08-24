@@ -9,6 +9,7 @@
 !Arrowgene.Ddon.Database/
 !Arrowgene.Ddon.GameServer/
 !Arrowgene.Ddon.LoginServer/
+!Arrowgene.Ddon.Metrics/
 !Arrowgene.Ddon.Rpc/
 !Arrowgene.Ddon.Rpc.Web/
 !Arrowgene.Ddon.Server/

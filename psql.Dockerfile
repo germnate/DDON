@@ -27,4 +27,4 @@ EXPOSE 52099/tcp
 # Login server
 EXPOSE 52100/tcp
 
-CMD ["/var/ddon/server/Arrowgene.Ddon.Cli", "server", "start"]
+CMD ["/var/ddon/server/Arrowgene.Ddon.Cli", "server", "start", "--service"]
