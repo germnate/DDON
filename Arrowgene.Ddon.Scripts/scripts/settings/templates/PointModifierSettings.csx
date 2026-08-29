@@ -26,7 +26,7 @@ var AdjustPartyEnemyExpTiers = new List<(uint MinLv, uint MaxLv, double ExpMulti
     (      3,     4,           0.9),
     (      5,     6,           0.8),
     (      7,     8,           0.6),
-    (      9,    10,           0.5),
+    (      9,    89,           0.5),
 };
 
 /// <summary>
