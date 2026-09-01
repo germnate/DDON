@@ -64,6 +64,7 @@ A xref:./Dockerfile[Dockerfile] builds & publishes the server from source. Docke
 
 * `docker-compose up` -- SQLite (xref:./docker-compose.yml[config])
 * `docker-compose -f docker-compose.psql.yml up` -- PostgreSQL (xref:./docker-compose.psql.yml[config])
+* `docker-compose -f docker-compose.psql.test.yml up` -- Isolated PostgreSQL test stack (xref:./docker-compose.psql.test.yml[config])
 
 .Useful commands
 [source,bash]
@@ -71,6 +72,34 @@ A xref:./Dockerfile[Dockerfile] builds & publishes the server from source. Docke
 docker-compose up --build                    # force rebuild
 docker-compose down -v                       # clean up with volumes
 RUNTIME=linux-arm64 docker-compose build     # build for arm64
+----
+
+=== Isolated Test Server With Cloned PostgreSQL State
+
+If you need a second server with the same character/state data while your main server stays online, use the test stack and clone helper:
+
+[source,bash]
+----
+./deploy/postgresql/start_test_server_with_db_clone.sh
+----
+
+This starts a separate `ddon-db-test` + `ddon-server-test` pair and clones data from the running main DB container (`ddon-db`) into the test DB.
+The test stack uses `GameServerList.test.csv` so login hands off clients to test game port `53000` instead of main.
+
+Port mapping for the test stack:
+
+* Login: `53100`
+* Game: `53000`
+* Web: `53099`
+* PostgreSQL: `5433`
+
+If your client runs on another machine, update `IpAddress` in `Arrowgene.Ddon.Shared/Files/Assets/GameServerList.test.csv` from `127.0.0.1` to the host/LAN IP of this server.
+
+Stop test stack:
+
+[source,bash]
+----
+docker compose -p ddon-test -f docker-compose.psql.test.yml down
 ----
 
 == Client

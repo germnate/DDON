@@ -80,6 +80,7 @@ namespace Arrowgene.Ddon.Shared
 
         private readonly DirectoryInfo _directory;
         private readonly Dictionary<string, FileSystemWatcher> _fileSystemWatchers;
+        private readonly bool _enableFileWatchers;
 
         public AssetRepository(string folder)
         {
@@ -91,6 +92,13 @@ namespace Arrowgene.Ddon.Shared
             }
 
             AssetsPath = folder;
+
+            // Allows environments with low inotify limits (containers/shared hosts)
+            // to run without registering many file watchers.
+            _enableFileWatchers = !string.Equals(
+                Environment.GetEnvironmentVariable("DDON_DISABLE_ASSET_WATCHERS"),
+                "true",
+                StringComparison.OrdinalIgnoreCase);
 
             _fileSystemWatchers = new Dictionary<string, FileSystemWatcher>();
 
@@ -259,6 +267,9 @@ namespace Arrowgene.Ddon.Shared
 
         private void RegisterDirectoryWatcher(IDirectoryAssetHandler handler)
         {
+            if (!_enableFileWatchers)
+                return;
+
             string dirPath = Path.Combine(_directory.FullName, handler.DirectoryKey);
             if (_fileSystemWatchers.ContainsKey(handler.DirectoryKey) || !Directory.Exists(dirPath))
                 return;
@@ -409,6 +420,11 @@ namespace Arrowgene.Ddon.Shared
 
         private void RegisterFileSystemWatcher<T>(Action<T> onLoadAction, string key, IAssetDeserializer<T> readerWriter)
         {
+            if (!_enableFileWatchers)
+            {
+                return;
+            }
+
             if (_fileSystemWatchers.ContainsKey(key))
             {
                 return;

@@ -27,6 +27,7 @@ namespace Arrowgene.Ddon.LoginServer.Manager
         private readonly HttpClient _httpClient = new() { Timeout = TimeSpan.FromSeconds(5) };
         private bool _httpReady = false;
         private ServerInfo _serverInfo;
+        private readonly string _internalRpcHost;
 
         private static readonly double QUEUE_CHECK_TIME = 10000; // msec
         private static readonly int MAXLOGIN_ADJUSTMENT = 0;
@@ -35,10 +36,21 @@ namespace Arrowgene.Ddon.LoginServer.Manager
         public LoginQueueManager(DdonLoginServer server) : base(QUEUE_CHECK_TIME)
         {
             Server = server;
+            _internalRpcHost = Environment.GetEnvironmentVariable("DDON_INTERNAL_RPC_HOST") ?? string.Empty;
 
             Elapsed += ResolveQueue;
             AutoReset = true;
             Start();
+        }
+
+        private string GetRpcHost(ServerInfo serverInfo)
+        {
+            if (!string.IsNullOrWhiteSpace(_internalRpcHost))
+            {
+                return _internalRpcHost;
+            }
+
+            return serverInfo.Addr;
         }
 
         public int Enqueue(int id)
@@ -144,6 +156,7 @@ namespace Arrowgene.Ddon.LoginServer.Manager
             try
             {
                 var route = $"http://{targetServer.Addr}:{targetServer.RpcPort}/rpc/internal/command";
+                route = $"http://{GetRpcHost(targetServer)}:{targetServer.RpcPort}/rpc/internal/command";
                 var wrappedObject = new RpcWrappedObject()
                 {
                     Command = RpcInternalCommand.Ping,
@@ -163,7 +176,7 @@ namespace Arrowgene.Ddon.LoginServer.Manager
         private async Task<List<ServerInfo>> GetServerInfo()
         {
             ReadyHttp();
-            string route = $"http://{_serverInfo.Addr}:{_serverInfo.RpcPort}/rpc/status";
+            string route = $"http://{GetRpcHost(_serverInfo)}:{_serverInfo.RpcPort}/rpc/status";
             return await _httpClient.GetFromJsonAsync<List<ServerInfo>>(route);
         }
 

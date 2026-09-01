@@ -1,0 +1,2 @@
+#Id,Name,Brief,MaxLoginNum,IpAddress,Port,IsHide,RpcPort,RpcAuth,LoginId,PreventLogin
+10,Local Test,Brief,1000,192.168.86.29,53000,false,53099,AuthToken,1,FALSE

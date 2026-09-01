@@ -23,12 +23,24 @@ namespace Arrowgene.Ddon.LoginServer.Handler
 
         private readonly HttpClient _httpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(5) };
         private bool _httpReady = false;
+        private readonly string _internalRpcHost;
 
         public ClientLoginHandler(DdonLoginServer server) : base(server)
         {
             _setting = server.Setting;
             _tokensInFlightLock = new object();
             _tokensInFlight = new HashSet<string>();
+            _internalRpcHost = Environment.GetEnvironmentVariable("DDON_INTERNAL_RPC_HOST") ?? string.Empty;
+        }
+
+        private string GetRpcHost(ServerInfo serverInfo)
+        {
+            if (!string.IsNullOrWhiteSpace(_internalRpcHost))
+            {
+                return _internalRpcHost;
+            }
+
+            return serverInfo.Addr;
         }
 
         public override L2CLoginRes Handle(LoginClient client, C2LLoginReq request)
@@ -219,7 +231,7 @@ namespace Arrowgene.Ddon.LoginServer.Handler
                 return;
             }
 
-            var route = $"http://{channel.Addr}:{channel.RpcPort}/rpc/internal/command";
+            var route = $"http://{GetRpcHost(channel)}:{channel.RpcPort}/rpc/internal/command";
 
             var wrappedObject = new RpcWrappedObject()
             {
