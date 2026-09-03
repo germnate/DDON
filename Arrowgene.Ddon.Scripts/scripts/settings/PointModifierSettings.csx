@@ -3,7 +3,7 @@
  * This file is read at runtime (unlike templates) and supports hotloading.
  */
 
-bool EnableAdjustPartyEnemyExp = true;
+bool EnableAdjustPartyEnemyExp = false;
 
 var AdjustPartyEnemyExpTiers = new List<(uint MinLv, uint MaxLv, double ExpMultiplier)>()
 {
@@ -15,7 +15,7 @@ var AdjustPartyEnemyExpTiers = new List<(uint MinLv, uint MaxLv, double ExpMulti
     (     11,   200,           0.4),
 };
 
-bool EnableAdjustTargetLvEnemyExp = true;
+bool EnableAdjustTargetLvEnemyExp = false;
 
 var AdjustTargetLvEnemyExpTiers = new List<(uint MinLv, uint MaxLv, double ExpMultiplier)>()
 {
