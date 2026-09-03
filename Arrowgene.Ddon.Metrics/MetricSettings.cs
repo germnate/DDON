@@ -27,9 +27,37 @@ namespace Arrowgene.Ddon.Metrics
         {
             Enabled = setting.Enabled;
             MetricsSink = setting.MetricsSink;
+            SamplingIntervalMs = setting.SamplingIntervalMs;
             FileMetricsSinkRetentionMin = setting.FileMetricsSinkRetentionMin;
             FileMetricsExportPath = setting.FileMetricsExportPath;
             FileMetricsExportIntervalMs = setting.FileMetricsExportIntervalMs;
+        }
+
+        /// <summary>
+        /// Applies defaults to any value left unset. Deserialization bypasses the constructor, so a
+        /// partial config block (for example only "Enabled": true) otherwise yields zeros and nulls.
+        /// </summary>
+        public void ApplyDefaults()
+        {
+            if (SamplingIntervalMs <= 0)
+            {
+                SamplingIntervalMs = 1000;
+            }
+
+            if (FileMetricsSinkRetentionMin <= 0)
+            {
+                FileMetricsSinkRetentionMin = 60 * 24;
+            }
+
+            if (FileMetricsExportIntervalMs <= 0)
+            {
+                FileMetricsExportIntervalMs = 30000;
+            }
+
+            if (string.IsNullOrWhiteSpace(FileMetricsExportPath))
+            {
+                FileMetricsExportPath = "Files/www/metrics/snapshot";
+            }
         }
     }
 }

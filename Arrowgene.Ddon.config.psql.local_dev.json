@@ -96,6 +96,14 @@
       }
     }
   },
+  "GameMetricSettings": {
+    "Enabled": true,
+    "MetricsSink": 0,
+    "SamplingIntervalMs": 1000,
+    "FileMetricsSinkRetentionMin": 1440,
+    "FileMetricsExportPath": "Files/www/metrics/snapshot",
+    "FileMetricsExportIntervalMs": 30000
+  },
   "LoginServerSetting": {
     "ServerSetting": {
       "Id": 1,

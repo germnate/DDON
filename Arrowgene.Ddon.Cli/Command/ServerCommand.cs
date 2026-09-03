@@ -249,6 +249,8 @@ public class ServerCommand : ICommand
         string serverName
     )
     {
+        settings.ApplyDefaults();
+
         IMetricsSink<DdonServerMetricsSnapshot> sink;
         switch (settings.MetricsSink)
         {
@@ -263,6 +265,10 @@ public class ServerCommand : ICommand
             default:
                 throw new InvalidEnumArgumentException(nameof(settings.MetricsSink), (int)settings.MetricsSink, typeof(MetricsSinkType));
         }
+
+        // Capture is gated off by default; every Record* call early-returns until this is set.
+        // Without it the collector samples faithfully and every histogram reads zero.
+        capture.EnableCapture();
 
         return new MetricsCollector<DdonServerMetricsSnapshot>(
             capture, sink, settings.SamplingIntervalMs

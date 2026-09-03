@@ -139,6 +139,9 @@ namespace Arrowgene.Ddon.Server
         public void EnableCapture()
         {
             _ddonMetricsState.EnableCapture();
+            _consumer.EnableDdonCapture();
+            // Enables ThreadedBlockingQueue's own metrics: received-data queue delay and per-lane
+            // queue depth. This is the time a packet waits before the consumer thread picks it up.
             ((IMetricsCapture)_consumer).EnableCapture();
             ((IMetricsCapture)_server).EnableCapture();
         }
@@ -146,6 +149,7 @@ namespace Arrowgene.Ddon.Server
         public void DisableCapture()
         {
             _ddonMetricsState.DisableCapture();
+            _consumer.DisableDdonCapture();
             ((IMetricsCapture)_consumer).DisableCapture();
             ((IMetricsCapture)_server).DisableCapture();
         }

@@ -217,12 +217,16 @@ namespace Arrowgene.Ddon.Server.Network
                 currentExecuted, currentErrors, durationBuckets, parseBuckets, handlerMetrics);
         }
 
-        void IMetricsCapture.EnableCapture()
+        // Deliberately NOT an IMetricsCapture re-implementation. ThreadedBlockingQueue implements
+        // IMetricsCapture explicitly and privately, so re-implementing it here would win interface
+        // dispatch and silently leave the base consumer metrics (queue delay, queue depth) disabled.
+        // DdonServer enables both this state and the base state separately.
+        public void EnableDdonCapture()
         {
             _ddonConsumerMetricsState.EnableCapture();
         }
 
-        void IMetricsCapture.DisableCapture()
+        public void DisableDdonCapture()
         {
             _ddonConsumerMetricsState.DisableCapture();
         }

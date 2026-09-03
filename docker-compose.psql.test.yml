@@ -44,6 +44,9 @@ services:
       - ./Arrowgene.Ddon.Shared/Files/Assets:/var/ddon/server/Files/Assets
       - ./Arrowgene.Ddon.Shared/Files/Assets/GameServerList.test.csv:/var/ddon/server/Files/Assets/GameServerList.csv:ro
       - ./Arrowgene.Ddon.Scripts/scripts:/var/ddon/server/Files/Assets/scripts
+      # Exposes metrics JSON on the host; without this the output stays in the
+      # container's writable layer and is destroyed by 'compose down'.
+      - ./metrics-test:/var/ddon/server/Files/www/metrics/snapshot
     networks:
       - ddon-network-test
     depends_on:
