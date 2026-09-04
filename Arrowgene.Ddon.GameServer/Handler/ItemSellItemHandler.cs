@@ -56,9 +56,12 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     var itemInfo = Server.AssetRepository.ClientItemInfos[itemId];
 
                     uint goldValue = itemInfo.Price;
-                    if (itemInfo.EquipSlot != null && Server.ShopManager.TryGetItemPrice(itemId, out uint shopPrice))
+                    if (itemInfo.EquipSlot != null)
                     {
-                        goldValue = shopPrice / 2;
+                        uint buyPrice = Server.ShopManager.TryGetItemPrice(itemId, out uint shopPrice)
+                            ? shopPrice
+                            : Server.ShopManager.EstimateEquipmentBuyPrice(itemInfo);
+                        goldValue = buyPrice / 2;
                     }
 
                     uint amountToAdd = goldValue * consumeItem.Num;
