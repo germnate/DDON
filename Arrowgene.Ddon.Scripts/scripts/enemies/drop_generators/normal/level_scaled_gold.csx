@@ -3,7 +3,10 @@
  * restricted to large monsters (Cyclops, Chimera, Griffin, Golem, Ogre,
  * Drake/Wyrm/Dragon, Behemoth, Grigori, Manticore, Medusa, Gorgon,
  * Cockatrice, Tarasque, Catoblepas, Colossus, Sphinx, Death, Ghost,
- * Evil Eye family, Orc family, etc.) instead of every enemy.
+ * Evil Eye family, Orc family, etc.) and unique superbosses (Zuhl,
+ * Ifrit, Elder Dragon, White/Black Dragon, Baphomet, etc.) instead of
+ * every enemy. Superbosses drop twice as much gold per level as
+ * regular large monsters.
  *
  * Coin Pouches are real items with their own correct itemlist price
  * (e.g. "Coin Pouch (100 G)") and are automatically converted to Gold
@@ -30,8 +33,20 @@ public class Generator : IInstanceEnemyDropGenerator
         return ((uint)enemyId & 0xFFF000) == 0x015000;
     }
 
+    // Unique/superboss enemies (Zuhl, Ifrit, Elder Dragon, White/Black
+    // Dragon, Baphomet, Diamantes, Golgorran, Ushumgal, The Evil Dragon,
+    // Spirit Dragon Willmia, etc.) are allocated in the 0x020000 -
+    // 0x02FFFF range.
+    private static bool IsSuperboss(EnemyId enemyId)
+    {
+        return ((uint)enemyId & 0xFF0000) == 0x020000;
+    }
+
     // Roughly how much gold a level 50 enemy should drop = GoldPerLevel * 50.
     private const double GoldPerLevel = 100.0;
+
+    // Superbosses drop double the gold per level of regular large monsters.
+    private const double SuperbossGoldPerLevel = GoldPerLevel * 2.0;
 
     // 0.0 - 1.0. 1.0 means every kill drops some gold.
     private const double DropChance = 1.0;
@@ -57,7 +72,8 @@ public class Generator : IInstanceEnemyDropGenerator
     {
         List<InstancedGatheringItem> results = new List<InstancedGatheringItem>();
 
-        if (!IsLargeMonster(enemyKilled.EnemyId))
+        bool isSuperboss = IsSuperboss(enemyKilled.EnemyId);
+        if (!isSuperboss && !IsLargeMonster(enemyKilled.EnemyId))
         {
             return results;
         }
@@ -68,8 +84,9 @@ public class Generator : IInstanceEnemyDropGenerator
         }
 
         int level = Math.Max(1, (int)enemyKilled.Lv);
+        double goldPerLevel = isSuperboss ? SuperbossGoldPerLevel : GoldPerLevel;
         double variance = VarianceMin + (Random.Shared.NextDouble() * (VarianceMax - VarianceMin));
-        uint goldAmount = (uint)Math.Round(level * GoldPerLevel * variance);
+        uint goldAmount = (uint)Math.Round(level * goldPerLevel * variance);
 
         if (goldAmount == 0)
         {
