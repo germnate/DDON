@@ -1,5 +1,9 @@
 /**
- * @brief Drops Coin Pouch items scaled to the killed enemy's level.
+ * @brief Drops Coin Pouch items scaled to the killed enemy's level,
+ * restricted to large monsters (Cyclops, Chimera, Griffin, Golem, Ogre,
+ * Drake/Wyrm/Dragon, Behemoth, Grigori, Manticore, Medusa, Gorgon,
+ * Cockatrice, Tarasque, Catoblepas, Colossus, Sphinx, Death, Ghost,
+ * Evil Eye family, Orc family, etc.) instead of every enemy.
  *
  * Coin Pouches are real items with their own correct itemlist price
  * (e.g. "Coin Pouch (100 G)") and are automatically converted to Gold
@@ -12,6 +16,19 @@
 public class Generator : IInstanceEnemyDropGenerator
 {
     public GameMode GameMode => GameMode.Normal;
+
+    // EnemyId values are allocated in ranges by the original developers.
+    // Every "Large Monster" species (Cyclops, Chimera, Griffin, Golem,
+    // Ogre, Drake/Wyrm/Dragon, Behemoth, Grigori, Manticore, Medusa,
+    // Gorgon, Cockatrice, Tarasque, Catoblepas, Colossus, Sphinx, Death,
+    // Ghost, the Eye family and the Orc family) falls in the 0x015000 -
+    // 0x015FFF range, while regular field enemies (Goblin, Wolf,
+    // Skeleton, Saurian, Harpy, etc.) fall in other ranges. This lets us
+    // detect large monsters without hand-maintaining an ID allowlist.
+    private static bool IsLargeMonster(EnemyId enemyId)
+    {
+        return ((uint)enemyId & 0xFFF000) == 0x015000;
+    }
 
     // Roughly how much gold a level 50 enemy should drop = GoldPerLevel * 50.
     private const double GoldPerLevel = 100.0;
@@ -39,6 +56,11 @@ public class Generator : IInstanceEnemyDropGenerator
     public List<InstancedGatheringItem> Generate(GameClient client, InstancedEnemy enemyKilled)
     {
         List<InstancedGatheringItem> results = new List<InstancedGatheringItem>();
+
+        if (!IsLargeMonster(enemyKilled.EnemyId))
+        {
+            return results;
+        }
 
         if (DropChance < 1.0 && Random.Shared.NextDouble() > DropChance)
         {
