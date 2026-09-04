@@ -53,7 +53,14 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
                     var itemId = ntcData.First().ItemList.ItemId;
 
-                    uint goldValue = Server.AssetRepository.ClientItemInfos[itemId].Price;
+                    var itemInfo = Server.AssetRepository.ClientItemInfos[itemId];
+
+                    uint goldValue = itemInfo.Price;
+                    if (itemInfo.EquipSlot != null && Server.ShopManager.TryGetItemPrice(itemId, out uint shopPrice))
+                    {
+                        goldValue = shopPrice / 2;
+                    }
+
                     uint amountToAdd = goldValue * consumeItem.Num;
 
                     var (specialQueue, isSpecial) = Server.ItemManager.HandleSpecialItem(client, ntc, (ItemId)itemId, consumeItem.Num, SpecialItemMode.OnSell, connection);

@@ -34,5 +34,17 @@ namespace Arrowgene.Ddon.GameServer.Shop
         {
             return Goods.GetValueOrDefault(ShopId, new S2CShopGetShopGoodsListRes());
         }
+
+        public bool TryGetItemPrice(uint itemId, out uint price)
+        {
+            price = this._assetList
+                .SelectMany(shop => shop.Data.GoodsParamList)
+                .Where(good => good.ItemId == itemId)
+                .Select(good => good.Price)
+                .DefaultIfEmpty()
+                .Min();
+
+            return price > 0;
+        }
     }
 }
