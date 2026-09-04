@@ -32,10 +32,17 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 index = client.Party.ClientIndex(client);
             }
 
+            Tuple<CDataContextSetBase, CDataContextSetAdditional> previousContext = ContextManager.GetContext(client.Party, context.Item1.UniqueId);
+
             ContextManager.SetContext(client.Party, context.Item1.UniqueId, context);
             ContextManager.AssignMaster(client, packet.Structure.Base.UniqueId, index);
 
-            Logger.Debug($"C2SSetContextNtc: ContextId: {context.Item1.ContextId}, UniqueId: 0x{context.Item1.UniqueId:x16}");
+            Logger.Debug(
+                $"C2SSetContextNtc: CharacterId={client.Character.CharacterId}, ContextId={context.Item1.ContextId}, UniqueId=0x{context.Item1.UniqueId:x16}, " +
+                $"MasterIndex={index}, StageNo={context.Item1.StageNo}, EncountArea={context.Item1.EncountArea}, " +
+                $"ActNo={context.Item2.ActNo}, StateLive={context.Item2.StateLive}, CatchType={context.Item2.CatchType}, CatchJointNo={context.Item2.CatchJointNo}, CatchTargetUID=0x{context.Item2.CatchTargetUID:x16}, " +
+                $"PreviousActNo={previousContext?.Item2.ActNo.ToString() ?? "null"}, PreviousStateLive={previousContext?.Item2.StateLive.ToString() ?? "null"}, " +
+                $"PreviousCatchType={previousContext?.Item2.CatchType.ToString() ?? "null"}, PreviousCatchJointNo={previousContext?.Item2.CatchJointNo.ToString() ?? "null"}, PreviousCatchTargetUID={(previousContext == null ? "null" : $"0x{previousContext.Item2.CatchTargetUID:x16}")}");
         }
     }
 }
