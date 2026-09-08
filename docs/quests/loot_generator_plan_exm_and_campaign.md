@@ -138,19 +138,50 @@ public class QuestInstanceGatheringItemGenerator : IGatheringGenerator
 }
 ```
 
-### 3.4 Open question to resolve during implementation (spike first)
+### 3.4 Resolving the active quest from stage context (precedent confirmed)
 
 `InstanceGatheringItemManager.Generate()` only receives `(StageLayoutId, index)`
-— it does not currently receive the active `quest_id`. Before writing the
-generator, we need to confirm the cleanest existing path from
-`GameClient`/`Character` to "what quest instance is this stage currently
-running for this client/party" (likely via `client.Party.QuestState` /
-`QuestManager`, which already tracks active `Quest` objects per
-`SharedQuestStateManager`/`SoloQuestStateManager`). This should be a short
-spike (read `QuestManager.cs` / `QuestStateManager.cs` for an existing
-accessor) before the generator is written, since it determines the exact
-constructor/method signature needed and whether `Generate()`'s signature must
-be extended to accept the resolved quest reference.
+— it does not currently receive the active `quest_id`. However, **the
+resolution path already exists in the codebase and is used in production for
+Tutorial quests** — no new lookup mechanism needs to be invented:
+
+1. `Quest.BaseLevel` (`Quests/Quest.cs:81`) and `Quest.StageId`
+   (`Quests/Quest.cs:79`) are already populated on every loaded `Quest` object
+   from each quest asset's `base_level` field — this is the value the new
+   generator needs.
+2. `QuestManager.GetQuestByStageNo(QuestType questType, uint stageNo)`
+   (`Characters/QuestManager.cs:345`) is a static reverse index — **stage
+   number → matching quest schedule IDs** — already built by
+   `AddQuestToCollections()` and already consumed by
+   `QuestGetTutorialQuestListHandler.cs` the same way this plan needs it.
+   Today `AddQuestToCollections()` only populates this index for
+   `QuestType.Tutorial` and `QuestType.Substory`; it needs to be **extended
+   to also index `QuestType.ExtremeMission`, `QuestType.World`,
+   `QuestType.Board`, and `QuestType.Clan`** the exact same way (small,
+   additive change to an existing `if`/`else if` chain).
+3. `SharedQuestStateManager`/`SoloQuestStateManager` (accessible via
+   `client.Party.QuestState` per the existing reward-pipeline trace) already
+   expose `GetActiveQuestScheduleIds()` / `HasActiveQuest(scheduleId)` —
+   this tells us which of the candidate schedule IDs from step 2 is actually
+   running for this specific client/party right now.
+
+Putting it together, the generator resolves its quest context as:
+
+```csharp
+uint stageNo = StageManager.ConvertIdToStageNo(stageId);
+var candidates = QuestManager.GetQuestByStageNo(QuestType.ExtremeMission, stageNo)
+    .Concat(QuestManager.GetQuestByStageNo(QuestType.World, stageNo))
+    // ...Board, Clan as needed
+    .Where(client.Party.QuestState.HasActiveQuest);
+var scheduleId = candidates.FirstOrDefault();
+if (scheduleId == 0) return new(); // no matching active quest for this stage
+Quest quest = QuestManager.GetQuestByScheduleId(scheduleId);
+uint baseLevel = quest.BaseLevel;
+```
+
+This is a low-risk, additive change (new index entries + a lookup helper) —
+no changes to `Generate()`'s signature or its call sites are required, and no
+spike/investigation phase is needed before implementation.
 
 ## 4. Scope Boundaries
 
@@ -170,9 +201,10 @@ be extended to accept the resolved quest reference.
 
 ## 5. Implementation Phases
 
-1. **Spike:** confirm the quest-instance lookup path from `GameClient`/
-   `StageLayoutId` (see 3.4). Output: a one-paragraph note on which
-   existing accessor to call, added to this doc before coding begins.
+1. **Extend quest-by-stage indexing:** in `QuestManager.AddQuestToCollections`,
+   add `QuestType.ExtremeMission`, `QuestType.World`, `QuestType.Board`, and
+   `QuestType.Clan` to the branch that populates `QuestByStageNo` (currently
+   Tutorial/Substory only) — mirrors existing code exactly, see section 3.4.
 2. **Data model + asset loader:**
    - `Model/Quest/QuestLootRange.cs`, `AssetReader/QuestLootRangeDeserializer.cs`,
      wire into `AssetRepository` (mirrors `BitterblackMazeAsset.LootRanges`
