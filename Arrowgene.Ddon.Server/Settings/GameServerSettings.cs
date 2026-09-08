@@ -1058,6 +1058,25 @@ namespace Arrowgene.Ddon.Server.Settings
         private const bool _EnableDefaultGatheringDrops = false;
 
         /// <summary>
+        /// If set to true, enables level-appropriate loot generation for treasure chests
+        /// inside Extreme Mission and campaign quest (World/Board/Clan) instances, using
+        /// QuestLootRanges.json and QuestBossChests.json to determine the item rank pool.
+        /// </summary>
+        [DefaultValue(_EnableQuestInstanceChestDrops)]
+        public bool EnableQuestInstanceChestDrops
+        {
+            set
+            {
+                SetSetting("EnableQuestInstanceChestDrops", value);
+            }
+            get
+            {
+                return TryGetSetting("EnableQuestInstanceChestDrops", _EnableQuestInstanceChestDrops);
+            }
+        }
+        private const bool _EnableQuestInstanceChestDrops = true;
+
+        /// <summary>
         /// The amount of golden gemstones it costs to use the beauty parlor.
         /// </summary>
         [DefaultValue(_BeautyParlorGGPrice)]

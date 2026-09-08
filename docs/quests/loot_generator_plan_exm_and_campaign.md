@@ -1,8 +1,84 @@
 # Plan: Level-Appropriate Loot Generators for Extreme Mission & Campaign Treasure Chests
 
-**Status:** Draft / not yet implemented
+**Status:** Implemented (see "Implementation Status" below); solution builds clean
 **Date:** 2026-09-08
 **Related:** `docs/gathering_nodes.md`, `docs/quests/generic_quest_state_machine.md`
+
+## 0. Implementation Status (2026-09-08)
+
+Implemented and building cleanly. Two deviations from the original design below,
+both discovered from real data during implementation:
+
+1. **Item filtering uses `ClientItemInfo.Level`, not `Rank`.** Direct inspection of
+   the full `itemlist.csv` (not just BBM's curated subsets) showed `Rank` does not
+   correlate consistently with a piece of equipment's intended character level
+   (e.g. a rank-15 item can require level 62 while a rank-45 item requires level 1).
+   `Rank` is only a reliable tier signal *within* BBM's small hand-picked item
+   lists, not across the whole catalog. `Level` (populated for ~16k/17k Equipment
+   items, itemlist.csv Category 3) is the correct, direct signal for "is this
+   item appropriate for a level-N mission" and is what `QuestLootRange` now uses
+   (`NormalItemLevelMin/Max`, `BossItemLevelMin/Max` instead of `NormalRange`/`BossRange`).
+2. **v2: materials/consumables added, weighted below equipment.** Rather than
+   authoring a brand-new leveled material table, the generator reuses the
+   existing hand-curated `DefaultGatheringDropsAsset` (`DefaultGatheringDrops.json`)
+   pool - the same data that powers overworld gathering nodes/chests - which
+   already carries a per-item `ItemLevel`. Since quest instances have no
+   `QuestAreaId`, the pool is flattened across *all* areas (deduped by ItemId)
+   rather than keyed by area; "area appropriate" is satisfied via level-window
+   filtering the same way equipment is. Each chest rolls exactly one reward:
+   30% chance Equipment (`EquipmentDropChance` in
+   `QuestInstanceGatheringItemGenerator`), 70% chance Material/Consumable
+   (any `DropCategory` except `Equipment`/`Jewelry`). The 30% ceiling on gear
+   is intentional - keeping materials/consumables (and by extension, the gald
+   earned from selling/using them) the common case so equipment drops don't
+   make everything else in the economy obsolete. If a chosen path yields no
+   candidates for the level window, it falls back to the other path so a
+   chest is never silently empty.
+3. **Signature EXM rare materials get a dedicated, boosted roll.** Investigation
+   showed EXM's headline rewards (e.g. "Rare Netherworld Crystal", "Rare Vortex
+   Crystal", "Otherworldly Drop") are hand-placed quest-completion rewards, not
+   part of any gathering/chest pool - so without extra work, chests would never
+   produce them even after the Equipment/Material split above. Added a curated
+   allow-list of 21 such items (`QuestRareMaterials.json`, gathered by scanning
+   `item_id` references across all 17 EXM quest JSONs and filtering to the
+   clearly EXM-signature crystals/drops), bucketed for eligibility by
+   `ClientItemInfo.Rank` per `QuestLootRange.RareMaterialRankMin/Max` (Rank
+   scales with EXM base_level in the observed reward data: e.g. Rank 12 for
+   BaseLevel ~58, Rank 130 for BaseLevel 100). For Extreme Mission quests only
+   (`QuestUtils.IsExmQuest`), each chest first rolls against
+   `RareMaterialChanceNormal`/`RareMaterialChanceBoss` (5-12% normal, 20-35%
+   boss) before falling through to the Equipment/Material split - boss-room
+   chests are meaningfully more likely to hand out one of these signature
+   materials, matching the expectation that "the last chests" are the big
+   payoff.
+
+Implemented files:
+- `Arrowgene.Ddon.Shared/Model/Quest/QuestLootRange.cs`, `QuestBossChestEntry.cs`
+- `Arrowgene.Ddon.Shared/Files/Assets/QuestLootRanges.json` (5 level brackets, 0-999)
+- `Arrowgene.Ddon.Shared/Files/Assets/QuestBossChests.json` (empty - see below)
+- `Arrowgene.Ddon.Shared/Files/Assets/QuestRareMaterials.json` (21 curated EXM item IDs)
+- `Arrowgene.Ddon.Shared/AssetRepository.cs` (new keys/properties/registrations)
+- `Arrowgene.Ddon.GameServer/GatheringItems/Generators/QuestInstanceGatheringItemGenerator.cs`
+- `Arrowgene.Ddon.GameServer/GatheringItems/InstanceGatheringItemManager.cs` (registered generator)
+- `Arrowgene.Ddon.GameServer/Characters/QuestManager.cs` (stage-number index extended to
+  World/ExtremeMission/Light quest types)
+- `Arrowgene.Ddon.Server/Settings/GameServerSettings.cs` +
+  `Arrowgene.Ddon.Scripts/scripts/settings/templates/GameServerSettings.csx`
+  (new `EnableQuestInstanceChestDrops`, default `true`)
+
+**Outstanding follow-up:** `QuestBossChests.json` ships empty - EM1's exact two
+boss-room chest `(StageId, GroupId, PosId)` coordinates were never confirmed
+in-game. Until entries are added there, *all* EXM chests (including the boss
+room's) roll from the Normal item-level window rather than the Boss window -
+they will no longer be empty, they just won't get the extra rarity bump yet.
+The generator logs a Debug line per chest roll (`QuestInstanceGatheringItemGenerator`)
+including quest id + `stageId.groupId.pos` - next time EM1 is run, check server
+logs for the final chests' coordinates and add them to `QuestBossChests.json`, e.g.:
+```json
+[
+  { "QuestId": 50101020, "StageId": 293, "GroupId": 0, "PosId": 5 }
+]
+```
 
 ## 1. Problem Statement
 
