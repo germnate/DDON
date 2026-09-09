@@ -8,6 +8,7 @@ using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Arrowgene.Ddon.GameServer.Handler
 {
@@ -88,6 +89,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 });
             }
 
+            LogEnemyRoster(client, stageLayoutId, subGroupId);
+
             if (subGroupId > 0 && response.EnemyList.Count > 0)
             {
                 S2CInstanceEnemySubGroupAppearNtc subgroupNtc = new S2CInstanceEnemySubGroupAppearNtc()
@@ -100,6 +103,23 @@ namespace Arrowgene.Ddon.GameServer.Handler
             }
 
             return response;
+        }
+
+        private void LogEnemyRoster(GameClient client, StageLayoutId stageLayoutId, byte subGroupId)
+        {
+            List<InstancedEnemy> group = client.Party.InstanceEnemyManager.GetInstancedEnemies(stageLayoutId);
+            if (group.Count == 0)
+            {
+                Logger.Info(client, $"[EnemyRoster] Stage={stageLayoutId} (StageId={stageLayoutId.Id} LayerNo={stageLayoutId.LayerNo} GroupId={stageLayoutId.GroupId}) SubGroupId={subGroupId} -> no enemies");
+                return;
+            }
+
+            int requiredCount = group.Count(x => x.IsRequired);
+            Logger.Info(client, $"[EnemyRoster] Stage={stageLayoutId} (StageId={stageLayoutId.Id} LayerNo={stageLayoutId.LayerNo} GroupId={stageLayoutId.GroupId}) SubGroupId={subGroupId} Count={group.Count} Required={requiredCount}");
+            foreach (var enemy in group.OrderBy(x => x.Index))
+            {
+                Logger.Info(client, $"[EnemyRoster]   Index/SetId={enemy.Index} Subgroup={enemy.Subgroup} EnemyId={enemy.EnemyId}(0x{(uint)enemy.EnemyId:X}) Lv={enemy.Lv} Named={enemy.NamedEnemyParams?.Id.ToString() ?? "-"} IsRequired={enemy.IsRequired} IsKilled={enemy.IsKilled} IsAreaBoss={enemy.IsAreaBoss} IsBossGauge={enemy.IsBossGauge} RepopCount={enemy.RepopCount} QuestScheduleId={enemy.QuestScheduleId}");
+            }
         }
     }
 }

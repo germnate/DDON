@@ -104,6 +104,14 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     groupDestroyed = group.Where(x => x.IsRequired).All(x => x.IsKilled);
                 }
 
+                var required = group.Where(x => x.IsRequired && (!isQuestControlled || x.QuestScheduleId == quest.QuestScheduleId)).ToList();
+                Logger.Info(client, $"[EnemyKill] Stage={stageId} (StageId={stageId.Id} LayerNo={stageId.LayerNo} GroupId={stageId.GroupId}) SetId={packet.SetId} EnemyId={enemyKilled.EnemyId}(0x{(uint)enemyKilled.EnemyId:X}) Lv={enemyKilled.Lv} Subgroup={enemyKilled.Subgroup} IsRequired={enemyKilled.IsRequired} IsAreaBoss={enemyKilled.IsAreaBoss} QuestScheduleId={enemyKilled.QuestScheduleId} QuestControlled={isQuestControlled} Epitaph={isEpitaphEnemy}");
+                Logger.Info(client, $"[EnemyKill] Group progress: {required.Count(x => x.IsKilled)}/{required.Count} required killed (total in group={group.Count}) -> GroupDestroyed={groupDestroyed}");
+                foreach (var member in group.OrderBy(x => x.Index))
+                {
+                    Logger.Info(client, $"[EnemyKill]   Index/SetId={member.Index} Subgroup={member.Subgroup} EnemyId={member.EnemyId} IsRequired={member.IsRequired} IsKilled={member.IsKilled} RepopNum={member.RepopNum}/{member.RepopCount} QuestScheduleId={member.QuestScheduleId}");
+                }
+
                 if (groupDestroyed)
                 {
                     bool isAreaBoss = group.Any(x => x.IsAreaBoss);
@@ -123,6 +131,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         IsAreaBoss = isCautionSpot && (client.GameMode == GameMode.Normal)
                     };
                     client.Party.EnqueueToAll(groupDestroyedNtc, queuedPackets);
+                    Logger.Info(client, $"[EnemyKill] Sent S2CInstanceEnemyGroupDestroyNtc for Stage={stageId} (StageId={stageId.Id} LayerNo={stageId.LayerNo} GroupId={stageId.GroupId}) IsAreaBoss={groupDestroyedNtc.IsAreaBoss}");
 
                     if (isAreaBoss && client.GameMode == GameMode.BitterblackMaze)
                     {
