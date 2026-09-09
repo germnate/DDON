@@ -364,7 +364,14 @@ bool EnableToolGatheringDrops = true;
 /// more balance and testing before being enabled
 /// all the time.
 /// </summary>
-bool EnableDefaultGatheringDrops = false;
+bool EnableDefaultGatheringDrops = true;
+
+/// <summary>
+/// If set to true, enables level-appropriate loot generation for treasure chests
+/// inside Extreme Mission and campaign quest (World/Board/Clan) instances, using
+/// QuestLootRanges.json and QuestBossChests.json to determine the item rank pool.
+/// </summary>
+bool EnableQuestInstanceChestDrops = true;
 
 /// <summary>
 /// The amount of golden gemstones it costs to use the beauty parlor.
