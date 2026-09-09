@@ -150,13 +150,19 @@ public class ScriptedQuest : IQuest
             
         process1.AddRawBlock(QuestAnnounceType.None)
             .AddCheckCmdDieEnemy(Stage.ElanWaterGrove, 50, -1)
-        ;  
+        ;
 
         process1.AddRawBlock(QuestAnnounceType.None)
             .AddQuestFlag(QuestFlagType.MyQst, QuestFlagAction.Set, MyQstFlag.FsmFlag)
             .AddResultCmdQstTalkChg(NpcId.Glenis, NpcText.GlenisIdle)
             .AddResultCmdQstTalkChg(NpcId.Nora, NpcText.NoraIdle)
         ;
+
+        process1.AddTalkToNpcBlock(QuestAnnounceType.CheckpointAndUpdate, Stage.ProtectorsRetreat, NpcId.Musel0, NpcText.MuselReturn)
+            .AddResultCmdQstTalkChg(NpcId.Ide, NpcText.IdeReturnIdle)
+        ;
+
+        process1.AddProcessEndBlock(true);
 
     }
 }
