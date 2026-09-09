@@ -8,6 +8,7 @@ using Arrowgene.Ddon.Server.Network;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
+using Arrowgene.Ddon.Shared.Model.EpitaphRoad;
 using Arrowgene.Ddon.Shared.Model.Quest;
 using Arrowgene.Logging;
 using System;
@@ -102,6 +103,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 else
                 {
                     groupDestroyed = group.Where(x => x.IsRequired).All(x => x.IsKilled);
+                }
+
+                if (_gameServer.EpitaphRoadManager.TryUnlockMysteriousDoor(client.Party, stageId, layoutId.GroupId, 3, queuedPackets))
+                {
+                    Logger.Info(client, $"Unlocked mysterious door for stage {stageId} group {layoutId.GroupId} pos 3 via enemy kill.");
                 }
 
                 if (groupDestroyed)

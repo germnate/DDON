@@ -1115,6 +1115,45 @@ namespace Arrowgene.Ddon.GameServer.Characters
             }
         }
 
+        public bool TryUnlockMysteriousDoor(PartyGroup party, StageLayoutId stageId, uint groupId, uint posId, PacketQueue queue)
+        {
+            var door = GetMysteriousDoor(stageId, posId);
+            if (door == null)
+            {
+                return false;
+            }
+
+            if (GetMysteriousDoorState(party, stageId, posId).State == SeasonDungeonOmState.DoorUnlocked)
+            {
+                // Already unlocked, no need to re-send the notice on every subsequent kill.
+                return false;
+            }
+
+            SetMysteriousDoorState(party, stageId, posId, SeasonDungeonOmState.DoorUnlocked);
+
+            var ntc = new S2CSeasonDungeonSetOmStateNtc()
+            {
+                LayoutId = new CDataStageLayoutId()
+                {
+                    StageId = stageId.Id,
+                    GroupId = groupId,
+                },
+                PosId = posId,
+                State = SeasonDungeonOmState.DoorUnlocked
+            };
+
+            if (queue != null)
+            {
+                party.EnqueueToAll(ntc, queue);
+            }
+            else
+            {
+                party.SendToAll(ntc);
+            }
+
+            return true;
+        }
+
         public void UpdateAllMysteriousDoorOmState(GameClient client, StageLayoutId stageId, PacketQueue queue)
         {
             UpdateAllMysteriousDoorOmState(client, stageId.Id, queue);
