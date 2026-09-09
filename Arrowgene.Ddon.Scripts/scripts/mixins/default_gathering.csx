@@ -41,7 +41,9 @@ private class GatheringExtensions
         [GatheringType.OM_GATHER_KEY_LV1] = 1,
         [GatheringType.OM_GATHER_KEY_LV2] = 2,
         [GatheringType.OM_GATHER_TREA_IRON] = 2,
+        [GatheringType.OM_GATHER_TREA_SILVER] = 3,
         [GatheringType.OM_GATHER_KEY_LV3] = 3,
+        [GatheringType.OM_GATHER_TREA_GOLD] = 4,
         [GatheringType.OM_GATHER_KEY_LV4] = 4,
     };
 
@@ -64,7 +66,10 @@ private class GatheringExtensions
         {
             return MIN_GATHERING_RANK;
         }
-        return TreasureChestBaseRank[spotInfo.UnitId] + ChestModifierRank[spotInfo.GatheringType];
+
+        var baseRank = TreasureChestBaseRank.GetValueOrDefault(spotInfo.UnitId, MIN_GATHERING_RANK);
+        var modifierRank = ChestModifierRank.GetValueOrDefault(spotInfo.GatheringType, 0);
+        return baseRank + modifierRank;
     }
 
     private static readonly Dictionary<GatheringType, int> LumberModifierRank = new Dictionary<GatheringType, int>()
@@ -124,6 +129,20 @@ public class Mixin : IDefaultGatherMixin
 {
     private static readonly ILogger Logger = LogProvider.Logger(typeof(Mixin));
 
+    private static readonly HashSet<GatheringType> TreasureLikeGatheringTypes = new()
+    {
+        GatheringType.OM_GATHER_KEY_LV1,
+        GatheringType.OM_GATHER_KEY_LV2,
+        GatheringType.OM_GATHER_KEY_LV3,
+        GatheringType.OM_GATHER_KEY_LV4,
+        GatheringType.OM_GATHER_TREA_OLD,
+        GatheringType.OM_GATHER_TREA_TREE,
+        GatheringType.OM_GATHER_TREA_IRON,
+        GatheringType.OM_GATHER_TREA_SILVER,
+        GatheringType.OM_GATHER_TREA_GOLD,
+        GatheringType.OM_GATHER_ANTIQUE,
+    };
+
     public override List<InstancedGatheringItem> GenerateGatheringDrops(GameClient client, StageLayoutId stageLayoutId, uint index)
     {
         if (StageManager.IsBitterBlackMazeStageId(stageLayoutId) || StageManager.IsEpitaphRoadStageId(stageLayoutId))
@@ -171,14 +190,39 @@ public class Mixin : IDefaultGatherMixin
         }
 
         var spotInfo = stageSpots[(stageLayoutId.GroupId, index)];
+        var isTreasureLike = TreasureLikeGatheringTypes.Contains(spotInfo.GatheringType) || spotInfo.UnitId.IsTreasureChest();
 
         Logger.Debug($"{stageLayoutId}.{index}  OmType={spotInfo.UnitId}, GatheringType={spotInfo.GatheringType}");
 
-        var dropTable = GetDropCategoriesForSpot(spotInfo)
+        var dropCategories = GetDropCategoriesForSpot(spotInfo);
+        var dropsForSpot = dropCategories
             .Select(x => LibDdon.Assets.DefaultGatheringDropsAsset.AreaDefaultDrops[areaId][x])
             .Where(x => x.Count > 0)
             .SelectMany(x => x)
-            .Where(x => x.StageId == stage.StageId)
+            .ToList();
+
+        if (dropsForSpot.Count == 0 && isTreasureLike)
+        {
+            // Some treasure-like points are authored with non-chest unit ids.
+            // If their mapped categories are empty, fall back to all categories.
+            Logger.Debug($"{stageLayoutId}.{index} using treasure-like all-category fallback");
+            dropsForSpot = DropCategoryExtension.All
+                .Select(x => LibDdon.Assets.DefaultGatheringDropsAsset.AreaDefaultDrops[areaId][x])
+                .Where(x => x.Count > 0)
+                .SelectMany(x => x)
+                .ToList();
+        }
+
+        var stageDrops = dropsForSpot.Where(x => x.StageId == stage.StageId).ToList();
+        if (stageDrops.Count == 0 && isTreasureLike)
+        {
+            // Some treasure pile/chest spots are missing explicit stage rows in DefaultGatheringDrops.
+            // Fall back to area-level treasure categories instead of returning an empty pile.
+            Logger.Debug($"{stageLayoutId}.{index} using treasure-like stage fallback");
+            stageDrops = dropsForSpot;
+        }
+
+        var dropTable = stageDrops
             .GroupBy(x => x.ItemId)
             .Select(x => x.First())
             .OrderBy(x => x.ItemLevel)

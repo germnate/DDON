@@ -1055,7 +1055,7 @@ namespace Arrowgene.Ddon.Server.Settings
                 return TryGetSetting("EnableDefaultGatheringDrops", _EnableDefaultGatheringDrops);
             }
         }
-        private const bool _EnableDefaultGatheringDrops = false;
+        private const bool _EnableDefaultGatheringDrops = true;
 
         /// <summary>
         /// If set to true, enables level-appropriate loot generation for treasure chests

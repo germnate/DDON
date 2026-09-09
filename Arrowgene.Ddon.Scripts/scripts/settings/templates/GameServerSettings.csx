@@ -364,7 +364,7 @@ bool EnableToolGatheringDrops = true;
 /// more balance and testing before being enabled
 /// all the time.
 /// </summary>
-bool EnableDefaultGatheringDrops = false;
+bool EnableDefaultGatheringDrops = true;
 
 /// <summary>
 /// If set to true, enables level-appropriate loot generation for treasure chests
