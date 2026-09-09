@@ -70,6 +70,9 @@ namespace Arrowgene.Ddon.Shared
         public const string CraftAddStatusKey = "CraftAddStatus.json";
         public const string SkillDataKey = "SkillData.json";
         public const string TrainingRoomKey = "TrainingRoom.json";
+        public const string QuestLootRangesKey = "QuestLootRanges.json";
+        public const string QuestBossChestsKey = "QuestBossChests.json";
+        public const string QuestRareMaterialsKey = "QuestRareMaterials.json";
 
         public const string QuestAssestKey = "quests";
         public const string EpitaphAssestKey = "epitaph";
@@ -149,6 +152,9 @@ namespace Arrowgene.Ddon.Shared
             CraftAddStatusAsset = new();
             SkillData = new([], [], []);
             TrainingRoomAsset = [];
+            QuestLootRangeAsset = new();
+            QuestBossChestAsset = new();
+            QuestRareMaterialAsset = new();
         }
 
         public Dictionary<ErrorCode, ClientErrorCode> ClientErrorCodes { get; private set; }
@@ -201,6 +207,9 @@ namespace Arrowgene.Ddon.Shared
         public Dictionary<QuestId, uint> QuestScheduleIdAsset { get; private set; }
         public CraftAddStatusAsset CraftAddStatusAsset { get; private set; }
         public List<TrainingRoomEntry> TrainingRoomAsset { get; private set; }
+        public List<QuestLootRange> QuestLootRangeAsset { get; private set; }
+        public List<QuestBossChestEntry> QuestBossChestAsset { get; private set; }
+        public List<ItemId> QuestRareMaterialAsset { get; private set; }
 
         public void Initialize()
         {
@@ -252,6 +261,9 @@ namespace Arrowgene.Ddon.Shared
             RegisterAsset(value => SkillData = value, SkillDataKey, new SkillDataAssetDeserializer());
             RegisterAsset(value => CraftAddStatusAsset = value, CraftAddStatusKey, new CraftAddStatusAssetReader());
             RegisterAsset(value => TrainingRoomAsset = value, TrainingRoomKey, new JsonReaderWriter<List<TrainingRoomEntry>>());
+            RegisterAsset(value => QuestLootRangeAsset = value, QuestLootRangesKey, new JsonReaderWriter<List<QuestLootRange>>());
+            RegisterAsset(value => QuestBossChestAsset = value, QuestBossChestsKey, new JsonReaderWriter<List<QuestBossChestEntry>>());
+            RegisterAsset(value => QuestRareMaterialAsset = value, QuestRareMaterialsKey, new JsonReaderWriter<List<ItemId>>());
 
             // This must be set before calling QuestAssetDeserializer and EpitaphTrialAssetDeserializer
             var commonEnemyDeserializer = new AssetCommonDeserializer(this.NamedParamAsset);

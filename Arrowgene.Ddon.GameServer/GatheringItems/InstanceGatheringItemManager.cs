@@ -26,7 +26,8 @@ namespace Arrowgene.Ddon.GameServer.GatheringItems
                 new DefaultGatheringItemGenerator(server),
                 new GatheringTableGatheringItemGenerator(server),
                 new BitterblackGatheringItemGenerator(server),
-                new EpitaphRoadGatheringItemGenerator(server)
+                new EpitaphRoadGatheringItemGenerator(server),
+                new QuestInstanceGatheringItemGenerator(server)
             };
         }
 

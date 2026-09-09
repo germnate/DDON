@@ -1,0 +1,7 @@
+[
+  { "MinLevel": 0,   "MaxLevel": 20,  "NormalItemLevelMin": 1,  "NormalItemLevelMax": 20,  "BossItemLevelMin": 15,  "BossItemLevelMax": 30,  "BossRareChanceBonus": 0.25, "RareMaterialRankMin": 1,   "RareMaterialRankMax": 8,   "RareMaterialChanceNormal": 0.05, "RareMaterialChanceBoss": 0.20 },
+  { "MinLevel": 21,  "MaxLevel": 40,  "NormalItemLevelMin": 15, "NormalItemLevelMax": 45,  "BossItemLevelMin": 35,  "BossItemLevelMax": 55,  "BossRareChanceBonus": 0.30, "RareMaterialRankMin": 1,   "RareMaterialRankMax": 12,  "RareMaterialChanceNormal": 0.05, "RareMaterialChanceBoss": 0.20 },
+  { "MinLevel": 41,  "MaxLevel": 60,  "NormalItemLevelMin": 35, "NormalItemLevelMax": 65,  "BossItemLevelMin": 55,  "BossItemLevelMax": 75,  "BossRareChanceBonus": 0.30, "RareMaterialRankMin": 9,   "RareMaterialRankMax": 20,  "RareMaterialChanceNormal": 0.08, "RareMaterialChanceBoss": 0.25 },
+  { "MinLevel": 61,  "MaxLevel": 80,  "NormalItemLevelMin": 55, "NormalItemLevelMax": 85,  "BossItemLevelMin": 75,  "BossItemLevelMax": 100, "BossRareChanceBonus": 0.35, "RareMaterialRankMin": 30,  "RareMaterialRankMax": 75,  "RareMaterialChanceNormal": 0.10, "RareMaterialChanceBoss": 0.30 },
+  { "MinLevel": 81,  "MaxLevel": 999, "NormalItemLevelMin": 75, "NormalItemLevelMax": 110, "BossItemLevelMin": 95,  "BossItemLevelMax": 115, "BossRareChanceBonus": 0.40, "RareMaterialRankMin": 100, "RareMaterialRankMax": 130, "RareMaterialChanceNormal": 0.12, "RareMaterialChanceBoss": 0.35 }
+]

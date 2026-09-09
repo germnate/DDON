@@ -76,19 +76,36 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
             if (quest.QuestType == QuestType.Tutorial || quest.QuestType == QuestType.Substory)
             {
-                uint stageNo = (uint)StageManager.ConvertIdToStageNo(quest.StageId);
-                if (!questByStageNo.ContainsKey(quest.QuestType))
-                    questByStageNo[quest.QuestType] = new();
-                var questDict = questByStageNo[quest.QuestType];
-                if (!questDict.ContainsKey(stageNo))
-                    questDict[stageNo] = new HashSet<uint>();
-                questDict[stageNo].Add(quest.QuestScheduleId);
+                AddQuestToStageIndex(quest, questByStageNo);
             }
             else if (quest.QuestType == QuestType.World)
             {
                 if (!worldQuests.ContainsKey(quest.QuestAreaId))
                     worldQuests[quest.QuestAreaId] = new HashSet<QuestId>();
                 worldQuests[quest.QuestAreaId].Add(quest.QuestId);
+
+                // World quests are also indexed by stage number so instance-level features
+                // (e.g. quest instance chest loot) can resolve "what quest is running at this
+                // stage" without needing a full character/party context.
+                AddQuestToStageIndex(quest, questByStageNo);
+            }
+            else if (quest.QuestType == QuestType.ExtremeMission)
+            {
+                // Extreme Missions have no dedicated collection of their own (unlike World
+                // quests via gWorldQuests) - the stage index is the only lookup they need for
+                // instance-level features such as quest instance chest loot.
+                AddQuestToStageIndex(quest, questByStageNo);
+            }
+            else if (quest.QuestType == QuestType.Light)
+            {
+                // Board and Clan quests are both authored with "type": "Light" in the quest
+                // assets (there is no distinct QuestType value for either) and are only
+                // distinguishable from ordinary personal Light quests by QuestId range
+                // (QuestUtils.IsBoardQuest / IsClanQuest). Index all of them here regardless -
+                // harmless for personal Light quests since nothing currently reads this bucket
+                // for QuestType.Light, and it lets instance-level features resolve Board/Clan
+                // quest instances by stage number the same way as World/Exm quests.
+                AddQuestToStageIndex(quest, questByStageNo);
             }
 
             if (!adventureGuideCategories.ContainsKey(quest.AdventureGuideCategory))
@@ -134,6 +151,17 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     areaTrialRanks[areaId][quest.QuestScheduleId] = requiredRank;
                 }
             }
+        }
+
+        private static void AddQuestToStageIndex(Quest quest, Dictionary<QuestType, Dictionary<uint, HashSet<uint>>> questByStageNo)
+        {
+            uint stageNo = (uint)StageManager.ConvertIdToStageNo(quest.StageId);
+            if (!questByStageNo.ContainsKey(quest.QuestType))
+                questByStageNo[quest.QuestType] = new();
+            var questDict = questByStageNo[quest.QuestType];
+            if (!questDict.ContainsKey(stageNo))
+                questDict[stageNo] = new HashSet<uint>();
+            questDict[stageNo].Add(quest.QuestScheduleId);
         }
 
         public static void LoadScriptedQuest(DdonGameServer server, IQuest questScript)
