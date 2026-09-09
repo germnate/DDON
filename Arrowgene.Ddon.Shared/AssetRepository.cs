@@ -73,6 +73,7 @@ namespace Arrowgene.Ddon.Shared
         public const string QuestLootRangesKey = "QuestLootRanges.json";
         public const string QuestBossChestsKey = "QuestBossChests.json";
         public const string QuestRareMaterialsKey = "QuestRareMaterials.json";
+        public const string KeyDoorsKey = "KeyDoors.json";
 
         public const string QuestAssestKey = "quests";
         public const string EpitaphAssestKey = "epitaph";
@@ -210,6 +211,7 @@ namespace Arrowgene.Ddon.Shared
         public List<QuestLootRange> QuestLootRangeAsset { get; private set; }
         public List<QuestBossChestEntry> QuestBossChestAsset { get; private set; }
         public List<ItemId> QuestRareMaterialAsset { get; private set; }
+        public List<KeyDoorEntry> KeyDoorAsset { get; private set; } = new List<KeyDoorEntry>();
 
         public void Initialize()
         {
@@ -264,6 +266,7 @@ namespace Arrowgene.Ddon.Shared
             RegisterAsset(value => QuestLootRangeAsset = value, QuestLootRangesKey, new JsonReaderWriter<List<QuestLootRange>>());
             RegisterAsset(value => QuestBossChestAsset = value, QuestBossChestsKey, new JsonReaderWriter<List<QuestBossChestEntry>>());
             RegisterAsset(value => QuestRareMaterialAsset = value, QuestRareMaterialsKey, new JsonReaderWriter<List<ItemId>>());
+            RegisterAsset(value => KeyDoorAsset = value, KeyDoorsKey, new JsonReaderWriter<List<KeyDoorEntry>>());
 
             // This must be set before calling QuestAssetDeserializer and EpitaphTrialAssetDeserializer
             var commonEnemyDeserializer = new AssetCommonDeserializer(this.NamedParamAsset);

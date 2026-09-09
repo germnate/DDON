@@ -1,0 +1,16 @@
+[
+  {
+    "Comment": "Crypt of Murmurs - key enemy door. OM 23/3 -> state 8 (DoorUnlocked) is confirmed working via `/updateom 23 3 8`. GroupId below is the enemy group that must be wiped to open it; use `/spawntest` inside the stage to find the group in front of the door, then add that group to EnemySpawn.json and set it here.",
+    "StageId": 331,
+    "LayerNo": 0,
+    "GroupId": 4,
+    "Opens": [
+      {
+        "StageId": 331,
+        "GroupId": 23,
+        "PosId": 3,
+        "State": 8
+      }
+    ]
+  }
+]

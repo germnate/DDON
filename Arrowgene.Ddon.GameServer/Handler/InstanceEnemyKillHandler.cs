@@ -133,6 +133,8 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     client.Party.EnqueueToAll(groupDestroyedNtc, queuedPackets);
                     Logger.Info(client, $"[EnemyKill] Sent S2CInstanceEnemyGroupDestroyNtc for Stage={stageId} (StageId={stageId.Id} LayerNo={stageId.LayerNo} GroupId={stageId.GroupId}) IsAreaBoss={groupDestroyedNtc.IsAreaBoss}");
 
+                    _gameServer.KeyDoorManager.EvaluateGroupDestroyed(client.Party, stageId, queuedPackets);
+
                     if (isAreaBoss && client.GameMode == GameMode.BitterblackMaze)
                     {
                         foreach (var memberClient in client.Party.Clients)

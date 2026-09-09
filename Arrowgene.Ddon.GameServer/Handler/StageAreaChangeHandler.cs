@@ -79,6 +79,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     }
 
                     Server.EpitaphRoadManager.ResetInstance(client.Party);
+                    Server.KeyDoorManager.ResetInstance(client.Party);
                     client.Party.ResetInstance();
                     client.Party.SendToAll(new S2CInstanceAreaResetNtc());
                     Server.RentalPawnManager.HandleReset(client.Party).Send();
@@ -144,6 +145,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             queue.AddRange(Server.JobMasterManager.HandleAreaChange(client));
 
             Server.EpitaphRoadManager.AreaChange(client, packet.StageId, queue);
+            Server.KeyDoorManager.AreaChange(client, packet.StageId, queue);
             return queue;
         }
     }

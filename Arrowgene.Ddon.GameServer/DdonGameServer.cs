@@ -84,6 +84,7 @@ namespace Arrowgene.Ddon.GameServer
             ClanManager = new ClanManager(this);
             RpcManager = new RpcManager(this);
             EpitaphRoadManager = new EpitaphRoadManager(this);
+            KeyDoorManager = new KeyDoorManager(this);
             ScheduleManager = new ScheduleManager(this);
             AreaRankManager = new AreaRankManager(this);
             GameTimeManager = new GameTimeManager(this);
@@ -133,6 +134,7 @@ namespace Arrowgene.Ddon.GameServer
         public ClanManager ClanManager { get; }
         public RpcManager RpcManager { get; }
         public EpitaphRoadManager EpitaphRoadManager { get; }
+        public KeyDoorManager KeyDoorManager { get; }
         public ScheduleManager ScheduleManager { get; }
         public AreaRankManager AreaRankManager { get; }
         public GameTimeManager GameTimeManager { get; }
