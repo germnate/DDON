@@ -542,6 +542,19 @@ public interface IDatabase
     bool InsertPartnerPawnPendingReward(uint characterId, uint pawnId, uint rewardLevel, DbConnection? connectionIn = null);
     void DeletePartnerPawnPendingReward(uint characterId, uint pawnId, uint rewardLevel, DbConnection? connectionIn = null);
 
+    // Pawn Expedition
+    PawnExpeditionRecord? GetPawnExpeditionRecord(uint characterId, DbConnection? connectionIn = null);
+    bool UpsertPawnExpeditionRecord(PawnExpeditionRecord record, DbConnection? connectionIn = null);
+    List<PawnExpeditionRecord> GetPawnExpeditionRecordsForClanMembers(List<uint> characterIds, DbConnection? connectionIn = null);
+
+    uint InsertPawnExpeditionRewardBox(uint characterId, byte mdlType, DbConnection? connectionIn = null);
+    bool InsertPawnExpeditionRewardBoxItem(PawnExpeditionRewardBoxItem item, DbConnection? connectionIn = null);
+    List<PawnExpeditionRewardBox> GetPawnExpeditionRewardBoxes(uint characterId, DbConnection? connectionIn = null);
+    PawnExpeditionRewardBox? GetPawnExpeditionRewardBox(uint characterId, uint boxId, DbConnection? connectionIn = null);
+    bool ClaimPawnExpeditionRewardBoxItem(uint boxId, uint slotNo, DbConnection? connectionIn = null);
+    bool SetPawnExpeditionRewardBoxClaimed(uint boxId, DbConnection? connectionIn = null);
+    void DeleteAllPawnExpeditionRewardBoxes(uint characterId, DbConnection? connectionIn = null);
+
     // Equipment Recycle
     bool InsertRecycleEquipmentRecord(uint characterId, byte numAttempts, DbConnection? connectionIn = null);
     bool UpdateRecycleEquipmentRecord(uint characterId, byte numAttempts, DbConnection? connectionIn = null);

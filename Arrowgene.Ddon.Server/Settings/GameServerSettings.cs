@@ -67,6 +67,92 @@ namespace Arrowgene.Ddon.Server.Settings
         private const uint _PartnerPawnAdventureDurationInSeconds = 1800;
 
         /// <summary>
+        /// The amount of seconds a Pawn Expedition sally takes to complete.
+        /// </summary>
+        [DefaultValue(_PawnExpeditionSallyDurationInSeconds)]
+        public uint PawnExpeditionSallyDurationInSeconds
+        {
+            set
+            {
+                SetSetting("PawnExpeditionSallyDurationInSeconds", value);
+            }
+            get
+            {
+                return TryGetSetting("PawnExpeditionSallyDurationInSeconds", _PawnExpeditionSallyDurationInSeconds);
+            }
+        }
+        private const uint _PawnExpeditionSallyDurationInSeconds = 1800;
+
+        /// <summary>
+        /// The maximum number of sallies a character can stack up before having to charge more.
+        /// </summary>
+        [DefaultValue(_PawnExpeditionMaxSallyCount)]
+        public byte PawnExpeditionMaxSallyCount
+        {
+            set
+            {
+                SetSetting("PawnExpeditionMaxSallyCount", value);
+            }
+            get
+            {
+                return TryGetSetting("PawnExpeditionMaxSallyCount", _PawnExpeditionMaxSallyCount);
+            }
+        }
+        private const byte _PawnExpeditionMaxSallyCount = 5;
+
+        /// <summary>
+        /// The "price" (in price units, as advertised to and echoed back by the client) to charge a Pawn Expedition sally count.
+        /// </summary>
+        [DefaultValue(_PawnExpeditionChargeSallyCountPrice)]
+        public byte PawnExpeditionChargeSallyCountPrice
+        {
+            set
+            {
+                SetSetting("PawnExpeditionChargeSallyCountPrice", value);
+            }
+            get
+            {
+                return TryGetSetting("PawnExpeditionChargeSallyCountPrice", _PawnExpeditionChargeSallyCountPrice);
+            }
+        }
+        private const byte _PawnExpeditionChargeSallyCountPrice = 1;
+
+        /// <summary>
+        /// The "price" (in price units, as advertised to and echoed back by the client) to make a sally golden.
+        /// </summary>
+        [DefaultValue(_PawnExpeditionGoldenSallyPrice)]
+        public byte PawnExpeditionGoldenSallyPrice
+        {
+            set
+            {
+                SetSetting("PawnExpeditionGoldenSallyPrice", value);
+            }
+            get
+            {
+                return TryGetSetting("PawnExpeditionGoldenSallyPrice", _PawnExpeditionGoldenSallyPrice);
+            }
+        }
+        private const byte _PawnExpeditionGoldenSallyPrice = 3;
+
+        /// <summary>
+        /// The amount of Gold charged per Pawn Expedition "price unit" (see <see cref="PawnExpeditionChargeSallyCountPrice"/>
+        /// and <see cref="PawnExpeditionGoldenSallyPrice"/>).
+        /// </summary>
+        [DefaultValue(_PawnExpeditionPriceGoldPerUnit)]
+        public uint PawnExpeditionPriceGoldPerUnit
+        {
+            set
+            {
+                SetSetting("PawnExpeditionPriceGoldPerUnit", value);
+            }
+            get
+            {
+                return TryGetSetting("PawnExpeditionPriceGoldPerUnit", _PawnExpeditionPriceGoldPerUnit);
+            }
+        }
+        private const uint _PawnExpeditionPriceGoldPerUnit = 10000;
+
+        /// <summary>
         /// Determines the maximum amount of consumable items that can be crafted in one go with a pawn.
         /// The default is a value of 10 which is equivalent to the original game's behavior.
         /// </summary>

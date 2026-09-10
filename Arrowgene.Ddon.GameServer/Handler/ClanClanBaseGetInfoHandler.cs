@@ -37,13 +37,13 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             var pcap = new S2CClanClanBaseGetInfoRes.Serializer().Read(BaseData);
 
-            // TODO: Pawn Expeditions
-            pcap.PawnExpeditionInfo = new() 
+            var expeditionRecord = Server.PawnExpeditionManager.GetOrCreateRecord(client);
+            pcap.PawnExpeditionInfo = new()
             {
-                SallyStatus = PawnExpeditionStatus.Locked,
-                GoldenSallyPrice = 3,
-                ChargeSallyPrice = 1
-            }; 
+                SallyStatus = expeditionRecord.Status,
+                GoldenSallyPrice = Server.GameSettings.GameServerSettings.PawnExpeditionGoldenSallyPrice,
+                ChargeSallyPrice = Server.GameSettings.GameServerSettings.PawnExpeditionChargeSallyCountPrice
+            };
             pcap.PartnerPawnInfo.MyPartnerPawnList = client.Character.Pawns.Select(x => new CDataCommonU32(x.PawnId)).OrderBy(x => Random.Shared.Next()).Take(3).ToList();
             pcap.PartnerPawnInfo.MemberPartnerPawnList = pawnIds.OrderBy(x => Random.Shared.Next()).Take(3).Select(x => new CDataCommonU32() { Value = x }).ToList();
             pcap.FunctionReleaseIds = new()

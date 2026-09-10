@@ -98,6 +98,7 @@ namespace Arrowgene.Ddon.GameServer
             BitterblackMazeManager = new BitterblackMazeManager(this);
             WorldQuestManager = new WorldQuestManager(this);
             GroupChatManager = new GroupChatManager(this);
+            PawnExpeditionManager = new PawnExpeditionManager(this);
 
             S2CStageGetStageListRes stageListPacket =
                 EntitySerializer.Get<S2CStageGetStageListRes>().Read(GameDump.data_Dump_19);
@@ -147,6 +148,7 @@ namespace Arrowgene.Ddon.GameServer
         public ChatLogHandler ChatLogHandler { get; }
         public LightQuestManager LightQuestManager { get; }
         public GroupChatManager GroupChatManager { get; }
+        public PawnExpeditionManager PawnExpeditionManager { get; }
 
         public List<CDataStageInfo> StageList { get; }
 
@@ -619,6 +621,15 @@ namespace Arrowgene.Ddon.GameServer
             AddHandler(new PawnDeleteFavoritePawnHandler(this));
 
             AddHandler(new PawnExpeditionGetSallyInfoHandler(this));
+            AddHandler(new PawnExpeditionGetMySallyInfoHandler(this));
+            AddHandler(new PawnExpeditionChargeSallyCountHandler(this));
+            AddHandler(new PawnExpeditionSallyHandler(this));
+            AddHandler(new PawnExpeditionChangeGoldenSallyHandler(this));
+            AddHandler(new PawnExpeditionGetSallyRewardHandler(this));
+            AddHandler(new PawnExpeditionCancelSallyHandler(this));
+            AddHandler(new PawnExpeditionGetRewardDropHandler(this));
+            AddHandler(new PawnExpeditionGetRewardDropItemListHandler(this));
+            AddHandler(new PawnExpeditionGetRewardDropItemHandler(this));
 
             AddHandler(new PhotoPhotoTakeHandler(this));
 
