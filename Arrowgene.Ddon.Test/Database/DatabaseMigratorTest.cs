@@ -513,6 +513,17 @@ namespace Arrowgene.Ddon.Test.Database
         public bool InsertPartnerPawnPendingReward(uint characterId, uint pawnId, uint rewardLevel, DbConnection? connectionIn = null) { return true; }
         public void DeletePartnerPawnPendingReward(uint characterId, uint pawnId, uint rewardLevel, DbConnection? connectionIn = null) { }
 
+        public PawnExpeditionRecord? GetPawnExpeditionRecord(uint characterId, DbConnection? connectionIn = null) { return null; }
+        public bool UpsertPawnExpeditionRecord(PawnExpeditionRecord record, DbConnection? connectionIn = null) { return true; }
+        public List<PawnExpeditionRecord> GetPawnExpeditionRecordsForClanMembers(List<uint> characterIds, DbConnection? connectionIn = null) { return new(); }
+        public uint InsertPawnExpeditionRewardBox(uint characterId, byte mdlType, DbConnection? connectionIn = null) { return 0; }
+        public bool InsertPawnExpeditionRewardBoxItem(PawnExpeditionRewardBoxItem item, DbConnection? connectionIn = null) { return true; }
+        public List<PawnExpeditionRewardBox> GetPawnExpeditionRewardBoxes(uint characterId, DbConnection? connectionIn = null) { return new(); }
+        public PawnExpeditionRewardBox? GetPawnExpeditionRewardBox(uint characterId, uint boxId, DbConnection? connectionIn = null) { return null; }
+        public bool ClaimPawnExpeditionRewardBoxItem(uint boxId, uint slotNo, DbConnection? connectionIn = null) { return true; }
+        public bool SetPawnExpeditionRewardBoxClaimed(uint boxId, DbConnection? connectionIn = null) { return true; }
+        public void DeleteAllPawnExpeditionRewardBoxes(uint characterId, DbConnection? connectionIn = null) { }
+
         public bool InsertRecycleEquipmentRecord(uint characterId, byte numAttempts, DbConnection? connectionIn = null) { return true; }
         public bool UpdateRecycleEquipmentRecord(uint characterId, byte numAttempts, DbConnection? connectionIn = null) { return true;  }
         public bool HasRecycleEquipmentRecord(uint characterId, DbConnection? connectionIn = null) { return true; }
