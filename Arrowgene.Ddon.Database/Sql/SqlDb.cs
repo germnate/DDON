@@ -636,6 +636,17 @@ public abstract class SqlDb : IDatabase
     public abstract HashSet<uint> GetPartnerPawnPendingRewards(uint characterId, uint pawnId, DbConnection? connectionIn = null);
     public abstract bool InsertPartnerPawnPendingReward(uint characterId, uint pawnId, uint rewardLevel, DbConnection? connectionIn = null);
     public abstract void DeletePartnerPawnPendingReward(uint characterId, uint pawnId, uint rewardLevel, DbConnection? connectionIn = null);
+
+    public abstract PawnExpeditionRecord? GetPawnExpeditionRecord(uint characterId, DbConnection? connectionIn = null);
+    public abstract bool UpsertPawnExpeditionRecord(PawnExpeditionRecord record, DbConnection? connectionIn = null);
+    public abstract List<PawnExpeditionRecord> GetPawnExpeditionRecordsForClanMembers(List<uint> characterIds, DbConnection? connectionIn = null);
+    public abstract uint InsertPawnExpeditionRewardBox(uint characterId, byte mdlType, DbConnection? connectionIn = null);
+    public abstract bool InsertPawnExpeditionRewardBoxItem(PawnExpeditionRewardBoxItem item, DbConnection? connectionIn = null);
+    public abstract List<PawnExpeditionRewardBox> GetPawnExpeditionRewardBoxes(uint characterId, DbConnection? connectionIn = null);
+    public abstract PawnExpeditionRewardBox? GetPawnExpeditionRewardBox(uint characterId, uint boxId, DbConnection? connectionIn = null);
+    public abstract bool ClaimPawnExpeditionRewardBoxItem(uint boxId, uint slotNo, DbConnection? connectionIn = null);
+    public abstract bool SetPawnExpeditionRewardBoxClaimed(uint boxId, DbConnection? connectionIn = null);
+    public abstract void DeleteAllPawnExpeditionRewardBoxes(uint characterId, DbConnection? connectionIn = null);
     public abstract bool InsertRecycleEquipmentRecord(uint characterId, byte numAttempts, DbConnection? connectionIn = null);
     public abstract bool UpdateRecycleEquipmentRecord(uint characterId, byte numAttempts, DbConnection? connectionIn = null);
     public abstract bool HasRecycleEquipmentRecord(uint characterId, DbConnection? connectionIn = null);
