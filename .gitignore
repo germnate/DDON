@@ -45,3 +45,6 @@ bld/
 _ReSharper*/
 *.[Rr]e[Ss]harper
 *.DotSettings.user
+
+# Database dumps produced by deploy/postgresql/backup_db.sh
+backups/
