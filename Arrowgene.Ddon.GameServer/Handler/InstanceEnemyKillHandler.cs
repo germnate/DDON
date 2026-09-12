@@ -33,6 +33,33 @@ namespace Arrowgene.Ddon.GameServer.Handler
             _gameServer = server;
         }
 
+        private static uint CalculateBloodOrbReward(InstancedEnemy enemy, double boModifier)
+        {
+            double sizeMultiplier = Math.Max(1d, enemy.Scale / 100d);
+
+            // Some "large" enemies are authored at Scale=100. Treat boss-class enemies
+            // as large by default so level-based BO scaling still matches expected rewards.
+            if (enemy.IsAreaBoss || enemy.IsBossGauge)
+            {
+                sizeMultiplier = Math.Max(2d, sizeMultiplier);
+            }
+            double level = Math.Max(1d, enemy.Lv);
+
+            double baseReward;
+            if (level < 45d)
+            {
+                baseReward = 75d * Math.Pow(level / 45d, 0.75d);
+            }
+            else
+            {
+                double levelMultiplier = Math.Pow(1d + ((level - 45d) / 18d), 2d);
+                baseReward = 75d * levelMultiplier;
+            }
+
+            double reward = baseReward * Math.Pow(sizeMultiplier, 2d) * boModifier;
+            return (uint)Math.Max(1d, Math.Round(reward));
+        }
+
         public override S2CInstanceEnemyKillRes Handle(GameClient client, C2SInstanceEnemyKillReq packet)
         {
             CDataStageLayoutId layoutId = packet.LayoutId;
@@ -217,7 +244,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
                             if (enemyKilled.BloodOrbs > 0)
                             {
                                 // Drop BO
-                                uint gainedBo = (uint)(enemyKilled.BloodOrbs * _gameServer.GameSettings.GameServerSettings.BoModifier);
+                                uint gainedBo = CalculateBloodOrbReward(enemyKilled, _gameServer.GameSettings.GameServerSettings.BoModifier);
                                 uint bonusBo = (uint)(gainedBo * _gameServer.GpCourseManager.EnemyBloodOrbBonus());
                                 CDataUpdateWalletPoint boUpdateWalletPoint = _gameServer.WalletManager.AddToWallet(memberClient.Character, WalletType.BloodOrbs, gainedBo + bonusBo, bonusBo, connectionIn: connectionIn);
                                 updateCharacterItemNtc.UpdateWalletList.Add(boUpdateWalletPoint);

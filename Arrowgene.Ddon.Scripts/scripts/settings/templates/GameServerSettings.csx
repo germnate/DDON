@@ -238,7 +238,7 @@ double RiftModifier = 1;
 /// <summary>
 /// Global modifier for BO calculations to scale up or down.
 /// </summary>
-double BoModifier = 1;
+double BoModifier = 2;
 
 /// <summary>
 /// Global modifier for HO calculations to scale up or down.

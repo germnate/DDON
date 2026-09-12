@@ -681,7 +681,7 @@ namespace Arrowgene.Ddon.Server.Settings
                 return TryGetSetting("BoModifier", _BoModifier);
             }
         }
-        private const double _BoModifier = 1.0;
+        private const double _BoModifier = 2.0;
 
         /// <summary>
         /// Global modifier for HO calculations to scale up or down.
