@@ -140,32 +140,8 @@ namespace Arrowgene.Ddon.GameServer.Characters
         /// </summary>
         public uint CalculateRecipeProductionSpeed(uint recipeTime, ClientItemInfo itemInfo, List<CraftPawn> craftPawns)
         {
-            uint difficultyModifier = ItemDifficultyModifier(itemInfo);
-            int total = 0;
-            int modifiedTime = (int)recipeTime;
-
-            foreach (var pawn in craftPawns)
-            {
-                if (pawn.ProductionSpeed < difficultyModifier)
-                {
-                    continue;
-                }
-                int effSkill = (int)(pawn.ProductionSpeed - difficultyModifier);
-                PawnCraftSkillSpeedRate speedRateAsset = _server.AssetRepository.PawnCraftSkillSpeedRateAsset.ElementAtOrDefault(effSkill)
-                    ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_CRAFT_SKILL_LEVEL_OVER, $"No speed rate information found for level: {effSkill}");
-                float speedRate = pawn.PositionModifier == 1.0 ? speedRateAsset.SpeedRate1 : speedRateAsset.SpeedRate2;
-
-                total += effSkill;
-                modifiedTime = (int)(modifiedTime * speedRate);
-            }
-
-            modifiedTime -= total;
-            if (modifiedTime < 30)
-            {
-                modifiedTime = 30;
-            }
-            modifiedTime = (int)(modifiedTime * _server.GameSettings.GameServerSettings.AdditionalProductionSpeedFactor);
-            return (uint)modifiedTime;
+            // Always zero out crafting duration.
+            return 0;
         }
 
         #endregion

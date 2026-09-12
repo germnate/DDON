@@ -94,6 +94,22 @@ public class CraftManagerTest
     }*/
 
     [Fact]
+    public void CalculateRecipeProductionSpeed_ShouldAlwaysReturnZero()
+    {
+        List<CraftPawn> craftPawns = new()
+        {
+            new(50, 50, 50, 50, 50, CraftPosition.Leader),
+            new(50, 50, 50, 50, 50, CraftPosition.Assistant),
+            new(50, 50, 50, 50, 50, CraftPosition.Assistant),
+            new(50, 50, 50, 50, 50, CraftPosition.Assistant)
+        };
+
+        uint result = _craftManager.CalculateRecipeProductionSpeed(1000, new ClientItemInfo(), craftPawns);
+
+        Assert.Equal(0u, result);
+    }
+
+    [Fact]
     public void CalculateEquipmentEnhancement_ShouldReturnCorrectEnhancementPoints()
     {
         List<CraftPawn> craftPawns = new()
