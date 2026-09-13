@@ -1,0 +1,1279 @@
+ItemId,Name,Category,SubCategory,Price,Rank
+7876,Bronze Ingot,2,101,10,1
+7873,Copper Ingot,2,101,20,2
+7872,Dull Iron Ingot,2,101,50,3
+7874,Iron Ingot,2,101,100,4
+7881,Drilled Plate Sheet,2,101,170,5
+7882,Jewel Steel Ingot,2,101,170,5
+7879,Red Chromium,2,101,260,6
+7875,Silver Ingot,2,101,370,7
+7883,Bornite Ingot,2,101,370,7
+7884,Spirit Silver Ingot,2,101,500,8
+7888,Red Alloy Ingot,2,101,500,8
+7877,Gold Ingot,2,101,650,9
+7880,Mithril Ingot,2,101,650,9
+7878,Black Iron Ingot,2,101,820,10
+7885,Blue Steel Ingot,2,101,820,10
+7892,Electrum,2,101,820,10
+7886,Magick Gold Ingot,2,101,1010,11
+7890,Phantom Metal,2,101,1010,11
+7891,Electrum Plate,2,101,1010,11
+7887,Dark Metal,2,101,1220,12
+9444,Diorite Steel Ingot,2,101,1200,12
+11778,Frost Metal,2,101,952,25
+15956,Bright Titanium,2,101,100,45
+16005,Silvery Snow Steel Ingot,2,101,980,65
+17892,Cobalt Alloy Ingot,2,101,3000,85
+19654,Unrefined Alloy Lump,2,101,500,95
+17894,Bright Purple Steel Ingot,2,101,3000,100
+21270,Flicker Gem,2,101,3000,110
+24738,Orichalcum,2,101,900,130
+24819,Black and Silver Chaos Metal,2,101,900,130
+25523,Kunstkette,2,101,350,150
+25526,Elegant Harp Steel Ingot,2,101,350,150
+7858,Bronze Ore,2,102,7,1
+7854,Copper Ore,2,102,15,2
+9060,Lead Ore,2,102,20,2
+7853,Iron Ore Fragment,2,102,37,3
+7855,Iron Ore,2,102,75,4
+7865,Monster Gallstone,2,102,80,4
+7856,Marble,2,102,127,5
+7863,Drilled Ore,2,102,127,5
+9061,Pyrite,2,102,127,5
+7861,Hematite,2,102,195,6
+7864,Rock Scale,2,102,195,6
+7857,Silver Ore,2,102,277,7
+7866,Golem Magickal Rock,2,102,615,7
+7867,Magick Medal,2,102,615,7
+7868,Phantom Ore,2,102,277,7
+7869,Lava Rock,2,102,375,8
+9062,Cerussite,2,102,375,8
+7859,Gold Ore,2,102,487,9
+7862,Mithril Ore,2,102,487,9
+7860,Black Ore,2,102,504,10
+7870,High Quality Magick Medal,2,102,757,10
+7889,Spiritual Will Fragment,2,102,820,10
+7871,Alchemite,2,102,915,12
+9440,Cockatrice Gastrolith,2,102,915,12
+15953,Ringing Ore,2,102,100,45
+15946,White Bone Rock,2,102,200,50
+16001,Ashen Flower Rock,2,102,250,65
+16004,Adamas Ore,2,102,250,65
+17861,Black Blade Fragment,2,102,350,80
+17882,Brittle Sandstone,2,102,250,80
+18738,Eye Ore,2,102,100,80
+17883,Pyroclastic Rock,2,102,1000,85
+19652,Silver Eye Ore,2,102,100,90
+18142,Blazing Ore,2,102,900,95
+21216,Phlogopite,2,102,350,100
+21258,Volcanic Tuff,2,102,350,110
+24725,Lestania Marble,2,102,350,130
+24820,Tinctura,2,102,900,130
+7843,Coarse Sand,2,103,5,2
+7844,Polishing Sand,2,103,10,3
+7845,Silken Sand,2,103,25,3
+7847,Hematite Sand,2,103,50,4
+7848,Blue Alluvial Gold,2,103,85,6
+7849,Magick Silt,2,103,130,6
+7846,Forest Chernozem,2,103,185,7
+7851,White Shining Sand,2,103,250,8
+7852,Sandcrystal,2,103,325,9
+7850,Bone Meal,2,103,330,10
+9441,Sand of Reminiscence,2,103,350,12
+16002,Smooth White Mud,2,103,250,65
+17959,Soft Soil,2,103,123,80
+18648,Volcanic Sand,2,103,250,80
+18649,Volcanic Glass,2,103,1000,85
+18141,Warm Mud,2,103,900,95
+21217,Highland Akadama,2,103,350,100
+21259,Volcanic Mountain Ash,2,103,350,110
+21292,Crystal Glass,2,103,100,110
+25527,Spirit Resonance Mudsand,2,103,350,140
+7934,Common Cloth,2,104,10,1
+7944,Burial Shroud,2,104,20,2
+7936,Linen,2,104,50,3
+7935,Leather Cloth,2,104,100,4
+7938,Combat Fabric,2,104,170,5
+7946,Bloodstained Red Cloth,2,104,170,5
+7937,Hard Leather Cloth,2,104,260,6
+7939,Courtly Cloth,2,104,370,7
+7945,Orcish Cloth,2,104,370,7
+7940,Protective Cloth,2,104,500,8
+7941,Dragonleather,2,104,500,8
+7942,Blow-Resistant Cloth,2,104,650,9
+7947,Sinister Black Cloth,2,104,650,9
+7948,Cursed Cloth,2,104,650,9
+7943,Sacred Blessed Cloth,2,104,820,10
+7950,Mergan Cloth,2,104,1010,11
+7949,Witch's Velvet,2,104,1220,12
+9445,Safeguarding Satin,2,104,1350,12
+15957,Spider Mesh,2,104,100,45
+16006,Elemental Lace,2,104,980,65
+19293,Cloth of Fighting Spirit,2,104,300,65
+19294,Cloth of Ambition,2,104,300,65
+17891,Ribbon of Rich Bounty,2,104,3000,85
+21777,Fluffly Ghost Cloth,2,104,500,85
+17929,Fluttering Rags,2,104,350,95
+21229,Padding,2,104,3000,105
+21269,Soul Siphoning Cloth,2,104,3000,110
+7960,Spider Thread,2,105,7,1
+7951,Filament,2,105,15,2
+7952,Rough Thread,2,105,37,3
+7953,Leather Cord,2,105,75,4
+7954,Spun Yarn,2,105,127,5
+7955,Iron Thread,2,105,195,6
+7957,Demon Thread,2,105,277,7
+7956,Strong Thread,2,105,277,8
+7958,Drómi,2,105,487,9
+7959,Gleipnir,2,105,615,10
+7743,Gold Thread,2,105,757,11
+9446,Wind Twine,2,105,790,12
+25023,Fluffy Yarn,2,105,10,15
+18893,Golden Palm Fiber,2,105,100,70
+21230,Fireproof Cord,2,105,3000,105
+7773,Animal Fur,2,106,5,1
+7774,Supple Fur,2,106,10,2
+7775,Ape Fur,2,106,25,3
+7809,Giant Fur,2,106,50,4
+7810,Sphinx Hair,2,106,85,4
+7779,Beast's Mane,2,106,130,5
+7776,Ogre Fur,2,106,130,6
+7777,Necrophagous Bristle,2,106,185,7
+7778,Beast Fur,2,106,250,8
+7780,Pure White Mane,2,106,325,9
+7782,Silver Bristle,2,106,410,9
+7781,Transmuted Fur,2,106,260,10
+9437,Magick Lion's Large Mane,2,106,410,12
+13224,Medusa's Serpent Hair,2,106,1014,35
+16009,Protected Beast's Green Fur,2,106,800,60
+17927,Goremanticore's White Beard,2,106,1500,100
+7917,Animal Pelt,2,107,5,1
+7919,Lizardscale Pelt,2,107,10,2
+7732,Ape Pelt,2,107,25,3
+7733,Large Simian Thick Pelt,2,107,50,4
+7918,Strong Animal Leather,2,107,130,5
+7924,Rugged Leather,2,107,85,5
+7920,Strong Lizardscale Pelt,2,107,130,6
+7921,Smooth Leather,2,107,185,7
+7925,Giant Tough Pelt,2,107,250,8
+7928,Dragon Hide,2,107,250,8
+7739,White Lion Pelt,2,107,325,9
+7923,Beast Leather,2,107,325,9
+7927,Smooth Dragonleather,2,107,325,9
+7929,Thick Dragonscale,2,107,325,9
+7932,Bluish Gray Dragonscale,2,107,325,9
+7742,Moist Black Leather,2,107,410,10
+7922,Spectral Dragonscale,2,107,610,12
+7930,Amber Dragonscale,2,107,610,12
+7931,Azure Dragonscale,2,107,610,12
+9438,Giant Single Pelt,2,107,700,12
+15961,Stiff Crocodile Skin,2,107,235,45
+17870,Rock Leather,2,107,350,80
+17857,Demonic Beast Snakeskin,2,107,1500,85
+17866,Manticore Raw Pelt,2,107,1500,85
+17879,Dragon's Inverse Scale,2,107,2000,85
+18726,Scarred Lizardscale Pelt,2,107,350,95
+21223,Strong Heat-Resistant Scale,2,107,350,105
+21226,Large Demon's Striped Pelt,2,107,1500,105
+21261,Demon Dog Pelt,2,107,350,110
+21262,Blazing Lizard Pelt,2,107,350,110
+21279,Reddish Dragon Scale,2,107,2000,120
+24739,Jet-black Dragon Scale,2,107,900,130
+24814,Chaotic Dark Dragonscale,2,107,900,130
+7768,Animal Bone,2,108,5,1
+7767,Dry Bone,2,108,10,2
+7771,Giant Bone,2,108,50,3
+7803,Fine Bleached Bone,2,108,25,3
+7804,Magick-Tinged Bone,2,108,85,5
+7769,Black Skull,2,108,130,6
+7807,Mutated Bone Lump,2,108,185,7
+7770,Thick Bone,2,108,325,9
+7772,Cursed Skull,2,108,410,11
+7806,Huge Dragon Bone Lump,2,108,410,12
+15927,Infected Giant Ulna,2,108,1200,50
+16008,Fine Femur,2,108,800,60
+17864,Magickal Giant Bones,2,108,1500,100
+19653,Groaning Skull,2,108,2000,100
+21219,War Demon's Ancestor Nasal Cartilage,2,108,350,100
+21266,Ancient Warrior's Bone,2,108,1500,110
+7798,Small Fang,2,109,15,2
+7760,Orc Tusk,2,109,20,3
+7788,Crooked Fang,2,109,100,4
+7762,Cyclops Tusk,2,109,170,5
+7787,Large Fang,2,109,260,5
+7766,Ogre Claw,2,109,370,6
+7747,Sphinx Claw,2,109,370,7
+7759,Sharp Claw,2,109,370,7
+7761,Orc's War Tusk,2,109,650,7
+7765,Water Dragon Fang,2,109,500,8
+7801,Beast Claw,2,109,500,8
+7799,Behemoth Fang,2,109,650,9
+7800,Shadowy Claw,2,109,820,10
+7763,Dragon Fang,2,109,1220,12
+7802,Spectral Dragon Claw,2,109,1220,12
+9453,Spectral Dragon Fang,2,109,1220,12
+15963,Bloodied Giant Tusk,2,109,320,45
+15971,Murky Dragon Fang,2,109,800,45
+15928,Rainbow-Colored Claw,2,109,1200,50
+16014,Eagle's Damaged Talon,2,109,800,60
+15996,Black Claw of Misfortune,2,109,1200,70
+17858,Giant's Molar,2,109,1500,85
+17871,Rock-Cutter,2,109,1500,85
+17873,Undead Nail Shaving,2,109,350,85
+17869,Undead Wolf's Fang,2,109,350,95
+21225,War Demon Ancestor's Large Tusk,2,109,1500,105
+24816,Darkness-filled Black Claw,2,109,900,130
+7750,Small Horn,2,110,10,1
+7752,Goblin Horn,2,110,20,3
+7749,Colossus Horn,2,110,170,6
+7758,Griffin Beak,2,110,260,6
+7784,Giant's Horn,2,110,370,7
+7785,Goat Horn,2,110,500,8
+7751,Corpse-Eater's Horn,2,110,650,9
+7756,Angules Horn,2,110,650,9
+7748,Sinister Horn,2,110,820,10
+7753,Cracked Black Horn,2,110,205,10
+7754,Dragon Horn,2,110,1220,12
+10986,Zuhl's Large Horn,2,110,1010,12
+11777,Discolored Hard Horn,2,110,952,25
+15969,Sharp Back Spine,2,110,800,45
+15973,Demon Envoy's Horn,2,110,800,45
+16013,Deformed Horn of Misfortune,2,110,800,60
+17865,Ogre's Horn,2,110,1500,100
+21264,Grotesque Burning Horn,2,110,1500,110
+21271,Evil Dragon's Chin Spike,2,110,2500,115
+21619,Smoldering Crown Horn,2,110,2000,120
+24818,Forbidden Horn of Corruption,2,110,900,130
+7811,Bird Feather,2,112,5,1
+7812,Clear Insect Wing,2,112,10,1
+7813,Harpy Pinion,2,112,10,2
+7815,Sphinx Azure Pinion,2,112,85,4
+7783,Harpy Flight Feather,2,112,130,6
+7814,Griffin Feather,2,112,130,6
+7820,Lindwurm Fin,2,112,250,8
+7816,Cockatrice Raven Pinion,2,112,325,9
+7818,Glossy Black Feather,2,112,410,10
+7822,Transmuted Gold Feather,2,112,405,11
+7823,Bright Gold Feather,2,112,505,11
+7819,Demonic Fowl Feather,2,112,610,12
+9439,Griffin Glossy Plume,2,112,700,12
+13223,Discolored Spore-covered Feather,2,112,952,20
+15959,Pixie Mock Wing,2,112,235,45
+15962,Bronze Tail Feather,2,112,235,45
+15967,Dazzling Silver Plume,2,112,800,45
+18735,Steel Featherwork,2,112,2000,85
+21224,War Dancing Large Feather,2,112,1500,105
+24815,Transformed black wing membrane,2,112,900,130
+7893,Fluorite,2,113,10,2
+7729,Orb of Darkness,2,113,75,3
+7897,Amethyst,2,113,37,3
+7895,Peridot,2,113,75,4
+7907,Spinel,2,113,75,4
+7912,Mist Gem,2,113,127,4
+7916,Apophyllite,2,113,75,4
+7896,Garnet,2,113,127,5
+7901,Crystal,2,113,127,5
+7899,Sapphire,2,113,195,6
+7903,Onyx,2,113,195,6
+7894,Agate,2,113,277,7
+7900,Ruby,2,113,375,8
+7902,Lapis Lazuli,2,113,375,8
+7904,Topaz,2,113,375,8
+7898,Emerald,2,113,487,9
+7910,Pigeon Blood,2,113,487,9
+7730,Eye Gem,2,113,515,10
+7911,Demonic Gem,2,113,515,10
+7908,Smoky Quartz,2,113,757,11
+7914,Star Sphene,2,113,527,11
+7731,Rainbow Eye Gem,2,113,915,12
+7909,Spirit Crystal,2,113,915,12
+7913,Flame Crystal,2,113,915,12
+15955,Kingalite,2,113,200,50
+15995,Griffin Spinel,2,113,1200,70
+17872,Giant Apophyllite,2,113,350,85
+17881,Bone Pearl,2,113,15000,85
+18650,Red Garnet,2,113,500,85
+21778,Moth Hard Gem,2,113,500,85
+21779,Speckled Mood Garnet,2,113,500,85
+21787,Crystal of Inspiration,2,113,500,110
+24726,Craft-grade Small Sparkling Gemstones,2,113,350,130
+24740,Dark Clouds Smoky Quartz,2,113,900,130
+25529,Zircon,2,113,350,150
+7974,Baby Herb,2,114,5,1
+7976,Lestania Herb,2,114,10,2
+7989,Small Nut,2,114,10,2
+7975,Wild Herb,2,114,25,3
+7980,Purple Anise,2,114,25,3
+7991,Green Seed,2,114,25,3
+7982,Angelica,2,114,50,4
+7985,Goblin's Leaf,2,114,50,4
+7987,Ent Leaf,2,114,50,4
+7977,Yellow Thyme,2,114,85,5
+7981,Moonglow,2,114,85,5
+7978,Red Sage,2,114,130,6
+7979,Blue Flower,2,114,185,7
+7983,King Bay Leaf,2,114,250,8
+7990,Bluecurrant,2,114,250,8
+7992,Ent Seed,2,114,250,8
+9064,Northern Oregano,2,114,250,8
+7984,Deenan Hyssop,2,114,325,9
+7986,Goblin's Flower,2,114,325,9
+9065,Zandoratalis,2,114,330,10
+25024,Passion Papyrus,2,114,10,15
+15944,Farana Mint,2,114,100,45
+15947,Old Geranium,2,114,100,45
+15952,Wijnruit,2,114,200,50
+17884,Ashen Grass,2,114,250,80
+17885,Blaze Grass,2,114,1000,85
+18663,Mandragora Leaf,2,114,500,85
+18662,Cursed Withered Grass,2,114,900,95
+21213,Waterweed,2,114,350,100
+21214,Rose Megadosys,2,114,350,100
+21256,Belladonna,2,114,350,110
+25522,Dragon Cotton Flower in the Temple Medicinal Garden,2,114,350,145
+25528,Cobalt Heliotrope,2,114,350,145
+7993,Gala Mushroom,2,117,5,1
+7994,Quality Gala Mushroom,2,117,10,2
+7996,Stagnant Shroom,2,117,25,3
+8000,Troll's Poisonous Moss,2,117,50,4
+7998,Moonlight Mushroom,2,117,85,5
+9063,Coconut-Scented Milkcap,2,117,130,6
+7995,High Quality Gala Mushroom,2,117,185,7
+7997,Fiend's Perch,2,117,250,8
+7999,Pearl Mushroom,2,117,325,9
+8001,Troll's Blue Poisonous Moss,2,117,325,9
+15951,Crab Brittlegill,2,117,100,45
+16012,Thousand-Year Moss,2,117,800,60
+18646,Toadstool Sitter,2,117,500,80
+18647,Mandragora Mushroom,2,117,500,85
+17917,Feryana Sweet Mushroom,2,117,900,95
+21218,Flame Mushroom,2,117,350,100
+21260,Scorched Mushroom,2,117,350,110
+7961,Thin Wood,2,118,7,1
+7962,Brown Wood,2,118,15,2
+7963,Hard Wood,2,118,37,3
+7965,Red Lumber,2,118,75,4
+7971,Ent Branch,2,118,100,4
+7967,Cedar Wood,2,118,127,5
+7968,Pine Lumber,2,118,195,6
+7972,High Quality Wood,2,118,210,6
+7964,White Wood,2,118,277,7
+7966,Rosewood,2,118,375,8
+7969,Sequoia Wood,2,118,375,8
+7970,Black Wood,2,118,487,9
+9059,Gold-Striped Hardwood,2,118,515,10
+9159,Alchemic Wood,2,118,557,11
+9442,Writhing Live Bark,2,118,710,12
+15948,Premium Fragrant Wood,2,118,100,45
+15950,Rotten Tree,2,118,100,45
+16003,Morrow Lauan Wood,2,118,250,65
+18507,Rathnite Local Hardwood,2,118,250,80
+18508,Natural Charcoal,2,118,1000,85
+18664,Mandragora Twig,2,118,500,85
+17916,Misleading Twig,2,118,900,95
+21215,Giant Caterpillar,2,118,350,100
+21252,Golden Mistletoe,2,118,100,100
+21257,Petrified Wood,2,118,350,110
+21265,Tree Man's Charred Branch,2,118,1500,110
+24724,Fine mahogany wood,2,118,350,130
+7834,Slime Liquid,2,119,5,1
+7836,Insect Venom,2,119,5,1
+7824,Clear Water,2,119,10,2
+7825,Clear Spring Water,2,119,25,3
+7827,Red Liquor,2,119,50,4
+7839,Unrefined Demon Wine,2,119,25,4
+7840,Strong Viscous Liquid,2,119,50,4
+7826,Stagnant Water,2,119,85,5
+7828,White Liquor,2,119,85,5
+7841,Black Tar,2,119,85,5
+7838,Undead Extract,2,119,130,6
+7829,Healing Drop,2,119,185,7
+7837,Strong Acid Slime Piece,2,119,185,7
+7830,Energy Liquid,2,119,250,8
+7831,Blessed Drop,2,119,325,9
+7832,Magickal Potion,2,119,325,9
+7842,Cockatrice Liquor,2,119,325,9
+7833,Alkahest,2,119,280,11
+9443,Demon's Prized Liquor,2,119,320,12
+15945,Sparkling Water,2,119,100,45
+15954,Valley Spring Water,2,119,100,45
+15949,Elana Water,2,119,200,50
+15935,Platinum Blood,2,119,1200,55
+15990,Sancto Sap,2,119,1200,65
+17880,Highly Viscous Slime Liquid,2,119,350,80
+17886,Plankton Liquid,2,119,500,80
+17856,Stone-Curser's Tears,2,119,2500,85
+17915,Underworld Drop,2,119,900,95
+21255,Urteca Hot Spring Water,2,119,350,110
+25525,Demon Leather Tanning Solution,2,119,350,145
+8002,Blank Scroll,2,120,15,2
+8003,Scroll of Power,2,120,75,4
+8004,Scroll of Protection,2,120,75,4
+8005,Scroll of Sorcery,2,120,75,4
+8006,Scroll of Magickal Protection,2,120,75,4
+8011,Scroll of Fire,2,120,127,5
+8012,Scroll of Ice,2,120,127,5
+8013,Scroll of Thunder,2,120,127,5
+8014,Scroll of Holy,2,120,195,6
+8015,Scroll of Darkness,2,120,195,6
+7764,Ancient Grimoire,2,120,277,7
+8007,Scroll of Great Strength,2,120,277,7
+8008,Scroll of Defense,2,120,277,7
+8009,Scroll of Great Sorcery,2,120,277,7
+8010,Scroll of Magickal Defense,2,120,277,7
+7808,Witch's Grimoire,2,120,757,11
+9447,Scroll of Bewitching,2,120,820,12
+15958,Scroll of Dream and Reality,2,120,200,45
+16007,Scroll of True Shadow,2,120,980,65
+17878,Cursed Letter,2,120,1500,85
+17893,Scroll of the Starry Sky,2,120,3000,100
+25521,Madness Amulet,2,120,350,140
+1074,Beast-Steak,2,122,5,1
+7735,Undead Carrion,2,122,5,1
+7736,Saurian Tail,2,122,10,2
+7728,Rotten Lump,2,122,25,3
+7551,Large Beast-Steak,2,122,85,5
+7737,Saurian Gland,2,122,130,6
+7738,Superior Saurian Tail,2,122,130,6
+7726,Marbled Beast-Steak,2,122,185,7
+7727,Ambrosial Beast-Steak,2,122,250,8
+7740,Giant Eyeball,2,122,250,8
+7734,Blob Flesh,2,122,325,9
+7741,Sinister Carrion,2,122,325,9
+7745,Cockatrice Poison Gland,2,122,325,9
+7744,Mystery Organs,2,122,410,10
+7746,Nightmare's Vocal Cords,2,122,610,12
+11774,Corroded Giant Eyeball,2,122,952,20
+11805,Manticore's Scorpion Tail,2,122,1014,35
+15960,Demon Wolf's Sinewy Meat,2,122,235,45
+15965,Composite Organ,2,122,800,45
+15974,Envoy's Loathsome Tail,2,122,800,45
+16010,Still-Beating Heart,2,122,800,60
+16011,Seabird Syrinx,2,122,800,60
+17928,Harpy Breast Meat,2,122,350,80
+18655,Demon Beast's Liver,2,122,350,80
+18661,Beast-Luring Meat,2,122,500,80
+17930,Winged Beast's Heart,2,122,1500,85
+21221,Strong Acid Sac,2,122,350,100
+21267,Charged Great Vessel,2,122,1500,110
+16800,2017 New Year Jumbo Draw Ticket,2,123,500,1
+19385,Extreme Winged Crest Fragment,2,123,100,1
+19386,Extreme Palm Fragment,2,123,100,1
+19387,Extreme Wind-Wrought Fragment,2,123,100,1
+19388,Extreme Weightless Fragment,2,123,100,1
+21389,2018 New Year Jumbo Draw Ticket,2,123,500,1
+8016,White Seashell,2,123,10,2
+1316,Glowworm,2,123,50,4
+8026,Mysterious Gold Lump,2,123,50,4
+8017,Beautiful Conch Shell,2,123,410,5
+8028,Large Metal Plate,2,123,85,5
+8024,Rusted Plate,2,123,130,6
+8034,Goblin Gunpowder,2,123,130,6
+8019,Broken Dagger,2,123,185,7
+10133,Riftstone Shard,2,123,320,8
+10983,Merit Medal (Direwolf),2,123,1000,8
+10984,Merit Medal (Lion),2,123,5000,8
+10987,Dragon Bone,2,123,500,8
+10988,Large Dragon Bone,2,123,1000,8
+10989,Shining Dragon Bone,2,123,1000,8
+10999,Hidell Medal,2,123,1000,8
+11000,Breya Medal,2,123,1000,8
+11001,Mysree Medal,2,123,1000,8
+11002,Volden Medal,2,123,1000,8
+11003,Dowe Medal,2,123,1000,8
+11004,Mysree Grove Medal,2,123,1000,8
+11005,Betland Medal,2,123,1000,8
+8020,Orc Decoration,2,123,325,9
+9458,Lestania Glass,2,123,180,9
+9459,Lestania Amber,2,123,180,9
+9460,Lestania Quartz,2,123,180,9
+10985,White Wings Radiant Crystal,2,123,1000,9
+10990,Lestalite,2,123,1000,9
+11006,Deenan Medal,2,123,1000,9
+11007,Northern Betland Medal,2,123,1000,9
+11011,Scale Dust,2,123,1000,9
+11012,Large-Grained Sand,2,123,1000,9
+11013,Ancient Scale Dust,2,123,1000,9
+11210,Wind-Wrought Ring Plate,2,123,1000,9
+11211,Winged Crest Ring Plate,2,123,1000,9
+11212,Palm Ring Plate,2,123,1000,9
+8018,Large Scallop Shell,2,123,85,10
+8025,Chipped Gold Lump,2,123,190,10
+8029,Dirty Sheet Metal,2,123,505,10
+8022,Demon Arming Points,2,123,410,11
+8023,Mergan Ring,2,123,250,11
+8027,Training Stakes,2,123,220,11
+8030,Exquisite Metal Plate,2,123,505,11
+8031,Alchemized Armor Plate,2,123,505,11
+8033,Aliment Extractant,2,123,210,11
+9461,Disordering Drop,2,123,180,11
+9462,Water of Chaos,2,123,180,11
+9463,Abyssal Ice of Chaos,2,123,180,11
+10991,High Lestalite,2,123,1000,11
+11008,Eastern Zandora Medal,2,123,1000,11
+11009,Zandora Medal,2,123,1000,11
+11010,Mergoda Medal,2,123,1000,11
+8021,Ancient Knight's Emblem,2,123,610,12
+8032,Golden Dragon King Wedge,2,123,610,12
+9448,Fiend Wing Membrane,2,123,1000,12
+9449,Demon Commander's Belt,2,123,1000,12
+9450,Riese Extract,2,123,750,12
+9451,Elfin Extract,2,123,750,12
+9452,Alchemical Extract,2,123,750,12
+9454,Weightless Ring Plate,2,123,1000,12
+9455,Enlightened Ring Plate,2,123,777,12
+9456,Rare Netherworld Crystal,2,123,1000,12
+9457,Rare Ancient Crystal,2,123,1000,12
+9788,Rare Greenleaf Crystal,2,123,1000,12
+9789,Rare Golden Crystal,2,123,1000,12
+9796,Pearl Shell,2,123,610,12
+10992,Lumina Lestalite,2,123,1000,12
+10993,Blessed Lestalite,2,123,1000,12
+10996,Golden Wedge,2,123,1000,12
+10997,Gold Ritual Instrument,2,123,1000,12
+10998,Gleaming Golden Jewel,2,123,1000,12
+11784,Refined Paraffin,2,123,100,12
+13491,Authentication Orb (Rathalos),2,123,500,12
+13492,Authentication Orb (Rathian),2,123,500,12
+11779,Reconnaissance Medal,2,123,1000,25
+11780,Rare Meteorite Crystal,2,123,952,30
+11781,Dragon Beard,2,123,952,30
+11782,Long Dragon Beard,2,123,952,30
+11783,Blessed Long Dragon Beard,2,123,988,30
+11819,White Knights Medal,2,123,1000,30
+12784,Arisen Corps Medal,2,123,1000,30
+11808,Prism Crystal,2,123,1014,40
+11809,Mirage Crystal,2,123,1014,40
+11810,Rare Vortex Crystal,2,123,1014,45
+11811,Droplets of Ruin,2,123,1014,45
+11812,Water of Ruin,2,123,1014,45
+11813,Abyssal Ice of Ruin,2,123,1056,45
+16017,Soldier's Loyalty,2,123,100,45
+16018,Abrasive,2,123,100,45
+16019,Rusty Iron Lump,2,123,100,45
+16020,Superior Abrasive,2,123,100,45
+16522,Spiritual Flame,2,123,100,45
+16833,Silver Authentication Orb,2,123,500,50
+16834,Gold Authentication Orb,2,123,500,50
+19345,Battlefield Ring Plate (Blue),2,123,50000,50
+19346,Battlefield Ring Plate (Purple),2,123,50000,50
+19347,Battlefield Ring Plate (Green),2,123,50000,50
+19348,Battlefield Ring Plate (Black),2,123,50000,50
+19349,Battlefield Ring Plate (Blue-green),2,123,50000,50
+19350,Battlefield Ring Plate (Yellow),2,123,50000,50
+15934,Tarasque Shell,2,123,1200,55
+15936,Farana Medal,2,123,1000,55
+15937,Elan Medal,2,123,1000,55
+15938,Morrow Medal,2,123,1000,55
+15939,Kingal Medal,2,123,1000,55
+15940,Rare Green Tree Crystal,2,123,1200,60
+15941,Ancient Knight's Letter,2,123,952,60
+15942,Ancient Knight's Book,2,123,952,60
+15943,Ancient Knight's Scripture,2,123,988,60
+15989,Pixie Crown,2,123,1200,65
+18615,Supreme Merit Medal,2,123,5,65
+18611,Myrmidon Ring Plate,2,123,5,70
+18612,Inquiry Ring Plate,2,123,5,70
+18613,Purge Ring Plate,2,123,5,70
+18614,Night Emperor Ring Plate,2,123,5,70
+18835,Survey Corps Token,2,123,104,70
+19147,Central Tree Drop,2,123,1000,70
+15997,Ocean Crystal,2,123,952,75
+15998,Blue Opal,2,123,988,75
+15999,Blue Skies Blue Opal,2,123,988,75
+16000,Sky Dragon's Blue Opal,2,123,988,75
+16698,Black Knight's Thoughts,2,123,960,75
+17859,Mark of Brute Courage,2,123,500,80
+17867,Goblin's Spellstaff,2,123,350,80
+17876,Battle Armor Fragment,2,123,500,80
+17877,Dragonkin Stone Shard,2,123,250,80
+17888,Dragon Head Tile Fragment,2,123,350,80
+17889,Dragon Tail Tile Fragment,2,123,350,80
+18729,Campaign Battle Armor,2,123,2500,80
+18876,Gusty Winds Stone Shard,2,123,250,80
+18877,Victorious Chance Stone Shard,2,123,250,80
+18878,Fallen Soldier Stone Shard,2,123,250,80
+18879,Animal Hunter Stone Shard,2,123,250,80
+18880,Demihuman Cutter Stone Shard,2,123,250,80
+18881,Demonic Slasher Stone Shard,2,123,250,80
+18882,Skeleton Smasher Stone Shard,2,123,250,80
+18883,Undead Destroyer Stone Shard,2,123,250,80
+18884,Giant Killer Stone Shard,2,123,250,80
+19644,Demon Expeller Stone Shard,2,123,250,80
+21244,Spirit Purifier Stone Shard,2,123,250,80
+21245,Cursed Exorciser Stone Shard,2,123,250,80
+21246,Alchemy Sealer Stone Shard,2,123,250,80
+21247,Corrupted Sealer Stone Shard,2,123,250,80
+21284,War-Ready Break Stone Shard,2,123,250,80
+21285,Fragments of the Soft Tissue Erasure Gemstone,2,123,250,80
+21286,Winged Slayer's Stone Shard,2,123,250,80
+21287,Magickal Constructs Destruction Shard,2,123,250,80
+17860,Mark of A Hundred Battles,2,123,1500,85
+18656,Guardsman's Spirit,2,123,50,85
+18815,Royal Crest Medal (Rathnite District),2,123,1000,85
+17868,Blood Drinking Vessel,2,123,350,95
+18658,Courtier's Spirit,2,123,50,95
+19655,Reinforced Battle Armor,2,123,2000,95
+17863,Evil Eye Lens,2,123,2500,100
+18819,Royal Crest Medal (Feryana District),2,123,1000,100
+21184,Mark of Tyranny,2,123,2000,100
+21222,Cracked Amulet,2,123,350,100
+18659,Executor's Spirit,2,123,50,105
+21227,Low-Grade Reinforced Armor,2,123,2000,105
+21231,Burning Magma Lump,2,123,2500,105
+21668,King Draf Enthronement Commemerotive Coin,2,123,2000,108
+21239,Void's Heartbeat,2,123,2000,110
+21253,Mark of the Underworld,2,123,2000,110
+21263,Small Flame Remains,2,123,350,110
+21627,Demon Crystal of Atonement,2,123,2000,110
+18660,Retainer's Spirit,2,123,50,115
+18820,Royal Crest Medal (Megadosys District),2,123,1000,115
+21268,Howling Blaze Lump,2,123,2000,115
+21669,King Kileek Enthronement Commemerotive Coin,2,123,2000,118
+18826,Royal Crest Medal (Urteca District),2,123,1000,120
+21293,Bright Fire Wing,2,123,2000,120
+24737,Otherworldly Drop,2,123,900,130
+25524,Shiny white Bonebiter Beetle,2,123,350,140
+9195,Crest of Power,2,124,100,3
+9199,Crest of Magick,2,124,100,3
+9209,Crest of Flesh Cutting,2,124,100,3
+9211,Crest of Beast Hunting,2,124,100,3
+9215,Crest of Massacre,2,124,100,3
+9217,Crest of Fracturing,2,124,100,3
+9219,Crest of Mutilation,2,124,100,3
+9223,Crest of Splicing,2,124,100,3
+9225,Crest of Purification,2,124,100,3
+9231,Crest of Manslaying,2,124,100,3
+9239,Crest of Poison,2,124,100,3
+9243,Crest of Sleep,2,124,100,3
+9245,Crest of Drenching,2,124,100,3
+9247,Crest of Tarring,2,124,100,3
+9267,Crest of Decreased Fire Resist,2,124,100,3
+9269,Crest of Decreased Ice Resist,2,124,100,3
+9271,Crest of Decreased Lightning Resist,2,124,100,3
+9277,Crest of Lowered Strength,2,124,100,3
+9279,Crest of Lowered Defense,2,124,100,3
+9281,Crest of Lowered Magick,2,124,100,3
+9283,Crest of Lowered Magick Defense,2,124,100,3
+9193,Crest of Lightness,2,124,100,6
+9203,Crest of Increased Attack,2,124,100,6
+9205,Crest of Dazzling,2,124,100,6
+9213,Crest of Demon Slaying,2,124,100,6
+9221,Crest of Giant Killing,2,124,100,6
+9229,Crest of Dismantling,2,124,100,6
+9241,Crest of Torpor,2,124,100,6
+9257,Crest of Burning,2,124,100,6
+9259,Crest of Freezing,2,124,100,6
+9261,Crest of Shock,2,124,100,6
+9273,Crest of Decreased Holy Resist,2,124,100,6
+9275,Crest of Decreased Dark Resist,2,124,100,6
+9196,Crest of Greater Power,2,124,100,7
+9200,Crest of Greater Magick,2,124,100,7
+9227,Crest of Exorcism,2,124,100,7
+9249,Crest of Stifling,2,124,100,7
+9251,Crest of Frailness,2,124,100,7
+9263,Crest of Holy Drain,2,124,100,7
+9265,Crest of Blinding,2,124,100,7
+9233,Crest of Sealed Alchemy,2,124,100,8
+9235,Crest of Dragonsbane,2,124,100,8
+9237,Crest of Expulsion,2,124,100,8
+9240,Crest of Fatal Poison,2,124,2500,8
+9242,Crest of Greater Torpor,2,124,2500,8
+9244,Crest of Deeper Sleep,2,124,100,8
+9246,Crest of Drowning,2,124,100,8
+9248,Crest of Greater Tarring,2,124,100,8
+9250,Crest of Sealing,2,124,100,8
+9252,Crest of Fragility,2,124,100,8
+9258,Crest of Incineration,2,124,100,8
+9260,Crest of Permafrost,2,124,100,8
+9262,Crest of Electrocution,2,124,100,8
+9268,Crest of Diminished Fire Resist,2,124,100,8
+9270,Crest of Diminished Ice Resist,2,124,100,8
+9272,Crest of Diminished Lightning Resist,2,124,100,8
+9278,Crest of Dwindled Strength,2,124,100,8
+9280,Crest of Dwindled Defense,2,124,100,8
+9282,Crest of Dwindled Magick,2,124,100,8
+9284,Crest of Dwindled Magick Defense,2,124,100,8
+9197,Crest of Sheer Power,2,124,100,9
+9201,Crest of Sheer Magick,2,124,100,9
+9204,Crest of Amplified Attack,2,124,100,9
+9230,Crest of Dismantling II,2,124,100,9
+9253,Crest of Petrification,2,124,100,9
+9255,Crest of Gilding,2,124,100,9
+9264,Crest of Sanctity,2,124,100,9
+9266,Crest of Twilight,2,124,100,9
+9274,Crest of Diminished Holy Resist,2,124,100,9
+9276,Crest of Diminished Dark Resist,2,124,100,9
+9198,Crest of Herculean Power,2,124,100,10
+9202,Crest of Superior Magick,2,124,100,10
+19363,Crest of War-Ready Break I,2,124,100,10
+9194,Crest of Unburdening,2,124,100,11
+9236,Crest of Dragonsbane II,2,124,100,11
+9238,Crest of Expulsion II,2,124,100,11
+9254,Crest of Crystallization,2,124,100,11
+9256,Crest of Glittering Gold,2,124,100,11
+11719,Crest of Power+,2,124,100,12
+11720,Crest of Magick+,2,124,100,12
+11721,Crest of Lowered Defense+,2,124,100,12
+11722,Crest of Lowered Magick Defense+,2,124,100,12
+11723,Crest of Lowered Strength+,2,124,100,12
+11724,Crest of Lowered Magick+,2,124,100,12
+11725,Crest of Flesh Cutting III,2,124,100,12
+11726,Crest of Beast Hunting III,2,124,100,12
+11727,Crest of Demon Slaying III,2,124,100,12
+11728,Crest of Massacre III,2,124,100,12
+11729,Crest of Fracturing III,2,124,100,12
+11730,Crest of Mutilation III,2,124,100,12
+11731,Crest of Giant Killing III,2,124,100,12
+11732,Crest of Splicing III,2,124,100,12
+11733,Crest of Purification III,2,124,100,12
+11734,Crest of Exorcism III,2,124,100,12
+11735,Crest of Dismantling III,2,124,100,12
+11736,Crest of Manslaying III,2,124,100,12
+11737,Crest of Sealed Alchemy III,2,124,100,12
+11738,Crest of Dragonsbane III,2,124,100,12
+11739,Crest of Expulsion III,2,124,100,12
+9210,Crest of Flesh Cutting II,2,124,2500,15
+9212,Crest of Beast Hunting II,2,124,2500,15
+9214,Crest of Demon Slaying II,2,124,2500,15
+9216,Crest of Massacre II,2,124,2500,15
+9218,Crest of Fracturing II,2,124,2500,15
+9220,Crest of Mutilation II,2,124,2500,15
+9222,Crest of Giant Killing II,2,124,2500,15
+9224,Crest of Splicing II,2,124,2500,15
+9226,Crest of Purification II,2,124,2500,15
+9228,Crest of Exorcism II,2,124,2500,15
+9232,Crest of Manslaying II,2,124,2500,15
+9234,Crest of Sealed Alchemy II,2,124,2500,15
+13653,Crest of Burning+,2,124,100,15
+13654,Crest of Freezing+,2,124,100,15
+13655,Crest of Shock+,2,124,100,15
+13656,Crest of Holy Drain+,2,124,100,15
+13657,Crest of Blinding+,2,124,100,15
+13658,Crest of Greater Power+,2,124,100,15
+13659,Crest of Greater Magick+,2,124,100,15
+13660,Crest of Poison+,2,124,100,15
+13661,Crest of Torpor+,2,124,100,15
+13662,Crest of Flesh Cutting IV,2,124,100,15
+13663,Crest of Beast Hunting IV,2,124,100,15
+13664,Crest of Demon Slaying IV,2,124,100,15
+13665,Crest of Massacre IV,2,124,100,15
+13666,Crest of Fracturing IV,2,124,100,15
+13667,Crest of Mutilation IV,2,124,100,15
+13668,Crest of Giant Killing IV,2,124,100,15
+13669,Crest of Splicing IV,2,124,100,15
+13670,Crest of Purification IV,2,124,100,15
+13671,Crest of Exorcism IV,2,124,100,15
+13672,Crest of Dismantling IV,2,124,100,15
+13673,Crest of Manslaying IV,2,124,100,15
+13674,Crest of Dwindled Strength+,2,124,100,15
+13675,Crest of Dwindled Defense+,2,124,100,15
+13676,Crest of Dwindled Magick+,2,124,100,15
+13677,Crest of Dwindled Magick Defense+,2,124,100,15
+14183,Crest of Sealed Alchemy IV,2,124,100,15
+14184,Crest of Dragonsbane IV,2,124,100,15
+14185,Crest of Expulsion IV,2,124,100,15
+19364,Crest of War-Ready Break II,2,124,100,15
+16030,Crest of Herculean Power (Burning),2,124,100,20
+16031,Crest of Herculean Power (Freezing),2,124,100,20
+16032,Crest of Herculean Power (Shock),2,124,100,20
+16033,Crest of Herculean Power (Holy Drain),2,124,100,20
+16034,Crest of Herculean Power (Blinding),2,124,100,20
+16035,Crest of Superior Magick (Burning),2,124,100,20
+16036,Crest of Superior Magick (Freezing),2,124,100,20
+16040,Crest of Superior Magick (Shock),2,124,100,20
+16041,Crest of Superior Magick (Holy Drain),2,124,100,20
+16042,Crest of Superior Magick (Blinding),2,124,100,20
+16043,Crest of Herculean Power (Blow Power),2,124,100,20
+16044,Crest of Herculean Power (Stun),2,124,100,20
+16045,Crest of Herculean Power (Poison),2,124,100,20
+16046,Crest of Herculean Power (Torpor),2,124,100,20
+16047,Crest of Herculean Power (Sleep),2,124,100,20
+16048,Crest of Herculean Power (Petrification),2,124,100,20
+16049,Crest of Herculean Power (Gilding),2,124,100,20
+16050,Crest of Herculean Power (Lowered Defense),2,124,100,20
+16051,Crest of Superior Magick (Blow Power),2,124,100,20
+16052,Crest of Superior Magick (Stun),2,124,100,20
+16053,Crest of Superior Magick (Poison),2,124,100,20
+16054,Crest of Superior Magick (Torpor),2,124,100,20
+16055,Crest of Superior Magick (Sleep),2,124,100,20
+16056,Crest of Superior Magick (Petrification),2,124,100,20
+16057,Crest of Superior Magick (Gilding),2,124,100,20
+16058,Crest of Superior Magick (Lowered Magick Defense),2,124,100,20
+16059,Crest of Herculean Power (Lightness),2,124,100,20
+16060,Crest of Superior Magick (Lightness),2,124,100,20
+16061,Crest of Incineration (Decreased Fire Resist),2,124,100,20
+16062,Crest of Permafrost (Decreased Ice Resist),2,124,100,20
+16063,Crest of Electrocution (Decreased Lightning Resist),2,124,100,20
+16064,Crest of Sanctity (Decreased Holy Resist),2,124,100,20
+16065,Crest of Twilight (Decreased Dark Resist),2,124,100,20
+19365,Crest of War-Ready Break III,2,124,100,20
+19366,Crest of War-Ready Break IV,2,124,100,25
+25654,Crest of Sheer Power+,2,124,100,25
+25670,Crest of Sheer Magick+,2,124,100,25
+25696,Crest of Dazzling+,2,124,100,25
+25699,Crest of Sleep+,2,124,100,25
+25701,Crest of Gilding+,2,124,100,25
+25703,Crest of Petrification+,2,124,100,25
+25705,Crest of Frailness+,2,124,100,25
+25707,Crest of Stifling+,2,124,100,25
+25709,Crest of Drenching+,2,124,100,25
+25711,Crest of Tarring+,2,124,100,25
+25714,Crest of Increased Attack+,2,124,100,25
+25655,Crest of Herculean Power+,2,124,100,30
+25656,Crest of Herculean Power (Burning)+,2,124,100,30
+25657,Crest of Herculean Power (Freezing)+,2,124,100,30
+25658,Crest of Herculean Power (Shock)+,2,124,100,30
+25659,Crest of Herculean Power (Holy Drain)+,2,124,100,30
+25660,Crest of Herculean Power (Blinding)+,2,124,100,30
+25661,Crest of Herculean Power (Blow Power)+,2,124,100,30
+25662,Crest of Herculean Power (Stun)+,2,124,100,30
+25663,Crest of Herculean Power (Poison)+,2,124,100,30
+25664,Crest of Herculean Power (Torpor)+,2,124,100,30
+25665,Crest of Herculean Power (Sleep)+,2,124,100,30
+25666,Crest of Herculean Power (Petrification)+,2,124,100,30
+25668,Crest of Herculean Power (Gilding)+,2,124,100,30
+25669,Crest of Herculean Power (Lowered Defense)+,2,124,100,30
+25671,Crest of Superior Magick+,2,124,100,30
+25672,Crest of Superior Magick (Burning)+,2,124,100,30
+25673,Crest of Superior Magick (Shock)+,2,124,100,30
+25674,Crest of Superior Magick (Holy Drain)+,2,124,100,30
+25675,Crest of Superior Magick (Blow Power)+,2,124,100,30
+25676,Crest of Superior Magick (Blinding)+,2,124,100,30
+25677,Crest of Superior Magick (Stun)+,2,124,100,30
+25678,Crest of Superior Magick (Poison)+,2,124,100,30
+25679,Crest of Superior Magick (Torpor)+,2,124,100,30
+25680,Crest of Superior Magick (Sleep)+,2,124,100,30
+25681,Crest of Superior Magick (Petrification)+,2,124,100,30
+25682,Crest of Superior Magick (Gilding)+,2,124,100,30
+25683,Crest of Superior Magick (Lowered Magick Defense)+,2,124,100,30
+25684,Crest of Incineration+,2,124,100,30
+25685,Crest of Incineration (Decreased Fire Resist)+,2,124,100,30
+25686,Crest of Permafrost+,2,124,100,30
+25687,Crest of Permafrost (Decreased Ice Resist)+,2,124,100,30
+25688,Crest of Electrocution+,2,124,100,30
+25689,Crest of Electrocution (Decreased Lightning Resist)+,2,124,100,30
+25690,Crest of Sanctity+,2,124,100,30
+25691,Crest of Sanctity (Decreased Holy Resist)+,2,124,100,30
+25692,Crest of Twilight+,2,124,100,30
+25693,Crest of Twilight (Decreased Dark Resist)+,2,124,100,30
+25694,Crest of Depleted Defense+,2,124,100,30
+25695,Crest of Depleted Magick Defense+,2,124,100,30
+25697,Crest of Sidesplitting Laughter+,2,124,100,30
+25698,Crest of Fatal Poison+,2,124,100,30
+25700,Crest of Deeper Sleep+,2,124,100,30
+25702,Crest of Glittering Gold+,2,124,100,30
+25704,Crest of Crystallization+,2,124,100,30
+25706,Crest of Fragility+,2,124,100,30
+25708,Crest of Sealing+,2,124,100,30
+25710,Crest of Drowning+,2,124,100,30
+25712,Crest of Greater Tarring+,2,124,100,30
+25713,Crest of Greater Torpor+,2,124,100,30
+25715,Crest of Amplified Attack+,2,124,100,30
+25767,Crest of Superior Magick (Freezing)+,2,124,100,30
+1053,Weight Reduction,2,125,5,1
+1054,Low Level XP Up,2,125,5,1
+9285,Crest of Lightness,2,125,100,3
+9287,Crest of Protection,2,125,100,3
+9291,Crest of Intelligence,2,125,100,3
+9329,Crest of Poison Warding,2,125,100,3
+9331,Crest of Torpor Warding,2,125,100,3
+9333,Crest of Sleep Warding,2,125,100,3
+9335,Crest of Stunning Warding,2,125,100,3
+9337,Crest of Drench Warding,2,125,100,3
+9339,Crest of Tar Warding,2,125,100,3
+9299,Crest of Fire Warding,2,125,100,6
+9302,Crest of Cold Warding,2,125,100,6
+9305,Crest of Electricity Warding,2,125,100,6
+9308,Crest of Light Warding,2,125,100,6
+9311,Crest of Gloom Warding,2,125,100,6
+9345,Crest of Frail Warding,2,125,100,6
+9288,Crest of Greater Protection,2,125,100,7
+9292,Crest of Greater Intelligence,2,125,100,7
+9295,Crest of Perseverance,2,125,100,7
+9297,Crest of Restoration,2,125,100,7
+9314,Crest of Burn Warding,2,125,100,7
+9317,Crest of Freeze Warding,2,125,100,7
+9320,Crest of Shock Warding,2,125,100,7
+9323,Crest of Holy Drain Warding,2,125,100,7
+9326,Crest of Blind Warding,2,125,100,7
+9346,Crest of Frail Prevention,2,125,100,7
+9286,Crest of Unburdening,2,125,100,8
+9300,Crest of Flame Warding,2,125,100,8
+9303,Crest of Ice Warding,2,125,100,8
+9306,Crest of Lightning Warding,2,125,100,8
+9309,Crest of Holy Warding,2,125,100,8
+9312,Crest of Dark Warding,2,125,100,8
+9330,Crest of Poison Prevention,2,125,100,8
+9332,Crest of Torpor Prevention,2,125,100,8
+9334,Crest of Sleep Prevention,2,125,100,8
+9336,Crest of Stunning Prevention,2,125,100,8
+9338,Crest of Drench Prevention,2,125,100,8
+9340,Crest of Tar Prevention,2,125,100,8
+9289,Crest of Sheer Protection,2,125,100,9
+9293,Crest of Sheer Intelligence,2,125,100,9
+9315,Crest of Burn Prevention,2,125,100,9
+9318,Crest of Freeze Prevention,2,125,100,9
+9321,Crest of Shock Prevention,2,125,100,9
+9324,Crest of Holy Drain Prevention,2,125,100,9
+9327,Crest of Blind Prevention,2,125,100,9
+9341,Crest of Stifle Warding,2,125,100,9
+9347,Crest of Petrification Warding,2,125,100,9
+9290,Crest of Firm Protection,2,125,100,10
+9294,Crest of Wisdom,2,125,100,10
+9342,Crest of Stifle Prevention,2,125,100,10
+9343,Crest of Curse Warding,2,125,100,10
+9348,Crest of Petrification Prevention,2,125,100,10
+9296,Crest of Stubborn Perseverance,2,125,100,11
+9298,Crest of Fortitude,2,125,100,11
+9316,Crest of Burn Immunity,2,125,100,11
+9319,Crest of Freeze Immunity,2,125,100,11
+9322,Crest of Shock Immunity,2,125,100,11
+9325,Crest of Holy Drain Immunity,2,125,100,11
+9328,Crest of Blind Immunity,2,125,100,11
+9344,Crest of Curse Prevention,2,125,100,11
+9349,Crest of Golden Warding,2,125,100,11
+9350,Crest of Golden Prevention,2,125,100,12
+11740,Crest of Protection+,2,125,100,12
+11741,Crest of Intelligence+,2,125,100,12
+11742,Crest of Perseverance+,2,125,100,12
+11743,Crest of Restoration+,2,125,100,12
+11744,Crest of Fire Warding+,2,125,100,12
+11745,Crest of Cold Warding+,2,125,100,12
+11746,Crest of Electricity Warding+,2,125,100,12
+11747,Crest of Light Warding+,2,125,100,12
+11748,Crest of Gloom Warding+,2,125,100,12
+9301,Crest of Hellfire Warding,2,125,2500,15
+9304,Crest of Snowstorm Warding,2,125,2500,15
+9307,Crest of Thunder Warding,2,125,2500,15
+9310,Crest of Sacred Warding,2,125,2500,15
+9313,Crest of Shadow Warding,2,125,2500,15
+13678,Crest of Stubborn Perseverance+,2,125,100,15
+13679,Crest of Flame Warding+,2,125,100,15
+13680,Crest of Ice Warding+,2,125,100,15
+13681,Crest of Lightning Warding+,2,125,100,15
+13682,Crest of Holy Warding+,2,125,100,15
+13683,Crest of Dark Warding+,2,125,100,15
+13684,Crest of Burn Warding+,2,125,100,15
+13685,Crest of Freeze Warding+,2,125,100,15
+13686,Crest of Shock Warding+,2,125,100,15
+13687,Crest of Holy Drain Warding+,2,125,100,15
+13688,Crest of Blind Warding+,2,125,100,15
+13689,Crest of Poison Warding+,2,125,100,15
+13690,Crest of Torpor Warding+,2,125,100,15
+13691,Crest of Sleep Warding+,2,125,100,15
+13692,Crest of Stunning Warding+,2,125,100,15
+13693,Crest of Drench Warding+,2,125,100,15
+13694,Crest of Tar Warding+,2,125,100,15
+13695,Crest of Stifle Warding+,2,125,100,15
+13696,Crest of Curse Warding+,2,125,100,15
+13697,Crest of Frail Warding+,2,125,100,15
+13698,Crest of Petrification Warding+,2,125,100,15
+13699,Crest of Golden Warding+,2,125,100,15
+13700,Crest of Decreased Fire Resist Prevention,2,125,100,15
+13701,Crest of Decreased Ice Resist Prevention,2,125,100,15
+13702,Crest of Decreased Thunder Resist Prevention,2,125,100,15
+13703,Crest of Decreased Holy Resist Prevention,2,125,100,15
+13704,Crest of Decreased Dark Resist Prevention,2,125,100,15
+13705,Crest of Lowered Strength Prevention,2,125,100,15
+13706,Crest of Lowered Magick Prevention,2,125,100,15
+13707,Crest of Lowered Defense Prevention,2,125,100,15
+13708,Crest of Lowered Magick Prevention,2,125,100,15
+14186,Crest of Greater Protection+,2,125,100,15
+14187,Crest of Greater Intelligence+,2,125,100,15
+14188,Crest of Fortitude+,2,125,100,15
+16066,Crest of Strong Health,2,125,100,20
+16067,Crest of Health,2,125,100,20
+16068,Crest of Strong Stamina,2,125,100,20
+16069,Crest of Stamina,2,125,100,20
+16070,Crest of Firm Protection (Health),2,125,100,20
+16071,Crest of Firm Protection (Endurance),2,125,100,20
+16072,Crest of Firm Protection (Vitality),2,125,100,20
+16073,Crest of Firm Protection (Lightness),2,125,100,20
+16074,Crest of Wisdom (Health),2,125,100,20
+16075,Crest of Wisdom (Endurance),2,125,100,20
+16076,Crest of Wisdom (Vitality),2,125,100,20
+16077,Crest of Wisdom (Lightness),2,125,100,20
+16078,Crest of Unwavering,2,125,100,20
+16079,Crest of Vigor,2,125,100,20
+16080,Crest of Fire Barrier,2,125,100,20
+16081,Crest of Ice Barrier,2,125,100,20
+16082,Crest of Lightning Barrier,2,125,100,20
+16083,Crest of Holy Barrier,2,125,100,20
+16084,Crest of Dark Barrier,2,125,100,20
+16085,Crest of Double Resist (Poison/Torpor),2,125,100,20
+16086,Crest of Double Resist (Sleep/Stun),2,125,100,20
+16087,Crest of Double Resist (Petrify/Gild),2,125,100,20
+16088,Crest of Double Resist (Curse/Stifle),2,125,100,20
+16089,Crest of Double Resist (Lowered Strength/Defense),2,125,100,20
+16090,Crest of Double Resist (Lowered Magick/Magick Defense),2,125,100,20
+16091,Crest of Fire Protection,2,125,100,20
+16092,Crest of Ice Protection,2,125,100,20
+16093,Crest of Lightning Protection,2,125,100,20
+16094,Crest of Holy Protection,2,125,100,20
+16095,Crest of Dark Protection,2,125,100,20
+16096,Crest of Triple Resist (Sleep/Poison/Slow),2,125,100,20
+16097,Crest of Triple Resist (Stun/Curse/Stifle),2,125,100,20
+16098,Crest of Triple Resist (Petrify/Gild/Frail),2,125,100,20
+16099,Crest of Stature Protection,2,125,100,20
+25716,Crest of Sheer Protection+,2,125,100,25
+25722,Crest of Sheer Intelligence+,2,125,100,25
+25728,Crest of Resurgence+,2,125,100,25
+25730,Crest of Determination+,2,125,100,25
+25732,Crest of Health+,2,125,100,25
+25734,Crest of Stamina+,2,125,100,25
+25737,Crest of Lightness+,2,125,100,25
+25717,Crest of Firm Protection (Health)+,2,125,100,30
+25718,Crest of Firm Protection (Endurance)+,2,125,100,30
+25719,Crest of Firm Protection (Vitality)+,2,125,100,30
+25720,Crest of Firm Protection (Lightness)+,2,125,100,30
+25721,Crest of Unwavering+,2,125,100,30
+25723,Crest of Wisdom+,2,125,100,30
+25724,Crest of Wisdom (Health)+,2,125,100,30
+25725,Crest of Wisdom (Endurance)+,2,125,100,30
+25726,Crest of Wisdom (Vitality)+,2,125,100,30
+25727,Crest of Wisdom (Lightness)+,2,125,100,30
+25729,Crest of Stoicism+,2,125,100,30
+25731,Crest of Pertinacity+,2,125,100,30
+25733,Crest of Strong Health+,2,125,100,30
+25735,Crest of Strong Stamina+,2,125,100,30
+25736,Crest of Vigor+,2,125,100,30
+25738,Crest of Unburdening+,2,125,100,30
+25739,Crest of Hellfire Warding+,2,125,100,30
+25740,Crest of Snowstorm Warding+,2,125,100,30
+25741,Crest of Thunder Warding+,2,125,100,30
+25742,Crest of Sacred Warding+,2,125,100,30
+25743,Crest of Shadow Warding+,2,125,100,30
+25744,Crest of Burn Immunity+,2,125,100,30
+25745,Crest of Freeze Immunity+,2,125,100,30
+25746,Crest of Shock Immunity+,2,125,100,30
+25747,Crest of Holy Drain Immunity+,2,125,100,30
+25748,Crest of Blind Immunity+,2,125,100,30
+25749,Crest of Fire Protection+,2,125,100,30
+25750,Crest of Ice Protection+,2,125,100,30
+25751,Crest of Lightning Protection+,2,125,100,30
+25752,Crest of Holy Protection+,2,125,100,30
+25753,Crest of Dark Protection+,2,125,100,30
+25754,Crest of Poison Prevention+,2,125,100,30
+25755,Crest of Torpor Prevention+,2,125,100,30
+25756,Crest of Sleep Prevention+,2,125,100,30
+25757,Crest of Stunning Prevention+,2,125,100,30
+25758,Crest of Drench Prevention+,2,125,100,30
+25759,Crest of Tar Prevention+,2,125,100,30
+25760,Crest of Stifle Prevention+,2,125,100,30
+25761,Crest of Curse Prevention+,2,125,100,30
+25762,Crest of Frail Prevention+,2,125,100,30
+25763,Crest of Petrification Prevention+,2,125,100,30
+25764,Crest of Golden Prevention+,2,125,100,30
+25765,Crest of Double Resist (Lowered Strength/Defense)+,2,125,100,30
+25766,Crest of Double Resist (Lowered Magick/Magick Defense)+,2,125,100,30
+25768,Crest of Firm Protection+,2,125,100,30
+8035,Attack Upgrade Rock,2,126,25,3
+8036,Quality Attack Upgrade Rock,2,126,500,7
+8052,White Dragon Attack Upgrade Rock,2,126,2000,8
+8067,Defense Upgrade Rock,2,127,25,3
+8068,Quality Defense Upgrade Rock,2,127,500,7
+8084,White Dragon Defense Upgrade Rock,2,127,2000,8
+8135,Red Dye,2,128,100,1
+8136,Green Dye,2,128,100,1
+8137,Blue Dye,2,128,100,1
+8138,Yellow Dye,2,128,100,1
+8139,Pink Dye,2,128,100,1
+8140,Black Dye,2,128,100,1
+8141,Rainbow Dye,2,128,2000,15
+8142,Color Restorer,2,128,2000,15
+11759,Unappraised Moon Trinket (Soldier),2,129,100,15
+13479,Unappraised Star Trinket (Soldier),2,129,100,15
+13483,Unappraised Flower Trinket (Soldier),2,129,100,15
+13487,Unappraised Wind Trinket (Soldier),2,129,100,15
+13476,Unappraised Moon Trinket (General),2,129,100,20
+13480,Unappraised Star Trinket (General),2,129,100,20
+13484,Unappraised Flower Trinket (General),2,129,100,20
+13488,Unappraised Wind Trinket (General),2,129,100,20
+13477,Unappraised Moon Trinket (King),2,129,100,25
+13481,Unappraised Star Trinket (King),2,129,100,25
+13485,Unappraised Flower Trinket (King),2,129,100,25
+13489,Unappraised Wind Trinket (King),2,129,100,25
+13478,Unappraised Moon Trinket (Emperor),2,129,100,30
+13482,Unappraised Star Trinket (Emperor),2,129,100,30
+13486,Unappraised Flower Trinket (Emperor),2,129,100,30
+13490,Unappraised Wind Trinket (Emperor),2,129,100,30
+16374,Unidentified Dragon Trinket (Fighter),2,129,100,50
+16375,Unidentified Dragon Trinket (Seeker),2,129,100,50
+16376,Unidentified Dragon Trinket (Hunter),2,129,100,50
+16377,Unidentified Dragon Trinket (Priest),2,129,100,50
+16378,Unidentified Dragon Trinket (Shield Sage),2,129,100,50
+16379,Unidentified Dragon Trinket (Sorcerer),2,129,100,50
+16380,Unidentified Dragon Trinket (Warrior),2,129,100,50
+16381,Unidentified Dragon Trinket (Element Archer),2,129,100,50
+16382,Unidentified Dragon Trinket (Alchemist),2,129,100,50
+16725,Unidentified Dragon Trinket (Spirit Lancer),2,129,100,50
+21355,Unidentified Dragon Trinket II (High Scepter),2,129,100,50
+21606,Unidentified Dragon Trinket II (Fighter),2,129,100,50
+21607,Unidentified Dragon Trinket II (Hunter),2,129,100,50
+21608,Unidentified Dragon Trinket II (Priest),2,129,100,50
+21609,Unidentified Dragon Trinket II (Shield Sage),2,129,100,50
+21610,Unidentified Dragon Trinket II (Seeker),2,129,100,50
+21611,Unidentified Dragon Trinket II (Sorcerer),2,129,100,50
+21612,Unidentified Dragon Trinket II (Element Archer),2,129,100,50
+21613,Unidentified Dragon Trinket II (Warrior),2,129,100,50
+21614,Unidentified Dragon Trinket II (Alchemist),2,129,100,50
+21615,Unidentified Dragon Trinket II (Spirit Lancer),2,129,100,50
+21616,Unidentified Dragon Trinket (High Scepter),2,129,100,50
+18730,Unappraised Snow Trinket (Soldier),2,129,100,75
+18731,Unappraised Snow Trinket (General),2,129,100,80
+18732,Unappraised Snow Trinket (King),2,129,100,85
+18821,Unappraised Flight Trinket (Soldier),2,129,100,85
+18733,Unappraised Snow Trinket (Emperor),2,129,100,90
+18822,Unappraised Flight Trinket (General),2,129,100,90
+18823,Unappraised Flight Trinket (King),2,129,100,95
+21240,Unappraised Water Trinket (Soldier),2,129,100,95
+18824,Unappraised Flight Trinket (Emperor),2,129,100,100
+21241,Unappraised Water Trinket (General),2,129,100,100
+21630,Bitterblack Deed Box,2,129,100,100
+23364,Bitterblack Orb,2,129,100,100
+21242,Unappraised Water Trinket (King),2,129,100,105
+21280,Unappraised Cloud Trinket (Soldier),2,129,100,105
+21243,Unappraised Water Trinket (Emperor),2,129,100,110
+21281,Unappraised Cloud Trinket (General),2,129,100,110
+21282,Unappraised Cloud Trinket (King),2,129,100,115
+21283,Unappraised Cloud Trinket (Emperor),2,129,100,120
+24723,Bitterblack Chest of the Farthest End,2,129,100,130
+11504,Ice Cube Fragment,2,130,300,15
+11505,Ice Cube,2,130,600,15
+11506,Rock Finger,2,130,300,15
+11507,Stone Arm,2,130,600,15
+11508,Saltpetre Chunk,2,130,300,15
+11509,Black Gunpowder,2,130,600,15
+11764,Grimoire Scrap,2,130,300,20
+11765,Foreign Scroll,2,130,600,20
+11766,Silver Moss,2,130,300,20
+11767,Luminescent Silver Moss,2,130,600,20
+11768,Ash Quartz,2,130,300,20
+11769,Vision Quartz,2,130,600,20
+11770,Volden Quality Coal,2,130,300,20
+11771,Voldic Diamond,2,130,600,20
+11772,Tomb Gravel,2,130,300,20
+11773,Broken Stone Manacles,2,130,600,20
+11775,Stalactite Tip,2,130,300,25
+11776,Luminescent Stalactite,2,130,600,25
+11789,Pebble Bud,2,130,300,30
+11790,Stone Bouquet,2,130,600,30
+11791,Cave Silkworm,2,130,300,30
+11792,Strong Silk Thread,2,130,600,30
+11793,Ancient Beast Pelt,2,130,300,30
+11794,Bristly Felt,2,130,600,30
+11795,Phyton Liquid,2,130,300,35
+11796,Phindymian Resin,2,130,600,35
+11797,Ball Moss,2,130,300,35
+11798,Light Green Moss Paper,2,130,600,35
+11799,Soft Tectrix,2,130,300,35
+11800,Feather Chiffon,2,130,600,35
+11801,Viscous Meat,2,130,300,35
+11802,Strong Adhesive Paste,2,130,600,35
+11803,Gold-Stained Animal Fur,2,130,300,35
+11804,Glitter Mohair,2,130,600,35
+11806,Slimy Hide,2,130,300,40
+11807,High Quality Slimy Leather,2,130,600,40
+15913,Carved Potsherd,2,130,300,45
+15914,Pottery Charm,2,130,600,45
+15915,Purple Petals,2,130,300,45
+15916,Purple Algae Seed,2,130,600,45
+15917,Ancient Iron Ore,2,130,300,45
+15918,Ancient Iron Ingot,2,130,600,45
+15919,Twisted Iron Scrap,2,130,300,50
+15920,Ancient General's Chainmail,2,130,600,50
+15921,Shrieking Mushroom,2,130,300,50
+15922,Cursed Shrieking Mushroom,2,130,600,50
+15923,Icon Fragment,2,130,300,50
+15924,Foreign Goddess Idol,2,130,600,50
+15925,Scarlet Plume,2,130,300,50
+15926,Demon Scraps,2,130,300,50
+16115,Rainbow Feather,2,130,600,50
+16116,Discolored Organs,2,130,600,50
+15929,Mysterious Shell Fragment,2,130,300,55
+15930,Giant Carapace,2,130,600,55
+15931,Ancient Manuscript Scrap,2,130,300,55
+15932,Phindym Manuscript,2,130,600,55
+15933,Giant Scale,2,130,300,55
+16117,Armored Scale,2,130,600,55
+15975,Thick Shell,2,130,300,60
+15976,Giant Fossil Shell,2,130,600,60
+15977,Gnarled Branch,2,130,300,60
+15978,Diseased Wreath,2,130,600,60
+15979,Illustrated Old Cloth,2,130,300,60
+15980,Spirit's Tapestry,2,130,600,60
+15981,Ancient Sago Palm,2,130,300,65
+15982,Aged Green Leaves,2,130,600,65
+15983,Transparent Coarse Sand,2,130,300,65
+15984,Clear Fine Sand,2,130,600,65
+15985,Malformed Nut,2,130,300,65
+15986,Strange Sprout,2,130,600,65
+15987,Jet Black Fur,2,130,300,65
+15988,Infected Demon Bone Fragment,2,130,300,65
+16118,Jet Black Pelt,2,130,600,65
+16119,Corroded Spine,2,130,600,65
+15991,Dubious Animal Pelt,2,130,300,70
+15992,Fleshed Animal Pelt,2,130,600,70
+15993,Crystallized Sap,2,130,300,70
+15994,Corrupted Small Feathers,2,130,300,70
+16120,Crystal-Encrusted Twig,2,130,600,70
+16121,Corrupted Griffin Blood,2,130,600,70
+17911,Delicate Intaglio,2,130,200,80
+17912,Acre Royal Family Intaglio,2,130,900,80
+17907,Dried Test Sample,2,130,200,85
+17908,Monster Tissue Sample,2,130,900,85
+17909,Flesh-Eating Snail,2,130,200,90
+17910,Blood-Colored Spiral Shell,2,130,900,90
+19646,Giant Husk,2,130,200,90
+19647,Scorpion Tail's Husk,2,130,900,90
+19648,Smelted Ore Stone,2,130,200,95
+19649,Red Hot Smelted Ore,2,130,900,95
+19650,Cursed Bone Fragment,2,130,200,100
+19651,Cursed Spine,2,130,900,100
+21232,Giant Animal Skull,2,130,500,100
+21233,Cave Shrimp,2,130,350,100
+21234,Cave Shrimp Eggs,2,130,900,100
+21235,Water Purification Stone Powder,2,130,350,105
+21236,Simple Purification Crystal,2,130,900,105
+21237,Scroll of Tribute,2,130,350,110
+21238,Royal Family Chants Grimoire,2,130,900,110
+21272,Old Brick Material,2,130,500,110
+21273,Ancient Wheat,2,130,350,110
+21274,Ancient Wheat Ear,2,130,900,110
+21275,Dragon Temple's Charm,2,130,350,115
+21276,Dragon Temple's Blessed Cloth,2,130,900,115
+21277,Royal Blazing Rock,2,130,350,120
+21278,Sacred Flame Steel,2,130,900,120
+24729,Tree Core Grass,2,130,900,130
+24731,Flame Apex Sacred Tree,2,130,900,130
+24733,The Wise Wizard's Chronicles,2,130,900,130
+24735,Forbidden Gold Sand,2,130,900,130
+17875,Dragonkin Stone,2,131,2500,85
+17897,Gusty Winds Stone,2,131,2500,85
+17898,Victorious Chance Stone,2,131,2500,85
+17899,Fallen Soldier Stone,2,131,2500,85
+17900,Animal Hunter Stone,2,131,2500,85
+17901,Demihuman Cutter Stone,2,131,2500,85
+17902,Demonic Slasher Stone,2,131,2500,85
+17903,Skeleton Smasher Stone,2,131,2500,85
+17904,Undead Destroyer Stone,2,131,2500,85
+17905,Giant Killer Stone,2,131,2500,85
+19645,Demon Expeller Stone,2,131,2500,85
+21248,Spirit Purifier Stone,2,131,2500,85
+21249,Cursed Exorciser Stone,2,131,2500,85
+21250,Alchemy Sealer Stone,2,131,2500,85
+21251,Corrupted Sealer Stone,2,131,2500,85
+21288,War-Ready Break Stone,2,131,2500,85
+21289,Soft Tissue Erasure Gemstone,2,131,2500,85
+21290,Winged Slayer's Stone,2,131,2500,85
+21291,Magickal Constructs Destruction Gemstone,2,131,2500,85
+21380,Fruit of Inspiration (Harden),2,132,100,1
+21381,Fruit of Inspiration (Heavy),2,132,100,1
+21382,Fruit of Inspiration (Restoration),2,132,100,1
+21383,Fruit of Inspiration (Protection),2,132,100,1
+21384,Fruit of Inspiration (Weaken),2,132,100,1
+21385,Fruit of Inspiration (Attraction),2,132,100,1
+21386,Fruit of Inspiration (Fearless),2,132,100,1
+21387,Fruit of Inspiration (Concentration),2,132,100,1
+21388,Fruit of Inspiration (Resurrection),2,132,100,1

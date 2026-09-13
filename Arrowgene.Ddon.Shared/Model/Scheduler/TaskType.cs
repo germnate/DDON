@@ -34,5 +34,6 @@ namespace Arrowgene.Ddon.Shared.Model.Scheduler
         EquipmentRecycleReset = 24,
         Crafting = 25,
         GroupChatPruning = 26,
+        BazaarRotation = 27,
     }
 }

@@ -13,6 +13,9 @@ namespace Arrowgene.Ddon.GameServer
     public class BazaarManager
     {
         private static readonly double TAXES = 0.05; // 5%, value taken from the ingame menu
+        private static readonly ItemSubCategory BazaarRotationMinSubCategory = ItemSubCategory.MaterialInorganicMetal;
+        private static readonly ItemSubCategory BazaarRotationMaxSubCategory = ItemSubCategory.MaterialPawnInspiration;
+        private static readonly ushort[] BazaarRotationBundleSizes = [1, 3, 5, 10];
 
         public BazaarManager(DdonGameServer server)
         {
@@ -207,6 +210,60 @@ namespace Arrowgene.Ddon.GameServer
             }
         }
 
+        public List<BazaarExhibition> BuildGeneratedExhibitions(int targetItemCount = 400, int targetPerRank = 50)
+        {
+            var rankedItems = Server.AssetRepository.ClientItemInfos.Values
+                .Where(item => IsRotatableBazaarItem(item))
+                .GroupBy(item => item.Rank)
+                .OrderBy(group => group.Key)
+                .ToList();
+
+            var selectedItems = new List<ClientItemInfo>();
+            foreach (var rankGroup in rankedItems)
+            {
+                selectedItems.AddRange(rankGroup
+                    .OrderBy(_ => Random.Shared.Next())
+                    .Take(Math.Min(targetPerRank, rankGroup.Count()))
+                    .ToList());
+            }
+
+            if (selectedItems.Count > targetItemCount)
+            {
+                selectedItems = selectedItems
+                    .OrderBy(_ => Random.Shared.Next())
+                    .Take(targetItemCount)
+                    .ToList();
+            }
+
+            var generated = new List<BazaarExhibition>(selectedItems.Count * BazaarRotationBundleSizes.Length);
+            foreach (var item in selectedItems)
+            {
+                foreach (ushort quantity in BazaarRotationBundleSizes)
+                {
+                    generated.Add(CreateGeneratedExhibition(item, quantity));
+                }
+            }
+
+            return generated;
+        }
+
+        public void RotateGeneratedStock(int targetItemCount = 400, int targetPerRank = 50)
+        {
+            Server.Database.ExecuteInTransaction(connection =>
+            {
+                Character serverCharacter = new() { CharacterId = Character.ServerCharacterId };
+                foreach (BazaarExhibition exhibition in GetExhibitionsByCharacter(serverCharacter, connection))
+                {
+                    Server.Database.DeleteBazaarExhibition(exhibition.Info.ItemInfo.BazaarId, connection);
+                }
+
+                foreach (BazaarExhibition exhibition in BuildGeneratedExhibitions(targetItemCount, targetPerRank))
+                {
+                    Server.Database.InsertBazaarExhibition(exhibition, connection);
+                }
+            });
+        }
+
         public BazaarExhibition GetExhibitionByBazaarId(ulong bazaarId, DbConnection? connectionIn = null)
         {
             return Server.Database.SelectBazaarExhibitionByBazaarId(bazaarId, connectionIn);
@@ -239,6 +296,36 @@ namespace Arrowgene.Ddon.GameServer
             return [.. GetExhibitionsByCharacter(character, connectionIn).Where(exhibition => exhibition.Info.State == BazaarExhibitionState.Sold)];
         }
 
+        private BazaarExhibition CreateGeneratedExhibition(ClientItemInfo itemInfo, ushort num)
+        {
+            var now = DateTimeOffset.UtcNow;
+            uint price = Math.Max(1u, itemInfo.Price * (uint)Math.Max(1, itemInfo.Rank + 1));
+
+            BazaarExhibition exhibition = new()
+            {
+                CharacterId = Character.ServerCharacterId,
+                Info = new CDataBazaarCharacterInfo()
+                {
+                    State = BazaarExhibitionState.OnSale,
+                    Proceeds = 0,
+                    Expire = now.AddSeconds(Server.GameSettings.GameServerSettings.BazaarExhibitionTimeSeconds),
+                    ItemInfo = new CDataBazaarItemInfo()
+                    {
+                        ExhibitionTime = now,
+                        ItemBaseInfo = new CDataBazaarItemBaseInfo()
+                        {
+                            ItemId = (uint)itemInfo.ItemId,
+                            Num = num,
+                            Price = price,
+                        }
+                    }
+                }
+            };
+
+            exhibition.Info.Proceeds = CalculateProceeds(exhibition.Info.ItemInfo.ItemBaseInfo);
+            return exhibition;
+        }
+
         private uint CalculateProceeds(CDataBazaarItemBaseInfo itemBaseInfo)
         {
             uint totalPrice = itemBaseInfo.Num*itemBaseInfo.Price;
@@ -246,6 +333,15 @@ namespace Arrowgene.Ddon.GameServer
 
             //Minimum proceeds are 1 because the client UI won't let the player receive them if the total proceeds are less than 1.
             return Math.Clamp(totalPrice - taxDeduction, 1, uint.MaxValue); 
+        }
+
+        private static bool IsRotatableBazaarItem(ClientItemInfo itemInfo)
+        {
+            return itemInfo.Category == 2
+                && itemInfo.Price > 0
+                && !string.IsNullOrWhiteSpace(itemInfo.Name)
+                && itemInfo.SubCategory >= BazaarRotationMinSubCategory
+                && itemInfo.SubCategory <= BazaarRotationMaxSubCategory;
         }
     }
 }

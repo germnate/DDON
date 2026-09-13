@@ -107,6 +107,7 @@ namespace Arrowgene.Ddon.Cli
         {
             AddCommand(new ShowCommand());
             AddCommand(new ServerCommand(_setting));
+            AddCommand(new BazaarCommand());
             AddCommand(new HelpCommand(_commands));
             AddCommand(new ClientCommand());
             AddCommand(new PacketCommand());

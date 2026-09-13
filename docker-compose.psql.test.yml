@@ -61,6 +61,7 @@ services:
     volumes:
       - ddon-server-psql-test-volume:/var/lib/postgresql/data
       - ./deploy/postgresql/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ./scripts/init_server_bazaar_character.sql:/tmp/init.sql:ro
     networks:
       - ddon-network-test
     environment:
