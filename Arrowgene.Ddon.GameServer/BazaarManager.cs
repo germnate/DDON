@@ -16,6 +16,7 @@ namespace Arrowgene.Ddon.GameServer
         private static readonly ItemSubCategory BazaarRotationMinSubCategory = ItemSubCategory.MaterialInorganicMetal;
         private static readonly ItemSubCategory BazaarRotationMaxSubCategory = ItemSubCategory.MaterialPawnInspiration;
         private static readonly ushort[] BazaarRotationBundleSizes = [1, 3, 5, 10, 15, 20, 30, 50];
+        private static readonly ulong BazaarPriceDivider = 4;
 
         public BazaarManager(DdonGameServer server)
         {
@@ -299,7 +300,8 @@ namespace Arrowgene.Ddon.GameServer
         private BazaarExhibition CreateGeneratedExhibition(ClientItemInfo itemInfo, ushort num)
         {
             var now = DateTimeOffset.UtcNow;
-            uint price = Math.Max(1u, itemInfo.Price * (uint)Math.Max(1, itemInfo.Rank + 1) / 2);
+            ulong priceValue = ((ulong)itemInfo.Price * (ulong)Math.Max(1, itemInfo.Rank + 1)) / BazaarPriceDivider;
+            uint price = (uint)Math.Max(1UL, priceValue);
 
             BazaarExhibition exhibition = new()
             {
@@ -328,11 +330,17 @@ namespace Arrowgene.Ddon.GameServer
 
         private uint CalculateProceeds(CDataBazaarItemBaseInfo itemBaseInfo)
         {
-            uint totalPrice = itemBaseInfo.Num*itemBaseInfo.Price;
-            uint taxDeduction = (uint)(totalPrice * TAXES);
+            ulong totalPrice = (ulong)itemBaseInfo.Num * itemBaseInfo.Price;
+            ulong taxDeduction = (ulong)(totalPrice * TAXES);
+            ulong proceeds = totalPrice - taxDeduction;
 
-            //Minimum proceeds are 1 because the client UI won't let the player receive them if the total proceeds are less than 1.
-            return Math.Clamp(totalPrice - taxDeduction, 1, uint.MaxValue); 
+            // Minimum proceeds are 1 because the client UI won't let the player receive them if the total proceeds are less than 1.
+            if (proceeds < 1)
+            {
+                return 1;
+            }
+
+            return (uint)Math.Min(proceeds, uint.MaxValue);
         }
 
         private static bool IsRotatableBazaarItem(ClientItemInfo itemInfo)
