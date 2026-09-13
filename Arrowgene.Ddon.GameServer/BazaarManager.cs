@@ -15,7 +15,7 @@ namespace Arrowgene.Ddon.GameServer
         private static readonly double TAXES = 0.05; // 5%, value taken from the ingame menu
         private static readonly ItemSubCategory BazaarRotationMinSubCategory = ItemSubCategory.MaterialInorganicMetal;
         private static readonly ItemSubCategory BazaarRotationMaxSubCategory = ItemSubCategory.MaterialPawnInspiration;
-        private static readonly ushort[] BazaarRotationBundleSizes = [1, 3, 5, 10];
+        private static readonly ushort[] BazaarRotationBundleSizes = [1, 3, 5, 10, 15, 20, 30, 50];
 
         public BazaarManager(DdonGameServer server)
         {
@@ -299,7 +299,7 @@ namespace Arrowgene.Ddon.GameServer
         private BazaarExhibition CreateGeneratedExhibition(ClientItemInfo itemInfo, ushort num)
         {
             var now = DateTimeOffset.UtcNow;
-            uint price = Math.Max(1u, itemInfo.Price * (uint)Math.Max(1, itemInfo.Rank + 1));
+            uint price = Math.Max(1u, itemInfo.Price * (uint)Math.Max(1, itemInfo.Rank + 1) / 2);
 
             BazaarExhibition exhibition = new()
             {
