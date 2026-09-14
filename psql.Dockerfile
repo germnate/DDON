@@ -9,12 +9,16 @@ RUN dotnet publish Arrowgene.Ddon.Cli -p:Version=1.0.0.0 -p:EnableSdkContainerSu
 RUN rm -rf out/Files/Client
 
 # -extra is required due to timezone looks up, e.g. for 'Tokyo Standard Time' in Arrowgene.Ddon.GameServer.StampManager.RelativeSpanToReset(DateTime lastStamp)
-FROM mcr.microsoft.com/dotnet/runtime-deps:10.0-noble-chiseled-extra
+FROM mcr.microsoft.com/dotnet/runtime:10.0-noble
 ENV DOTNET_EnableDiagnostics=0
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=true
 
+RUN apt-get update && apt-get install -y --no-install-recommends cron && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /var/ddon/server
 COPY --from=build-env /App/out .
+COPY scripts/bazaar-cron.sh /var/ddon/server/bazaar-cron.sh
+RUN chmod +x /var/ddon/server/bazaar-cron.sh
 # Required due to dynamic script file compilation
 USER root
 
