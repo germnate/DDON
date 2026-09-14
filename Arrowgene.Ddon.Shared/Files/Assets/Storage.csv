@@ -3,6 +3,9 @@
 # ItemBagEquipment = 3 
 # ItemBagJob = 4
 # StorageBoxNormal = 6
+# StorageBoxExpansion = 7
+# StorageBoxExpansion2 = 8
+# StorageBoxExpansion3 = 9
 # Storage Type, Max Slots
 1, 20
 2, 40

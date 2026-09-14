@@ -408,8 +408,8 @@ namespace Arrowgene.Ddon.Shared.Model
         KeyItems = 0x5,
         StorageBoxNormal = 0x6,
         StorageBoxExpansion = 0x7,
-        StorageChestDrawer1 = 0x8, // The one in the Arisen Room
-        StorageChestDrawer2 = 0x9,
+        StorageBoxExpansion2 = 0x8,
+        StorageBoxExpansion3 = 0x9,
         StorageChestDrawer3 = 0xA,
         Unk11 = 0xB,
         Unk12 = 0xC, 

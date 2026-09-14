@@ -42,15 +42,15 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_STORAGE_CAPACITY_OVER);
                 }
             }
-            else if (request.DestinationStorage == StorageType.StorageChestDrawer1)
+            else if (request.DestinationStorage == StorageType.StorageBoxExpansion2)
             {
-                if (client.Character.Storage.GetStorage(StorageType.StorageChestDrawer1).EmptySlots() > 0)
+                if (client.Character.Storage.GetStorage(StorageType.StorageBoxExpansion2).EmptySlots() > 0)
                 {
-                    targetStorageType = StorageType.StorageChestDrawer1;
+                    targetStorageType = StorageType.StorageBoxExpansion2;
                 }
-                else if (client.Character.Storage.GetStorage(StorageType.StorageChestDrawer2).EmptySlots() > 0)
+                else if (client.Character.Storage.GetStorage(StorageType.StorageBoxExpansion3).EmptySlots() > 0)
                 {
-                    targetStorageType = StorageType.StorageChestDrawer2;
+                    targetStorageType = StorageType.StorageBoxExpansion3;
                 }
                 else if (client.Character.Storage.GetStorage(StorageType.StorageChestDrawer3).EmptySlots() > 0)
                 {
