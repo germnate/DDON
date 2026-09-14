@@ -1,3 +1,4 @@
+using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.GameServer.Party;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
@@ -35,14 +36,26 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             // The invited player doesn't move to the new party leader's server until this packet is sent
             // Why this wasn't included in the Response packet directly beats me
+            bool alreadyAtLeaderSafeArea =
+                StageManager.IsSafeArea(client.Character.Stage)
+                && StageManager.IsSafeArea(party.Leader.Client.Character.Stage)
+                && client.Character.Stage.Id == party.Leader.Client.Character.Stage.Id;
+
             S2CPartyPartyInviteAcceptNtc inviteAcceptNtc = new()
             {
                 ServerId = (ushort)Server.Id,
                 PartyId = party.Id,
-                StageId = party.Leader.Client.Character.LastSafeStageId,
+                StageId = alreadyAtLeaderSafeArea
+                    ? client.Character.Stage.Id
+                    : party.Leader.Client.Character.LastSafeStageId,
                 PositionId = 0, // TODO: Figure what this is about
                 MemberIndex = (byte)partyMember.MemberIndex
             };
+
+            if (alreadyAtLeaderSafeArea)
+            {
+                Logger.Info(client, $"Already at leader's safe area ({inviteAcceptNtc.StageId}); skipping stage relocation");
+            }
 
             // Temporary hacky fix for this stage in particular being a bad safe area.
             if (inviteAcceptNtc.StageId == Stage.KinozaMineralSprings.StageId)
