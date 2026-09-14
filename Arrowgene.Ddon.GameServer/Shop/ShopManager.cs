@@ -10,6 +10,8 @@ namespace Arrowgene.Ddon.GameServer.Shop
 {
     public class ShopManager : AssetManager<Shared.Model.Shop>
     {
+        public const uint BitterblackMazeShopId = 247;
+
         protected Dictionary<uint, S2CShopGetShopGoodsListRes> Goods;
 
         public ShopManager(AssetRepository assetRepository, IDatabase database) : base(assetRepository, AssetRepository.ShopKey, database, assetRepository.ShopAsset)

@@ -1,5 +1,6 @@
 #nullable enable
 using Arrowgene.Ddon.GameServer.Characters;
+using Arrowgene.Ddon.GameServer.Shop;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
@@ -35,7 +36,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             bool sendToItemBag;
             StorageType destinationStorage;
-            switch(packet.Destination) {
+            bool isBitterblackMazeShop = client.Character.LastEnteredShopId == ShopManager.BitterblackMazeShopId;
+            bool forceStorage = isBitterblackMazeShop;
+
+            switch (forceStorage ? 20 : packet.Destination)
+            {
                 case 19:
                     // If packet.Structure.Destination is 19: Send to corresponding item bag
                     sendToItemBag = true;
@@ -50,7 +55,17 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     throw new Exception("Unexpected destination when buying goods: "+packet.Destination);
             }
 
-            if (!Server.ItemManager.CanAddItem(client.Character, destinationStorage, good.ItemId, boughtAmount))
+            // BBM uses a temporary character. Purchases must be written to the normal
+            // character or they will be discarded when the player leaves BBM.
+            Character purchaseCharacter = isBitterblackMazeShop
+                ? Server.Database.SelectCharacter(client.Character.CharacterId)
+                : client.Character;
+            if (purchaseCharacter == null)
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_INTERNAL_ERROR);
+            }
+
+            if (!Server.ItemManager.CanAddItem(purchaseCharacter, destinationStorage, good.ItemId, boughtAmount))
             {
                 if (sendToItemBag)
                 {
@@ -70,7 +85,14 @@ namespace Arrowgene.Ddon.GameServer.Handler
             Server.Database.ExecuteInTransaction(connection =>
             {
                 // UPDATE INVENTORY
-                List<CDataItemUpdateResult> itemUpdateResults = Server.ItemManager.AddItem(Server, client.Character, sendToItemBag, good.ItemId, boughtAmount, connectionIn: connection);
+                List<CDataItemUpdateResult> itemUpdateResults = Server.ItemManager.AddItem(
+                    Server,
+                    purchaseCharacter,
+                    destinationStorage,
+                    good.ItemId,
+                    boughtAmount,
+                    connectionIn: connection
+                );
 
                 boughtAmount = (uint)itemUpdateResults.Select(result => result.UpdateItemNum).Sum();
                 if (boughtAmount > 0) 
@@ -91,7 +113,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         Server.WalletManager.RemoveFromWallet(client.Character, shop.WalletType, totalPrice, connection)
                             ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_SHOP_LACK_MONEY)
                     };
-                    itemNtc.UpdateItemList = itemUpdateResults;
+                    // The BBM character is temporary, so do not show the normal
+                    // character's storage item as if it were in the BBM inventory.
+                    itemNtc.UpdateItemList = isBitterblackMazeShop
+                        ? new List<CDataItemUpdateResult>()
+                        : itemUpdateResults;
                 }
             });
 
