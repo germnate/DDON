@@ -63,6 +63,7 @@ namespace Arrowgene.Ddon.GameServer
         // TODO: Place somewhere else more sensible
         public uint LastWarpPointId { get; set; }
         public DateTime LastWarpDateTime { get; set; }
+        public uint PartyLeaveSafeStageId { get; set; }
         public S2CLobbyLobbyDataMsgNotice LastLobbyDataMsg { get; set; }
     }
 }

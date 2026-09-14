@@ -84,7 +84,12 @@ namespace Arrowgene.Ddon.GameServer.Handler
             }
             else
             {
-                if (BoardManager.BoardIdIsExm(client.Party.ContentId))
+                if (client.PartyLeaveSafeStageId != 0)
+                {
+                    response.JumpLocation.stageId = client.PartyLeaveSafeStageId;
+                    client.PartyLeaveSafeStageId = 0;
+                }
+                else if (BoardManager.BoardIdIsExm(client.Party.ContentId))
                 {
                     response.JumpLocation.stageId = client.Character.Stage.Id;
                 }
