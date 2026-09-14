@@ -1,5 +1,6 @@
 #nullable enable
 using Arrowgene.Ddon.GameServer.Characters;
+using Arrowgene.Ddon.GameServer.Shop;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
@@ -35,7 +36,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             bool sendToItemBag;
             StorageType destinationStorage;
-            switch(packet.Destination) {
+            bool forceStorage = client.Character.LastEnteredShopId == ShopManager.BitterblackMazeShopId
+                && clientItemInfo.StorageType == StorageType.ItemBagEquipment;
+
+            switch (forceStorage ? 20 : packet.Destination)
+            {
                 case 19:
                     // If packet.Structure.Destination is 19: Send to corresponding item bag
                     sendToItemBag = true;
