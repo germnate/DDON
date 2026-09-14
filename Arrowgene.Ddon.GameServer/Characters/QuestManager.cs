@@ -464,6 +464,21 @@ namespace Arrowgene.Ddon.GameServer.Characters
             return progress != null && (quest.SaveWorkAsStep || progress.Step == step);
         }
 
+        public static bool IsClientEligibleForMainQuestCompletion(DdonGameServer server, GameClient client, Quest quest, DbConnection? connectionIn = null)
+        {
+            if (quest.QuestType != QuestType.Main)
+            {
+                return true;
+            }
+
+            if (client.Character.HasQuestCompleted(quest.QuestId))
+            {
+                return false;
+            }
+
+            return server.Database.GetQuestProgressByScheduleId(client.Character.CommonId, quest.QuestScheduleId, connectionIn) != null;
+        }
+
         public static HashSet<uint> CollectQuestScheduleIds(GameClient client, StageLayoutId stageId)
         {
             var questScheduleIds = new HashSet<uint>();

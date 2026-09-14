@@ -66,7 +66,9 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
                 Server.Database.ExecuteInTransaction(connection =>
                 {
-                    questProgressRecipientIds = GetQuestProgressRecipientIds(client, quest, questStep, connection);
+                    questProgressRecipientIds = questProgressState == QuestProgressState.Complete
+                        ? GetQuestCompletionRecipientIds(client, quest, connection)
+                        : GetQuestProgressRecipientIds(client, quest, questStep, connection);
 
                     if (questProgressState == QuestProgressState.Accepted && quest.QuestType == QuestType.World)
                     {
@@ -162,6 +164,19 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             return client.Party.Clients
                 .Where(memberClient => QuestManager.IsClientAlignedForMainQuestProgress(Server, memberClient, quest, step, connectionIn))
+                .Select(memberClient => memberClient.Character.CharacterId)
+                .ToHashSet();
+        }
+
+        private HashSet<uint> GetQuestCompletionRecipientIds(GameClient client, Quest quest, DbConnection? connectionIn = null)
+        {
+            if (quest.IsPersonal)
+            {
+                return new HashSet<uint>() { client.Character.CharacterId };
+            }
+
+            return client.Party.Clients
+                .Where(memberClient => QuestManager.IsClientEligibleForMainQuestCompletion(Server, memberClient, quest, connectionIn))
                 .Select(memberClient => memberClient.Character.CharacterId)
                 .ToHashSet();
         }
@@ -280,7 +295,18 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     ? client.Party.Clients.Where(memberClient => questProgressRecipientIds.Contains(memberClient.Character.CharacterId)).ToList()
                     : client.Party.Clients.ToList();
 
-                client.Party.EnqueueToAll(completeNtc, packets);
+                if (quest.QuestType == QuestType.Main && questProgressRecipientIds != null)
+                {
+                    foreach (var completionClient in completionClients)
+                    {
+                        completionClient.Enqueue(completeNtc, packets);
+                    }
+                }
+                else
+                {
+                    client.Party.EnqueueToAll(completeNtc, packets);
+                }
+
                 packets.AddRange(client.Party.QuestState.UpdatePriorityQuestList(client.Party.Leader.Client, connectionIn));
                 foreach(var memberClient in completionClients)
                 {

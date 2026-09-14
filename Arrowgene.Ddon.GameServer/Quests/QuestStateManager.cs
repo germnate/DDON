@@ -1264,13 +1264,21 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 }
 
                 if (quest.QuestType == QuestType.Main
-                    && !QuestManager.IsClientAlignedForMainQuestProgress(Server, memberClient, quest, questState.Step, connectionIn))
+                    && !QuestManager.IsClientEligibleForMainQuestCompletion(Server, memberClient, quest, connectionIn))
                 {
+                    Logger.Info(memberClient,
+                        $"[PartyId:{Party.Id}] Skipping main quest completion for {quest.QuestId} " +
+                        $"({quest.QuestScheduleId}); character is not actively progressing the quest");
                     continue;
                 }
 
-                if (result.Step != questState.Step && !quest.SaveWorkAsStep)
+                if (quest.QuestType != QuestType.Main
+                    && result.Step != questState.Step
+                    && !quest.SaveWorkAsStep)
                 {
+                    Logger.Info(memberClient,
+                        $"[PartyId:{Party.Id}] Skipping quest completion for {quest.QuestId} " +
+                        $"({quest.QuestScheduleId}); character step {result.Step} does not match party step {questState.Step}");
                     continue;
                 }
 
@@ -1330,7 +1338,7 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 // If this is a main quest, check to see that the member is currently on this quest, otherwise don't reward
                 if (quest.QuestType == QuestType.Main)
                 {
-                    if (!QuestManager.IsClientAlignedForMainQuestProgress(Server, memberClient, quest, questState.Step, connectionIn))
+                    if (!QuestManager.IsClientEligibleForMainQuestCompletion(Server, memberClient, quest, connectionIn))
                     {
                         continue;
                     }
