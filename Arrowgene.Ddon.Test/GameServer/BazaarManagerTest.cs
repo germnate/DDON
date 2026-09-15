@@ -13,6 +13,13 @@ public class BazaarManagerTest
     private static readonly ushort[] ExpectedGeneratedQuantities = [1, 3, 5, 10];
 
     [Fact]
+    public void ServerBazaarCharacter_ShouldMatchDatabaseSeed()
+    {
+        Assert.Equal(40u, Character.ServerCharacterId);
+        Assert.Equal("Server", Character.ServerCharacterFirstName);
+    }
+
+    [Fact]
     public void BuildGeneratedExhibitions_ShouldCreateAboutFourHundredRankedListings()
     {
         var settings = new GameServerSetting();

@@ -12,7 +12,7 @@ namespace Arrowgene.Ddon.Shared.Model
 {
     public class Character : CharacterCommon
     {
-        public const uint ServerCharacterId = 12;
+        public const uint ServerCharacterId = 40;
         public const string ServerCharacterFirstName = "Server";
 
         public Character() : base()
