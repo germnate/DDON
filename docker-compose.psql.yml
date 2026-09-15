@@ -70,7 +70,7 @@ services:
       - DB_ENABLE_TRACING=true
       - DB_ENABLE_POOLING=true
       - DB_MAX_AUTO_PREPARE=200
-      - BAZAAR_ROTATION_SCHEDULE=0 0 * * *
+      - BAZAAR_ROTATION_SCHEDULE=0 */6 * * *
     volumes:
       - ./Arrowgene.Ddon.config.psql.local_dev.json:/var/ddon/server/Files/Arrowgene.Ddon.config.json:ro
       - ./Arrowgene.Ddon.Shared/Files/Assets:/var/ddon/server/Files/Assets
