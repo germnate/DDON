@@ -12,8 +12,11 @@ RUN rm -rf out/Files/Client
 FROM mcr.microsoft.com/dotnet/runtime:10.0-noble
 ENV DOTNET_EnableDiagnostics=0
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=true
+ENV TZ=America/New_York
 
-RUN apt-get update && apt-get install -y --no-install-recommends cron && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends cron tzdata && rm -rf /var/lib/apt/lists/* \
+    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+    && echo $TZ > /etc/timezone
 
 WORKDIR /var/ddon/server
 COPY --from=build-env /App/out .
