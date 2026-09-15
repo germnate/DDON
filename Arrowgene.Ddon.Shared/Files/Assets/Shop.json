@@ -15325,6 +15325,506 @@
                     "Unk5": 0,
                     "Unk6": 0,
                     "Unk7": []
+                },
+                {
+                    "Index": 42,
+                    "ItemId": 15168,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 43,
+                    "ItemId": 15539,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 44,
+                    "ItemId": 15594,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 45,
+                    "ItemId": 11499,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 46,
+                    "ItemId": 14872,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 47,
+                    "ItemId": 14877,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 48,
+                    "ItemId": 14988,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 49,
+                    "ItemId": 14993,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 50,
+                    "ItemId": 15173,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 51,
+                    "ItemId": 15178,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 52,
+                    "ItemId": 15183,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 53,
+                    "ItemId": 15198,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 54,
+                    "ItemId": 15203,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 55,
+                    "ItemId": 15359,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 56,
+                    "ItemId": 15364,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 57,
+                    "ItemId": 15544,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 58,
+                    "ItemId": 15549,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 59,
+                    "ItemId": 15554,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 60,
+                    "ItemId": 15589,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 61,
+                    "ItemId": 15599,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 62,
+                    "ItemId": 15604,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 63,
+                    "ItemId": 15609,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 64,
+                    "ItemId": 17154,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 65,
+                    "ItemId": 17811,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 66,
+                    "ItemId": 17826,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 67,
+                    "ItemId": 17841,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 68,
+                    "ItemId": 18894,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 69,
+                    "ItemId": 19236,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 70,
+                    "ItemId": 19241,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 71,
+                    "ItemId": 19246,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 72,
+                    "ItemId": 19251,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 73,
+                    "ItemId": 17816,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 74,
+                    "ItemId": 17831,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 75,
+                    "ItemId": 17846,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 76,
+                    "ItemId": 17821,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 77,
+                    "ItemId": 17836,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 78,
+                    "ItemId": 17851,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 79,
+                    "ItemId": 18439,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 80,
+                    "ItemId": 18454,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 81,
+                    "ItemId": 18469,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 82,
+                    "ItemId": 18444,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 83,
+                    "ItemId": 18459,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 84,
+                    "ItemId": 18474,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 85,
+                    "ItemId": 18449,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 86,
+                    "ItemId": 18464,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 87,
+                    "ItemId": 18479,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 88,
+                    "ItemId": 20698,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 89,
+                    "ItemId": 20713,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 90,
+                    "ItemId": 20728,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
+                },
+                {
+                    "Index": 91,
+                    "ItemId": 21142,
+                    "Price": 50,
+                    "Stock": 255,
+                    "Unk4": false,
+                    "Unk5": 0,
+                    "Unk6": 0,
+                    "Unk7": []
                 }
             ]
         }
