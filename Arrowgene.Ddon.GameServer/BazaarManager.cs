@@ -17,6 +17,7 @@ namespace Arrowgene.Ddon.GameServer
         private static readonly ItemSubCategory BazaarRotationMaxSubCategory = ItemSubCategory.MaterialPawnInspiration;
         private static readonly ushort[] BazaarRotationBundleSizes = [1, 3, 5, 10, 15, 20, 30, 50];
         private static readonly ulong BazaarPriceDivider = 4;
+        private static readonly double BazaarRotationUnselectedItemWeight = 2.0;
 
         public BazaarManager(DdonGameServer server)
         {
@@ -213,6 +214,18 @@ namespace Arrowgene.Ddon.GameServer
 
         public List<BazaarExhibition> BuildGeneratedExhibitions(int targetItemCount = 400, int targetPerRank = 50)
         {
+            return BuildGeneratedExhibitions(new HashSet<uint>(), targetItemCount, targetPerRank, Random.Shared);
+        }
+
+        public List<BazaarExhibition> BuildGeneratedExhibitions(
+            IReadOnlySet<uint> previouslySelectedItemIds,
+            int targetItemCount = 400,
+            int targetPerRank = 50,
+            Random? random = null)
+        {
+            ArgumentNullException.ThrowIfNull(previouslySelectedItemIds);
+            random ??= Random.Shared;
+
             var rankedItems = Server.AssetRepository.ClientItemInfos.Values
                 .Where(item => IsRotatableBazaarItem(item))
                 .GroupBy(item => item.Rank)
@@ -222,16 +235,14 @@ namespace Arrowgene.Ddon.GameServer
             var selectedItems = new List<ClientItemInfo>();
             foreach (var rankGroup in rankedItems)
             {
-                selectedItems.AddRange(rankGroup
-                    .OrderBy(_ => Random.Shared.Next())
-                    .Take(Math.Min(targetPerRank, rankGroup.Count()))
-                    .ToList());
+                var items = rankGroup.ToList();
+                selectedItems.AddRange(WeightedShuffle(items, previouslySelectedItemIds, random)
+                    .Take(Math.Min(targetPerRank, items.Count)));
             }
 
             if (selectedItems.Count > targetItemCount)
             {
-                selectedItems = selectedItems
-                    .OrderBy(_ => Random.Shared.Next())
+                selectedItems = WeightedShuffle(selectedItems, previouslySelectedItemIds, random)
                     .Take(targetItemCount)
                     .ToList();
             }
@@ -253,12 +264,21 @@ namespace Arrowgene.Ddon.GameServer
             Server.Database.ExecuteInTransaction(connection =>
             {
                 Character serverCharacter = new() { CharacterId = Character.ServerCharacterId };
-                foreach (BazaarExhibition exhibition in GetExhibitionsByCharacter(serverCharacter, connection))
+                List<BazaarExhibition> currentExhibitions = GetExhibitionsByCharacter(serverCharacter, connection);
+                HashSet<uint> currentItemIds = currentExhibitions
+                    .Select(exhibition => exhibition.Info.ItemInfo.ItemBaseInfo.ItemId)
+                    .ToHashSet();
+                List<BazaarExhibition> generatedExhibitions = BuildGeneratedExhibitions(
+                    currentItemIds,
+                    targetItemCount,
+                    targetPerRank);
+
+                foreach (BazaarExhibition exhibition in currentExhibitions)
                 {
                     Server.Database.DeleteBazaarExhibition(exhibition.Info.ItemInfo.BazaarId, connection);
                 }
 
-                foreach (BazaarExhibition exhibition in BuildGeneratedExhibitions(targetItemCount, targetPerRank))
+                foreach (BazaarExhibition exhibition in generatedExhibitions)
                 {
                     Server.Database.InsertBazaarExhibition(exhibition, connection);
                 }
@@ -295,6 +315,20 @@ namespace Arrowgene.Ddon.GameServer
         private List<BazaarExhibition> GetSoldExhibitionsByCharacter(Character character, DbConnection? connectionIn = null)
         {
             return [.. GetExhibitionsByCharacter(character, connectionIn).Where(exhibition => exhibition.Info.State == BazaarExhibitionState.Sold)];
+        }
+
+        private static IEnumerable<ClientItemInfo> WeightedShuffle(
+            IEnumerable<ClientItemInfo> items,
+            IReadOnlySet<uint> previouslySelectedItemIds,
+            Random random)
+        {
+            return items.OrderBy(item =>
+            {
+                double weight = previouslySelectedItemIds.Contains((uint)item.ItemId)
+                    ? 1.0
+                    : BazaarRotationUnselectedItemWeight;
+                return -Math.Log(1.0 - random.NextDouble()) / weight;
+            });
         }
 
         private BazaarExhibition CreateGeneratedExhibition(ClientItemInfo itemInfo, ushort num)
