@@ -15,7 +15,11 @@ namespace Arrowgene.Ddon.GameServer
         private static readonly double TAXES = 0.05; // 5%, value taken from the ingame menu
         private static readonly ItemSubCategory BazaarRotationMinSubCategory = ItemSubCategory.MaterialInorganicMetal;
         private static readonly ItemSubCategory BazaarRotationMaxSubCategory = ItemSubCategory.MaterialPawnInspiration;
-        private static readonly ushort[] BazaarRotationBundleSizes = [1, 3, 5, 10, 15, 20, 30, 50];
+        private static readonly ushort[] BazaarRotationBundleSizes = Enumerable.Repeat((ushort) 1, 10)
+            .Concat(Enumerable.Repeat((ushort) 2, 10))
+            .Concat(Enumerable.Repeat((ushort) 3, 10))
+            .Concat(Enumerable.Repeat((ushort) 5, 10))
+            .ToArray();
         private static readonly ulong BazaarPriceDivider = 4;
         private static readonly double BazaarRotationUnselectedItemWeight = 2.0;
 
