@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Linq;
 using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Model;
+using Arrowgene.Ddon.Shared.Model.Quest;
 
 namespace Arrowgene.Ddon.Database.Sql.Core;
 
@@ -14,6 +15,21 @@ public partial class DdonSqlDb : SqlDb
 
     private const string SqlSelectOfficialPawns =
         @"SELECT * FROM ddon_pawn WHERE is_official_pawn=true;";
+
+    private const string SqlSelectServerSupportPawnDefinitions =
+        """
+        SELECT pawn_id, required_quest_id, enabled
+        FROM ddon_server_support_pawn;
+        """;
+
+    private const string SqlInsertServerSupportPawnDefinition =
+        """
+        INSERT INTO ddon_server_support_pawn (pawn_id, required_quest_id, enabled)
+        VALUES (@pawn_id, @required_quest_id, @enabled)
+        ON CONFLICT (pawn_id) DO UPDATE SET
+            required_quest_id = EXCLUDED.required_quest_id,
+            enabled = EXCLUDED.enabled;
+        """;
 
     private const string SqlSelectAllPlayerPawns =
         @"SELECT * FROM ddon_pawn WHERE is_official_pawn=false LIMIT @limit;";
@@ -58,6 +74,14 @@ public partial class DdonSqlDb : SqlDb
         	)
         WHERE
         	ddon_pawn.character_id != @character_id
+            AND NOT (
+                ddon_pawn.character_id = @server_character_id
+                AND EXISTS (
+                    SELECT 1
+                    FROM ddon_server_support_pawn AS server_support
+                    WHERE server_support.pawn_id = ddon_pawn.pawn_id
+                )
+            )
         	AND (
         		@dont_filter_by_owner_name
         		OR (
@@ -221,6 +245,25 @@ public partial class DdonSqlDb : SqlDb
 
             StorePawnData(conn, pawn);
         });
+    }
+
+    public override bool InsertServerSupportPawnDefinition(
+        ServerSupportPawnDefinition definition,
+        DbConnection? connectionIn = null
+    )
+    {
+        return ExecuteQuerySafe(connectionIn, connection =>
+            ExecuteNonQuery(
+                connection,
+                SqlInsertServerSupportPawnDefinition,
+                command =>
+                {
+                    AddParameter(command, "@pawn_id", definition.PawnId);
+                    AddParameter(command, "@required_quest_id", (uint)definition.RequiredQuestId);
+                    AddParameter(command, "@enabled", definition.Enabled);
+                }
+            ) == 1
+        );
     }
 
     public override Pawn SelectPawn(uint pawnId)
@@ -403,6 +446,31 @@ public partial class DdonSqlDb : SqlDb
             foreach (Pawn pawn in pawns) QueryPawnData(conn, pawn);
         });
         return pawns;
+    }
+
+    public override List<ServerSupportPawnDefinition> SelectServerSupportPawnDefinitions(DbConnection? connectionIn = null)
+    {
+        return ExecuteQuerySafe(connectionIn, connection =>
+        {
+            List<ServerSupportPawnDefinition> definitions = [];
+            ExecuteReader(
+                connection,
+                SqlSelectServerSupportPawnDefinitions,
+                command => { },
+                reader =>
+                {
+                    while (reader.Read())
+                    {
+                        definitions.Add(new ServerSupportPawnDefinition
+                        {
+                            PawnId = GetUInt32(reader, "pawn_id"),
+                            RequiredQuestId = (QuestId)GetUInt32(reader, "required_quest_id"),
+                            Enabled = GetBoolean(reader, "enabled"),
+                        });
+                    }
+                });
+            return definitions;
+        });
     }
 
     public override List<uint> SelectOfficialPawns(DbConnection? connectionIn = null)
@@ -862,6 +930,7 @@ public partial class DdonSqlDb : SqlDb
     )
     {
         AddParameter(command, "character_id", searchingCharacter.CharacterId);
+        AddParameter(command, "server_character_id", Character.ServerCharacterId);
         AddParameter(command, "clan_id", searchingCharacter.ClanId);
         AddParameter(
             command,

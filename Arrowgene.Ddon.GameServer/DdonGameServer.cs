@@ -49,6 +49,7 @@ namespace Arrowgene.Ddon.GameServer
 {
     public class DdonGameServer : DdonServer<GameClient>
     {
+        internal ServerSupportPawnManager ServerSupportPawnManager { get; }
         private static readonly ServerLogger Logger = LogProvider.Logger<ServerLogger>(typeof(DdonGameServer));
 
         public DdonGameServer(GameServerSetting setting, GameSettings gameSettings, IDatabase database,
@@ -94,6 +95,8 @@ namespace Arrowgene.Ddon.GameServer
             JobEmblemManager = new JobEmblemManager(this);
             LightQuestManager = new LightQuestManager(this);
             RentalPawnManager = new RentalPawnManager(this);
+            ServerSupportPawnManager = new ServerSupportPawnManager(this);
+            ServerSupportPawnBootstrap.EnsureSeeded(this);
             OrbUnlockManager = new OrbUnlockManager(this);
             BitterblackMazeManager = new BitterblackMazeManager(this);
             WorldQuestManager = new WorldQuestManager(this);

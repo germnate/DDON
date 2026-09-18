@@ -366,9 +366,11 @@ public abstract class SqlDb : IDatabase
     public abstract CDataCharacterSearchParam SelectCharacterNameById(uint characterId);
     public abstract CDataCharacterSearchParam SelectCharacterNameById(DbConnection connection, uint characterId);
     public abstract bool CreatePawn(Pawn pawn);
+    public abstract bool InsertServerSupportPawnDefinition(ServerSupportPawnDefinition definition, DbConnection? connectionIn = null);
     public abstract Pawn SelectPawn(uint pawnId);
     public abstract Pawn SelectPawn(DbConnection connection, uint pawnId);
     public abstract List<Pawn> SelectPawnsByCharacterId(uint characterId, DbConnection? connectionIn = null);
+    public abstract List<ServerSupportPawnDefinition> SelectServerSupportPawnDefinitions(DbConnection? connectionIn = null);
     public abstract List<uint> SelectOfficialPawns(DbConnection? connectionIn = null);
     public abstract List<uint> SelectAllPlayerPawns(uint limit = 100);
     public abstract List<uint> SelectAllPlayerPawns(DbConnection connection, uint limit = 100);

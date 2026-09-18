@@ -68,6 +68,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_CHARACTER_PAWN_PARAM_NOT_FOUND);
                 }
+                if (ownerCharacterId == Character.ServerCharacterId
+                    && !Server.ServerSupportPawnManager.IsAvailable(client.Character, request.RequestedPawnId, connectionIn))
+                {
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED);
+                }
 
                 var ownerCharacter = Server.CharacterManager.SelectCharacter(ownerCharacterId, true, connectionIn);
                 Pawn pawn = null;

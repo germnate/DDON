@@ -108,3 +108,12 @@ ON CONFLICT ("character_id") DO UPDATE SET
   game_mode = EXCLUDED.game_mode;
 
 COMMIT;
+
+INSERT INTO ddon_server_support_pawn (pawn_id, required_quest_id, enabled)
+SELECT pawn_id, 0, TRUE
+FROM ddon_pawn
+WHERE character_id = 40
+  AND name = 'ServerPawn'
+ON CONFLICT (pawn_id) DO UPDATE SET
+  required_quest_id = EXCLUDED.required_quest_id,
+  enabled = EXCLUDED.enabled;
