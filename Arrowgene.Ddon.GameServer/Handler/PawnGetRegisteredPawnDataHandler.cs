@@ -41,9 +41,13 @@ namespace Arrowgene.Ddon.GameServer.Handler
             Server.Database.ExecuteInTransaction(connection =>
             {
                 uint ownerCharacterId = Server.Database.GetPawnOwnerCharacterId((uint)request.PawnId, connection);
-                if (ownerCharacterId == Character.ServerCharacterId)
+                bool isServerSupportPawn = ownerCharacterId == Character.ServerCharacterId
+                    && Server.ServerSupportPawnManager.IsManaged((uint)request.PawnId, connection);
+                if (ownerCharacterId == Character.ServerCharacterId
+                    && (!isServerSupportPawn
+                        || !Server.ServerSupportPawnManager.IsAvailable(client.Character, (uint)request.PawnId, connection)))
                 {
-                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_CHARACTER_PAWN_PARAM_NOT_FOUND);
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED);
                 }
 
                 var ownerCharacter = Server.CharacterManager.SelectCharacter(ownerCharacterId, true, connection);
@@ -68,7 +72,16 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     CharacterId = ownerCharacterId,
                     PawnId = pawn.PawnId,
-                    OwnerBaseInfo = Server.Database.SelectCommunityCharacterBaseInfo(ownerCharacterId, connection),
+                    OwnerBaseInfo = isServerSupportPawn
+                        ? new CDataCommunityCharacterBaseInfo
+                        {
+                            CharacterId = Character.ServerCharacterId,
+                            CharacterName = new CDataCharacterName
+                            {
+                                FirstName = Character.ServerCharacterFirstName
+                            }
+                        }
+                        : Server.Database.SelectCommunityCharacterBaseInfo(ownerCharacterId, connection),
                     PawnProfile = pawn.CharacterProfile.CDataArisenProfile,
                     Comment = pawn.CharacterProfile.Comment,
                     RentalCost = mixin.GetRentalCost(client, pawn.CDataRegisterdPawnList, clanPawns.Contains(pawn.PawnId))
@@ -79,7 +92,9 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     CharacterId = ownerCharacterId,
                     PawnId = pawn.PawnId,
-                    PawnHistoryList = Server.Database.SelectPawnHistory(pawn.PawnId, connection)
+                    PawnHistoryList = isServerSupportPawn
+                        ? []
+                        : Server.Database.SelectPawnHistory(pawn.PawnId, connection)
                 };
                 client.Enqueue(historyNtc, queue);
 
@@ -87,7 +102,9 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     CharacterId = ownerCharacterId,
                     PawnId = pawn.PawnId,
-                    PawnTotalScore = Server.Database.SelectPawnTotalScore(pawn.PawnId, connection)
+                    PawnTotalScore = isServerSupportPawn
+                        ? new CDataPawnTotalScore()
+                        : Server.Database.SelectPawnTotalScore(pawn.PawnId, connection)
                 };
                 client.Enqueue(scoreNtc, queue);
             });

@@ -26,7 +26,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
             {
                 // Official pawns have no row in ddon_pawn so the feedback table's FK constraint
                 // would fail. Skip feedback — there is no real owner to receive it.
-                if (!pawn.IsOfficialPawn)
+                if (!pawn.IsOfficialPawn && pawn.OwningCharacterId != Character.ServerCharacterId)
                 {
                     Server.Database.InsertRentalPawnFeedback(client.Character.CharacterId, pawn, request.PawnFeedbackList, connection);
                 }

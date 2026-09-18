@@ -109,9 +109,11 @@ public interface IDatabase
 
     // Pawn
     bool CreatePawn(Pawn pawn);
+    bool InsertServerSupportPawnDefinition(ServerSupportPawnDefinition definition, DbConnection? connectionIn = null);
     Pawn SelectPawn(uint pawnId);
     Pawn SelectPawn(DbConnection connection, uint pawnId);
     List<Pawn> SelectPawnsByCharacterId(uint characterId, DbConnection? connectionIn = null);
+    List<ServerSupportPawnDefinition> SelectServerSupportPawnDefinitions(DbConnection? connectionIn = null);
     List<uint> SelectOfficialPawns(DbConnection? connectionIn = null);
     List<uint> SelectAllPlayerPawns(uint limit = 100);
     List<uint> SelectAllPlayerPawns(DbConnection connection, uint limit = 100);

@@ -1,4 +1,5 @@
 using Arrowgene.Ddon.GameServer.Scripting.Interfaces;
+using Arrowgene.Ddon.GameServer.Characters;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Entity.Structure;
@@ -17,6 +18,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
         {
             HashSet<uint> clanPawns = [];
             List<CDataRegisterdPawnList> registeredPawns = [];
+            List<Pawn> serverSupportPawns = [];
 
             // Pre-process the request params to make the SQL easier.
             // The DB stores 0 as the default skill level, but the client parses this as 1, so we offset.
@@ -34,6 +36,10 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     clanPawns = [.. Server.Database.SelectClanPawns(client.Character.ClanId, limit: 1000, connectionIn: connection)];
                 }
                 registeredPawns = Server.Database.SelectRegisteredPawns(client.Character, request.SearchParam, connection);
+                serverSupportPawns = Server.ServerSupportPawnManager
+                    .SelectAvailablePawns(client.Character, connection)
+                    .Where(pawn => ServerSupportPawnManager.MatchesSearch(pawn, request.SearchParam))
+                    .ToList();
             });
 
             var mixin = Server.ScriptManager.MixinModule.Get<IRentalCostMixin>("rental_cost");
@@ -41,6 +47,14 @@ namespace Arrowgene.Ddon.GameServer.Handler
             foreach (var registeredPawn in registeredPawns)
             {
                 registeredPawn.RentalCost = mixin.GetRentalCost(client, registeredPawn, clanPawns.Contains(registeredPawn.PawnId));
+            }
+
+            var rentedPawnIds = client.Character.RentedPawns.Select(x => x.PawnId).ToHashSet();
+            foreach (var pawn in serverSupportPawns.Where(x => !rentedPawnIds.Contains(x.PawnId)))
+            {
+                var listEntry = ServerSupportPawnManager.ToListEntry(pawn);
+                listEntry.RentalCost = mixin.GetRentalCost(client, listEntry, false);
+                registeredPawns.Add(listEntry);
             }
 
             return new()

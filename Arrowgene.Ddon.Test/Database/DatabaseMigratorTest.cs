@@ -339,6 +339,8 @@ namespace Arrowgene.Ddon.Test.Database
         public Pawn SelectPawn(uint pawnId) { return new Pawn(); }
         public Pawn SelectPawn(DbConnection connection, uint pawnId) { return new Pawn(); }
         public List<Pawn> SelectPawnsByCharacterId(uint characterId, DbConnection? connectionIn = null) { return new List<Pawn>(); }
+        public bool InsertServerSupportPawnDefinition(ServerSupportPawnDefinition definition, DbConnection? connectionIn = null) { return true; }
+        public List<ServerSupportPawnDefinition> SelectServerSupportPawnDefinitions(DbConnection? connectionIn = null) { return []; }
         public List<ReleasedWarpPoint> SelectReleasedWarpPoints(uint characterId) { return new List<ReleasedWarpPoint>(); }
         public GameToken SelectToken(string tokenStr) { return new GameToken(); }
         public GameToken SelectTokenByAccountId(int accountId) { return new GameToken(); }
