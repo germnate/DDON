@@ -218,7 +218,7 @@ public partial class DdonPostgresDb : DdonSqlDb
         if (value.HasValue)
             AddTypedParameter(command, name, DateTime.SpecifyKind(value.Value, DateTimeKind.Utc));
         else
-            command.Parameters.Add(new NpgsqlParameter(name, null));
+            command.Parameters.Add(new NpgsqlParameter(name, NpgsqlTypes.NpgsqlDbType.TimestampTz) { Value = DBNull.Value });
     }
 
     public override void AddParameter(DbCommand command, string name, DateTime value)
