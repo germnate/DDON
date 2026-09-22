@@ -12,18 +12,18 @@ public partial class DdonSqlDb : SqlDb
     /* ddon_pawn_expedition */
     protected static readonly string[] PawnExpeditionFields = new[]
     {
-        "character_id", "status", "area_id", "spot_id", "is_hot_spot", "is_golden_sally", "sally_count", "sally_start_time"
+        "character_id", "pawn_id", "status", "area_id", "spot_id", "is_hot_spot", "is_golden_sally", "sally_count", "sally_start_time"
     };
 
     private readonly string SqlSelectPawnExpeditionRecord =
-        $"SELECT {BuildQueryField(PawnExpeditionFields)} FROM \"ddon_pawn_expedition\" WHERE \"character_id\"=@character_id;";
+        $"SELECT {BuildQueryField(PawnExpeditionFields)} FROM \"ddon_pawn_expedition\" WHERE \"character_id\"=@character_id AND \"pawn_id\"=@pawn_id;";
 
     private readonly string SqlSelectPawnExpeditionRecordsForClanMembers =
         $"SELECT {BuildQueryField(PawnExpeditionFields)} FROM \"ddon_pawn_expedition\" WHERE \"character_id\" IN ({{0}});";
 
     private readonly string SqlUpsertPawnExpeditionRecord =
         $"INSERT INTO \"ddon_pawn_expedition\" ({BuildQueryField(PawnExpeditionFields)}) VALUES ({BuildQueryInsert(PawnExpeditionFields)}) " +
-        $"ON CONFLICT(\"character_id\") DO UPDATE SET {BuildQueryUpdate(new[] { "status", "area_id", "spot_id", "is_hot_spot", "is_golden_sally", "sally_count", "sally_start_time" })};";
+        $"ON CONFLICT(\"character_id\", \"pawn_id\") DO UPDATE SET {BuildQueryUpdate(new[] { "status", "area_id", "spot_id", "is_hot_spot", "is_golden_sally", "sally_count", "sally_start_time" })};";
 
     /* ddon_pawn_expedition_reward_box */
     protected static readonly string[] PawnExpeditionRewardBoxFields = new[]
@@ -62,9 +62,9 @@ public partial class DdonSqlDb : SqlDb
         $"SELECT {BuildQueryField(PawnExpeditionRewardBoxItemFields)} FROM \"ddon_pawn_expedition_reward_box_item\" WHERE \"box_id\"=@box_id;";
 
     private readonly string SqlClaimPawnExpeditionRewardBoxItem =
-        "UPDATE \"ddon_pawn_expedition_reward_box_item\" SET \"claimed\"=1 WHERE \"box_id\"=@box_id AND \"slot_no\"=@slot_no;";
+        "UPDATE \"ddon_pawn_expedition_reward_box_item\" SET \"claimed\"=@claimed WHERE \"box_id\"=@box_id AND \"slot_no\"=@slot_no;";
 
-    public override PawnExpeditionRecord? GetPawnExpeditionRecord(uint characterId, DbConnection? connectionIn = null)
+    public override PawnExpeditionRecord? GetPawnExpeditionRecord(uint characterId, DbConnection? connectionIn = null, uint pawnId = 0)
     {
         PawnExpeditionRecord? result = null;
         ExecuteQuerySafe(connectionIn, connection =>
@@ -72,6 +72,7 @@ public partial class DdonSqlDb : SqlDb
             ExecuteReader(connection, SqlSelectPawnExpeditionRecord, command =>
             {
                 AddParameter(command, "character_id", characterId);
+                AddParameter(command, "pawn_id", pawnId);
             }, reader =>
             {
                 if (reader.Read())
@@ -117,6 +118,7 @@ public partial class DdonSqlDb : SqlDb
         return new PawnExpeditionRecord()
         {
             CharacterId = GetUInt32(reader, "character_id"),
+            PawnId = GetUInt32(reader, "pawn_id"),
             Status = (PawnExpeditionStatus)GetByte(reader, "status"),
             AreaId = GetUInt32(reader, "area_id"),
             SpotId = GetUInt32(reader, "spot_id"),
@@ -134,6 +136,7 @@ public partial class DdonSqlDb : SqlDb
             return ExecuteNonQuery(connection, SqlUpsertPawnExpeditionRecord, command =>
             {
                 AddParameter(command, "character_id", record.CharacterId);
+                AddParameter(command, "pawn_id", record.PawnId);
                 AddParameter(command, "status", (byte)record.Status);
                 AddParameter(command, "area_id", record.AreaId);
                 AddParameter(command, "spot_id", record.SpotId);
@@ -282,6 +285,7 @@ public partial class DdonSqlDb : SqlDb
             {
                 AddParameter(command, "box_id", boxId);
                 AddParameter(command, "slot_no", slotNo);
+                AddParameter(command, "claimed", true);
             }) == 1;
         });
     }

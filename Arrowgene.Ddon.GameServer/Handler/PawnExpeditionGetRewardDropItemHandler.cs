@@ -27,7 +27,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             S2CItemUpdateCharacterItemNtc ntc = new S2CItemUpdateCharacterItemNtc()
             {
-                UpdateType = ItemNoticeType.Default
+                UpdateType = ItemNoticeType.PawnExpeditionDrop
             };
 
             Server.Database.ExecuteInTransaction(connection =>

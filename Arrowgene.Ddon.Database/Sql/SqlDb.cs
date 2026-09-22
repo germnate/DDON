@@ -637,7 +637,7 @@ public abstract class SqlDb : IDatabase
     public abstract bool InsertPartnerPawnPendingReward(uint characterId, uint pawnId, uint rewardLevel, DbConnection? connectionIn = null);
     public abstract void DeletePartnerPawnPendingReward(uint characterId, uint pawnId, uint rewardLevel, DbConnection? connectionIn = null);
 
-    public abstract PawnExpeditionRecord? GetPawnExpeditionRecord(uint characterId, DbConnection? connectionIn = null);
+    public abstract PawnExpeditionRecord? GetPawnExpeditionRecord(uint characterId, DbConnection? connectionIn = null, uint pawnId = 0);
     public abstract bool UpsertPawnExpeditionRecord(PawnExpeditionRecord record, DbConnection? connectionIn = null);
     public abstract List<PawnExpeditionRecord> GetPawnExpeditionRecordsForClanMembers(List<uint> characterIds, DbConnection? connectionIn = null);
     public abstract uint InsertPawnExpeditionRewardBox(uint characterId, byte mdlType, DbConnection? connectionIn = null);

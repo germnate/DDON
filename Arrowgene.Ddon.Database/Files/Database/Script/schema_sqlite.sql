@@ -959,6 +959,7 @@ CREATE TABLE IF NOT EXISTS "ddon_partner_pawn_pending_rewards"
 CREATE TABLE IF NOT EXISTS "ddon_pawn_expedition"
 (
     "character_id"      INTEGER  NOT NULL,
+    "pawn_id"           INTEGER  NOT NULL,
     "status"             TINYINT  NOT NULL,
     "area_id"            INTEGER  NOT NULL,
     "spot_id"            INTEGER  NOT NULL,
@@ -966,8 +967,9 @@ CREATE TABLE IF NOT EXISTS "ddon_pawn_expedition"
     "is_golden_sally"    BOOLEAN  NOT NULL,
     "sally_count"        TINYINT  NOT NULL,
     "sally_start_time"   DATETIME NULL,
-    CONSTRAINT "pk_ddon_pawn_expedition" PRIMARY KEY ("character_id"),
-    CONSTRAINT "fk_ddon_pawn_expedition_character_id" FOREIGN KEY ("character_id") REFERENCES "ddon_character" ("character_id") ON DELETE CASCADE
+    CONSTRAINT "pk_ddon_pawn_expedition" PRIMARY KEY ("character_id", "pawn_id"),
+    CONSTRAINT "fk_ddon_pawn_expedition_character_id" FOREIGN KEY ("character_id") REFERENCES "ddon_character" ("character_id") ON DELETE CASCADE,
+    CONSTRAINT "fk_ddon_pawn_expedition_pawn_id" FOREIGN KEY ("pawn_id") REFERENCES "ddon_pawn" ("pawn_id") ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS "ddon_pawn_expedition_reward_box"

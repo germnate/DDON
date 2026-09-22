@@ -56,16 +56,44 @@ namespace Arrowgene.Ddon.GameServer.Characters
         private byte MaxSallyCount => Server.GameSettings.GameServerSettings.PawnExpeditionMaxSallyCount;
         private uint SallyDurationInSeconds => Server.GameSettings.GameServerSettings.PawnExpeditionSallyDurationInSeconds;
 
+        public static PawnExpeditionRecord CreateDefaultRecord(uint characterId)
+        {
+            return new PawnExpeditionRecord()
+            {
+                CharacterId = characterId,
+                PawnId = 0,
+                Status = PawnExpeditionStatus.Tired,
+                SallyCount = 1
+            };
+        }
+
+        public static bool CanPersistRecord(PawnExpeditionRecord record)
+        {
+            return record.PawnId != 0;
+        }
+
         public PawnExpeditionRecord GetOrCreateRecord(GameClient client, DbConnection? connectionIn = null)
+        {
+            return GetOrCreateRecord(client, 0, connectionIn);
+        }
+
+        public PawnExpeditionRecord GetOrCreateRecord(GameClient client, uint pawnId, DbConnection? connectionIn = null)
         {
             return Server.Database.ExecuteQuerySafe(connectionIn, connection =>
             {
-                PawnExpeditionRecord? record = Server.Database.GetPawnExpeditionRecord(client.Character.CharacterId, connection);
+                if (pawnId == 0)
+                {
+                    PawnExpeditionRecord? currentRecord = GetCurrentRecord(client, connection);
+                    return currentRecord ?? CreateDefaultRecord(client.Character.CharacterId);
+                }
+
+                PawnExpeditionRecord? record = Server.Database.GetPawnExpeditionRecord(client.Character.CharacterId, connection, pawnId);
                 if (record == null)
                 {
                     record = new PawnExpeditionRecord()
                     {
                         CharacterId = client.Character.CharacterId,
+                        PawnId = pawnId,
                         Status = PawnExpeditionStatus.Tired,
                         SallyCount = 1
                     };
@@ -75,6 +103,31 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
                 return TryFinalizeSally(record, connection);
             });
+        }
+
+        private PawnExpeditionRecord? GetCurrentRecord(GameClient client, DbConnection? connectionIn = null)
+        {
+            List<PawnExpeditionRecord> records = Server.Database
+                .GetPawnExpeditionRecordsForClanMembers(new List<uint> { client.Character.CharacterId }, connectionIn);
+            PawnExpeditionRecord? record = records
+                .OrderBy(x => GetRecordPriority(x.Status))
+                .ThenByDescending(x => x.SallyStartTime ?? DateTime.MinValue)
+                .ThenByDescending(x => x.SallyCount)
+                .ThenBy(x => x.PawnId)
+                .FirstOrDefault();
+
+            return record == null ? null : TryFinalizeSally(record, connectionIn);
+        }
+
+        private static int GetRecordPriority(PawnExpeditionStatus status)
+        {
+            return status switch
+            {
+                PawnExpeditionStatus.OnSally => 0,
+                PawnExpeditionStatus.Returned => 1,
+                PawnExpeditionStatus.Tired => 2,
+                _ => 3
+            };
         }
 
         /// <summary>
@@ -146,8 +199,8 @@ namespace Arrowgene.Ddon.GameServer.Characters
         {
             return Server.Database.ExecuteQuerySafe(connectionIn, connection =>
             {
-                PawnExpeditionRecord record = GetOrCreateRecord(client, connection);
-                if (record.Status != PawnExpeditionStatus.Returned)
+                PawnExpeditionRecord record = GetOrCreateRecord(client, connectionIn: connection);
+                if (!CanPersistRecord(record) || record.Status != PawnExpeditionStatus.Returned)
                 {
                     return false;
                 }
@@ -162,11 +215,27 @@ namespace Arrowgene.Ddon.GameServer.Characters
             });
         }
 
-        public bool StartSally(GameClient client, uint areaId, uint spotId, DbConnection? connectionIn = null)
+        public bool StartSally(GameClient client, uint pawnId, uint areaId, uint spotId, DbConnection? connectionIn = null)
         {
             return Server.Database.ExecuteQuerySafe(connectionIn, connection =>
             {
-                PawnExpeditionRecord record = GetOrCreateRecord(client, connection);
+                if (pawnId == 0)
+                {
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_EXPEDITION_POINTER_NOT_EXIST, "Pawn expedition requires a valid pawn id");
+                }
+
+                PawnExpeditionRecord? currentRecord = GetCurrentRecord(client, connection);
+                if (currentRecord?.Status == PawnExpeditionStatus.OnSally && currentRecord.PawnId != pawnId)
+                {
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_EXPEDITION_NOT_SALLY, "A sally is already in progress");
+                }
+
+                PawnExpeditionRecord record = GetOrCreateRecord(client, pawnId, connection);
+                if (!CanPersistRecord(record))
+                {
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_EXPEDITION_POINTER_NOT_EXIST, "Pawn expedition requires a valid pawn id");
+                }
+
                 if (record.Status == PawnExpeditionStatus.OnSally)
                 {
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_EXPEDITION_NOT_SALLY, "A sally is already in progress");
@@ -178,6 +247,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 }
 
                 record.Status = PawnExpeditionStatus.OnSally;
+                record.PawnId = pawnId;
                 record.AreaId = areaId;
                 record.SpotId = spotId;
                 record.IsHotSpot = SallySpots.Any(x => (uint)x.AreaId == areaId && x.SpotId == spotId) && Random.Shared.NextDouble() < 0.2;
@@ -192,7 +262,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
         {
             return Server.Database.ExecuteQuerySafe(connectionIn, connection =>
             {
-                PawnExpeditionRecord record = GetOrCreateRecord(client, connection);
+                PawnExpeditionRecord record = GetOrCreateRecord(client, connectionIn: connection);
+                if (!CanPersistRecord(record))
+                {
+                    return false;
+                }
+
                 if (record.Status != PawnExpeditionStatus.OnSally)
                 {
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_EXPEDITION_NOT_SALLY, "No sally in progress to cancel");
@@ -201,8 +276,13 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 record.Status = PawnExpeditionStatus.Tired;
                 record.AreaId = 0;
                 record.SpotId = 0;
+                record.IsHotSpot = false;
                 record.IsGoldenSally = false;
                 record.SallyStartTime = null;
+                if (record.SallyCount < MaxSallyCount)
+                {
+                    record.SallyCount++;
+                }
 
                 return Server.Database.UpsertPawnExpeditionRecord(record, connection);
             });
@@ -218,7 +298,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_EXPEDITION_DIFFERENT_PRICE, $"Expected price {expectedPrice}, got {price}");
                 }
 
-                PawnExpeditionRecord record = GetOrCreateRecord(client, connection);
+                PawnExpeditionRecord record = GetOrCreateRecord(client, connectionIn: connection);
+                if (!CanPersistRecord(record))
+                {
+                    return false;
+                }
+
                 if (record.SallyCount >= MaxSallyCount)
                 {
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_EXPEDITION_POINTER_NOT_EXIST, "Sally count is already at maximum");
@@ -243,7 +328,12 @@ namespace Arrowgene.Ddon.GameServer.Characters
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_EXPEDITION_DIFFERENT_PRICE, $"Expected price {expectedPrice}, got {price}");
                 }
 
-                PawnExpeditionRecord record = GetOrCreateRecord(client, connection);
+                PawnExpeditionRecord record = GetOrCreateRecord(client, connectionIn: connection);
+                if (!CanPersistRecord(record))
+                {
+                    return false;
+                }
+
                 if (record.Status == PawnExpeditionStatus.OnSally)
                 {
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_EXPEDITION_NOT_SALLY, "Cannot change golden sally state while a sally is in progress");

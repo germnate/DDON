@@ -1,6 +1,7 @@
 using Arrowgene.Ddon.Database.Model;
 using Arrowgene.Ddon.Server;
 using Arrowgene.Ddon.Server.Network;
+using Arrowgene.Ddon.Shared.Entity.Structure;
 using Arrowgene.Ddon.Shared.Entity.PacketStructure;
 using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.Quest;
@@ -32,9 +33,16 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     SpotId = record.SpotId
                 },
                 SearchSpotType = (byte)(record.IsHotSpot ? 1 : 0),
-                BattleResult = Server.PawnExpeditionManager.GetLastBattleResult(record),
                 IsGoldenSally = record.IsGoldenSally
             };
+
+            CDataBattleResultInfo battleResult = Server.PawnExpeditionManager.GetLastBattleResult(record);
+            if (battleResult != null)
+            {
+                res.BattleResult.EnemyId = battleResult.EnemyId;
+                res.BattleResult.EnemyNum = battleResult.EnemyNum;
+                res.BattleResult.EnemyLevel = battleResult.EnemyLevel;
+            }
 
             Server.PawnExpeditionManager.FinishViewingReward(client);
 

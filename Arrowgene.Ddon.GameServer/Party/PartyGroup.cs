@@ -326,11 +326,21 @@ namespace Arrowgene.Ddon.GameServer.Party
             }
         }
 
+        public static bool CanPawnJoinParty(Pawn pawn)
+        {
+            return pawn != null && pawn.PawnState != PawnState.ExpeditionSally && pawn.PawnState != PawnState.ExpeditionReturn;
+        }
+
         public PawnPartyMember Join(Pawn pawn)
         {
             if (pawn == null)
             {
                 throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED, $"[PartyId:{Id}][Join(Pawn)] (pawn == null)");
+            }
+
+            if (!CanPawnJoinParty(pawn))
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_PARTY_NOT_JOIN_MYPAWN, $"[PartyId:{Id}][Join(Pawn)] pawn {pawn.PawnId} is unavailable for party join (state:{pawn.PawnState})");
             }
 
             PawnPartyMember partyMember = CreatePartyMember(pawn);

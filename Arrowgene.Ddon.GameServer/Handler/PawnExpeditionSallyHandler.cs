@@ -14,7 +14,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         public override S2CPawnExpeditionSallyRes Handle(GameClient client, C2SPawnExpeditionSallyReq request)
         {
-            Server.PawnExpeditionManager.StartSally(client, request.AreaId, request.SpotId);
+            Server.PawnExpeditionManager.StartSally(client, request.PawnId, request.AreaId, request.SpotId);
             return new S2CPawnExpeditionSallyRes();
         }
     }
