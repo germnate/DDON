@@ -48,11 +48,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
             pcap.PartnerPawnInfo.MemberPartnerPawnList = pawnIds.OrderBy(x => Random.Shared.Next()).Take(3).Select(x => new CDataCommonU32() { Value = x }).ToList();
             pcap.FunctionReleaseIds = new()
             {
-                //new CDataCommonU32(5), // Probably Pawn Expedition-related?
-                //new CDataCommonU32(6), // Probably Pawn Expedition-related?
-                //new CDataCommonU32(7), // Probably Pawn Expedition-related?
-                //new CDataCommonU32(8), // Probably Pawn Expedition-related?
-                //new CDataCommonU32(9), // Probably Pawn Expedition-related?
+                new CDataCommonU32(5),
+                new CDataCommonU32(6),
+                new CDataCommonU32(7),
+                new CDataCommonU32(8),
+                new CDataCommonU32(9),
             };
 
             if (baseFuncs.Contains(18)) pcap.FunctionReleaseIds.Add(new(4)); // Clan Flag
