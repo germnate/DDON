@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "A Man-Eating Ogre Appears!",
+  "comment": "A Man-Eating Ogre Appears! (Night)",
   "quest_id": 20005011,
   "base_level": 26,
   "minimum_item_rank": 0,

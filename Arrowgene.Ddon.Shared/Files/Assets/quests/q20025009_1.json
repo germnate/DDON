@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "A Whirling Hawk on a Dark Night (II)",
+  "comment": "A Whirling Hawk on a Dark Night (II) (Night)",
   "quest_id": 20025009,
   "base_level": 57,
   "minimum_item_rank": 0,

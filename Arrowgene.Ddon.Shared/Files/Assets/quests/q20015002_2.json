@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "Phantoms in the Moonlight (III)",
+  "comment": "Phantoms in the Moonlight (III) (Night)",
   "quest_id": 20015002,
   "base_level": 21,
   "minimum_item_rank": 0,

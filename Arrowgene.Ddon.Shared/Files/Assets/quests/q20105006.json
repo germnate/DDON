@@ -1,7 +1,7 @@
 {
   "state_machine": "GenericStateMachine",
   "type": "World",
-  "comment": "The Old Witch of the Woods",
+  "comment": "The Old Witch of the Woods (Night)",
   "quest_id": 20105006,
   "base_level": 43,
   "minimum_item_rank": 0,
