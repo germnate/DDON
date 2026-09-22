@@ -805,6 +805,24 @@ namespace Arrowgene.Ddon.Server.Settings
         private const bool _EnableMainPartyPawnsQuestRewards = false;
 
         /// <summary>
+        /// When enabled, bazaar stock rotation keeps all rotatable items available and refreshes the full stock
+        /// on each maintenance run instead of rotating a subset.
+        /// </summary>
+        [DefaultValue(_EnableBazaarFullStockRotation)]
+        public bool EnableBazaarFullStockRotation
+        {
+            set
+            {
+                SetSetting("EnableBazaarFullStockRotation", value);
+            }
+            get
+            {
+                return TryGetSetting("EnableBazaarFullStockRotation", _EnableBazaarFullStockRotation);
+            }
+        }
+        private const bool _EnableBazaarFullStockRotation = true;
+
+        /// <summary>
         /// Specifies the time in seconds that a bazaar exhibit will last.
         /// By default, the equivalent of 3 days
         /// </summary>

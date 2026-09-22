@@ -272,10 +272,10 @@ namespace Arrowgene.Ddon.GameServer
                 HashSet<uint> currentItemIds = currentExhibitions
                     .Select(exhibition => exhibition.Info.ItemInfo.ItemBaseInfo.ItemId)
                     .ToHashSet();
-                List<BazaarExhibition> generatedExhibitions = BuildGeneratedExhibitions(
-                    currentItemIds,
-                    targetItemCount,
-                    targetPerRank);
+                bool fullStockRotation = Server.GameSettings.GameServerSettings.EnableBazaarFullStockRotation;
+                List<BazaarExhibition> generatedExhibitions = fullStockRotation
+                    ? BuildGeneratedExhibitions(new HashSet<uint>(), int.MaxValue, int.MaxValue)
+                    : BuildGeneratedExhibitions(currentItemIds, targetItemCount, targetPerRank);
 
                 foreach (BazaarExhibition exhibition in currentExhibitions)
                 {
