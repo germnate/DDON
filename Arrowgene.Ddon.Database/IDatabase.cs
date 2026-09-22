@@ -543,7 +543,7 @@ public interface IDatabase
     void DeletePartnerPawnPendingReward(uint characterId, uint pawnId, uint rewardLevel, DbConnection? connectionIn = null);
 
     // Pawn Expedition
-    PawnExpeditionRecord? GetPawnExpeditionRecord(uint characterId, DbConnection? connectionIn = null);
+    PawnExpeditionRecord? GetPawnExpeditionRecord(uint characterId, DbConnection? connectionIn = null, uint pawnId = 0);
     bool UpsertPawnExpeditionRecord(PawnExpeditionRecord record, DbConnection? connectionIn = null);
     List<PawnExpeditionRecord> GetPawnExpeditionRecordsForClanMembers(List<uint> characterIds, DbConnection? connectionIn = null);
 

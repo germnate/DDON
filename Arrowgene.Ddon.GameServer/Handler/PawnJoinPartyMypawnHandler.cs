@@ -17,6 +17,11 @@ namespace Arrowgene.Ddon.GameServer.Handler
         public override S2CPawnJoinPartyMyPawnRes Handle(GameClient client, C2SPawnJoinPartyMyPawnReq request)
         {
             Pawn pawn = client.Character.Pawns[request.PawnNumber-1];
+            if (!PartyGroup.CanPawnJoinParty(pawn))
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_PARTY_NOT_JOIN_MYPAWN, $"Pawn {pawn.Name} is on expedition and cannot join the party");
+            }
+
             PawnPartyMember partyMember = client.Party.Join(pawn);
 
             pawn.PawnState = PawnState.Party;

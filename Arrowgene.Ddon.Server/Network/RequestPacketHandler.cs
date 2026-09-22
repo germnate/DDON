@@ -31,13 +31,23 @@ namespace Arrowgene.Ddon.Server.Network
 
         public sealed override void Handle(TClient client, StructurePacket<TReqStruct> request)
         {
-            TResStruct response;
             try
             {
-                response = Handle(client, request.Structure);
+                TResStruct response = Handle(client, request.Structure);
+                if (response == null)
+                {
+                    Logger.Error(client, $"{GetType().Name} returned a null response for {typeof(TReqStruct).Name}");
+                    response = new TResStruct
+                    {
+                        Error = (uint)ErrorCode.ERROR_CODE_FAIL
+                    };
+                }
+
+                client.Send(response);
             }
             catch (SQLiteException ex)
             {
+                TResStruct response;
                 if (ex.ErrorCode == (int)SQLiteErrorCode.Busy)
                 {
                     response = new TResStruct
@@ -58,7 +68,7 @@ namespace Arrowgene.Ddon.Server.Network
             }
             catch (PostgresException ex)
             {
-                response = new TResStruct
+                TResStruct response = new TResStruct
                 {
                     Error = (uint)ErrorCode.ERROR_CODE_DB_FAILURE
                 };
@@ -68,37 +78,41 @@ namespace Arrowgene.Ddon.Server.Network
             }
             catch (NotImplementedException ex)
             {
-                throw new ResponseErrorException(ErrorCode.ERROR_CODE_NOT_IMPLEMENTED, ex.Message, ex);
+                SendResponseError(client, new ResponseErrorException(ErrorCode.ERROR_CODE_NOT_IMPLEMENTED, ex.Message, ex));
             }
             catch (ResponseErrorException ex)
             {
-                response = new TResStruct();
-                response.Error = (uint) ex.ErrorCode;
-
-                var stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine($"{(ex.Critical ? "!!CRITICAL!! " : "")}{ex.ErrorCode} thrown when handling {typeof(TReqStruct).Name}");
-                if (ex.Message.Length > 0)
-                {
-                    stringBuilder.AppendLine($"\tMessage: {ex.Message}");
-                }
-                stringBuilder.AppendLine(ex.StackTrace?.Split(Environment.NewLine).FirstOrDefault());
-                Logger.Error(client, stringBuilder.ToString());
-
-                client.Send(response);
-
-                if (ex.Critical)
-                {
-                    client.Close();
-                }
+                SendResponseError(client, ex);
             }
             catch (Exception)
             {
-                response = new TResStruct();
+                TResStruct response = new TResStruct();
                 response.Error = (uint) ErrorCode.ERROR_CODE_FAIL;
                 client.Send(response);
                 throw;
-            }    
+            }
+        }
+
+        private void SendResponseError(TClient client, ResponseErrorException ex)
+        {
+            TResStruct response = new TResStruct();
+            response.Error = (uint)ex.ErrorCode;
+
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine($"{(ex.Critical ? "!!CRITICAL!! " : "")}{ex.ErrorCode} thrown when handling {typeof(TReqStruct).Name}");
+            if (ex.Message.Length > 0)
+            {
+                stringBuilder.AppendLine($"\tMessage: {ex.Message}");
+            }
+            stringBuilder.AppendLine(ex.StackTrace?.Split(Environment.NewLine).FirstOrDefault());
+            Logger.Error(client, stringBuilder.ToString());
+
             client.Send(response);
+
+            if (ex.Critical)
+            {
+                client.Close();
+            }
         }
 
     }

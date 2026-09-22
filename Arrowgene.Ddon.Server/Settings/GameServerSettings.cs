@@ -81,7 +81,7 @@ namespace Arrowgene.Ddon.Server.Settings
                 return TryGetSetting("PawnExpeditionSallyDurationInSeconds", _PawnExpeditionSallyDurationInSeconds);
             }
         }
-        private const uint _PawnExpeditionSallyDurationInSeconds = 1800;
+        private const uint _PawnExpeditionSallyDurationInSeconds = 10;
 
         /// <summary>
         /// The maximum number of sallies a character can stack up before having to charge more.

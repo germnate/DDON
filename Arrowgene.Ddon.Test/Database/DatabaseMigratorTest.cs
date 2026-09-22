@@ -513,7 +513,7 @@ namespace Arrowgene.Ddon.Test.Database
         public bool InsertPartnerPawnPendingReward(uint characterId, uint pawnId, uint rewardLevel, DbConnection? connectionIn = null) { return true; }
         public void DeletePartnerPawnPendingReward(uint characterId, uint pawnId, uint rewardLevel, DbConnection? connectionIn = null) { }
 
-        public PawnExpeditionRecord? GetPawnExpeditionRecord(uint characterId, DbConnection? connectionIn = null) { return null; }
+        public PawnExpeditionRecord? GetPawnExpeditionRecord(uint characterId, DbConnection? connectionIn = null, uint pawnId = 0) { return null; }
         public bool UpsertPawnExpeditionRecord(PawnExpeditionRecord record, DbConnection? connectionIn = null) { return true; }
         public List<PawnExpeditionRecord> GetPawnExpeditionRecordsForClanMembers(List<uint> characterIds, DbConnection? connectionIn = null) { return new(); }
         public uint InsertPawnExpeditionRewardBox(uint characterId, byte mdlType, DbConnection? connectionIn = null) { return 0; }

@@ -21,32 +21,6 @@ double AdditionalCostPerformanceFactor = 1;
 uint PartnerPawnAdventureDurationInSeconds = 1800;
 
 /// <summary>
-/// The amount of seconds a Pawn Expedition sally takes to complete.
-/// </summary>
-uint PawnExpeditionSallyDurationInSeconds = 1800;
-
-/// <summary>
-/// The maximum number of sallies a character can stack up before having to charge more.
-/// </summary>
-byte PawnExpeditionMaxSallyCount = 5;
-
-/// <summary>
-/// The "price" (in price units, as advertised to and echoed back by the client) to charge a Pawn Expedition sally count.
-/// </summary>
-byte PawnExpeditionChargeSallyCountPrice = 1;
-
-/// <summary>
-/// The "price" (in price units, as advertised to and echoed back by the client) to make a sally golden.
-/// </summary>
-byte PawnExpeditionGoldenSallyPrice = 3;
-
-/// <summary>
-/// The amount of Gold charged per Pawn Expedition "price unit" (see PawnExpeditionChargeSallyCountPrice
-/// and PawnExpeditionGoldenSallyPrice).
-/// </summary>
-uint PawnExpeditionPriceGoldPerUnit = 10000;
-
-/// <summary>
 /// Determines the maximum amount of consumable items that can be crafted in one go with a pawn.
 /// The default is a value of 10 which is equivalent to the original game's behavior.
 /// </summary>

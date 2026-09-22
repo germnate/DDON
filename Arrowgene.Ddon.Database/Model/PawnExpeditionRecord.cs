@@ -6,6 +6,7 @@ namespace Arrowgene.Ddon.Database.Model
     public class PawnExpeditionRecord
     {
         public uint CharacterId { get; set; }
+        public uint PawnId { get; set; }
         public PawnExpeditionStatus Status { get; set; } = PawnExpeditionStatus.Tired;
         public uint AreaId { get; set; }
         public uint SpotId { get; set; }

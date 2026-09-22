@@ -7,6 +7,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
     {
         public PacketId Id => PacketId.C2S_PAWN_EXPEDITION_PAWN_EXPEDITION_SALLY_REQ;
 
+        public uint PawnId { get; set; }
         public uint AreaId { get; set; }
         public uint SpotId { get; set; }
 
@@ -14,6 +15,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
         {
             public override void Write(IBuffer buffer, C2SPawnExpeditionSallyReq obj)
             {
+                WriteUInt32(buffer, obj.PawnId);
                 WriteUInt32(buffer, obj.AreaId);
                 WriteUInt32(buffer, obj.SpotId);
             }
@@ -21,6 +23,7 @@ namespace Arrowgene.Ddon.Shared.Entity.PacketStructure
             public override C2SPawnExpeditionSallyReq Read(IBuffer buffer)
             {
                 C2SPawnExpeditionSallyReq obj = new C2SPawnExpeditionSallyReq();
+                obj.PawnId = ReadUInt32(buffer);
                 obj.AreaId = ReadUInt32(buffer);
                 obj.SpotId = ReadUInt32(buffer);
                 return obj;
