@@ -562,7 +562,7 @@ namespace Arrowgene.Ddon.Server.Settings
                 return TryGetSetting("NormalPartySize", _NormalPartySize);
             }
         }
-        private const uint _NormalPartySize = 4;
+        private const uint _NormalPartySize = 8;
 
         /// <summary>
         /// Global modifier for enemy exp calculations to scale up or down.

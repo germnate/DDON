@@ -203,7 +203,7 @@ uint DefaultWarpFavorites = 5;
 /// Controls the party size for regular adventuring content.
 /// Used to control main pawns auto-joining parties alongside their owners.
 /// </summary>
-uint NormalPartySize = 4;
+uint NormalPartySize = 8;
 
 /// <summary>
 /// Global modifier for enemy exp calculations to scale up or down.

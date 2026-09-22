@@ -1,4 +1,6 @@
 using Arrowgene.Ddon.Cli;
+using Arrowgene.Ddon.Server.Scripting.utils;
+using Arrowgene.Ddon.Server.Settings;
 using Xunit;
 
 namespace Arrowgene.Ddon.Test.GameServer
@@ -59,6 +61,15 @@ namespace Arrowgene.Ddon.Test.GameServer
             string json = Setting.Serialize(originalSetting);
             Setting deserializedSetting = Setting.Deserialize(json);
             Assert.Equal(originalSetting.LogPath, deserializedSetting.LogPath);
+        }
+
+        [Fact]
+        public void DefaultGameServerSettings_NormalPartySize_ShouldBeEight()
+        {
+            var settings = new GameServerSettings(new ScriptableSettings());
+            settings.InitializeDefaults();
+
+            Assert.Equal(8u, settings.NormalPartySize);
         }
     }
 }
