@@ -317,11 +317,17 @@ namespace Arrowgene.Ddon.GameServer.Characters
 
         private void SelectPawns(Character character, DbConnection? connectionIn = null)
         {
-            character.Pawns = Server.Database.SelectPawnsByCharacterId(character.ContentCharacterId, connectionIn);
+            character.Pawns = Server.Database.SelectPawnsByCharacterId(character.ContentCharacterId, connectionIn) ?? new List<Pawn>();
 
             for (int i = 0; i < character.Pawns.Count; i++)
             {
                 Pawn pawn = character.Pawns[i];
+                if (pawn is null)
+                {
+                    Logger.Error($"Character: AccountId={character.AccountId}, CharacterId={character.ContentCharacterId}, CommonId={character.CommonId} contains null pawn entry at index {i}; skipping.");
+                    continue;
+                }
+
                 pawn.Server = character.Server;
                 pawn.Equipment = character.Storage.GetPawnEquipment(i);
                 pawn.ExtendedParams = Server.Database.SelectOrbGainExtendParam(pawn.CommonId, connectionIn);
@@ -340,13 +346,19 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 UpdateCharacterExtendedParams(pawn, ownerCharacter: character);
             }
 
-            character.RentedPawns = Server.Database.SelectRentalPawns(character.ContentCharacterId, connectionIn);
+            character.RentedPawns = Server.Database.SelectRentalPawns(character.ContentCharacterId, connectionIn) ?? new List<RentalPawn>();
             foreach(var pawn in character.RentedPawns)
             {
+                if (pawn is null)
+                {
+                    Logger.Error($"Character: AccountId={character.AccountId}, CharacterId={character.ContentCharacterId}, CommonId={character.CommonId} contains null rented pawn entry; skipping.");
+                    continue;
+                }
+
                 pawn.MaxAdventureCount = Server.GameSettings.GameServerSettings.RentalPawnAdventureCount;
                 pawn.MaxCraftCount = Server.GameSettings.GameServerSettings.RentalPawnCraftCount;
 
-                foreach (var item in pawn.Equipment.GetItems(EquipType.Performance))
+                foreach (var item in pawn.Equipment?.GetItems(EquipType.Performance) ?? Enumerable.Empty<Item>())
                 {
                     if (item is not null && item.ItemId == (uint)pawn.Job.VocationEmblemItemId())
                     {

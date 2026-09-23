@@ -75,6 +75,12 @@ namespace Arrowgene.Ddon.GameServer.GatheringItems.Generators
                 return new();
             }
 
+            // This generator's equipment policy applies only to locked treasure chests.
+            if (!IsLockedChest(stageId, index))
+            {
+                return new();
+            }
+
             Quests.Quest quest = ResolveActiveQuest(client, stageId);
             if (quest is null)
             {
@@ -95,6 +101,8 @@ namespace Arrowgene.Ddon.GameServer.GatheringItems.Generators
                 entry.GroupId == stageId.GroupId &&
                 entry.PosId == index);
 
+            List<InstancedGatheringItem> results = new();
+
             if (QuestUtils.IsExmQuest(quest.QuestId))
             {
                 double rareMaterialChance = isBossChest ? lootRange.RareMaterialChanceBoss : lootRange.RareMaterialChanceNormal;
@@ -103,7 +111,7 @@ namespace Arrowgene.Ddon.GameServer.GatheringItems.Generators
                     List<InstancedGatheringItem> rareResult = RollRareMaterial(quest, stageId, index, lootRange, isBossChest);
                     if (rareResult.Count > 0)
                     {
-                        return rareResult;
+                        results.AddRange(rareResult);
                     }
                 }
             }
@@ -111,26 +119,24 @@ namespace Arrowgene.Ddon.GameServer.GatheringItems.Generators
             byte minLevel = isBossChest ? lootRange.BossItemLevelMin : lootRange.NormalItemLevelMin;
             byte maxLevel = isBossChest ? lootRange.BossItemLevelMax : lootRange.NormalItemLevelMax;
 
-            List<InstancedGatheringItem> result;
+            List<InstancedGatheringItem> materialResult;
             if (Random.Shared.NextDouble() < EquipmentDropChance)
             {
-                result = RollEquipment(quest, stageId, index, minLevel, maxLevel, isBossChest, lootRange);
-                if (result.Count == 0)
+                List<InstancedGatheringItem> equipmentResult = RollEquipment(quest, stageId, index, minLevel, maxLevel, isBossChest, lootRange);
+                if (equipmentResult.Count > 0)
                 {
-                    // Fall back to materials if no equipment fits this level window.
-                    result = RollMaterial(quest, stageId, index, minLevel, maxLevel, isBossChest);
-                }
-            }
-            else
-            {
-                result = RollMaterial(quest, stageId, index, minLevel, maxLevel, isBossChest);
-                if (result.Count == 0)
-                {
-                    result = RollEquipment(quest, stageId, index, minLevel, maxLevel, isBossChest, lootRange);
+                    results.AddRange(equipmentResult);
                 }
             }
 
-            return result;
+            materialResult = RollMaterial(quest, stageId, index, minLevel, maxLevel, isBossChest);
+            if (materialResult.Count == 0)
+            {
+                materialResult = RollEquipment(quest, stageId, index, minLevel, maxLevel, isBossChest, lootRange);
+            }
+
+            results.AddRange(materialResult);
+            return results;
         }
 
         private List<InstancedGatheringItem> RollRareMaterial(Quests.Quest quest, StageLayoutId stageId, uint index,
@@ -173,6 +179,8 @@ namespace Arrowgene.Ddon.GameServer.GatheringItems.Generators
                 .Where(item => item.Category == 3 && item.Level.HasValue
                     && item.Level.Value >= minLevel && item.Level.Value <= maxLevel)
                 .ToList();
+
+            candidates = ExcludeCraftReservedTopRank(candidates);
 
             if (candidates.Count == 0)
             {
@@ -296,6 +304,55 @@ namespace Arrowgene.Ddon.GameServer.GatheringItems.Generators
             }
 
             return null;
+        }
+
+        private bool IsLockedChest(StageLayoutId stageId, uint index)
+        {
+            uint stageNo = StageManager.ConvertIdToStageNo(stageId);
+            if (!Server.AssetRepository.GatheringSpotInfoAsset.GatheringInfoMap.TryGetValue(stageNo, out var stageSpots))
+            {
+                return IsHidellCatacombsLockedChestFallback(stageId, index);
+            }
+
+            if (!stageSpots.TryGetValue((stageId.GroupId, index), out GatheringSpotInfo spotInfo))
+            {
+                return false;
+            }
+
+            return spotInfo.GatheringType.IsLockedChest();
+        }
+
+        private static bool IsHidellCatacombsLockedChestFallback(StageLayoutId stageId, uint index)
+        {
+            if (index >= 4)
+            {
+                return false;
+            }
+
+            return stageId.Id == Stage.HidellCatacombs0.StageId
+                || stageId.Id == Stage.HidellCatacombs1.StageId
+                || stageId.Id == Stage.HidellCatacombsDepths.StageId
+                || stageId.Id == Stage.HidellCatacombsInnermostDepths.StageId;
+        }
+
+        private static List<ClientItemInfo> ExcludeCraftReservedTopRank(List<ClientItemInfo> candidates)
+        {
+            List<ClientItemInfo> filtered = new();
+
+            foreach (IGrouping<(byte Level, ItemSubCategory SubCategory, EquipJobList? JobGroup), ClientItemInfo> lane in
+                     candidates.GroupBy(item => (item.Level ?? 0, item.SubCategory, item.JobGroup)))
+            {
+                List<byte> ranks = lane.Select(item => item.Rank).Distinct().OrderBy(rank => rank).ToList();
+                if (ranks.Count <= 1)
+                {
+                    continue;
+                }
+
+                byte topRank = ranks[^1];
+                filtered.AddRange(lane.Where(item => item.Rank < topRank));
+            }
+
+            return filtered;
         }
     }
 }

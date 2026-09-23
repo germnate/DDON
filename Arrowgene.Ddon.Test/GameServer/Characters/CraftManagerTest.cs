@@ -6,6 +6,7 @@ using Arrowgene.Ddon.Shared.Model;
 using Arrowgene.Ddon.Shared.Model.Craft;
 using Arrowgene.Ddon.Test.Database;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Arrowgene.Ddon.GameServer.Characters;
@@ -107,6 +108,19 @@ public class CraftManagerTest
         uint result = _craftManager.CalculateRecipeProductionSpeed(1000, new ClientItemInfo(), craftPawns);
 
         Assert.Equal(0u, result);
+    }
+
+    [Fact]
+    public void CraftingRecipes_ShouldNotContainDuplicateItemIds()
+    {
+        var duplicateItemIds = _mockServer.AssetRepository.CraftingRecipesAsset
+            .SelectMany(group => group.RecipeList)
+            .GroupBy(recipe => recipe.ItemID)
+            .Where(group => group.Count() > 1)
+            .Select(group => group.Key)
+            .ToList();
+
+        Assert.Empty(duplicateItemIds);
     }
 
     [Fact]

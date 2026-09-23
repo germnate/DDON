@@ -128,6 +128,12 @@ private class GatheringExtensions
 public class Mixin : IDefaultGatherMixin
 {
     private static readonly ILogger Logger = LogProvider.Logger(typeof(Mixin));
+    private const double LockedChestBonusEquipmentDropChance = 0.15;
+    private const double VariantQualityBias = 1.6;
+    private static readonly Lazy<Dictionary<(byte Level, ItemSubCategory SubCategory, EquipJobList? JobGroup), byte>> TopRankByEquipmentLane =
+        new(BuildTopRankByEquipmentLane);
+    private static readonly Lazy<HashSet<(byte Level, ItemSubCategory SubCategory, EquipJobList? JobGroup)>> MultiRankEquipmentLanes =
+        new(BuildMultiRankEquipmentLanes);
 
     private static readonly HashSet<GatheringType> TreasureLikeGatheringTypes = new()
     {
@@ -142,6 +148,26 @@ public class Mixin : IDefaultGatherMixin
         GatheringType.OM_GATHER_TREA_GOLD,
         GatheringType.OM_GATHER_ANTIQUE,
     };
+
+    private static readonly Dictionary<OmGatheringPoint, double> TreasureChestEquipmentDropChance = new()
+    {
+        [OmGatheringPoint.IronChest] = 0.15,
+        [OmGatheringPoint.BrownChest] = 0.25,
+        [OmGatheringPoint.TreasureChest] = 0.35,
+        [OmGatheringPoint.BronzeChest] = 0.45,
+        [OmGatheringPoint.SilverChest] = 0.55,
+        [OmGatheringPoint.GoldChest] = 0.65,
+        [OmGatheringPoint.PurpleChest] = 0.80,
+        [OmGatheringPoint.SmallRoundChest0] = 0.60,
+        [OmGatheringPoint.SmallRoundChest1] = 0.60,
+        [OmGatheringPoint.BronzeChest1] = 0.60,
+        [OmGatheringPoint.PearlescentChest1] = 0.80,
+        [OmGatheringPoint.OrangeSealedChest] = 0.80,
+        [OmGatheringPoint.PurpleSealedChest] = 0.80,
+        [OmGatheringPoint.PearlescentChest] = 0.80,
+    };
+
+    private const double LockedChestBaselineEquipmentDropChance = 0.50;
 
     public override List<InstancedGatheringItem> GenerateGatheringDrops(GameClient client, StageLayoutId stageLayoutId, uint index)
     {
@@ -191,6 +217,7 @@ public class Mixin : IDefaultGatherMixin
 
         var spotInfo = stageSpots[(stageLayoutId.GroupId, index)];
         var isTreasureLike = TreasureLikeGatheringTypes.Contains(spotInfo.GatheringType) || spotInfo.UnitId.IsTreasureChest();
+        var isLockedChest = spotInfo.GatheringType.IsLockedChest();
 
         Logger.Debug($"{stageLayoutId}.{index}  OmType={spotInfo.UnitId}, GatheringType={spotInfo.GatheringType}");
 
@@ -242,7 +269,24 @@ public class Mixin : IDefaultGatherMixin
 
         // Determine how many items to generate
         var slots = Random.Shared.WeightedNext(1, potentialSlots + 1, Settings.DefaultGatherDropsRandomBias);
-        return RollDrops(slots, rolls, dropTable, bias);
+        var results = RollDrops(slots, rolls, dropTable, bias);
+
+        var shouldRollEquipment = !HasActiveQuestChest(client, stageLayoutId)
+            && Random.Shared.NextDouble() < GetTreasureChestEquipmentDropChance(spotInfo, isTreasureLike, isLockedChest);
+
+        if (shouldRollEquipment)
+        {
+            // If the spot is backed by a fixed authored drop table, skip the normal material roll
+            // to avoid stacking random junk on top of the equipment reward from the same chest.
+            if (LibDdon.Assets.DefaultGatheringDropsAsset.SpotDefaultDrops.ContainsKey((stageLayoutId, index)))
+            {
+                return RollTreasureChestEquipment(client, stageLayoutId, areaId, gatherPointRank);
+            }
+
+            results.AddRange(RollTreasureChestEquipment(client, stageLayoutId, areaId, gatherPointRank));
+        }
+
+        return results;
     }
 
     private double FindRollBiasForSpot(int rank)
@@ -254,6 +298,19 @@ public class Mixin : IDefaultGatherMixin
 
         double t = (rank - 1.0) / (GatheringExtensions.MAX_GATHERING_RANK - 1.0); // Normalized rank [0, 1]
         return minBias * Math.Pow(maxBias / minBias, t);
+    }
+
+    private double GetTreasureChestEquipmentDropChance(GatheringSpotInfo spotInfo, bool isTreasureLike, bool isLockedChest)
+    {
+        double chance = TreasureChestEquipmentDropChance.GetValueOrDefault(spotInfo.UnitId, isTreasureLike ? 0.05 : 0.0);
+
+        if (isLockedChest)
+        {
+            chance = Math.Max(LockedChestBaselineEquipmentDropChance, chance);
+            chance = Math.Min(1.0, chance + LockedChestBonusEquipmentDropChance);
+        }
+
+        return chance;
     }
 
     private List<InstancedGatheringItem> RollDrops(int slots, List<ItemId> rolls, Dictionary<ItemId, DefaultGatheringDrop> dropTable, double rollBias)
@@ -293,6 +350,143 @@ public class Mixin : IDefaultGatherMixin
             results.Add(drop);
         }
         return results;
+    }
+
+    private List<InstancedGatheringItem> RollTreasureChestEquipment(GameClient client, StageLayoutId stageLayoutId, QuestAreaId areaId, int gatherPointRank)
+    {
+        uint equipmentLevel = ResolveStageEquipmentLevel(client, stageLayoutId, areaId, gatherPointRank);
+        uint minLevel = equipmentLevel > 3 ? equipmentLevel - 3 : 1;
+        uint maxLevel = equipmentLevel + 3;
+
+        var candidates = LibDdon.Assets.ClientItemInfos.Values
+            .Where(item => item.Category == 3 && item.Level.HasValue
+                && item.Level.Value >= minLevel
+                && item.Level.Value <= maxLevel)
+            .ToList();
+
+        if (candidates.Count == 0)
+        {
+            return new();
+        }
+
+        var filtered = ExcludeCraftReservedTopRank(candidates)
+            .ToList();
+
+        if (filtered.Count == 0)
+        {
+            filtered = candidates;
+        }
+
+        if (filtered.Count == 0)
+        {
+            return new();
+        }
+
+        var nameBuckets = filtered
+            .GroupBy(item => item.Name)
+            .Select(group => group.ToList())
+            .ToList();
+
+        var selectedNameBucket = nameBuckets[Random.Shared.Next(nameBuckets.Count)];
+        var selected = SelectVariantPreferUnenhanced(selectedNameBucket);
+
+        Logger.Debug($"Rolled treasure chest equipment: {selected.Name} <{selected.ItemId}> (Rank={selected.Rank}, Level={selected.Level}, Quality={selected.Quality}, Window={minLevel}-{maxLevel})");
+
+        return new List<InstancedGatheringItem>
+        {
+            new InstancedGatheringItem
+            {
+                ItemId = selected.ItemId,
+                ItemNum = 1,
+                Quality = 1,
+                IsHidden = false
+            }
+        };
+    }
+
+    private static ClientItemInfo SelectVariantPreferUnenhanced(List<ClientItemInfo> variants)
+    {
+        if (variants.Count == 1)
+        {
+            return variants[0];
+        }
+
+        // Lower quality values represent less-enhanced variants and should be favored.
+        var ordered = variants
+            .OrderBy(item => item.Quality ?? 0)
+            .ThenBy(item => item.ItemId)
+            .ToList();
+
+        int index = Random.Shared.WeightedNext(ordered.Count, VariantQualityBias);
+        return ordered[index];
+    }
+
+    private uint ResolveStageEquipmentLevel(GameClient client, StageLayoutId stageLayoutId, QuestAreaId areaId, int gatherPointRank)
+    {
+        var stageLevels = LibDdon.Assets.EnemySpawnAsset.Enemies
+            .Where(entry => entry.Key.Id == stageLayoutId.Id)
+            .SelectMany(entry => entry.Value)
+            .Select(enemy => (uint)enemy.Lv)
+            .Where(level => level > 0)
+            .ToList();
+
+        if (stageLevels.Count > 0)
+        {
+            uint resolvedLevel = (uint)Math.Round(stageLevels.Average(level => (double)level));
+            Logger.Debug($"Resolved locked chest stage level from enemy spawn data: StageId={stageLayoutId.Id}, Level={resolvedLevel}");
+            return resolvedLevel;
+        }
+
+        return client.Character.AreaRanks.GetValueOrDefault(areaId)?.Rank ?? (uint)gatherPointRank;
+    }
+
+    private static bool HasActiveQuestChest(GameClient client, StageLayoutId stageLayoutId)
+    {
+        return QuestManager.CollectQuestScheduleIds(client, stageLayoutId).Any();
+    }
+
+    private static List<ClientItemInfo> ExcludeCraftReservedTopRank(List<ClientItemInfo> candidates)
+    {
+        return candidates
+            .Where(item =>
+            {
+                if (!item.Level.HasValue)
+                {
+                    return false;
+                }
+
+                var lane = (item.Level.Value, item.SubCategory, item.JobGroup);
+                if (!MultiRankEquipmentLanes.Value.Contains(lane))
+                {
+                    return true;
+                }
+
+                if (!TopRankByEquipmentLane.Value.TryGetValue(lane, out byte topRank))
+                {
+                    return true;
+                }
+
+                return item.Rank < topRank;
+            })
+            .ToList();
+    }
+
+    private static Dictionary<(byte Level, ItemSubCategory SubCategory, EquipJobList? JobGroup), byte> BuildTopRankByEquipmentLane()
+    {
+        return LibDdon.Assets.ClientItemInfos.Values
+            .Where(item => item.Category == 3 && item.Level.HasValue)
+            .GroupBy(item => (item.Level!.Value, item.SubCategory, item.JobGroup))
+            .ToDictionary(group => group.Key, group => group.Max(item => item.Rank));
+    }
+
+    private static HashSet<(byte Level, ItemSubCategory SubCategory, EquipJobList? JobGroup)> BuildMultiRankEquipmentLanes()
+    {
+        return LibDdon.Assets.ClientItemInfos.Values
+            .Where(item => item.Category == 3 && item.Level.HasValue)
+            .GroupBy(item => (item.Level!.Value, item.SubCategory, item.JobGroup))
+            .Where(group => group.Select(item => item.Rank).Distinct().Count() > 1)
+            .Select(group => group.Key)
+            .ToHashSet();
     }
 
     private static Dictionary<GatheringPointType, List<DropCategory>> DropCategories = new Dictionary<GatheringPointType, List<DropCategory>>()

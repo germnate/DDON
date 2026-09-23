@@ -18,19 +18,12 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
         public override S2CCraftRecipeGetCraftGradeupRecipeRes Handle(GameClient client, C2SCraftRecipeGetCraftGradeupRecipeReq request)
         {
-            List<CDataMDataCraftGradeupRecipe> categoryRecipes = Server.AssetRepository.CraftingGradeUpRecipesAsset
-                .Where(recipes => recipes.Category == request.Category)
-                .SelectMany(recipes => recipes.RecipeList)
-                .ToList();
-
-            List<CDataCommonU32> itemList = request.ItemList;
-
             var response = new S2CCraftRecipeGetCraftGradeupRecipeRes()
             {
                 Category = request.Category, 
-                RecipeList = categoryRecipes.Skip((int)request.Offset).Take(request.Num).ToList(),
-                UpgradableItemList = itemList,  
-                IsEnd = (request.Offset + request.Num) >= categoryRecipes.Count
+                RecipeList = [],
+                UpgradableItemList = [],
+                IsEnd = true
             };
             return response;
         }
