@@ -60,6 +60,12 @@ echo "Clearing transient session rows from cloned test database..."
 docker exec -e PGPASSWORD="${DB_PASS}" "${TARGET_DB_CONTAINER}" \
   psql -U "${DB_USER}" -d "${DB_NAME}" -c 'TRUNCATE TABLE "ddon_connection";'
 
+if docker exec "${TARGET_DB_CONTAINER}" test -f /tmp/init.sql; then
+  echo "Applying server character seed script (/tmp/init.sql)..."
+  docker exec -e PGPASSWORD="${DB_PASS}" "${TARGET_DB_CONTAINER}" \
+    psql -U "${DB_USER}" -d "${DB_NAME}" -f /tmp/init.sql
+fi
+
 echo "Starting isolated test app container..."
 "${COMPOSE_CMD[@]}" -p "${TEST_PROJECT_NAME}" -f "${TEST_COMPOSE_FILE}" up -d --build app
 

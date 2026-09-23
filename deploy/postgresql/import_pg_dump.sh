@@ -52,6 +52,10 @@ docker exec "${CONTAINER_NAME}" bash -c "\
   echo '${PGPASS_ENTRY}' > ~/.pgpass && \
   chmod 600 ~/.pgpass && \
   pg_restore -U ${DB_USER} -d ${DATABASE_NAME} --clean --if-exists -v /tmp/restore.dump && \
+  if [ -f /tmp/init.sql ]; then \
+    echo 'Applying /tmp/init.sql seed script...' && \
+    psql -U ${DB_USER} -d ${DATABASE_NAME} -f /tmp/init.sql; \
+  fi && \
   rm ~/.pgpass"
 EXIT_CODE=$?
 
