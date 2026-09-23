@@ -1,6 +1,7 @@
 using Arrowgene.Ddon.Database;
 using Arrowgene.Ddon.Database.Sql.Core.Migration;
 using Arrowgene.Ddon.Shared;
+using Arrowgene.Ddon.Shared.Entity;
 using Arrowgene.Logging;
 using System.Linq;
 using System.IO;
@@ -49,13 +50,32 @@ namespace Arrowgene.Ddon.Cli.Command
                 .Select(type => InstanceMigrationStrategy(type, dbSettings))
                 .ToList());
 
+            uint targetVersion = DdonDatabaseBuilder.Version;
+            uint currentVersion = database.GetMeta().DatabaseVersion;
+
+            // Some test environments may carry over a stale meta version from a newer branch.
+            // Downgrade migrations are not supported, so normalize the recorded version.
+            if (currentVersion > targetVersion)
+            {
+                Logger.Info($"Database version '{currentVersion}' is newer than supported version '{targetVersion}'. " +
+                    "Resetting database meta version to the supported version.");
+                if (!database.SetMeta(new DatabaseMeta { DatabaseVersion = targetVersion }))
+                {
+                    Logger.Error("Failed to reset database meta version.");
+                    return CommandResultType.Exit;
+                }
+
+                Logger.Info($"Successfully reset database version metadata to '{targetVersion}'.");
+                return CommandResultType.Exit;
+            }
+
             // TODO: Warn that migration is destructive
-            bool result = database.MigrateDatabase(migrator, DdonDatabaseBuilder.Version);
+            bool result = database.MigrateDatabase(migrator, targetVersion);
 
             // TODO: Better logging
             if(result)
             {
-                Logger.Info($"Successfully migrated the database to version '{DdonDatabaseBuilder.Version}'.");
+                Logger.Info($"Successfully migrated the database to version '{targetVersion}'.");
             }
             else
             {
