@@ -1260,15 +1260,21 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 var result = Server.Database.GetQuestProgressByScheduleId(memberClient.Character.CommonId, questScheduleId, connectionIn);
                 if (result == null)
                 {
+                    if (quest.QuestType == QuestType.Main)
+                    {
+                        Logger.Info(memberClient,
+                            $"[PartyId:{Party.Id}] Skipping main quest completion for {quest.QuestId} " +
+                            $"({quest.QuestScheduleId}); no quest progress row for this character");
+                    }
                     continue;
                 }
 
                 if (quest.QuestType == QuestType.Main
-                    && !QuestManager.IsClientEligibleForMainQuestCompletion(Server, memberClient, quest, connectionIn))
+                    && !QuestManager.IsClientEligibleForMainQuestCompletion(Server, memberClient, quest, out string reason, connectionIn))
                 {
                     Logger.Info(memberClient,
                         $"[PartyId:{Party.Id}] Skipping main quest completion for {quest.QuestId} " +
-                        $"({quest.QuestScheduleId}); character is not actively progressing the quest");
+                        $"({quest.QuestScheduleId}); {reason}");
                     continue;
                 }
 
@@ -1338,8 +1344,11 @@ namespace Arrowgene.Ddon.GameServer.Quests
                 // If this is a main quest, check to see that the member is currently on this quest, otherwise don't reward
                 if (quest.QuestType == QuestType.Main)
                 {
-                    if (!QuestManager.IsClientEligibleForMainQuestCompletion(Server, memberClient, quest, connectionIn))
+                    if (!QuestManager.IsClientEligibleForMainQuestCompletion(Server, memberClient, quest, out string reason, connectionIn))
                     {
+                        Logger.Info(memberClient,
+                            $"[PartyId:{Party.Id}] Skipping main quest reward distribution for {quest.QuestId} " +
+                            $"({quest.QuestScheduleId}); {reason}");
                         continue;
                     }
                 }

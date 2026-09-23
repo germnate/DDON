@@ -70,6 +70,14 @@ namespace Arrowgene.Ddon.GameServer.Handler
                         ? GetQuestCompletionRecipientIds(client, quest, connection)
                         : GetQuestProgressRecipientIds(client, quest, questStep, connection);
 
+                    if (questProgressState == QuestProgressState.Complete && quest.QuestType == QuestType.Main)
+                    {
+                        Logger.Info(client,
+                            $"[MainQuestComplete] QuestId:{quest.QuestId} ScheduleId:{quest.QuestScheduleId} " +
+                            $"PartyId:{client.Party.Id} AliveClients:{client.Party.Clients.Count} " +
+                            $"PartyMembers:{client.Party.Members.Count} CompletionRecipients:{questProgressRecipientIds.Count}");
+                    }
+
                     if (questProgressState == QuestProgressState.Accepted && quest.QuestType == QuestType.World)
                     {
                         foreach (var memberClient in client.Party.Clients)
@@ -133,7 +141,7 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
                         S2CQuestQuestProgressNtc ntc = new S2CQuestQuestProgressNtc()
                         {
-                            ProgressCharacterId = memberClient.Character.CharacterId,
+                            ProgressCharacterId = client.Character.CharacterId,
                             QuestScheduleId = quest.QuestScheduleId,
                             QuestProcessStateList = res.QuestProcessState,
                         };
@@ -173,6 +181,25 @@ namespace Arrowgene.Ddon.GameServer.Handler
             if (quest.IsPersonal)
             {
                 return new HashSet<uint>() { client.Character.CharacterId };
+            }
+
+            if (quest.QuestType == QuestType.Main)
+            {
+                HashSet<uint> recipients = new();
+                foreach (var memberClient in client.Party.Clients)
+                {
+                    bool eligible = QuestManager.IsClientEligibleForMainQuestCompletion(Server, memberClient, quest, out string reason, connectionIn);
+                    Logger.Info(memberClient,
+                        $"[MainQuestCompleteEligibility] QuestId:{quest.QuestId} ScheduleId:{quest.QuestScheduleId} " +
+                        $"PartyId:{client.Party.Id} CharacterId:{memberClient.Character.CharacterId} Eligible:{eligible} Reason:{reason}");
+
+                    if (eligible)
+                    {
+                        recipients.Add(memberClient.Character.CharacterId);
+                    }
+                }
+
+                return recipients;
             }
 
             return client.Party.Clients
@@ -294,6 +321,13 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 var completionClients = quest.QuestType == QuestType.Main && questProgressRecipientIds != null
                     ? client.Party.Clients.Where(memberClient => questProgressRecipientIds.Contains(memberClient.Character.CharacterId)).ToList()
                     : client.Party.Clients.ToList();
+
+                if (quest.QuestType == QuestType.Main && completionClients.Count == 0)
+                {
+                    Logger.Error(client,
+                        $"[MainQuestComplete] No completion recipients for QuestId:{quest.QuestId} " +
+                        $"ScheduleId:{quest.QuestScheduleId} PartyId:{client.Party.Id}; quest completion will not notify or reward anyone");
+                }
 
                 if (quest.QuestType == QuestType.Main && questProgressRecipientIds != null)
                 {
