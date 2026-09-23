@@ -167,8 +167,6 @@ public class Mixin : IDefaultGatherMixin
         [OmGatheringPoint.PearlescentChest] = 0.80,
     };
 
-    private const double LockedChestBaselineEquipmentDropChance = 0.50;
-
     public override List<InstancedGatheringItem> GenerateGatheringDrops(GameClient client, StageLayoutId stageLayoutId, uint index)
     {
         if (StageManager.IsBitterBlackMazeStageId(stageLayoutId) || StageManager.IsEpitaphRoadStageId(stageLayoutId))
@@ -306,7 +304,6 @@ public class Mixin : IDefaultGatherMixin
 
         if (isLockedChest)
         {
-            chance = Math.Max(LockedChestBaselineEquipmentDropChance, chance);
             chance = Math.Min(1.0, chance + LockedChestBonusEquipmentDropChance);
         }
 

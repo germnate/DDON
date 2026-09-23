@@ -42,11 +42,16 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     uint itemId = client.Character.Storage.FindItemByUIdInStorage(ItemManager.AllItemStorages, item.ItemUID)?.Item2.Item2.ItemId
                         ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_ITEM_NOT_FOUND, $"Could not find item {item.ItemUID}.");
-                    var searchResult = client.Character.Storage.FindItemByUIdInStorage(ItemManager.BothStorageTypes, item.ItemUID);
-                    var itemUpdate = Server.ItemManager.ConsumeItemByUId(Server, client.Character, searchResult.Item1, item.ItemUID, item.Num, connectionIn: connection)
-                        ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_QUEST_DONT_HAVE_DELIVERY_ITEM);
-
-                    itemUpdateResults.Add(itemUpdate);
+                    // Consume by item id across bag + storage box so turn-ins can always use
+                    // items from storage, even when stacks are split across locations.
+                    itemUpdateResults.AddRange(Server.ItemManager.ConsumeItemByIdFromMultipleStorages(
+                        Server,
+                        client.Character,
+                        ItemManager.BothStorageTypes,
+                        itemId,
+                        item.Num,
+                        connection
+                    ));
 
                     if (!deliveredItems.ContainsKey(itemId))
                     {
