@@ -19,9 +19,15 @@ internal sealed class ServerSupportPawnManager(DdonGameServer server)
             .Where(x => x.Enabled && IsQuestRequirementSatisfied(character, x.RequiredQuestId))
             .ToDictionary(x => x.PawnId);
 
-        return Server.Database.SelectPawnsByCharacterId(Character.ServerCharacterId, connection)
+        return SelectManagedPawns(connection)
             .Where(x => definitions.ContainsKey(x.PawnId))
             .ToList();
+    }
+
+    public Pawn? SelectManagedPawn(uint pawnId, DbConnection connection)
+    {
+        return SelectManagedPawns(connection)
+            .FirstOrDefault(x => x.PawnId == pawnId);
     }
 
     public bool IsAvailable(Character character, uint pawnId, DbConnection connection)
@@ -92,6 +98,21 @@ internal sealed class ServerSupportPawnManager(DdonGameServer server)
             Updated = DateTimeOffset.UtcNow,
             PawnListData = pawn.CDataRegisterdPawnList.PawnListData,
         };
+    }
+
+    private List<Pawn> SelectManagedPawns(DbConnection connection)
+    {
+        List<Pawn> pawns = Server.Database.SelectPawnsByCharacterId(Character.ServerCharacterId, connection);
+        Storages storages = Server.Database.SelectAllStoragesByCharacterId(Character.ServerCharacterId);
+
+        for (int i = 0; i < pawns.Count; i++)
+        {
+            Pawn pawn = pawns[i];
+            pawn.Equipment = storages.GetPawnEquipment(i);
+            pawn.ExtendedParams = Server.Database.SelectOrbGainExtendParam(pawn.CommonId, connection) ?? new CDataOrbGainExtendParam();
+        }
+
+        return pawns;
     }
 
     private static bool IsQuestRequirementSatisfied(Character character, QuestId requiredQuestId)

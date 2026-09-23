@@ -68,15 +68,22 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 {
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_CHARACTER_PAWN_PARAM_NOT_FOUND);
                 }
+                bool isServerSupportPawn = ownerCharacterId == Character.ServerCharacterId
+                    && Server.ServerSupportPawnManager.IsManaged(request.RequestedPawnId, connectionIn);
                 if (ownerCharacterId == Character.ServerCharacterId
-                    && !Server.ServerSupportPawnManager.IsAvailable(client.Character, request.RequestedPawnId, connectionIn))
+                    && (!isServerSupportPawn
+                        || !Server.ServerSupportPawnManager.IsAvailable(client.Character, request.RequestedPawnId, connectionIn)))
                 {
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED);
                 }
 
-                var ownerCharacter = Server.CharacterManager.SelectCharacter(ownerCharacterId, true, connectionIn);
-                Pawn pawn = null;
-                for (int i = 0; i < ownerCharacter.Pawns.Count; i++)
+                Character ownerCharacter = isServerSupportPawn
+                    ? new Character { CharacterId = Character.ServerCharacterId }
+                    : Server.CharacterManager.SelectCharacter(ownerCharacterId, true, connectionIn);
+                Pawn pawn = isServerSupportPawn
+                    ? Server.ServerSupportPawnManager.SelectManagedPawn(request.RequestedPawnId, connectionIn)
+                    : null;
+                for (int i = 0; !isServerSupportPawn && i < ownerCharacter.Pawns.Count; i++)
                 {
                     if (ownerCharacter.Pawns[i].PawnId != request.RequestedPawnId)
                         continue;

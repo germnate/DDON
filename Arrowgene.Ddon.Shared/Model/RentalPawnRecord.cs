@@ -72,6 +72,14 @@ namespace Arrowgene.Ddon.Shared.Model
 
         public RentalPawn ToRentalPawn(uint hiringCharacterId, byte adventureCount, byte craftCount, uint killCount = 0)
         {
+            Equipment equipment = Equipment ?? new Equipment(new Storage(StorageType.PawnEquipment, (ushort)(EquipmentTemplate.TOTAL_EQUIP_SLOTS * 2)), 0);
+            CDataCharacterJobData characterJobData = CharacterJobData ?? new CDataCharacterJobData { Job = Job };
+            List<CDataNormalSkillParam> learnedNormalSkills = LearnedNormalSkills ?? [];
+            List<CustomSkill?> equippedCustomSkills = EquippedCustomSkills ?? [];
+            List<Ability?> equippedAbilities = EquippedAbilities ?? [];
+            CDataOrbGainExtendParam extendedParams = ExtendedParams ?? new CDataOrbGainExtendParam();
+            CharacterProfile pawnProfile = PawnProfile ?? new CharacterProfile();
+
             RentalPawn pawn = new()
             {
                 // RentalPawn Fields
@@ -101,12 +109,12 @@ namespace Arrowgene.Ddon.Shared.Model
                 EditInfo = EditInfo,
                 StatusInfo = new()
                 {
-                    GainAttack = ExtendedParams.Attack,
-                    GainDefense = ExtendedParams.Defence,
-                    GainMagicAttack = ExtendedParams.MagicAttack,
-                    GainMagicDefense = ExtendedParams.MagicDefence,
-                    GainStamina = ExtendedParams.StaminaMax,
-                    GainHP = ExtendedParams.HpMax,
+                    GainAttack = extendedParams.Attack,
+                    GainDefense = extendedParams.Defence,
+                    GainMagicAttack = extendedParams.MagicAttack,
+                    GainMagicDefense = extendedParams.MagicDefence,
+                    GainStamina = extendedParams.StaminaMax,
+                    GainHP = extendedParams.HpMax,
 
                     MaxHP = 760U,
                     MaxStamina = 450U,
@@ -117,18 +125,18 @@ namespace Arrowgene.Ddon.Shared.Model
                 Job = Job,
                 HideEquipHead = HideEquipHead,
                 HideEquipLantern = HideEquipLantern,
-                CharacterJobDataList = [CharacterJobData],
-                Equipment = Equipment,
-                JewelrySlotNum = (byte)(1 + ExtendedParams.JewelrySlot),
-                LearnedNormalSkills = LearnedNormalSkills,
-                LearnedCustomSkills = [.. EquippedCustomSkills.Where(x => x is not null)],
-                EquippedCustomSkillsDictionary = new() { { Job, EquippedCustomSkills } },
-                LearnedAbilities = [.. EquippedAbilities.Where(x => x is not null)],
-                EquippedAbilitiesDictionary = new() { { Job, EquippedAbilities } },
-                ExtendedParams = ExtendedParams,
+                CharacterJobDataList = [characterJobData],
+                Equipment = equipment,
+                JewelrySlotNum = (byte)(1 + extendedParams.JewelrySlot),
+                LearnedNormalSkills = learnedNormalSkills,
+                LearnedCustomSkills = [.. equippedCustomSkills.Where(x => x is not null)],
+                EquippedCustomSkillsDictionary = new() { { Job, equippedCustomSkills } },
+                LearnedAbilities = [.. equippedAbilities.Where(x => x is not null)],
+                EquippedAbilitiesDictionary = new() { { Job, equippedAbilities } },
+                ExtendedParams = extendedParams,
                 ExtendedJobParams = new() { { Job, new() } },
                 OrbRelease = [],
-                CharacterProfile = PawnProfile
+                CharacterProfile = pawnProfile
             };
 
             

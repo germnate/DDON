@@ -330,6 +330,7 @@ namespace Arrowgene.Ddon.GameServer.Characters
                 {
                     // Old DB is in use and new table not populated with required data for character
                     Logger.Error($"Character: AccountId={character.AccountId}, CharacterId={character.ContentCharacterId}, CommonId={character.CommonId}, PawnCommonId={pawn.CommonId} is missing table entry in 'ddon_orb_gain_extend_param'.");
+                    pawn.ExtendedParams = new CDataOrbGainExtendParam();
                 }
                 bool isServerSupportPawn = character.CharacterId == Character.ServerCharacterId
                     && pawn.PawnType == PawnType.Support;

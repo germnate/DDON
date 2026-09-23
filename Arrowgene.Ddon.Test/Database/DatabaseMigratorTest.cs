@@ -14,6 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Linq;
+using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -174,6 +176,55 @@ namespace Arrowgene.Ddon.Test.Database
             Assert.False(from0to1.Called);
             Assert.False(from1to2.Called);
             Assert.False(from2to3.Called);
+        }
+
+        [Fact]
+        public void TestMigrationTargetVersionsAreUnique()
+        {
+            DatabaseSetting databaseSetting = new();
+            List<IMigrationStrategy> strategies = typeof(IMigrationStrategy).Assembly.GetTypes()
+                .Where(type => type != typeof(IMigrationStrategy)
+                    && typeof(IMigrationStrategy).IsAssignableFrom(type)
+                    && type.Namespace == typeof(IMigrationStrategy).Namespace)
+                .Select(type => InstanceMigrationStrategy(type, databaseSetting))
+                .ToList();
+
+            List<uint> duplicateTargetVersions = strategies
+                .GroupBy(strategy => strategy.To)
+                .Where(group => group.Count() > 1)
+                .Select(group => group.Key)
+                .ToList();
+
+            Assert.True(
+                duplicateTargetVersions.Count == 0,
+                $"Duplicate migration target versions detected: {string.Join(", ", duplicateTargetVersions)}");
+            Assert.Single(strategies, strategy => strategy.To == DdonDatabaseBuilder.Version);
+        }
+
+        private static IMigrationStrategy InstanceMigrationStrategy(Type type, DatabaseSetting databaseSetting)
+        {
+            foreach (ConstructorInfo constructorInfo in type.GetConstructors())
+            {
+                List<object> parameters = new();
+                foreach (ParameterInfo constructorParam in constructorInfo.GetParameters())
+                {
+                    if (constructorParam.ParameterType == typeof(DatabaseSetting))
+                    {
+                        parameters.Add(databaseSetting);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                if (parameters.Count == constructorInfo.GetParameters().Length)
+                {
+                    return (IMigrationStrategy) constructorInfo.Invoke(parameters.ToArray());
+                }
+            }
+
+            throw new MissingMethodException($"No suitable constructor found in {type.Name}");
         }
     }
 

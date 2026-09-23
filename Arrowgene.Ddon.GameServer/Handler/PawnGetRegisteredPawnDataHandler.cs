@@ -50,9 +50,14 @@ namespace Arrowgene.Ddon.GameServer.Handler
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED);
                 }
 
-                var ownerCharacter = Server.CharacterManager.SelectCharacter(ownerCharacterId, true, connection);
-                Pawn pawn = ownerCharacter.Pawns.Where(x => x.PawnId == request.PawnId).FirstOrDefault()
-                    ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED);
+                Pawn pawn = isServerSupportPawn
+                    ? Server.ServerSupportPawnManager.SelectManagedPawn((uint)request.PawnId, connection)
+                    : Server.CharacterManager.SelectCharacter(ownerCharacterId, true, connection)
+                        .Pawns.FirstOrDefault(x => x.PawnId == request.PawnId);
+                if (pawn is null)
+                {
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED);
+                }
 
                 HashSet<uint> clanPawns = [.. Server.Database.SelectClanPawns(client.Character.ClanId, limit: 1000, connectionIn: connection)];
 
