@@ -6,19 +6,12 @@ public class MonsterSpotInfo : IMonsterSpotInfo
     public override QuestAreaId AreaId => QuestAreaId.BloodbaneIsle;
     public override uint RequiredAreaRank => 2;
 
-    public class NamedParamId
-    {
-        public const uint Variant = 915;
-    }
-
     public override void Initialize()
     {
         AddEnemies(new List<InstancedEnemy>()
         {
-            LibDdon.Enemy.CreateAuto(EnemyId.InfectedGorecyclops, 65, 0, isBoss: true)
-            .SetNamedEnemyParams(NamedParamId.Variant)
-            .AddDrop(ItemId.CrestOfFortitude0, 1, 1, DropRate.UNCOMMON)
-            .AddDrop(ItemId.CrestOfStubbornPerseverance0, 1, 1, DropRate.UNCOMMON),
+            LibDdon.Enemy.CreateAuto(EnemyId.InfectedGriffin, 65, 0),
+            LibDdon.Enemy.CreateAuto(EnemyId.InfectedGriffin, 65, 1),
         });
     }
 }

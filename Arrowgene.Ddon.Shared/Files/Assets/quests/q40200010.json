@@ -1,0 +1,49 @@
+{
+  "state_machine": "GenericStateMachine",
+  "type": "Light",
+  "quest_id": 40200010,
+  "base_level": 65,
+  "minimum_item_rank": 0,
+  "discoverable": false,
+  "comment": "Area Order: Bloodbane Isle Demon Extermination",
+  "light_quest_details": {
+    "board_type": 2,
+    "board_id": 16,
+    "get_cp": 28,
+    "order_limit": 7
+  },
+  "rewards": [
+    {
+      "type": "exp",
+      "amount": 1600
+    },
+    {
+      "type": "wallet",
+      "wallet_type": "Gold",
+      "amount": 1250
+    },
+    {
+      "type": "wallet",
+      "wallet_type": "RiftPoints",
+      "amount": 180
+    }
+  ],
+  "blocks": [
+    {
+      "type": "Raw",
+      "announce_type": "Accept",
+      "check_commands": [
+        {
+          "type": "IsOrderLightQuest"
+        }
+      ]
+    },
+    {
+      "type": "KillTargetEnemies",
+      "announce_type": "Checkpoint",
+      "enemy_id": "0x015012",
+      "level": 65,
+      "amount": 1
+    }
+  ]
+}

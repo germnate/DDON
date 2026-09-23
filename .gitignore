@@ -6,6 +6,7 @@ Arrowgene.Ddon.Shared/Files/Assets/scripts/addendums/*
 ## Folders specific
 /publish/
 /release/
+/out/
 /packages/
 
 ## Folders anywhere
