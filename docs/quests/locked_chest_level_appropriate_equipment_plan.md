@@ -1,19 +1,19 @@
-# Plan: Level-Appropriate Equipment From Locked Quest Chests
+# Plan: Level-Appropriate Equipment From All Locked Chests
 
 **Date:** 2026-09-23  
-**Scope:** Quest-instance locked treasure chests only  
+**Scope:** All locked treasure chests  
 **Related:** `docs/quests/loot_generator_plan_exm_and_campaign.md`, `docs/items/armor-weapons-by-rank.csv`
 
 ## 1. Goal
 
 Restrict equipment chest drops so that:
 
-1. Only **locked treasure chests** in quest instances use the new equipment-drop logic.
-2. Dropped equipment is **level appropriate** for the quest.
+1. Only **locked treasure chests** use the new equipment-drop logic.
+2. Dropped equipment is **level appropriate** for the content that owns the chest.
 3. Dropped equipment is **not the highest rank available** for that equipment lane.
 4. The **highest rank is reserved for crafting**, not chest drops.
 
-This is a refinement of the existing quest-instance chest generator rather than a new loot system.
+This should become a general locked-chest rule, not a quest-only exception.
 
 ## 2. Existing Constraints
 
@@ -29,7 +29,7 @@ Why:
 
 Therefore:
 
-- **Level** decides whether an item is appropriate for the quest.
+- **Level** decides whether an item is appropriate for the chest's owning content.
 - **Rank** is only used as a secondary policy for which items in that level-appropriate pool may drop.
 
 ### 2.2 Locked chests are already represented in code
@@ -47,7 +47,7 @@ This should be the authoritative definition of a locked chest.
 
 ## 3. Current Implementation Surface
 
-The current quest-instance chest logic already exists in:
+There is already one implementation anchor for level-based locked-chest gear in:
 
 - `Arrowgene.Ddon.GameServer/GatheringItems/Generators/QuestInstanceGatheringItemGenerator.cs`
 
@@ -61,40 +61,47 @@ Relevant behavior today:
 
 Relevant gap today:
 
-- It does **not** currently check whether the gathering spot is a locked chest before rolling this special quest loot.
+- It is scoped to quest-instance content rather than all locked chests.
+- It does **not** currently check whether the gathering spot is a locked chest before rolling this special loot.
 - It does **not** currently reserve the highest-rank level-appropriate items for crafting.
+
+Design implication:
+
+- The quest generator should be treated as a useful prototype, not as the final scope boundary.
 
 ## 4. Revised Design
 
 ### 4.1 Apply the special equipment logic only to locked chests
 
-Add a lock-state gate to `QuestInstanceGatheringItemGenerator.Generate()`.
+The special equipment logic should apply to **all** locked chests, regardless of whether they appear in quests, overworld content, or other instanced content.
+
+Add a lock-state gate anywhere chest loot is resolved, including `QuestInstanceGatheringItemGenerator.Generate()` where applicable.
 
 Desired behavior:
 
-- If the interacted spot is **not** a locked chest, the quest-specific equipment-roll path should not run.
-- If the interacted spot **is** a locked chest, proceed with quest-specific reward logic.
+- If the interacted spot is **not** a locked chest, this special equipment-roll path should not run.
+- If the interacted spot **is** a locked chest, proceed with locked-chest reward logic.
 
-This changes the current scope from:
+This changes the scope from:
 
-- all quest treasure chests
+- a quest-only implementation idea
 
 to:
 
-- only quest **locked** treasure chests
+- all **locked** treasure chests
 
 ### 4.2 Keep level-based filtering exactly as the outer filter
 
 Do not replace the existing level windows.
 
-Use the current quest-level buckets in `QuestLootRanges.json`:
+Use content-appropriate level buckets for the chest source. For quest content, reuse the current buckets in `QuestLootRanges.json`:
 
 - `NormalItemLevelMin`
 - `NormalItemLevelMax`
 - `BossItemLevelMin`
 - `BossItemLevelMax`
 
-These remain the first-pass filter for candidate equipment.
+These remain the first-pass filter for candidate equipment in quest content. Other locked-chest systems should expose an equivalent content-level or area-level source rather than falling back to rank.
 
 ### 4.3 Reserve the top rank within each equipment lane
 
@@ -120,22 +127,22 @@ Result:
 - Chest drops remain level appropriate.
 - The best-in-lane rank remains craft-only.
 
-### 4.4 Boss chests still use the better droppable pool, not the craft-only pool
+### 4.4 Higher-tier locked chests still use the better droppable pool, not the craft-only pool
 
-Boss-room locked chests should still feel better than ordinary locked chests.
+Higher-value locked chests should still feel better than ordinary locked chests.
 
-Keep the current boss behavior:
+For quest boss-room locked chests, keep the current boss behavior:
 
 - higher item-level window
 - rarity bias toward the upper end of the allowed window
 - rare material chance for EXM where applicable
 
-But boss chests must still obey the same craft-reservation rule:
+But higher-tier locked chests must still obey the same craft-reservation rule:
 
-- boss chests may roll the **best droppable rank**
-- boss chests may **not** roll the craft-reserved top rank
+- they may roll the **best droppable rank**
+- they may **not** roll the craft-reserved top rank
 
-## 5. How To Determine Whether A Quest Chest Is Locked
+## 5. How To Determine Whether A Chest Is Locked
 
 ### 5.1 Preferred source: `GatheringSpotInfo.json`
 
@@ -155,20 +162,21 @@ Plan:
 1. Resolve the gathering spot for `(stageId.Id, stageId.GroupId, posId)`.
 2. Read its `GatheringType`.
 3. Call `IsLockedChest()`.
-4. Only allow the locked-chest quest equipment logic if that returns `true`.
+4. Only allow the locked-chest equipment logic if that returns `true`.
 
-### 5.2 Fallback source: explicit quest locked-chest map
+### 5.2 Fallback source: explicit locked-chest metadata map
 
-If instanced quest stages are missing or incomplete in `GatheringSpotInfo.json`, add a small explicit asset:
+If some chest sources are missing or incomplete in `GatheringSpotInfo.json`, add a small explicit asset:
 
-- `Arrowgene.Ddon.Shared/Files/Assets/QuestLockedChests.json`
+- `Arrowgene.Ddon.Shared/Files/Assets/LockedChests.json`
 
 Recommended shape:
 
 ```json
 [
 	{
-		"QuestId": 50101020,
+		"ContentType": "Quest",
+		"ContentId": 50101020,
 		"StageId": 293,
 		"GroupId": 0,
 		"PosId": 5,
@@ -179,7 +187,8 @@ Recommended shape:
 
 Minimum required fields:
 
-- `QuestId`
+- `ContentType`
+- `ContentId`
 - `StageId`
 - `GroupId`
 - `PosId`
@@ -188,7 +197,7 @@ Optional field:
 
 - `LockLevel` if later balancing should differentiate LV1-LV4 locked chests
 
-This asset should only be used where metadata is absent or unreliable.
+This asset should only be used where normal metadata is absent or unreliable.
 
 ## 6. Drop-Policy Data
 
@@ -198,7 +207,7 @@ The chest-drop ceiling should be data-driven.
 
 Recommended asset:
 
-- `QuestEquipmentDropPolicy.json`
+- `LockedChestEquipmentDropPolicy.json`
 
 Recommended generated fields per lane:
 
@@ -243,18 +252,20 @@ Use this to remove promotional/collab/cosmetic outliers without rewriting the ge
 
 ## 7. Code Changes
 
-### 7.1 `QuestInstanceGatheringItemGenerator`
+### 7.1 Shared locked-chest loot flow
 
-Primary changes go in:
+Primary changes should go where locked-chest loot is actually resolved. Today, the clearest existing anchor is:
 
 - `Arrowgene.Ddon.GameServer/GatheringItems/Generators/QuestInstanceGatheringItemGenerator.cs`
 
 Planned changes:
 
 1. Resolve whether the current spot is a locked chest.
-2. Early-return from the quest-specific equipment path if it is not locked.
+2. Early-return from the special equipment path if it is not locked.
 3. After the level-based candidate filter, apply the drop-policy ceiling.
-4. Keep existing boss weighting and EXM rare-material behavior.
+4. Keep existing weighting behavior for higher-tier chest sources.
+
+If other locked-chest flows exist outside quest generation, they should use the same policy rather than re-implementing different rules.
 
 ### 7.2 Asset registration
 
@@ -264,8 +275,8 @@ If a fallback map or policy asset is added, register it in:
 
 Likely new assets:
 
-- `QuestLockedChests.json`
-- `QuestEquipmentDropPolicy.json`
+- `LockedChests.json`
+- `LockedChestEquipmentDropPolicy.json`
 
 ### 7.3 Optional helper model types
 
@@ -280,7 +291,7 @@ Keep them narrow and data-only.
 
 ### 8.1 Spot audit
 
-Produce a report of quest-instance chest spots, classified into:
+Produce a report of locked-chest spots, classified into:
 
 - locked chest
 - non-locked treasure chest
@@ -321,20 +332,22 @@ This plan does **not** change:
 - overworld chest behavior
 - Bitterblack Maze chest logic
 - Epitaph Road chest logic
-- ordinary unlocked quest treasure chests
+- ordinary unlocked treasure chests
 - EXM rare material handling, except that it remains attached to the locked-chest flow if desired
+
+This plan also does **not** require every chest system to share the same level-source logic. It only requires that all locked chests share the same top-rank reservation rule.
 
 ## 10. Final Rule Set
 
 The intended final behavior is:
 
-1. A player interacts with a quest-instance gathering spot.
+1. A player interacts with a gathering spot.
 2. If the spot is **not** a locked chest, this special equipment-drop plan does not apply.
-3. If the spot **is** a locked chest, resolve the quest's level bracket.
-4. Build the candidate equipment pool using the bracket's item-level window.
+3. If the spot **is** a locked chest, resolve the content-appropriate level bracket or equivalent level source.
+4. Build the candidate equipment pool using that item-level window.
 5. Remove the highest-rank candidates within each equipment lane.
 6. Roll from the remaining pool.
-7. Allow boss locked chests to use better windows and weighting, but never the craft-reserved top rank.
+7. Allow higher-tier locked chests to use better windows and weighting, but never the craft-reserved top rank.
 
 That preserves the intended progression model:
 
