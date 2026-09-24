@@ -6444,9 +6444,7 @@
 			"id": 220,
 			"name": "Altered Zuhl (Lv1+)",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 221,
@@ -6994,9 +6992,7 @@
 			"id": 247,
 			"name": "Mandragora (Lv1+)",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 248,
@@ -9198,17 +9194,13 @@
 			"id": 332,
 			"name": "Geo Saurian (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 333,
 			"name": "Giant Geo Saurian (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 334,
@@ -9562,9 +9554,7 @@
 			"id": 346,
 			"name": "Dagon (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 347,
@@ -9961,25 +9951,19 @@
 			"id": 364,
 			"name": "Legion (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 365,
 			"name": "Legion Leader (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 366,
 			"name": "Gigant Machina Trinity (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 367,
@@ -10030,9 +10014,7 @@
 			"id": 370,
 			"name": "Grand Ent (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 371,
@@ -10494,9 +10476,7 @@
 			"id": 387,
 			"name": "Golgorran (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 388,
@@ -10571,9 +10551,7 @@
 			"id": 391,
 			"name": "",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 392,
@@ -10841,17 +10819,13 @@
 			"id": 402,
 			"name": "Skeleton Lord (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 403,
 			"name": "Iris (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 404,
@@ -10980,41 +10954,31 @@
 			"id": 409,
 			"name": "Diamantes (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 410,
 			"name": "White Dragon (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 411,
 			"name": "Spirit Dragon Willmia (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 412,
 			"name": "Black Knight (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 413,
 			"name": "Baphomet (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 414,
@@ -11491,9 +11455,7 @@
 			"id": 431,
 			"name": "Giant Unspeakable Meat (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 432,
@@ -11661,9 +11623,7 @@
 			"id": 438,
 			"name": "Megado Guard (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 439,
@@ -11822,17 +11782,13 @@
 			"id": 446,
 			"name": "Merman (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 447,
 			"name": "Poison Merman (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 448,
@@ -12060,9 +12016,7 @@
 			"id": 458,
 			"name": "Valefar (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 459,
@@ -12151,25 +12105,19 @@
 			"id": 464,
 			"name": "Tentacle Evil Eye (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 465,
 			"name": "Flame Skeleton Cyclops (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 466,
 			"name": "Ushumgal (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 467,
@@ -12190,97 +12138,73 @@
 			"id": 468,
 			"name": "War Master (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 469,
 			"name": "Beast Master (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 470,
 			"name": "The Evil Dragon (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 471,
 			"name": "Arisen of the Black Dragon (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 472,
 			"name": "Black Dragon (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 473,
 			"name": "Former Commander Leo (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 474,
 			"name": "Ukobach (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 475,
 			"name": "Frost Skeleton Cyclops (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 476,
 			"name": "Frost Machina Trinity (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 477,
 			"name": "Bolt Skeleton Cyclops (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 478,
 			"name": "Bolt Machina (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 479,
 			"name": "Bolt Machina Trinity (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 480,
@@ -12575,9 +12499,7 @@
 			"id": 495,
 			"name": "Severely Infected Scourge (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 496,
@@ -12598,33 +12520,25 @@
 			"id": 497,
 			"name": "Shadow Grigori (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 498,
 			"name": "Shadow Master (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 499,
 			"name": "Gorgon (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 500,
 			"name": "Rage Ghost (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 501,
@@ -12675,9 +12589,7 @@
 			"id": 504,
 			"name": "Vile Eye (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 505,
@@ -12911,25 +12823,19 @@
 			"id": 517,
 			"name": "Black Knight Phantom (Lv1-??) INCONCLUSIVE",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 518,
 			"name": "Drops Table 516",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 519,
 			"name": "Drops Table 517",
 			"mdlType": 0,
-			"items": [
-
-			]
+			"items": []
 		},
 		{
 			"id": 520,
@@ -57233,7 +57139,7 @@
 			2298,
 			0,
 			100,
-			20,
+			57,
 			0,
 			0,
 			0,
@@ -57265,7 +57171,7 @@
 			2298,
 			0,
 			100,
-			20,
+			57,
 			0,
 			0,
 			0,
@@ -57297,7 +57203,7 @@
 			2298,
 			0,
 			100,
-			20,
+			57,
 			0,
 			0,
 			0,
@@ -57329,7 +57235,7 @@
 			2298,
 			0,
 			100,
-			20,
+			57,
 			0,
 			0,
 			0,
@@ -57361,7 +57267,7 @@
 			2298,
 			0,
 			100,
-			20,
+			57,
 			0,
 			0,
 			0,
@@ -57393,7 +57299,7 @@
 			2298,
 			0,
 			100,
-			20,
+			57,
 			0,
 			0,
 			0,
@@ -57425,7 +57331,7 @@
 			2298,
 			0,
 			100,
-			20,
+			57,
 			0,
 			0,
 			0,
@@ -57457,7 +57363,7 @@
 			2298,
 			0,
 			100,
-			20,
+			57,
 			0,
 			0,
 			0,
@@ -183121,7 +183027,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183153,7 +183059,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183185,7 +183091,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183217,7 +183123,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183249,7 +183155,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183258,38 +183164,6 @@
 			0,
 			0,
 			2,
-			false,
-			false,
-			false,
-			false,
-			false,
-			0,
-			false,
-			0,
-			6590,
-			-1,
-			"00:00,23:59",
-			0
-		],
-		[
-			316,
-			0,
-			4,
-			0,
-			0,
-			"0x010161",
-			2298,
-			0,
-			100,
-			56,
-			0,
-			0,
-			0,
-			0,
-			1,
-			0,
-			0,
-			0,
 			false,
 			false,
 			false,
@@ -183308,12 +183182,44 @@
 			0,
 			4,
 			0,
+			0,
+			"0x010161",
+			2298,
+			0,
+			100,
+			57,
+			0,
+			0,
+			0,
+			0,
+			1,
+			0,
+			0,
+			0,
+			false,
+			false,
+			false,
+			false,
+			false,
+			0,
+			false,
+			0,
+			6590,
+			-1,
+			"00:00,23:59",
+			0
+		],
+		[
+			316,
+			0,
+			4,
+			0,
 			1,
 			"0x010161",
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183345,7 +183251,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183377,7 +183283,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183409,7 +183315,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183441,7 +183347,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183473,7 +183379,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183505,7 +183411,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183537,7 +183443,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183569,7 +183475,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183601,7 +183507,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183633,7 +183539,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183665,7 +183571,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183697,7 +183603,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183729,7 +183635,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183761,7 +183667,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183793,7 +183699,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183825,7 +183731,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183857,7 +183763,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183889,7 +183795,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183921,7 +183827,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183953,7 +183859,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -183985,7 +183891,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -184017,7 +183923,7 @@
 			925,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -184049,7 +183955,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -184081,7 +183987,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -184113,7 +184019,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -184145,7 +184051,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -184177,7 +184083,7 @@
 			2298,
 			0,
 			100,
-			56,
+			57,
 			0,
 			0,
 			0,
@@ -188209,7 +188115,7 @@
 			2298,
 			0,
 			100,
-			1,
+			57,
 			0,
 			0,
 			0,
@@ -188241,7 +188147,7 @@
 			2298,
 			0,
 			100,
-			1,
+			57,
 			0,
 			0,
 			0,
@@ -188273,7 +188179,7 @@
 			2298,
 			0,
 			100,
-			1,
+			57,
 			0,
 			0,
 			0,
@@ -189329,7 +189235,7 @@
 			2298,
 			0,
 			100,
-			5,
+			57,
 			0,
 			0,
 			0,
@@ -196269,7 +196175,7 @@
 			4,
 			0,
 			1,
-			"0x010430",
+			"0x010460",
 			2298,
 			0,
 			100,
@@ -196301,7 +196207,7 @@
 			4,
 			0,
 			2,
-			"0x010430",
+			"0x010460",
 			2298,
 			0,
 			100,
@@ -196333,7 +196239,7 @@
 			4,
 			0,
 			3,
-			"0x010430",
+			"0x010460",
 			2298,
 			0,
 			100,
@@ -196365,7 +196271,7 @@
 			4,
 			0,
 			4,
-			"0x010430",
+			"0x010460",
 			2298,
 			0,
 			100,
@@ -282726,6 +282632,230 @@
 			-1,
 			"00:00,23:59",
 			12
+		],
+		[
+			316,
+			0,
+			11,
+			0,
+			3,
+			"0x015712",
+			2298,
+			0,
+			100,
+			70,
+			0,
+			0,
+			0,
+			0,
+			1,
+			0,
+			0,
+			1,
+			true,
+			true,
+			false,
+			false,
+			false,
+			0,
+			false,
+			0,
+			607000,
+			-1,
+			"00:00,23:59",
+			80
+		],
+		[
+			316,
+			0,
+			11,
+			0,
+			10,
+			"0x010612",
+			2298,
+			0,
+			100,
+			65,
+			0,
+			0,
+			0,
+			0,
+			1,
+			0,
+			0,
+			0,
+			false,
+			false,
+			false,
+			false,
+			false,
+			0,
+			false,
+			0,
+			6590,
+			-1,
+			"00:00,23:59",
+			0
+		],
+		[
+			316,
+			0,
+			11,
+			0,
+			11,
+			"0x010209",
+			2298,
+			0,
+			100,
+			65,
+			0,
+			0,
+			0,
+			0,
+			1,
+			0,
+			0,
+			0,
+			false,
+			false,
+			false,
+			false,
+			false,
+			0,
+			false,
+			0,
+			6590,
+			-1,
+			"00:00,23:59",
+			0
+		],
+		[
+			316,
+			0,
+			11,
+			0,
+			12,
+			"0x010160",
+			2298,
+			0,
+			100,
+			65,
+			0,
+			0,
+			0,
+			0,
+			1,
+			0,
+			0,
+			0,
+			false,
+			false,
+			false,
+			false,
+			false,
+			0,
+			false,
+			0,
+			6590,
+			-1,
+			"00:00,23:59",
+			0
+		],
+		[
+			316,
+			0,
+			11,
+			0,
+			0,
+			"0x010160",
+			2298,
+			0,
+			100,
+			65,
+			0,
+			0,
+			0,
+			0,
+			1,
+			0,
+			0,
+			0,
+			false,
+			false,
+			false,
+			false,
+			false,
+			0,
+			false,
+			0,
+			6590,
+			-1,
+			"00:00,23:59",
+			0
+		],
+		[
+			316,
+			0,
+			11,
+			0,
+			14,
+			"0x010161",
+			2298,
+			0,
+			100,
+			65,
+			0,
+			0,
+			0,
+			0,
+			1,
+			0,
+			0,
+			0,
+			false,
+			false,
+			false,
+			false,
+			false,
+			0,
+			false,
+			0,
+			6590,
+			-1,
+			"00:00,23:59",
+			0
+		],
+		[
+			316,
+			0,
+			11,
+			0,
+			2,
+			"0x010162",
+			2298,
+			0,
+			100,
+			65,
+			0,
+			0,
+			0,
+			0,
+			1,
+			0,
+			0,
+			0,
+			false,
+			false,
+			false,
+			false,
+			false,
+			0,
+			false,
+			0,
+			6590,
+			-1,
+			"00:00,23:59",
+			0
 		]
 	]
 }

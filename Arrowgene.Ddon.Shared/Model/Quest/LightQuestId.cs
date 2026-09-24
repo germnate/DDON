@@ -376,7 +376,7 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         public static readonly LightQuestInfo q40000298 = new(40000298, QuestAreaId.ZandoraWastelands, LightQuestType.Delivery, QuestBoardBaseId.ZandoraWastelandShrine, "Notice to Forbidden Zone Explorers: Regarding Acquired Items");
         public static readonly LightQuestInfo q40000299 = new(40000299, QuestAreaId.ZandoraWastelands, LightQuestType.Delivery, QuestBoardBaseId.ZandoraWastelandShrine, "To Wasteland Explorers: About Finds");
         public static readonly LightQuestInfo q40000300 = new(40000300, QuestAreaId.ZandoraWastelands, LightQuestType.Delivery, QuestBoardBaseId.ZandoraWastelandShrine, "Area Order: Zandora Resupply");
-        public static readonly LightQuestInfo q40200001 = new(40200001, QuestAreaId.BloodbaneIsle, LightQuestType.Hunt, QuestBoardBaseId.BloodbaneExpeditionSouth, "Bloodbane Isle Griffin Extermination");
+        public static readonly LightQuestInfo q40200001 = new(40200001, QuestAreaId.BloodbaneIsle, LightQuestType.Hunt, QuestBoardBaseId.BloodbaneExpeditionSouth, "Teach Them a Lesson");
         public static readonly LightQuestInfo q40200002 = new(40200002, QuestAreaId.BloodbaneIsle, LightQuestType.Hunt, QuestBoardBaseId.BloodbaneExpeditionSouth, "For Clean Bedsheets");
         public static readonly LightQuestInfo q40200003 = new(40200003, QuestAreaId.BloodbaneIsle, LightQuestType.Hunt, QuestBoardBaseId.BloodbaneExpeditionSouth, "Set Off By a Robbery");
         public static readonly LightQuestInfo q40200004 = new(40200004, QuestAreaId.BloodbaneIsle, LightQuestType.Hunt, QuestBoardBaseId.BloodbaneExpeditionSouth, "Flower's Revenge");
