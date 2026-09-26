@@ -36,6 +36,11 @@
           "comment": "Crest of Wisdom (Health)",
           "item_id": 16074,
           "num": 1
+        },
+        {
+          "comment": "Hidell Medal",
+          "item_id": 10999,
+          "num": 1
         }
       ]
     },

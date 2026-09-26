@@ -30828,6 +30828,87 @@
             ]
         },
         {
+            "shop_type": "MedalExchangeHidellPlains",
+            "categories": [
+                {
+                    "label": "Hidell Plains Supplies",
+                    "appraisals": [
+                        {
+                            "label": "＜Exch＞ Quality Attack Upgrade Rock",
+                            "base_items": [
+                                {
+                                    "item_id": 10999,
+                                    "name": "Hidell Medal",
+                                    "amount": 20
+                                }
+                            ],
+                            "pool": [
+                                {
+                                    "item_id": 8036,
+                                    "name": "Quality Attack Upgrade Rock",
+                                    "amount": 1
+                                }
+                            ]
+                        },
+                        {
+                            "label": "＜Exch＞ Quality Defense Upgrade Rock",
+                            "base_items": [
+                                {
+                                    "item_id": 10999,
+                                    "name": "Hidell Medal",
+                                    "amount": 20
+                                }
+                            ],
+                            "pool": [
+                                {
+                                    "item_id": 8068,
+                                    "name": "Quality Defense Upgrade Rock",
+                                    "amount": 1
+                                }
+                            ]
+                        },
+                        {
+                            "label": "＜Exch＞ Gold/BO/HO Lucky Draw",
+                            "base_items": [
+                                {
+                                    "item_id": 10999,
+                                    "name": "Hidell Medal",
+                                    "amount": 25
+                                }
+                            ],
+                            "pool": [
+                                {
+                                    "item_id": 19509,
+                                    "name": "10,000G",
+                                    "amount": 1
+                                },
+                                {
+                                    "item_id": 19509,
+                                    "name": "100,000G",
+                                    "amount": 10
+                                },
+                                {
+                                    "item_id": 19509,
+                                    "name": "1,000,000G",
+                                    "amount": 100
+                                },
+                                {
+                                    "item_id": 19511,
+                                    "name": "50,000BO",
+                                    "amount": 50
+                                },
+                                {
+                                    "item_id": 18744,
+                                    "name": "1,000HO",
+                                    "amount": 10
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "shop_type": "BitterBlackMaze",
             "categories": [
                 {

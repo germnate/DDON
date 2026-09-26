@@ -39,6 +39,11 @@
           "num": 1
         },
         {
+          "comment": "Hidell Medal",
+          "item_id": 10999,
+          "num": 1
+        },
+        {
           "comment": "High Quality Magick Medal",
           "item_id": 7870,
           "num": 2
