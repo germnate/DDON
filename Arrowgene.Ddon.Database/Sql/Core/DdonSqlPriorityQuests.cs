@@ -16,6 +16,8 @@ public partial class DdonSqlDb : SqlDb
 
     private readonly string SqlInsertIfNotExistPriorityQuestId = $"INSERT INTO \"ddon_priority_quests\" ({BuildQueryField(PriorityQuestFields)}) SELECT " +
                                                                  $"{BuildQueryInsert(PriorityQuestFields)} WHERE NOT EXISTS (SELECT 1 FROM \"ddon_priority_quests\" WHERE " +
+                                                                 $"\"character_common_id\" = @character_common_id AND \"quest_schedule_id\" = @quest_schedule_id) " +
+                                                                 $"AND EXISTS (SELECT 1 FROM \"ddon_quest_progress\" WHERE " +
                                                                  $"\"character_common_id\" = @character_common_id AND \"quest_schedule_id\" = @quest_schedule_id);";
 
     private readonly string SqlSelectPriorityQuests =

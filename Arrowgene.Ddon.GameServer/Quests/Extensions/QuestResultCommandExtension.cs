@@ -273,6 +273,12 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return resultCommands;
         }
 
+        public static List<CDataQuestCommand> AddResultCmdEventExecCont(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, uint eventNo, StageInfo destStageInfo, uint jumpPos)
+        {
+            resultCommands.Add(QuestManager.ResultCommand.EventExecCont(stageInfo.StageNo, (int)eventNo, destStageInfo.StageNo, (int)jumpPos));
+            return resultCommands;
+        }
+
         public static List<CDataQuestCommand> AddResultCmdExeEventAfterStageJump(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, uint eventNo, uint startPos)
         {
             resultCommands.Add(QuestManager.ResultCommand.ExeEventAfterStageJump(stageInfo.StageNo, (int)eventNo, (int)startPos));
@@ -489,6 +495,18 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
         public static List<CDataQuestCommand> AddResultCmdLinkageEnemyFlagOff(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, int groupNo, int setNo, uint flagNo)
         {
             resultCommands.Add(QuestManager.ResultCommand.LinkageEnemyFlagOff(stageInfo.StageNo, groupNo, setNo, (int)flagNo));
+            return resultCommands;
+        }
+
+        public static List<CDataQuestCommand> AddResultCmdSetDiePlayerReturnPos(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, int startPos, int outSceNo)
+        {
+            resultCommands.Add(QuestManager.ResultCommand.SetDiePlayerReturnPos(stageInfo.StageNo, startPos, outSceNo));
+            return resultCommands;
+        }
+
+        public static List<CDataQuestCommand> AddResultCmdResetDiePlayerReturnPos(this List<CDataQuestCommand> resultCommands, StageInfo stageInfo, int startPos)
+        {
+            resultCommands.Add(QuestManager.ResultCommand.ResetDiePlayerReturnPos(stageInfo.StageNo, startPos));
             return resultCommands;
         }
     }

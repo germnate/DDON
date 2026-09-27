@@ -270,6 +270,12 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return questBlock;
         }
 
+        public static QuestBlock AddResultCmdEventExecCont(this QuestBlock questBlock, StageInfo stageInfo, uint eventNo, StageInfo destStageInfo, uint jumpPos)
+        {
+            questBlock.ResultCommands.AddResultCmdEventExecCont(stageInfo, eventNo, destStageInfo, jumpPos);
+            return questBlock;
+        }
+
         public static QuestBlock AddResultCmdExeEventAfterStageJump(this QuestBlock questBlock, StageInfo stageInfo, uint eventNo, uint startPos)
         {
             questBlock.ResultCommands.AddResultCmdExeEventAfterStageJump(stageInfo, eventNo, startPos);
@@ -485,6 +491,18 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
         public static QuestBlock AddResultCmdLinkageEnemyFlagOff(this QuestBlock questBlock, StageInfo stageInfo, int groupNo, int setNo, uint flagNo)
         {
             questBlock.ResultCommands.AddResultCmdLinkageEnemyFlagOff(stageInfo, groupNo, setNo, flagNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdSetDiePlayerReturnPos(this QuestBlock questBlock, StageInfo stageInfo, int startPos, int outSceNo)
+        {
+            questBlock.ResultCommands.AddResultCmdSetDiePlayerReturnPos(stageInfo, startPos, outSceNo);
+            return questBlock;
+        }
+
+        public static QuestBlock AddResultCmdResetDiePlayerReturnPos(this QuestBlock questBlock, StageInfo stageInfo, int startPos)
+        {
+            questBlock.ResultCommands.AddResultCmdResetDiePlayerReturnPos(stageInfo, startPos);
             return questBlock;
         }
     }

@@ -382,6 +382,21 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             /// Unlocks the southern "Vegasa Corridor" entrance when set
             /// </summary>
             public static QuestFlagInfo VegasaCorridorSouth { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(1997, QuestId.Q70023001);
+
+            /// <summary>
+            /// Unlocks the door to Tarie Small Tower
+            /// </summary>
+            public static QuestFlagInfo TarieSmallTower { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(4311, QuestId.Q70032001);
+        }
+
+        public static class BloodbaneIsle
+        {
+            private static StageInfo StageInfo = Stage.BloodbaneIsle0;
+
+            /// <summary>
+            /// Unlocks the door to Sage Tower Ruins
+            /// </summary>
+            public static QuestFlagInfo SageTowerRuins { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(4312, QuestId.Q70032001);
         }
 
         public static class MorrowForest
@@ -738,6 +753,71 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             /// Opens the gate to Epitaph Road: Feryana Wilderness
             /// </summary>
             public static QuestFlagInfo EpitaphRoadFeryanaWilderness { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(3520, QuestId.Q70031001);
+
+            /// <summary>
+            /// Activates the door to Lookout Castle harbour
+            /// </summary>
+            public static QuestFlagInfo HarborDoor { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(3403, QuestId.Q70030001);
+
+            /// <summary>
+            /// Activates warp to Megadosys Plateau (133)
+            /// </summary>
+            public static QuestFlagInfo MegadosysPlateauWarp { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(7438, QuestId.Q70032001, StageInfo);
+        }
+
+        public static class MegadosysPlateau
+        {
+            private static StageInfo StageInfo = Stage.MegadosysPlateau;
+
+            /// <summary>
+            /// Enables the first set of field area markers for Megadosys Plateau
+            /// </summary>
+            public static QuestFlagInfo FieldAreaMarkers1 { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(4834, QuestId.Q70032001);
+
+            /// <summary>
+            /// Enables the second set of field area markers for Megadosys Plateau
+            /// </summary>
+            public static QuestFlagInfo FieldAreaMarkers2 { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(4835, QuestId.Q70032001);
+
+            /// <summary>
+            /// Enables the third set of field area markers for Megadosys Plateau
+            /// </summary>
+            public static QuestFlagInfo FieldAreaMarkers3 { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(4836, QuestId.Q70032001);
+
+            /// <summary>
+            /// Spawns the closed well for Eli Guard Tower
+            /// </summary>
+            public static QuestFlagInfo EliGuardTowerWellClosed { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(7240, QuestId.Q70032001, StageInfo);
+
+            /// <summary>
+            /// Spawns the open well for Eli Guard Tower
+            /// </summary>
+            public static QuestFlagInfo EliGuardTowerWellOpen { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(7241, QuestId.Q70032001, StageInfo);
+
+            /// <summary>
+            /// Spawns the High Scepter job trainer Kirsty
+            /// </summary>
+            public static QuestFlagInfo Kirsty { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(7336, QuestId.Q70032001, StageInfo);
+        }
+
+        public static class EliGuardTower
+        {
+            private static StageInfo StageInfo = Stage.EliGuardTower;
+
+            /// <summary>
+            /// Spawns the area master Doris
+            /// </summary>
+            public static QuestFlagInfo Doris { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(7496, QuestId.Q70032001, StageInfo);
+        }
+
+        public static class FortressCityMegadoResidentialLevel
+        {
+            private static StageInfo StageInfo = Stage.FortressCityMegadoResidentialLevel1;
+
+            /// <summary>
+            /// Activates warp to Megado Corridor
+            /// </summary>
+            public static QuestFlagInfo MegadoCorridor { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(5185, QuestId.Q70034001);
         }
 
         public static class NpcFunctions
@@ -870,6 +950,11 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             /// Unlocks the NPC option "Area Information" for the NPC Nayajiku in Feryana Wilderness
             /// </summary>
             public static QuestFlagInfo FeryanaWildernessAreaInfo { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(3241, QuestId.Q70030001);
+
+            /// <summary>
+            /// Unlocks the NPC option "Area Information" for the NPC Doris in Megadosys Plateau
+            /// </summary>
+            public static QuestFlagInfo MegadosysPlateauAreaInfo { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(4408, QuestId.Q70032001);
 
             /// <summary>
             /// Adds the NPC option "Extreme Mission" for the NPC Seneka

@@ -443,6 +443,20 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             return AddEventExecBlock(process, announceType, stageInfo, eventNo, stageInfo, 0);
         }
 
+        public static QuestBlock AddEventExecContBlock(this QuestProcess process, QuestAnnounceType announceType, StageInfo stageInfo, uint eventNo, StageInfo destStage, uint jumpPos)
+        {
+            var block = CreateGenericBlock(process.QuestScheduleId, 0, 0, QuestBlockType.Raw, announceType)
+                .AddResultCmdEventExecCont(stageInfo, eventNo, destStage, jumpPos)
+                .AddCheckCmdEventEnd(stageInfo, eventNo);
+            process.AddBlock(block);
+            return block;
+        }
+
+        public static QuestBlock AddEventExecContBlock(this QuestProcess process, QuestAnnounceType announceType, StageInfo stageInfo, uint eventNo)
+        {
+            return AddEventExecContBlock(process, announceType, stageInfo, eventNo, stageInfo, 0);
+        }
+
         public static QuestBlock AddStageJumpBlock(this QuestProcess process, QuestAnnounceType announceType, StageLayoutId stageId, uint jumpPos)
         {
             var block = CreateGenericBlock(process.QuestScheduleId, 0, 0, QuestBlockType.StageJump, announceType)
@@ -462,6 +476,15 @@ namespace Arrowgene.Ddon.GameServer.Quests.Extensions
             var block = CreateGenericBlock(process.QuestScheduleId, 0, 0, QuestBlockType.Raw, announceType)
                             .AddCheckCmdEventEnd(stageInfo, eventNo)
                             .AddResultCmdExeEventAfterStageJump(stageInfo, eventNo, jumpPos);
+            process.AddBlock(block);
+            return block;
+        }
+
+        public static QuestBlock AddEventAfterJumpContinueBlock(this QuestProcess process, QuestAnnounceType announceType, StageInfo stageInfo, uint eventNo, uint jumpPos)
+        {
+            var block = CreateGenericBlock(process.QuestScheduleId, 0, 0, QuestBlockType.Raw, announceType)
+                            .AddCheckCmdEventEnd(stageInfo, eventNo)
+                            .AddResultCmdExeEventAfterStageJumpContinue(stageInfo, eventNo, jumpPos);
             process.AddBlock(block);
             return block;
         }

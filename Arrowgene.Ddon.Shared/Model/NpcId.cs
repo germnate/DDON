@@ -729,6 +729,7 @@ namespace Arrowgene.Ddon.Shared.Model
         Travers1 = 718,
         Ugau = 2001,
         Ultan = 2605,
+        Umit = 3202,
         Urda = 1502,
         Vanessa0 = 11,
         Vanessa1 = 4960,
