@@ -785,6 +785,16 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             public static QuestFlagInfo FieldAreaMarkers3 { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(4836, QuestId.Q70032001);
 
             /// <summary>
+            /// Opens gates leading to The King's Hidden Chamber
+            /// </summary>
+            public static QuestFlagInfo TheKingsHiddenChamber { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(4402, QuestId.Q70032001);
+
+            /// <summary>
+            /// Unlocks World Quest "Flames of Darkness"
+            /// </summary>
+            public static QuestFlagInfo FlamesOfDarkness { get; private set; } = QuestFlagInfo.WorldManageQuestFlag(4580, QuestId.Q70032001);
+
+            /// <summary>
             /// Spawns the closed well for Eli Guard Tower
             /// </summary>
             public static QuestFlagInfo EliGuardTowerWellClosed { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(7240, QuestId.Q70032001, StageInfo);

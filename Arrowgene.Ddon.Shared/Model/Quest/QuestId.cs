@@ -230,6 +230,11 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
         SummerBeachFestival2 = 60200034,
         SummerBeachFestivalDecorations = 60200035,
 
+        // Megadosys Plateau Trials
+        MegadosysPlateauTrialMaterialProcurement = 60320000,
+        MegadosysPlateauTrialShadowOfHeresy = 60320010,
+        TheRulerOverwhelmedByPower = 60320011,
+
         // Substory Quests
         TasteOfBitterMemories = 10300100,
         FortThinesFoodProcurement = 10300101,
