@@ -416,7 +416,7 @@ namespace Arrowgene.Ddon.Server.Settings
                 return TryGetSetting("PlayPointMax", _PlayPointMax);
             }
         }
-        private const uint _PlayPointMax = 2000;
+        private const uint _PlayPointMax = 50000;
 
         /// <summary>
         /// Maximum level for each job. 

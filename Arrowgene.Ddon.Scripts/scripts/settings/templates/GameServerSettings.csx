@@ -135,7 +135,7 @@ double RandomizedBoEnemyChance = 0.05;
 /// Maximum amount of play points the client will display in the UI.
 /// Play points past this point will also trigger a chat log message saying you've reached the cap.
 /// </summary>
-uint PlayPointMax = 2000;
+uint PlayPointMax = 50000;
 
 /// <summary>
 /// Maximum level for each job.
@@ -706,4 +706,3 @@ double WorldQuestRepeatClearGoldPct = 1;
 /// Only applies when WorldQuestFirstClearRewards = true.
 /// </summary>
 double WorldQuestRepeatClearJpPct = 1;
-
