@@ -55,19 +55,6 @@ public class Generator : IInstanceEnemyDropGenerator
     private const double VarianceMin = 0.8;
     private const double VarianceMax = 1.2;
 
-    // Largest denomination first so we can greedily break down the total
-    // into as few stacks as possible. Coin Pouch items stack up to 255.
-    private static readonly (ItemId ItemId, uint Value)[] CoinPouchDenominations = new[]
-    {
-        (ItemId.CoinPouch10000G, 10000u),
-        (ItemId.CoinPouch1000G, 1000u),
-        (ItemId.CoinPouch100G, 100u),
-        (ItemId.CoinPouch10G, 10u),
-        (ItemId.CoinPouch1G, 1u),
-    };
-
-    private const uint MaxStackSize = 255;
-
     public List<InstancedGatheringItem> Generate(GameClient client, InstancedEnemy enemyKilled)
     {
         List<InstancedGatheringItem> results = new List<InstancedGatheringItem>();
@@ -93,22 +80,14 @@ public class Generator : IInstanceEnemyDropGenerator
             return results;
         }
 
-        foreach (var (itemId, value) in CoinPouchDenominations)
+        // Wallet items aren't stack-limited (pickup adds Quantity * ItemNum
+        // directly to the wallet), so a single 1G pouch stack shows up as
+        // one bag with the exact total, like gold in treasure chests.
+        results.Add(new InstancedGatheringItem()
         {
-            uint count = Math.Min(goldAmount / value, MaxStackSize);
-            if (count == 0)
-            {
-                continue;
-            }
-
-            results.Add(new InstancedGatheringItem()
-            {
-                ItemId = itemId,
-                ItemNum = count
-            });
-
-            goldAmount -= count * value;
-        }
+            ItemId = ItemId.CoinPouch1G,
+            ItemNum = goldAmount
+        });
 
         return results;
     }

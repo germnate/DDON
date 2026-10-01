@@ -706,3 +706,4 @@ double WorldQuestRepeatClearGoldPct = 1;
 /// Only applies when WorldQuestFirstClearRewards = true.
 /// </summary>
 double WorldQuestRepeatClearJpPct = 1;
+
