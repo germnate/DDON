@@ -192,6 +192,11 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             /// <summary>
             /// Spawns Gurdolin, Lise, Elliot after Clearing
             /// </summary>
+            public static QuestFlagInfo TheCrewEndSeason33 { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(7916, QuestId.Q70033001, StageInfo);
+
+            /// <summary>
+            /// Spawns Gurdolin, Lise, Elliot after Clearing
+            /// </summary>
             public static QuestFlagInfo TheCrewEndSeason34 { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(8630, QuestId.Q70034001, StageInfo);
         }
 
@@ -763,6 +768,16 @@ namespace Arrowgene.Ddon.Shared.Model.Quest
             /// Activates warp to Megadosys Plateau (133)
             /// </summary>
             public static QuestFlagInfo MegadosysPlateauWarp { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(7438, QuestId.Q70032001, StageInfo);
+
+            /// <summary>
+            /// Spawns Bertha, Gillian, Meirova and Nedo after clearing Season 3.3
+            /// </summary>
+            public static QuestFlagInfo TheCrewEndSeason33 { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(7917, QuestId.Q70033001, StageInfo);
+
+            /// <summary>
+            /// Spawns Bertha, Gillian, Meirova and Nedo after clearing Season 3.4
+            /// </summary>
+            public static QuestFlagInfo TheCrewEndSeason34 { get; private set; } = QuestFlagInfo.WorldManageLayoutFlag(8631, QuestId.Q70034001, StageInfo);
         }
 
         public static class MegadosysPlateau
