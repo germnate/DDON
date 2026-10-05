@@ -106,6 +106,14 @@
             },
             "comment": "This blocks the Sphinx in the world quest q20055005 from spawning",
             "enemies": []
+        },
+        {
+            "stage_id": {
+                "id": 79,
+                "group_id": 0
+            },
+            "comment": "Blocks the level-scaled Sphinx world quest from spawning during the trial.",
+            "enemies": []
         }
     ],
     "blocks": [
