@@ -4,8 +4,8 @@ namespace Arrowgene.Ddon.Database.Sql.Core.Migration;
 
 public class PawnCloneMigration(DatabaseSetting databaseSetting) : IMigrationStrategy
 {
-    public uint From => 68;
-    public uint To => 69;
+    public uint From => 64;
+    public uint To => 65;
 
     public bool Migrate(IDatabase db, DbConnection conn)
     {
