@@ -52,6 +52,18 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 return packetQueue;
             }
 
+            var pawnClone = Server.Database.SelectPawnClone(request.RequestedPawnId);
+            if (pawnClone is not null)
+            {
+                if (pawnClone.CharacterId == client.Character.CharacterId)
+                {
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED);
+                }
+
+                HandlePawnCloneRent(client, pawnClone, request, packetQueue);
+                return packetQueue;
+            }
+
             // Normal player pawn: existing path
             if (Server.WalletManager.GetWalletAmount(client.Character, WalletType.RiftPoints) < request.RentalCost)
             {
@@ -67,6 +79,10 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 if (ownerCharacterId == 0)
                 {
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_CHARACTER_PAWN_PARAM_NOT_FOUND);
+                }
+                if (ownerCharacterId == client.Character.CharacterId)
+                {
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED);
                 }
 
                 var ownerCharacter = Server.CharacterManager.SelectCharacter(ownerCharacterId, true, connectionIn);
@@ -105,6 +121,33 @@ namespace Arrowgene.Ddon.GameServer.Handler
 
             client.Enqueue(response, packetQueue);
             return packetQueue;
+        }
+
+        private void HandlePawnCloneRent(GameClient client, PawnClone pawnClone, C2SPawnRentRegisteredPawnReq request, PacketQueue packetQueue)
+        {
+            if (Server.WalletManager.GetWalletAmount(client.Character, WalletType.RiftPoints) < request.RentalCost)
+            {
+                throw new ResponseErrorException(ErrorCode.ERROR_CODE_CHARACTER_DATA_NO_RIM);
+            }
+
+            var rentalRecord = pawnClone.Record;
+            S2CPawnRentRegisteredPawnRes response = new();
+
+            Server.Database.ExecuteInTransaction(connectionIn =>
+            {
+                var walletUpdate = Server.WalletManager.RemoveFromWallet(client.Character, WalletType.RiftPoints, request.RentalCost, connectionIn)
+                    ?? throw new ResponseErrorException(ErrorCode.ERROR_CODE_FAIL, "Insufficient Rim for pawn rental.");
+                response.TotalRim = walletUpdate.Value;
+
+                Server.Database.InsertRentalPawn(client.Character.CharacterId, rentalRecord, AdventureCount, CraftCount, connectionIn);
+                packetQueue.AddRange(Server.AchievementManager.HandleHirePawn(client, connectionIn));
+            });
+
+            var rentalPawn = rentalRecord.ToRentalPawn(client.Character.CharacterId, AdventureCount, CraftCount);
+            rentalPawn.MaxAdventureCount = AdventureCount;
+            rentalPawn.MaxCraftCount = CraftCount;
+            client.Character.RentedPawns.Add(rentalPawn);
+            client.Enqueue(response, packetQueue);
         }
 
         private void HandleOfficialPawnRent(GameClient client, IOfficialPawnScript script, C2SPawnRentRegisteredPawnReq request, PacketQueue packetQueue)

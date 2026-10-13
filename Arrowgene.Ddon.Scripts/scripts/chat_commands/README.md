@@ -8,6 +8,8 @@ Chat commands are behaviors which can be executed in game, starting with `/`. Co
 
 Each chat command should be named as `<chat_command>.csx` and stored in the directory `<assets>/scripts/chat_commands`. The name of the file should match the name assigned to the field `CommandName`. If a command is complex and requires it's own settings file, they should be located in a file located in  `<assets>/scripts/settings/chat_commands`. The name of the settings file should match the name of the chat command.
 
+The `/clone` command is available to regular users. `/clone <slot 1-10>` saves or overwrites a snapshot of the character's current vocation and build, and `/clone list` shows all ten slots. Saved clones are available to other players through pawn search; the owner cannot see their own clones in pawn search or hire them.
+
 General settings for all chat commands can be found in `<assets>/scripts/settings/ChatCommands.csx`.
 
 ## Guidelines

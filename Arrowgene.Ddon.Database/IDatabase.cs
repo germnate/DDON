@@ -112,6 +112,9 @@ public interface IDatabase
     Pawn SelectPawn(uint pawnId);
     Pawn SelectPawn(DbConnection connection, uint pawnId);
     List<Pawn> SelectPawnsByCharacterId(uint characterId, DbConnection? connectionIn = null);
+    List<PawnClone> SelectPawnClones(uint characterId, DbConnection? connectionIn = null);
+    PawnClone? SelectPawnClone(uint pawnId, DbConnection? connectionIn = null);
+    PawnClone SavePawnClone(uint characterId, byte slot, Pawn pawn, RentalPawnRecord record);
     List<uint> SelectOfficialPawns(DbConnection? connectionIn = null);
     List<uint> SelectAllPlayerPawns(uint limit = 100);
     List<uint> SelectAllPlayerPawns(DbConnection connection, uint limit = 100);

@@ -99,6 +99,7 @@ namespace Arrowgene.Ddon.GameServer
             WorldQuestManager = new WorldQuestManager(this);
             GroupChatManager = new GroupChatManager(this);
             PawnExpeditionManager = new PawnExpeditionManager(this);
+            PawnCloneManager = new PawnCloneManager(this);
 
             S2CStageGetStageListRes stageListPacket =
                 EntitySerializer.Get<S2CStageGetStageListRes>().Read(GameDump.data_Dump_19);
@@ -149,6 +150,7 @@ namespace Arrowgene.Ddon.GameServer
         public LightQuestManager LightQuestManager { get; }
         public GroupChatManager GroupChatManager { get; }
         public PawnExpeditionManager PawnExpeditionManager { get; }
+        public PawnCloneManager PawnCloneManager { get; }
 
         public List<CDataStageInfo> StageList { get; }
 

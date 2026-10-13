@@ -220,4 +220,12 @@ namespace Arrowgene.Ddon.Shared.Model
 
         #endregion
     }
+
+    public class PawnClone
+    {
+        public uint CharacterId { get; set; }
+        public byte Slot { get; set; }
+        public uint PawnId { get; set; }
+        public RentalPawnRecord Record { get; set; } = new();
+    }
 }

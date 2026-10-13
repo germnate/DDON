@@ -35,13 +35,26 @@ namespace Arrowgene.Ddon.GameServer.Handler
                 return queue;
             }
 
+            var clone = Server.Database.SelectPawnClone(unchecked((uint)request.PawnId));
+            if (clone is not null)
+            {
+                if (clone.CharacterId == client.Character.CharacterId)
+                {
+                    throw new ResponseErrorException(ErrorCode.ERROR_CODE_PAWN_NOT_FOUNDED);
+                }
+
+                HandlePawnClone(client, clone, queue);
+                return queue;
+            }
+
             // Normal player pawn: existing DB path
             var mixin = Server.ScriptManager.MixinModule.Get<IRentalCostMixin>("rental_cost");
 
             Server.Database.ExecuteInTransaction(connection =>
             {
                 uint ownerCharacterId = Server.Database.GetPawnOwnerCharacterId((uint)request.PawnId, connection);
-                if (ownerCharacterId == Character.ServerCharacterId)
+                if (ownerCharacterId == Character.ServerCharacterId
+                    || ownerCharacterId == client.Character.CharacterId)
                 {
                     throw new ResponseErrorException(ErrorCode.ERROR_CODE_CHARACTER_PAWN_PARAM_NOT_FOUND);
                 }
@@ -93,6 +106,49 @@ namespace Arrowgene.Ddon.GameServer.Handler
             });
 
             return queue;
+        }
+
+        private void HandlePawnClone(GameClient client, PawnClone clone, PacketQueue queue)
+        {
+            var mixin = Server.ScriptManager.MixinModule.Get<IRentalCostMixin>("rental_cost");
+            byte adventureCount = Server.GameSettings.GameServerSettings.RentalPawnAdventureCount;
+            byte craftCount = Server.GameSettings.GameServerSettings.RentalPawnCraftCount;
+            RentalPawn pawn = clone.Record.ToRentalPawn(client.Character.CharacterId, adventureCount, craftCount);
+            pawn.MaxAdventureCount = adventureCount;
+            pawn.MaxCraftCount = craftCount;
+
+            var listEntry = pawn.CDataRegisterdPawnList;
+            HashSet<uint> clanPawns = [.. Server.Database.SelectClanPawns(client.Character.ClanId, limit: 1000)];
+
+            client.Enqueue(new S2CPawnGetRegisteredPawnDataRes
+            {
+                PawnId = clone.PawnId,
+                PawnInfo = pawn.CDataPawnInfo
+            }, queue);
+
+            client.Enqueue(new S2CPawnGetPawnProfileNtc
+            {
+                CharacterId = clone.CharacterId,
+                PawnId = clone.PawnId,
+                OwnerBaseInfo = Server.Database.SelectCommunityCharacterBaseInfo(clone.CharacterId),
+                PawnProfile = clone.Record.PawnProfile.CDataArisenProfile,
+                Comment = clone.Record.PawnProfile.Comment,
+                RentalCost = mixin.GetRentalCost(client, listEntry, clanPawns.Contains(clone.PawnId))
+            }, queue);
+
+            client.Enqueue(new S2CPawnGetPawnHistoryInfoNtc
+            {
+                CharacterId = clone.CharacterId,
+                PawnId = clone.PawnId,
+                PawnHistoryList = Server.Database.SelectPawnHistory(clone.PawnId)
+            }, queue);
+
+            client.Enqueue(new S2CPawnGetPawnTotalScoreInfoNtc
+            {
+                CharacterId = clone.CharacterId,
+                PawnId = clone.PawnId,
+                PawnTotalScore = Server.Database.SelectPawnTotalScore(clone.PawnId)
+            }, queue);
         }
 
         private void HandleOfficialPawn(GameClient client, IOfficialPawnScript script, PacketQueue queue)

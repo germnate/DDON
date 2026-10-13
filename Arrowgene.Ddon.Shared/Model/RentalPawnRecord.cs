@@ -7,7 +7,7 @@ namespace Arrowgene.Ddon.Shared.Model
 {
  
     /// <summary>
-    /// IMPORTANT: If this class changes shape, the table `ddon_rental_pawn` needs to be emptied to prevent improperly shared records from trying to be deserialized.
+    /// Incompatible shape changes require clearing `ddon_rental_pawn`; additive properties with defaults remain backward-compatible.
     /// </summary>
     public class RentalPawnRecord
     {
@@ -26,6 +26,7 @@ namespace Arrowgene.Ddon.Shared.Model
         public bool HideEquipLantern { get; set; }
         public CDataCharacterJobData CharacterJobData { get; set; } = new();
         public Equipment Equipment { get; set; }
+        public List<CDataEquipJobItem> EquippedJobItems { get; set; } = [];
         public List<CDataNormalSkillParam> LearnedNormalSkills { get; set; } = [];
         public List<CustomSkill?> EquippedCustomSkills { get; set; } = [];
         public List<Ability?> EquippedAbilities { get; set; } = [];
@@ -57,6 +58,7 @@ namespace Arrowgene.Ddon.Shared.Model
                 HideEquipLantern = pawn.HideEquipLantern,
                 CharacterJobData = pawn.CharacterJobDataList.FirstOrDefault(x => x.Job == pawn.Job),
                 Equipment = pawn.Equipment,
+                EquippedJobItems = pawn.EquipmentTemplate.JobItemsAsCDataEquipJobItem(pawn.Job),
                 LearnedNormalSkills = [.. pawn.LearnedNormalSkills.Where(x => x.Job == pawn.Job)],
                 EquippedCustomSkills = pawn.EquippedCustomSkillsDictionary.GetValueOrDefault(pawn.Job),
                 EquippedAbilities = pawn.EquippedAbilitiesDictionary.GetValueOrDefault(pawn.Job),
@@ -72,6 +74,17 @@ namespace Arrowgene.Ddon.Shared.Model
 
         public RentalPawn ToRentalPawn(uint hiringCharacterId, byte adventureCount, byte craftCount, uint killCount = 0)
         {
+            EquipmentTemplate equipmentTemplate = new();
+            foreach (CDataEquipJobItem jobItem in EquippedJobItems)
+            {
+                if (jobItem.JobItemId == 0)
+                {
+                    continue;
+                }
+
+                equipmentTemplate.SetJobItem(new Item { ItemId = jobItem.JobItemId }, Job, jobItem.EquipSlotNo);
+            }
+
             RentalPawn pawn = new()
             {
                 // RentalPawn Fields
@@ -118,6 +131,7 @@ namespace Arrowgene.Ddon.Shared.Model
                 HideEquipHead = HideEquipHead,
                 HideEquipLantern = HideEquipLantern,
                 CharacterJobDataList = [CharacterJobData],
+                EquipmentTemplate = equipmentTemplate,
                 Equipment = Equipment,
                 JewelrySlotNum = (byte)(1 + ExtendedParams.JewelrySlot),
                 LearnedNormalSkills = LearnedNormalSkills,

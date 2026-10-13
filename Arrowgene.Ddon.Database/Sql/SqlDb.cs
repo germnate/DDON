@@ -369,6 +369,9 @@ public abstract class SqlDb : IDatabase
     public abstract Pawn SelectPawn(uint pawnId);
     public abstract Pawn SelectPawn(DbConnection connection, uint pawnId);
     public abstract List<Pawn> SelectPawnsByCharacterId(uint characterId, DbConnection? connectionIn = null);
+    public abstract List<PawnClone> SelectPawnClones(uint characterId, DbConnection? connectionIn = null);
+    public abstract PawnClone? SelectPawnClone(uint pawnId, DbConnection? connectionIn = null);
+    public abstract PawnClone SavePawnClone(uint characterId, byte slot, Pawn pawn, RentalPawnRecord record);
     public abstract List<uint> SelectOfficialPawns(DbConnection? connectionIn = null);
     public abstract List<uint> SelectAllPlayerPawns(uint limit = 100);
     public abstract List<uint> SelectAllPlayerPawns(DbConnection connection, uint limit = 100);

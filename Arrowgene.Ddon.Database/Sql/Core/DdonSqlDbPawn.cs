@@ -16,7 +16,10 @@ public partial class DdonSqlDb : SqlDb
         @"SELECT * FROM ddon_pawn WHERE is_official_pawn=true;";
 
     private const string SqlSelectAllPlayerPawns =
-        @"SELECT * FROM ddon_pawn WHERE is_official_pawn=false LIMIT @limit;";
+        @"SELECT * FROM ddon_pawn
+          WHERE is_official_pawn=false
+          AND NOT EXISTS (SELECT 1 FROM ddon_character_pawn_clone clone WHERE clone.pawn_id = ddon_pawn.pawn_id)
+          LIMIT @limit;";
 
     private const string SqlSelectPawnOwnerId =
         "SELECT * FROM ddon_pawn WHERE \"pawn_id\" = @pawn_id;";
@@ -185,42 +188,45 @@ public partial class DdonSqlDb : SqlDb
         + "LEFT JOIN \"ddon_status_info\" ON \"ddon_status_info\".\"character_common_id\" = \"ddon_pawn\".\"character_common_id\" "
         + "LEFT JOIN \"ddon_character_profile\" ON \"ddon_character_profile\".\"character_common_id\" = \"ddon_pawn\".\"character_common_id\" "
         + "WHERE \"character_id\" = @character_id "
+        + "AND NOT EXISTS (SELECT 1 FROM \"ddon_character_pawn_clone\" clone WHERE clone.\"pawn_id\" = \"ddon_pawn\".\"pawn_id\") "
         + "ORDER BY \"pawn_id\"";
 
     public override bool CreatePawn(Pawn pawn)
     {
-        return ExecuteInTransaction(conn =>
-        {
-            ExecuteNonQuery(
-                conn,
-                SqlInsertCharacterCommon,
-                command => { AddParameter(command, pawn); },
-                out long commonId
-            );
-            pawn.CommonId = (uint)commonId;
+        return ExecuteInTransaction(conn => CreatePawnInTransaction(conn, pawn));
+    }
 
-            ExecuteNonQuery(
-                conn,
-                SqlInsertPawn,
-                command => { AddParameter(command, pawn); },
-                out long pawnId
-            );
-            pawn.PawnId = (uint)pawnId;
+    private void CreatePawnInTransaction(DbConnection conn, Pawn pawn)
+    {
+        ExecuteNonQuery(
+            conn,
+            SqlInsertCharacterCommon,
+            command => { AddParameter(command, pawn); },
+            out long commonId
+        );
+        pawn.CommonId = (uint)commonId;
 
-            ExecuteNonQuery(
-                conn,
-                SqlInsertEditInfo,
-                command => { AddParameter(command, pawn); }
-            );
-            ExecuteNonQuery(
-                conn,
-                SqlInsertStatusInfo,
-                command => { AddParameter(command, pawn); }
-            );
-            ExecuteNonQuery(conn, SqlInsertCharacterProfile, command => { AddParameter(command, pawn); });
+        ExecuteNonQuery(
+            conn,
+            SqlInsertPawn,
+            command => { AddParameter(command, pawn); },
+            out long pawnId
+        );
+        pawn.PawnId = (uint)pawnId;
 
-            StorePawnData(conn, pawn);
-        });
+        ExecuteNonQuery(
+            conn,
+            SqlInsertEditInfo,
+            command => { AddParameter(command, pawn); }
+        );
+        ExecuteNonQuery(
+            conn,
+            SqlInsertStatusInfo,
+            command => { AddParameter(command, pawn); }
+        );
+        ExecuteNonQuery(conn, SqlInsertCharacterProfile, command => { AddParameter(command, pawn); });
+
+        StorePawnData(conn, pawn);
     }
 
     public override Pawn SelectPawn(uint pawnId)
